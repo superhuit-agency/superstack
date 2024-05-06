@@ -1,0 +1,103 @@
+@import '@resources/index.css';
+
+.supt-footer {
+	a {
+		text-decoration: none;
+	}
+
+	ul {
+		list-style: none;
+	}
+
+	&__inner {
+		@extend %grid;
+	}
+
+	&__top,
+	&__bottom {
+		grid-column: 1 / 13;
+	}
+
+	&__top {
+		@extend %grid-no-margin;
+
+		@mixin clamp padding-top, 40, 60, $xxs-breakpoint, $lg-breakpoint;
+		@mixin clamp padding-bottom, 20, 40, $xxs-breakpoint, $lg-breakpoint;
+	}
+
+	&__menu {
+		@extend %t-paragraph;
+
+		grid-column: 1 / span 12;
+
+		@media (min-width: $sm-breakpoint) {
+			grid-column: 1 / span 5;
+		}
+		@media (min-width: $md-breakpoint) {
+			grid-column: 1 / span 4;
+		}
+	}
+
+	&__legal {
+		@extend %t-introduction;
+
+		grid-column: 1 / span 12;
+
+		@media (min-width: $sm-breakpoint) {
+			grid-column: 7 / span 5;
+		}
+		@media (min-width: $md-breakpoint) {
+			grid-column: 5 / span 4;
+		}
+	}
+
+	&__social {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		grid-column: 1 / span 12;
+
+		@media (min-width: $sm-breakpoint) {
+			grid-column: 1 / span 5;
+		}
+		@media (min-width: $md-breakpoint) {
+			grid-column: 9 / span 4;
+		}
+
+		&__icon {
+			display: inline-flex;
+		}
+	}
+
+	&__bottom {
+		@mixin clamp padding-top, 20, 40, $xxs-breakpoint, $lg-breakpoint;
+		@mixin clamp padding-bottom, 40, 60, $xxs-breakpoint, $lg-breakpoint;
+
+		border-top: 1px solid $color-neutral-000;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 10px;
+
+		@media (min-width: $sm-breakpoint) {
+			flex-direction: row;
+			align-items: center;
+			justify-content: space-between;
+		}
+	}
+
+	&__credits {
+		text-align: right;
+	}
+
+	&__copyright,
+	&__credits {
+		@extend %t-introduction;
+	}
+
+	&__logo {
+		display: inline-block;
+		vertical-align: middle;
+		margin-left: 8px;
+	}
+}

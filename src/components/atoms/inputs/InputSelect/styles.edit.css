@@ -1,0 +1,17 @@
+@import '@resources/index.css';
+
+.supt-input-select {
+	&__inner {
+		position: relative;
+	}
+
+	&__optional {
+		@extend %input-optional-edit;
+	}
+	&__input {
+		@extend %input-edit;
+	}
+	&__label {
+		@extend %input-label-edit;
+	}
+}

@@ -1,0 +1,83 @@
+{
+	"name": "superhuit/superstack",
+	"version": "1.0.0",
+	"type": "project",
+	"authors": [
+		{
+			"name": "Superhuit",
+			"email": "tech+superstack@superhuit.ch"
+		}
+	],
+	"config": {
+		"allow-plugins": {
+			"composer/installers": true
+		}
+	},
+	"extra": {
+		"installer-paths": {
+			"wp-content/plugins/{$name}/": [
+				"type:wordpress-plugin"
+			]
+		}
+	},
+	"require": {
+		"ashhitch/wp-graphql-yoast-seo": "^4.22",
+		"php": "^8.1 || ^8.2",
+		"pristas-peter/wp-graphql-gutenberg": "dev-master",
+		"superhuit/wp-graphql-redirection": "^1.1",
+		"superhuit-agency/nextjs-revalidate": "^1.6.4",
+		"superhuit-agency/starterpack-forms": "^1.0",
+		"valu/wp-graphql-offset-pagination": "dev-master",
+		"wp-graphql/wp-graphql-jwt-authentication": "^0.7.0",
+		"wpackagist-plugin/disable-comments": "^2.4",
+		"wpackagist-plugin/disable-emojis": "^1.7",
+		"wpackagist-plugin/duplicate-post": "^4.5",
+		"wpackagist-plugin/redirection": "^5.3",
+		"wpackagist-plugin/simple-custom-post-order": "^2.5",
+		"wpackagist-plugin/svg-support": "^2.5",
+		"wpackagist-plugin/wordpress-seo": "^22.3",
+		"wpackagist-plugin/wp-graphql": "^1.23"
+	},
+	"repositories": [
+		{
+			"type": "package",
+			"package": {
+				"name": "superhuit-agency/nextjs-revalidate",
+				"version": "1.6.4",
+				"type": "wordpress-plugin",
+				"dist": {
+					"url": "https://github.com/superhuit-agency/nextjs-revalidate/releases/download/v1.6.4/nextjs-revalidate-v1.6.4.zip",
+					"type": "zip"
+				}
+			}
+		},
+		{
+			"type": "package",
+			"package": {
+				"name": "superhuit-agency/starterpack-forms",
+				"version": "1.0.17",
+				"type": "wordpress-plugin",
+				"dist": {
+					"url": "https://github.com/superhuit-agency/starterpack-forms/releases/download/v1.0.17/starterpack-forms-v1.0.17.zip",
+					"type": "zip"
+				}
+			}
+		},
+		{
+			"type": "composer",
+			"url": "https://wpackagist.org",
+			"only": [
+				"wpackagist-plugin/*",
+				"wpackagist-theme/*"
+			]
+		},
+		{
+			"type": "vcs",
+			"url": "https://github.com/superhuit-agency/wp-graphql-gutenberg"
+		},
+		{
+			"type": "vcs",
+			"url": "https://github.com/superhuit-agency/wp-graphql-offset-pagination"
+		}
+	]
+}

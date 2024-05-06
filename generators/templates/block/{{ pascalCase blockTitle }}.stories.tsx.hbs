@@ -1,0 +1,20 @@
+import { Meta, StoryObj } from '@storybook/react';
+
+import { {{ pascalCase blockTitle }} } from './index';
+
+const meta = {
+	title: 'Components/{{ pascalCase blockType }}/{{ pascalCase blockTitle }}',
+	component: {{ pascalCase blockTitle }},
+} satisfies Meta<typeof {{ pascalCase blockTitle }}>;
+
+export default meta;
+
+type Story = StoryObj<typeof meta>;
+
+export const Default: Story = {
+	args: {
+		{{#each blockAttributes as |attribute|}}
+		{{attribute.name}}: '',
+		{{/each}}
+	},
+};

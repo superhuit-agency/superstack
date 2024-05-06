@@ -1,0 +1,56 @@
+.supt-terms-select-control {
+	position: relative;
+
+	&__spinner {
+		position: absolute;
+		top: 36px;
+		left: 50%;
+		height: 100%;
+		width: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background-color: rgb(255 255 255 / 50%);
+		transform: translate(-50%, -50%);
+		opacity: 0;
+		pointer-events: none;
+	}
+
+	.components-form-token-field__input-container {
+		position: relative;
+		flex-direction: column;
+		align-items: stretch;
+		gap: 2px;
+
+		.components-form-token-field__token {
+			margin: 0;
+
+			.components-form-token-field__token-text {
+				flex-grow: 1;
+			}
+		}
+
+		.components-form-token-field__input {
+			width: 100% !important;
+		}
+
+		.components-form-token-field__suggestions-list {
+			position: absolute;
+			top: 100%;
+			background: white;
+			border: 1px solid #757575;
+			border-top-color: #ccc;
+			left: -1px;
+			margin: 0;
+			width: calc(100% + 2px);
+			z-index: 20;
+		}
+	}
+
+	&.-is-loading {
+		.terms-select-control__spinner {
+			opacity: 1;
+			pointer-events: initial;
+		}
+	}
+}

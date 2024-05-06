@@ -1,0 +1,92 @@
+import { FC{{#ifNot (equals blockType "organisms")}}, HTMLProps{{/ifNot}} } from "react";
+// internal imports
+{{#if (equals blockType "organisms")}}
+import { Section } from '@/helpers/Section';
+{{/if}}
+import { BlockConfigs{{#if (equals blockType "organisms")}}, SectionProps{{/if}} } from '@/typings';
+import block from './block.json';
+// styles
+import "./styles.css";
+
+/**
+ * TYPINGS
+ */
+export interface {{ pascalCase blockTitle }}Props extends {{#if (equals blockType "organisms")}}SectionProps{{else}}HTMLProps<HTMLDivElement>{{/if}} {
+	{{#each blockAttributes as |attribute|}}
+	{{attribute.name}}: {{attribute.type}};
+	{{/each}}
+	{{#if supportsData}}
+	data?: any;
+	{{/if}}
+	{{#if supportsData}}
+	queryVars?: any;
+	{{/if}}
+};
+
+
+/**
+ * COMPONENT
+ */
+export const {{pascalCase blockTitle}}: FC<{{pascalCase blockTitle}}Props> & BlockConfigs = ({
+	{{#if (equals blockType "organisms")}}
+	anchor,
+	uptitle,
+	title,
+	introduction,
+	{{/if}}
+	{{#each blockAttributes as |attribute|}}
+	{{attribute.name}},
+	{{/each}}
+	{{#if supportsData}}
+	data, // Dynamically fetched props by GraphQL query
+	{{/if}}
+	{{#if supportsInnerBlocks}}
+	children,
+	{{/if}}
+}) => {
+	return (
+		{{#if (equals blockType "organisms")}}
+		<section
+			id={anchor}
+			className="{{blockPrefix}}-{{ dashCase blockTitle }}"
+		>
+		{{else}}
+		<div className="{{blockPrefix}}-{{ dashCase blockTitle }}">
+		{{/if}}
+
+			<div className="{{blockPrefix}}-{{ dashCase blockTitle }}__inner">
+				{{#if (equals blockType "organisms")}}
+					<div className="{{blockPrefix}}-{{ dashCase blockTitle }}__headline">
+						{uptitle && <Section.Uptitle text={uptitle} />}
+						{title && <Section.Title text={title} />}
+						{introduction && (
+							<Section.Introduction text={introduction} />
+						)}
+					</div>
+				{{/if}}
+
+				{{#if supportsInnerBlocks}}
+					{/* InnerBlocks */}
+					{children ? (
+						<div className="{{blockPrefix}}-{{ dashCase blockTitle }}__content">{children}</div>
+					) : null}
+				{{/if}}
+			</div>
+
+			{{#if supportsData}}
+				<div>
+					<h2>Dynamic data fetching</h2>
+					<pre>{JSON.stringify(data, null, 2)}</pre>
+				</div>
+			{{/if}}
+
+		{{#if (equals blockType "organisms")}}
+		</section>
+		{{else}}
+		</div>
+		{{/if}}
+	);
+};
+
+{{pascalCase blockTitle}}.slug = block.slug;
+{{pascalCase blockTitle}}.title = block.title;

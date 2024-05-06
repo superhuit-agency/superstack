@@ -1,0 +1,67 @@
+@import '@resources/index.css';
+
+.supt-card-news {
+	@mixin expand-link .supt-card-news__title a, after;
+
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	text-decoration: none;
+	border: 1px solid $color-text;
+	overflow: hidden;
+	width: 100%;
+	height: 100%;
+	background-color: $color-neutral-200;
+	transition: all $transition-mid ease-out;
+
+	&__image {
+		aspect-ratio: 16 / 9;
+		position: relative;
+
+		img {
+			object-fit: cover;
+		}
+	}
+
+	&__inner {
+		@mixin clamp padding, 10, 20, $xxs-breakpoint, $lg-breakpoint;
+
+		display: flex;
+		flex-direction: column;
+	}
+
+	&__metas {
+		display: flex;
+		align-items: center;
+	}
+
+	&__category {
+		@extend %t-small-text;
+
+		position: relative;
+		z-index: 2;
+		padding-right: 10px;
+		margin-right: 10px;
+		border-right: 1px solid currentColor;
+	}
+
+	&__date {
+		@extend %t-small-text;
+	}
+
+	&__title {
+		@extend %t-h4;
+	}
+
+	&__excerpt {
+		@extend %t-paragraph;
+	}
+
+	&__read {
+		@extend %t-link;
+	}
+
+	&:hover,
+	&:focus-visible {
+	}
+}

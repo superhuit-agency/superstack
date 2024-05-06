@@ -1,0 +1,19 @@
+.icons-story {
+	display: flex;
+	flex-direction: column;
+	gap: 2rem;
+}
+
+.grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr 1fr;
+	gap: 2rem;
+}
+
+.grid-item {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	font-size: 0.75rem;
+}

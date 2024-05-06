@@ -1,0 +1,81 @@
+name: 'Deploy Next.js'
+description: 'Deploy Next.js on any Server'
+inputs:
+  SSH_PRIVATE_KEY:
+    description: 'Private key of the SSH user to deploy'
+    required: true
+  SSH_USER:
+    description: 'SSH user'
+    required: true
+  SSH_HOST:
+    description: 'SSH Host (IP adress)'
+    required: true
+  SSH_PORT:
+    description: 'SSH Port (default: 22)'
+    required: false
+    default: 22
+  WORDPRESS_URL:
+    description: 'WordPress URL'
+    required: true
+  NEXT_PATH:
+    description: 'Next absolute path on remote server'
+    required: true
+  PM2_APP_NAME:
+    description: 'The name of the pm2 process to start'
+    required: true
+  PM2_APP_ENV:
+    description: "The  pm2's env instance name. (Default: production)"
+    required: false
+    default: 'production'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Deploy
+      uses: easingthemes/ssh-deploy@main
+      with:
+        SSH_PRIVATE_KEY: ${{ inputs.SSH_PRIVATE_KEY }}
+        REMOTE_USER: ${{ inputs.SSH_USER }}
+        REMOTE_HOST: ${{ inputs.SSH_HOST }}
+        REMOTE_PORT: ${{ inputs.SSH_PORT }}
+        ARGS: -aulrqtvz
+        SOURCE: .
+        TARGET: ${{ inputs.NEXT_PATH }}/_new
+        EXCLUDE: '.git*, .*ignore, .next, .storybook, .vscode, docs, generators, node_modules, wiki, wordpress, .editorconfig, .env.local.example, README.md, next-env.d.ts, vercel.json'
+
+    - name: Copy env file
+      uses: garygrossgarten/github-action-ssh@release
+      with:
+        username: ${{ inputs.SSH_USER }}
+        host: ${{ inputs.SSH_HOST }}
+        port: ${{ inputs.SSH_PORT }}
+        privateKey: ${{ inputs.SSH_PRIVATE_KEY }}
+        command: cp "${{ inputs.NEXT_PATH }}/public/.env" "${{ inputs.NEXT_PATH }}/_new/"
+
+    - name: Build
+      uses: garygrossgarten/github-action-ssh@release
+      with:
+        username: ${{ inputs.SSH_USER }}
+        host: ${{ inputs.SSH_HOST }}
+        port: ${{ inputs.SSH_PORT }}
+        privateKey: ${{ inputs.SSH_PRIVATE_KEY }}
+        command: |
+          cd "${{ inputs.NEXT_PATH }}/_new" 
+          npm install 
+          WORDPRESS_URL=${{ inputs.WORDPRESS_URL }} NODE_ENV=production npm run build
+
+    - name: Release
+      uses: garygrossgarten/github-action-ssh@release
+      with:
+        username: ${{ inputs.SSH_USER }}
+        host: ${{ inputs.SSH_HOST }}
+        port: ${{ inputs.SSH_PORT }}
+        privateKey: ${{ inputs.SSH_PRIVATE_KEY }}
+        command: |
+          cd ${{ inputs.NEXT_PATH }} 
+          [ -d "${{ inputs.NEXT_PATH }}/_previous" ] && rm -rf "${{ inputs.NEXT_PATH }}/_previous" 
+          mv "${{ inputs.NEXT_PATH }}/public" "${{ inputs.NEXT_PATH }}/_previous" 
+          mv "${{ inputs.NEXT_PATH }}/_new" "${{ inputs.NEXT_PATH }}/public"
+          cd "${{ inputs.NEXT_PATH }}/public" 
+          pm2 restart ecosystem.config.js --only ${{ inputs.PM2_APP_NAME }} --env ${{ inputs.PM2_APP_ENV }} 
+          pm2 save

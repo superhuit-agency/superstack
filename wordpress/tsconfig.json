@@ -1,0 +1,19 @@
+{
+	"extends": "@tsconfig/node20/tsconfig.json",
+	"compilerOptions": {
+		"lib": ["dom"],
+		"outDir": "./theme/static",
+		"preserveConstEnums": true,
+		"allowSyntheticDefaultImports": true,
+		"noImplicitAny": true,
+		"jsx": "react",
+		"allowJs": true,
+		"baseUrl": ".",
+		"paths": {
+			"@/*": ["../src/*"],
+			"#/*": ["./theme/lib/editor/*"]
+		}
+	},
+	"include": ["theme/**/*.ts", "theme/**/*.tsx"],
+	"exclude": ["node_modules"]
+}

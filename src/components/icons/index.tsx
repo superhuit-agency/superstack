@@ -1,0 +1,1 @@
+// export { MyIcon } from './MyIcon';

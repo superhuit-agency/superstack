@@ -1,0 +1,5 @@
+@import '@resources/index.css';
+
+.wp-block[data-type='supt/input-file'] {
+	@extend %input-size-edit;
+}

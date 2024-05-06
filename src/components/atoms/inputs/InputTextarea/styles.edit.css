@@ -1,0 +1,18 @@
+@import '@resources/index.css';
+
+.supt-input-textarea {
+	&__optional {
+		@extend %input-optional-edit;
+	}
+	&__input {
+		@extend %input-edit;
+		min-height: calc(1.5 * 1em * 4); /* min 4 lines */
+	}
+	&__label {
+		@extend %input-label-edit;
+	}
+}
+
+.wp-block[data-type='supt/input-textarea'] {
+	@extend %input-size-edit;
+}

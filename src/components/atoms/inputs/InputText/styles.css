@@ -1,0 +1,21 @@
+@import '@resources/index.css';
+
+.supt-input-text {
+	@extend %input-wrapper;
+
+	&__label {
+		@extend %input-label;
+	}
+	&__input {
+		@extend %input;
+	}
+	&__error {
+		@extend %input-error;
+	}
+
+	&.-error {
+		.supt-input-text__input {
+			border-color: $color-error;
+		}
+	}
+}

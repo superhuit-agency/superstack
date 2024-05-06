@@ -1,0 +1,23 @@
+.supt-video {
+	&__poster {
+		margin: 0;
+	}
+
+	&:not(.-has-poster) {
+		.supt-video__wrapper {
+			position: relative;
+			width: 100%;
+			height: 0;
+			/* Ratio 16/9 */
+			padding-top: calc(100% * 9 / 16);
+
+			> * {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+			}
+		}
+	}
+}

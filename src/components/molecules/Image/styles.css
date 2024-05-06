@@ -1,0 +1,20 @@
+@import '@resources/index.css';
+
+.supt-figure {
+	width: 100%;
+
+	&__image {
+		max-width: 100%;
+		width: 100%;
+		height: auto;
+	}
+
+	&__figcaption {
+		@extend %t-caption;
+	}
+
+	&.-is-sticky {
+		position: sticky;
+		top: 80px;
+	}
+}

@@ -1,0 +1,73 @@
+@import '@resources/index.css';
+
+.supt-archive-post {
+	@extend %container;
+
+	@mixin clamp padding-top, 80, 120, $xs-breakpoint, $lg-breakpoint;
+	@mixin clamp padding-bottom, 80, 120, $xs-breakpoint, $lg-breakpoint;
+
+	&__title {
+		@extend %t-h1;
+	}
+
+	&__categories {
+		@mixin clamp margin-bottom, 20, 40, $xs-breakpoint, $lg-breakpoint;
+
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		list-style: none;
+	}
+
+	&__category {
+		margin-right: 10px;
+
+		&:last-child {
+			margin-right: 0;
+		}
+	}
+
+	&__tags {
+		@extend %t-paragraph;
+
+		@mixin clamp margin-bottom, 10, 20, $xs-breakpoint, $lg-breakpoint;
+
+		span {
+			@extend %t-h6;
+		}
+
+		a {
+			@extend %link-underline;
+			@mixin clamp margin-left, 10, 20, $xs-breakpoint, $lg-breakpoint;
+
+			transition: all $transition-mid ease-out;
+			will-change: background-size;
+			background-position: 0 1rem !important;
+
+			&:focus-visible {
+				background-size: 100% 2px;
+			}
+
+			&:hover,
+			&.-is-current {
+			}
+		}
+	}
+
+	&__list {
+		@extend %grid-no-margin;
+
+		@mixin clamp margin-top, 20, 40, $xs-breakpoint, $lg-breakpoint;
+
+		.supt-card {
+			grid-column-end: span 12;
+
+			@media (min-width: $sm-breakpoint) {
+				grid-column-end: span 6;
+			}
+			@media (min-width: $md-breakpoint) {
+				grid-column-end: span 4;
+			}
+		}
+	}
+}

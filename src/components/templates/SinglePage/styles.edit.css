@@ -1,0 +1,17 @@
+@import '@resources/index.css';
+
+.post-type-page
+	.edit-post-visual-editor
+	.editor-styles-wrapper
+	.block-editor-block-list__layout {
+	.single-page {
+		.supt-section {
+			@mixin clamp padding-top, 80, 120, $xs-breakpoint, $lg-breakpoint;
+			@mixin clamp padding-bottom, 80, 120, $xs-breakpoint, $lg-breakpoint;
+		}
+
+		.supt-section.-default + .supt-section.-default {
+			@mixin clamp margin-top, -40, -60, $xs-breakpoint, $lg-breakpoint;
+		}
+	}
+}

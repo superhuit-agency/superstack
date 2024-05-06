@@ -1,0 +1,37 @@
+/* Breakpoints */
+$xxs-breakpoint: 375px;
+$xs-breakpoint: 600px;
+$sm-breakpoint: 768px;
+$md-breakpoint: 1024px;
+$lg-breakpoint: 1440px;
+$xl-breakpoint: 1680px;
+$xxl-breakpoint: 2500px;
+
+/* z-index */
+$z-index-nav: 9;
+
+/* Shared */
+/* $box-shadow: 0px 0px 20px 0px rgba(#000, 0.06); */
+
+/* Transition */
+$transition-fast: 0.2s;
+$transition-mid: 0.4s;
+$transition-slow: 0.6s;
+
+/**
+ * GRID
+ */
+/* container */
+$container-min-offset: 24px;
+$container-tablet-offset: 40px;
+$container-laptop-offset: 56px;
+$container-desktop-offset: 72px;
+$container-max-width: 1300px;
+$container-max-width-mq: 1444px; /* when the grid reaches its max width: maxWidth + desktopOffset * 2 */
+
+/*
+* GRID LAYOUT
+*/
+$grid-gap: 2.13vw;
+$grid-gap-max: 32px;
+$grid-gap-max-mq: 1500px; /* approx. when grid-gap reaches grid-gap-max */

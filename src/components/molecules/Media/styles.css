@@ -1,0 +1,25 @@
+@import '@resources/index.css';
+
+.supt-media {
+	position: relative;
+	width: 100%; /* to prevent big images from stretching the grid */
+	margin-bottom: 10px;
+
+	@media (min-width: $sm-breakpoint) {
+		margin-bottom: 0px;
+	}
+
+	&__image {
+		width: 100%;
+		max-width: 100%;
+	}
+
+	&.-is-sticky {
+		@media (min-width: $sm-breakpoint) {
+			position: sticky;
+			top: 80px;
+			/* For sticky to work */
+			align-self: baseline;
+		}
+	}
+}

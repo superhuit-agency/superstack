@@ -1,0 +1,23 @@
+@import '@resources/index.css';
+
+.supt-input-textarea {
+	@extend %input-wrapper;
+
+	&__label {
+		@extend %input-label;
+	}
+	&__input {
+		@extend %input;
+
+		resize: vertical;
+	}
+	&__error {
+		@extend %input-error;
+	}
+
+	&.-error {
+		.supt-input-textarea__input {
+			border-color: $color-error;
+		}
+	}
+}

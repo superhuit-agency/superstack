@@ -1,0 +1,140 @@
+@import '@resources/index.css';
+
+.supt-input-file {
+	@extend %input-wrapper;
+
+	&__inner {
+		@mixin clamp padding-top, 12, 25, $xxs-breakpoint, $lg-breakpoint;
+		@mixin clamp padding-right, 12, 25, $xxs-breakpoint, $lg-breakpoint;
+		@mixin clamp padding-bottom, 16, 30, $xxs-breakpoint, $lg-breakpoint;
+		@mixin clamp padding-left, 16, 30, $xxs-breakpoint, $lg-breakpoint;
+
+		border: 1px solid $color-text;
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+	}
+
+	&__title-wrap {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		width: 100%;
+
+		svg {
+			fill: $color-text;
+		}
+	}
+
+	&__title {
+		@extend %t-h4, %input-optional;
+
+		display: flex;
+		color: $color-text;
+	}
+
+	&__description {
+		@extend %t-paragraph;
+		color: $color-text;
+	}
+
+	&__list {
+		@extend %t-paragraph;
+		color: $color-text;
+		list-style: none;
+	}
+
+	&__file {
+		&__delete {
+			@extend %reset-button;
+			position: relative;
+			display: flex;
+			align-items: center;
+			z-index: 2;
+			cursor: pointer;
+			padding-right: 40px;
+			line-height: inherit;
+			font-size: inherit;
+
+			span {
+				flex-grow: 1;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+
+			svg {
+				position: absolute;
+				top: 50%;
+				right: 0;
+				padding: 9px;
+				width: 29px;
+				height: 29px;
+				transform: translateY(-50%);
+				border-radius: 50%;
+				transition: background $transition-mid ease-out;
+				fill: $color-text;
+			}
+
+			&:hover {
+				span {
+					text-decoration: underline;
+				}
+
+				svg {
+					background-color: $color-text;
+					fill: #fff;
+				}
+			}
+		}
+	}
+
+	&__label {
+		@extend %t-paragraph;
+		color: $color-text;
+		cursor: pointer;
+
+		&--disabled {
+			pointer-events: none;
+			opacity: 0.5;
+		}
+	}
+
+	&__label-wrapper {
+		display: flex;
+		margin-top: auto;
+	}
+
+	&__input {
+		position: absolute;
+		inset: 0;
+		opacity: 0 !important;
+		padding: 0;
+		outline: none;
+		z-index: 1;
+		cursor: pointer;
+	}
+
+	/* Modifiers */
+	&.-has-max-files {
+		.supt-input-file__input {
+			pointer-events: none;
+		}
+	}
+	&.-error {
+		.supt-input-file__inner {
+			border-color: $color-error;
+		}
+
+		.supt-input-file__title,
+		.supt-input-file__description {
+			color: $color-error;
+		}
+
+		.supt-input-file__title-wrap {
+			svg {
+				fill: $color-error;
+			}
+		}
+	}
+}

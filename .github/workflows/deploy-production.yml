@@ -1,0 +1,105 @@
+name: Deploy WP & Nextjs to Production - builds and deploys
+on:
+  push:
+    branches:
+      - 'production'
+    # # Only run workflow if push a server tag
+    # tags:
+    #   - 'v*.*.*'
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  should_deploy_wp:
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' # If it's a pull request we don't want to deploy wordpress
+    outputs:
+      inputs_checked: ${{ steps.check_secrets.outputs.inputs_checked }}
+      should_deploy: ${{ steps.changed_files_wp.outputs.any_changed }}
+    steps:
+      - uses: styfle/cancel-workflow-action@0.12.1
+        with:
+          access_token: ${{ github.token }}
+
+      - id: check_secrets
+        run: |
+          missing_vars=0
+          for var in PRODUCTION_BE_SSH_USER PRODUCTION_BE_SSH_HOST PRODUCTION_BE_SSH_PORT SSH_PRIVATE_KEY PRODUCTION_WORDPRESS_PATH PRODUCTION_NEXT_URL WORDPRESS_THEME_NAME RELEASE_BELT_USER RELEASE_BELT_PWD; do
+            if [ -z "${!var}" ]; then
+              echo "$var is not set."
+              missing_vars=$((missing_vars+1))
+            else
+              echo "$var is set to '${!var}'."
+            fi
+          done
+
+          if [ $missing_vars -ne 0 ]; then
+            echo "inputs_checked=false" >> $GITHUB_OUTPUT
+            echo "Error: $missing_vars variables are missing."
+            exit 1
+          else
+            echo "inputs_checked=true" >> $GITHUB_OUTPUT
+          fi
+        # uses: svrooij/secret-gate-action@v1.1
+        # with:
+        #   inputsToCheck: 'PRODUCTION_BE_SSH_USER,PRODUCTION_BE_SSH_HOST,PRODUCTION_BE_SSH_PORT,SSH_PRIVATE_KEY,PRODUCTION_WORDPRESS_PATH,PRODUCTION_NEXT_URL,WORDPRESS_THEME_NAME,RELEASE_BELT_USER,RELEASE_BELT_PWD'
+        env:
+          PRODUCTION_BE_SSH_USER: ${{ secrets.PRODUCTION_BE_SSH_USER }}
+          PRODUCTION_BE_SSH_HOST: ${{ secrets.PRODUCTION_BE_SSH_HOST }}
+          PRODUCTION_BE_SSH_PORT: ${{ secrets.PRODUCTION_BE_SSH_PORT }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          PRODUCTION_WORDPRESS_PATH: ${{ secrets.PRODUCTION_WORDPRESS_PATH }}
+          PRODUCTION_NEXT_URL: ${{ secrets.PRODUCTION_NEXT_URL }}
+          WORDPRESS_THEME_NAME: ${{ secrets.WORDPRESS_THEME_NAME }}
+          RELEASE_BELT_USER: ${{ secrets.RELEASE_BELT_USER }}
+          RELEASE_BELT_PWD: ${{ secrets.RELEASE_BELT_PWD }}
+
+      - uses: styfle/cancel-workflow-action@0.12.1
+        with:
+          access_token: ${{ github.token }}
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - id: changed_files_wp
+        if: steps.check_secrets.outputs.inputs_checked == 'true'
+        uses: tj-actions/changed-files@v44
+        with:
+          since_last_remote_commit: 'true'
+          files: |
+            wordpress/**
+
+      - name: Set output
+        if: steps.check_secrets.outputs.inputs_checked == 'true'
+        run: echo "should_deploy=${{ steps.changed_files_wp.outputs.any_changed }}" >> $GITHUB_OUTPUT
+
+  deploy_wp:
+    needs: should_deploy_wp
+    if: needs.should_deploy_wp.outputs.should_deploy == 'true'
+    uses: ./.github/workflows/deploy-wp.yml
+    secrets:
+      SSH_USER: ${{ secrets.PRODUCTION_BE_SSH_USER }}
+      SSH_HOST: ${{ secrets.PRODUCTION_BE_SSH_HOST }}
+      SSH_PORT: ${{ secrets.PRODUCTION_BE_SSH_PORT }}
+      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      WORDPRESS_PATH: ${{ secrets.PRODUCTION_WORDPRESS_PATH }}
+      NEXT_URL: ${{ secrets.PRODUCTION_NEXT_URL }}
+      WORDPRESS_THEME_NAME: ${{ secrets.WORDPRESS_THEME_NAME }}
+
+  deploy_next:
+    runs-on: ubuntu-latest
+    needs: deploy_wp
+    if: ${{ always() }} # Always run the job regardless if build_deploy_wp was successful/skip or not
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy NextJS
+        uses: ./.github/actions/deploy-vercel
+        with:
+          GITHUB_TOKEN: ${{ github.token }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          GITHUB_DEPLOYMENT_ENV: Production
+          PRODUCTION: true

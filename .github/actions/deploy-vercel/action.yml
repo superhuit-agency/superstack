@@ -1,0 +1,44 @@
+name: 'Deploy Next.js on Vercel'
+
+inputs:
+  GITHUB_TOKEN:
+    description: 'GitHub Token to use when creating deployment and comment'
+    required: true
+  VERCEL_TOKEN:
+    description: 'Vercel Token to use with the Vercel CLI'
+    required: true
+  VERCEL_ORG_ID:
+    description: 'Id of your Vercel Organisation'
+    required: true
+  VERCEL_PROJECT_ID:
+    description: 'Id of your Vercel project'
+    required: true
+  GITHUB_DEPLOYMENT_ENV:
+    description: 'Environment for the deployement'
+    required: true
+  PRODUCTION:
+    description: 'Whether to create a production deployement on Vercel or not'
+    required: true
+  VERCEL_SCOPE:
+    description: 'Vercel team or user to execute command from'
+    required: false
+    default: 'superhuit-ch'
+  ALIAS_DOMAINS:
+    description: 'Alias domain(s) to assign to the deployment'
+    required: false
+    default: ''
+
+runs:
+  using: 'composite'
+  steps:
+    - uses: BetaHuhn/deploy-to-vercel-action@v1.10.0
+      with:
+        GITHUB_TOKEN: ${{ inputs.GITHUB_TOKEN }}
+        VERCEL_TOKEN: ${{ inputs.VERCEL_TOKEN }}
+        VERCEL_ORG_ID: ${{ inputs.VERCEL_ORG_ID }}
+        VERCEL_PROJECT_ID: ${{ inputs.VERCEL_PROJECT_ID }}
+        PR_PREVIEW_DOMAIN: '{REPO}-{PR}.now.sh'
+        GITHUB_DEPLOYMENT_ENV: ${{ inputs.GITHUB_DEPLOYMENT_ENV }}
+        VERCEL_SCOPE: ${{ inputs.VERCEL_SCOPE }}
+        PRODUCTION: ${{ inputs.PRODUCTION }}
+        ALIAS_DOMAINS: ${{ inputs.ALIAS_DOMAINS }}

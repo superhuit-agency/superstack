@@ -1,0 +1,33 @@
+{
+  "postcss.validate": false,
+	"editor.formatOnSave": true,
+	"typescript.tsdk": "node_modules/typescript/lib",
+	"files.watcherExclude": {
+		"**/.git/objects/**": true,
+		"**/.git/subtree-cache/**": true,
+		"**/node_modules/**": true,
+		"wordpress/theme/static/**": true,
+		"wordpress/wp-content/**": true,
+		"wordpress/.data/**": true,
+		"**/package-lock.json": true,
+		".next/**": true,
+		"**/build/**": true,
+	},
+	"search.exclude": {
+		"**/.git/objects/**": true,
+		"**/.git/subtree-cache/**": true,
+		"**/node_modules/**": true,
+		"wordpress/theme/static/**": true,
+		"wordpress/plugins/**": true,
+		"wordpress/.data/**": true,
+		"**/package-lock.json": true,
+		".next/**": true,
+		"**/build/**": true,
+	},
+	"[typescriptreact]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[typescript]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+}

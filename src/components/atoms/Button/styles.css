@@ -1,0 +1,17 @@
+@import '@resources/index.css';
+
+.supt-button {
+	@extend %reset-button, %t-button;
+
+	display: inline-block;
+	padding: 5px 10px;
+	border: 1px solid $color-text;
+
+	&:last-child {
+		margin-right: 0;
+	}
+
+	&.-secondary {
+		background-color: pink;
+	}
+}

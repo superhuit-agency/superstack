@@ -1,0 +1,9 @@
+@import '@resources/index.css';
+
+.supt-form-section-breaker {
+	margin: 50px 0 20px;
+
+	&__title {
+		@extend %t-h4;
+	}
+}

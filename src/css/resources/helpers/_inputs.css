@@ -1,0 +1,85 @@
+%input {
+	@extend %t-paragraph;
+
+	@mixin clamp padding-top, 6, 9, $xxs-breakpoint, $lg-breakpoint;
+	@mixin clamp padding-right, 9, 12, $xxs-breakpoint, $lg-breakpoint;
+	@mixin clamp padding-bottom, 6, 9, $xxs-breakpoint, $lg-breakpoint;
+	@mixin clamp padding-left, 9, 12, $xxs-breakpoint, $lg-breakpoint;
+
+	border: 1px solid $color-text;
+	appearance: none;
+	display: block;
+	width: 100%;
+	outline: 0;
+
+	&[disabled] {
+		cursor: not-allowed;
+	}
+
+	&:not([disabled]):hover,
+	&:not([disabled]):focus {
+	}
+
+	&[aria-invalid='true'] {
+	}
+
+	&::placeholder {
+		color: #00000066;
+	}
+}
+
+%input-wrapper {
+	position: relative;
+	margin-bottom: 10px;
+}
+
+%input-label {
+	@extend %t-paragraph, %input-optional;
+
+	margin-bottom: 10px;
+}
+
+%input-optional {
+	display: flex;
+	align-items: center;
+
+	&[data-optional]:not([data-optional=''])::after {
+		@extend %t-caption;
+
+		content: attr(data-optional);
+		display: inline;
+		margin-left: 12px;
+	}
+}
+
+%input-error {
+	@extend %t-paragraph;
+
+	margin-bottom: 0;
+	position: absolute;
+	left: 0;
+	padding-top: 5px;
+	width: 100%;
+	color: $color-error;
+}
+
+/* EDIT */
+%input-edit {
+	color: #00000066;
+}
+%input-size-edit {
+	max-width: 100%;
+	width: calc(100% - 32px);
+	margin: 0 16px !important;
+}
+%input-label-edit {
+	background: none !important;
+	pointer-events: initial;
+}
+%input-optional-edit {
+	@extend %t-caption;
+
+	position: absolute;
+	top: 12px;
+	right: 12px;
+}

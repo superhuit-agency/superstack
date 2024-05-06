@@ -1,0 +1,52 @@
+version: '2'
+
+services:
+  wp:
+    build: .
+    depends_on:
+      - db
+    links:
+      - db
+    ports:
+      - '80:80'
+    volumes:
+      - './composer.json:/var/www/html/composer.json'
+      - './composer.lock:/var/www/html/composer.lock'
+    working_dir: /var/www/html
+    container_name: spck_wp
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      # TODO: clean provision script which requires these vars
+      THEME_NAME: superstack
+      WORDPRESS_PATH: /var/www/html
+      WORDPRESS_ENV: dev
+      # END TODO
+      WORDPRESS_DEBUG: 1
+      WORDPRESS_CONFIG_EXTRA: |
+        define('WP_DEBUG_LOG', '/dev/stderr');        // write logs to stderr
+        define('DISALLOW_FILE_EDIT', true);           // Disable theme & plugins editor
+        define('FS_METHOD', 'direct');                // Auto-update without FTP
+        define('MULTISITE', 0);                       
+        define('WP_ALLOW_MULTISITE', 0);              
+        define('WP_AUTO_UPDATE_CORE', 'minor');              
+        define('GRAPHQL_JWT_AUTH_SECRET_KEY', 'y8151qr3T-5PfcRnNOE3}8@vtO=m[PchP:bP:oZC4MD_EsPD.A@&|>xFAY*WM');
+
+        // WP Memory Limit
+        // define('WP_MEMORY_LIMIT', '128M');
+        // define( 'WP_MAX_MEMORY_LIMIT', '128M' );
+  db:
+    image: mariadb:latest
+    volumes:
+      - './.data/db:/var/lib/mysql'
+    ports:
+      - '3306:3306'
+    container_name: spck_db
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: wordpress
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress

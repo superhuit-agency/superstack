@@ -1,0 +1,19 @@
+@import '@resources/index.css';
+
+.supt-input-checkbox {
+	&__optional {
+		@extend %input-optional-edit;
+	}
+	&__wrapper {
+		@extend %input-edit;
+	}
+	&__label {
+		@extend %input-label-edit;
+	}
+}
+
+.wp-block[data-type='supt/input-checkbox'] {
+	@extend %input-size-edit;
+
+	vertical-align: top;
+}

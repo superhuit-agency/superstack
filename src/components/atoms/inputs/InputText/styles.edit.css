@@ -1,0 +1,17 @@
+@import '@resources/index.css';
+
+.supt-input-text {
+	&__optional {
+		@extend %input-optional-edit;
+	}
+	&__input {
+		@extend %input-edit;
+	}
+	&__label {
+		@extend %input-label-edit;
+	}
+}
+
+.wp-block[data-type='supt/input-text'] {
+	@extend %input-size-edit;
+}

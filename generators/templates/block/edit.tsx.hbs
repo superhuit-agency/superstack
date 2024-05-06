@@ -1,0 +1,173 @@
+{{#if supportsData}}
+import { useMemo } from 'react';
+{{/if}}
+{{#if supportsInnerBlocks}}
+import { InnerBlocks } from '@wordpress/block-editor';
+{{/if}}
+import { _x } from '@wordpress/i18n';
+
+{{#if (equals blockType "organisms")}}
+import { SectionEdit, PreviewBlockImage } from '#/components';
+{{/if}}
+{{#if supportsData}}
+import { useGraphQlApi } from '#/hooks';
+
+// Data
+import { getData } from './data';
+{{/if}}
+
+// block
+import { WpBlockEditProps, WpBlockType } from '@/typings';
+import block from './block.json';
+import { {{ pascalCase blockTitle }}Props } from '.';
+
+// styles
+import './styles.css';
+import './styles.edit.css';
+
+/**
+ * COMPONENT EDITOR
+ */
+const Edit = (props: WpBlockEditProps<{{ pascalCase blockTitle }}Props>) => {
+	{{#if (equals blockType "organisms")}}
+	const slug = props.name;
+	{{/if}}
+	const { {{join blockAttributes 'name'}}{{#if (hasLength blockAttributes)}}, {{/if}}{{#if (equals blockType "organisms")}}uptitle, title, introduction,{{/if}}{{#if supportsData}}queryVars,{{/if}} } = props.attributes;
+
+	{{#if supportsData}}
+	const variables = useMemo(() => ({ queryVars }), [queryVars]);
+	const { isLoading, data } = useGraphQlApi(getData, variables);
+	{{/if}}
+
+	{{#if (equals blockType "organisms")}}
+	// For block preview
+	if (slug && props.attributes.isPreview) return <PreviewBlockImage slug={slug} />;
+	{{/if}}
+
+	return (
+		{{#if (equals blockType "organisms")}}
+		<section className="{{blockPrefix}}-{{ dashCase blockTitle }}">
+		{{/if}}
+		{{#ifNot (equals blockType "organisms")}}
+		<div className="{{blockPrefix}}-{{ dashCase blockTitle }}">
+		{{/ifNot}}
+
+			<div className="{{blockPrefix}}-{{ dashCase blockTitle }}__inner">
+				{{#if (equals blockType "organisms")}}
+					<div className="{{blockPrefix}}-{{ dashCase blockTitle }}__headline">
+						<SectionEdit.Uptitle
+							attribute={uptitle}
+							onChange={(uptitle: string) =>
+								props.setAttributes({ uptitle })
+							}
+						/>
+						<SectionEdit.Title
+							attribute={title}
+							onChange={(title: string) =>
+								props.setAttributes({ title })
+							}
+						/>
+						<SectionEdit.Introduction
+							attribute={introduction}
+							onChange={(introduction: string) =>
+								props.setAttributes({ introduction })
+							}
+						/>
+					</div>
+				{{/if}}
+
+				{{#if supportsInnerBlocks}}
+					<div className="{{blockPrefix}}-{{ dashCase blockTitle }}__content">
+						<InnerBlocks
+								allowedBlocks={[]}
+								template={[]}
+								templateLock={false}
+							/>
+					</div>
+				{{/if}}
+			</div>
+
+			{{#if supportsData}}
+			<div>
+				<h2>Dynamic data fetching</h2>
+				<pre>{JSON.stringify(data, null, 2)}</pre>
+			</div>
+			{{/if}}
+
+		{{#if (equals blockType "organisms")}}
+		</section>
+		{{/if}}
+		{{#ifNot (equals blockType "organisms")}}
+		</div>
+		{{/ifNot}}
+	);
+};
+
+/**
+ * WORDPRESS BLOCK
+ */
+export const {{pascalCase blockTitle}}Block: WpBlockType<{{ pascalCase blockTitle }}Props> = {
+	slug: block.slug,
+	settings: {
+		title: block.title,
+		// parent: [],
+		description: _x(
+			'',
+			'Block {{pascalCase blockTitle}}',
+			'{{blockPrefix}}'
+		),
+		category: {{#if blockIsCard}}'spck-card'{{else}}''{{/if}},
+		icon: '',
+		{{#if (equals blockType "organisms")}}
+		supports: {
+			anchor: true,
+		},
+		{{/if}}
+		postTypes: ['page'],
+		attributes: {
+			isPreview: {
+				type: 'boolean',
+				default: false,
+			},
+		{{#if (equals blockType "organisms")}}
+			anchor: {
+				type: 'string',
+			},
+			uptitle: {
+				type: 'string',
+				default: '',
+			},
+			title: {
+				type: 'string',
+				default: '',
+			},
+			introduction: {
+				type: 'string',
+				default: '',
+			},
+		{{/if}}
+		{{#each blockAttributes as |attribute|}}
+			{{attribute.name}}: {
+			{{#if (equals attribute.type "object")}}
+				type: '{{attribute.type}}',
+			{{else}}
+				type: '{{attribute.type}}',
+			{{/if}}
+			},
+		{{/each}}
+		{{#if supportsData}}
+			queryVars: {
+				type: 'object',
+				default: {},
+			}
+		{{/if}}
+		},
+		example: {
+			attributes: {
+				isPreview: true,
+			},
+		},
+		edit: Edit,
+		save: () => {{#if supportsInnerBlocks}}<InnerBlocks.Content />{{else}}null{{/if}},
+	},
+};

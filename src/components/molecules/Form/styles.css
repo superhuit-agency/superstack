@@ -1,0 +1,58 @@
+@import '@resources/index.css';
+
+.supt-form {
+	&__fields {
+	}
+
+	&__opt-in {
+		position: relative;
+		margin-bottom: 10px;
+		a {
+			@extend %link-underline;
+		}
+	}
+
+	&__messages {
+		position: relative;
+
+		&__error,
+		&__success {
+			> p {
+				@extend %t-paragraph;
+			}
+		}
+
+		&__error {
+			> p {
+				color: $color-error;
+			}
+		}
+
+		&__success {
+			> p {
+				color: $color-brand-1-base;
+			}
+		}
+
+		&__error,
+		&__success {
+			position: absolute;
+			left: 0;
+			width: 100%;
+		}
+
+		&__actions {
+			display: flex;
+			justify-content: flex-end;
+		}
+
+		&__submit {
+			cursor: pointer;
+
+			&[disabled] {
+				opacity: 0.7;
+				cursor: not-allowed;
+			}
+		}
+	}
+}

@@ -1,0 +1,27 @@
+@import '@resources/index.css';
+
+.supt-input-checkbox {
+	@extend %input-wrapper;
+
+	&__label {
+		@extend %input-label;
+	}
+	&__wrapper {
+		@extend %input;
+	}
+	&__error {
+		@extend %input-error;
+		text-align: left;
+
+		position: absolute;
+		left: 0;
+
+		display: block;
+	}
+
+	&.-error {
+		.supt-input-checkbox__wrapper {
+			border-color: $color-error;
+		}
+	}
+}

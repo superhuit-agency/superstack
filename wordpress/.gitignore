@@ -1,0 +1,11 @@
+/.data
+/wp-content
+/theme/static
+/theme/vendors
+auth.json
+/vendor
+
+# Plugins: track only those that cannot be installed by the bootstrap script
+!/plugins
+/plugins/*
+!/plugins/.gitkeep

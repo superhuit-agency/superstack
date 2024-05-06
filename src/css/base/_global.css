@@ -1,0 +1,32 @@
+.app {
+	/* &.-is-loading {
+		visibility: hidden;
+		pointer-events: none;
+	} */
+
+	sub,
+	sup {
+		font-size: smaller;
+	}
+	sub {
+		vertical-align: sub;
+	}
+	sup {
+		vertical-align: super;
+	}
+
+	/***** LINKS *****/
+	.supt-introduction,
+	.supt-paragraph,
+	.supt-list,
+	.supt-section__introduction,
+	.supt-table {
+		a {
+			@extend %link-underline;
+		}
+	}
+}
+
+.main {
+	padding-top: 130px;
+}

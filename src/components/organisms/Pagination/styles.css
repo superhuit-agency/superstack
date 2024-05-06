@@ -1,0 +1,83 @@
+@import '@resources/index.css';
+
+.supt-pagination {
+	@mixin clamp margin-top, 20, 40, $xxs-breakpoint, $lg-breakpoint;
+	@mixin clamp margin-bottom, 20, 40, $xxs-breakpoint, $lg-breakpoint;
+
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+
+	nav {
+		order: 1;
+		width: 100%;
+		margin-top: 15px;
+
+		@media (min-width: $xs-breakpoint) {
+			order: 0;
+			width: auto;
+			margin-top: 0;
+		}
+	}
+
+	ul {
+		list-style: none;
+		display: flex;
+		justify-content: center;
+	}
+
+	li {
+		margin-left: 10px;
+
+		&:first-child {
+			margin-left: 0;
+		}
+
+		span {
+			user-select: none;
+		}
+	}
+
+	&__link {
+		@mixin clamp width, 20, 30, $xxs-breakpoint, $lg-breakpoint;
+		@mixin clamp height, 20, 30, $xxs-breakpoint, $lg-breakpoint;
+
+		@extend %t-introduction;
+
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border: 1px solid $color-neutral-900;
+
+		&.-is-prev,
+		&.-is-next {
+			width: auto;
+			border: 0;
+
+			svg {
+				fill: none;
+				stroke: currentColor;
+				overflow: visible;
+				transition: transform $transition-mid ease-in-out;
+			}
+			span {
+				margin: 0 10px;
+			}
+		}
+
+		&.-is-prev {
+			svg {
+				transform: scaleX(-1);
+			}
+		}
+
+		&.-is-disabled {
+			opacity: 0.5;
+			pointer-events: none;
+		}
+		&.-is-active {
+			font-weight: 700;
+		}
+	}
+}

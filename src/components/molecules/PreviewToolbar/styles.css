@@ -1,0 +1,49 @@
+.supt-preview-toolbar {
+	font-family: 'Open Sans', sans-serif;
+	position: fixed;
+	z-index: 9999999;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	gap: 20px;
+	align-items: center;
+	width: 100%;
+	background-color: #fff;
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 1.2;
+	letter-spacing: 0;
+	color: #000;
+	padding: 12px 20px;
+	box-shadow: 0 0 16px 0 rgba(0 0 0 / 16%);
+	display: flex;
+	justify-content: space-between;
+
+	&__button {
+		font-weight: bold;
+		display: inline-flex;
+		justify-content: center;
+		align-items: center;
+		text-align: center;
+		padding: 8px 20px;
+		cursor: pointer;
+		background-color: transparent;
+		transition: background-color 0.2s ease-out;
+		border: 1px solid #757575;
+		border-radius: 16px;
+
+		&:hover {
+			background-color: lightgray;
+		}
+	}
+
+	&__checkbox {
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
+	}
+
+	&__screen {
+		min-width: 200px;
+	}
+}

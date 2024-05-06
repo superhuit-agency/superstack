@@ -1,0 +1,13 @@
+{
+	"recommendations": [
+		"graphql.vscode-graphql",
+		"graphql.vscode-graphql-syntax",
+		"wordpresstoolbox.wordpress-toolbox",
+		"johnbillion.vscode-wordpress-hooks",
+		"yogensia.searchwpdocs",
+		"editorconfig.editorconfig",
+		"dbaeumer.vscode-eslint",
+		"esbenp.prettier-vscode",
+		"stylelint.vscode-stylelint",
+	]
+}

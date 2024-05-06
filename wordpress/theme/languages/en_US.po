@@ -1,0 +1,168 @@
+# Copyright (C) 2022 superhuit
+# This file is distributed under the .
+msgid ""
+msgstr ""
+"Project-Id-Version: Superstack 0.0.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/theme/theme\n"
+"POT-Creation-Date: 2022-10-13T15:19:00+00:00\n"
+"PO-Revision-Date: 2022-10-13 17:33+0200\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.1.1\n"
+"X-Domain: supt\n"
+
+#. Theme Name of the theme
+msgid "Superstack"
+msgstr ""
+
+#. Description of the theme
+msgid "starter website backend - frontend is built on Next.js"
+msgstr ""
+
+#. Author of the theme
+msgid "superhuit"
+msgstr ""
+
+#: lib/editor/block-categories.php:22
+msgctxt "editor blocks category"
+msgid "Text"
+msgstr ""
+
+#: lib/editor/block-categories.php:26
+msgctxt "editor blocks category"
+msgid "Cards"
+msgstr ""
+
+#: lib/editor/block-categories.php:30
+msgctxt "editor blocks category"
+msgid "Content - inform your visitors, build trust"
+msgstr ""
+
+#: lib/editor/block-categories.php:34
+msgctxt "editor blocks category"
+msgid "Action - prompt your visitors to act"
+msgstr ""
+
+#: lib/editor/block-categories.php:38
+msgctxt "editor blocks category"
+msgid "Forms"
+msgstr ""
+
+#: lib/editor/block-categories.php:42
+msgctxt "editor blocks category"
+msgid "Custom - blocks handcrafted just for you"
+msgstr ""
+
+#: lib/editor/block-categories.php:46
+msgctxt "editor blocks category"
+msgid "Headers"
+msgstr ""
+
+#: lib/graphql/add-media-item-relative-url.php:9
+msgid "The relative url"
+msgstr ""
+
+#: lib/graphql/archive-interface.php:16
+msgid "Retrieves filters data for the current archive page."
+msgstr ""
+
+#: lib/graphql/archive-interface.php:29
+msgid "Retrieves the data for the current archive page."
+msgstr ""
+
+#: lib/graphql/node-idtype.php:17
+msgid "Type of unique identifier to fetch a menu by. Default is Global ID"
+msgstr ""
+
+#: lib/graphql/post-edit-link.php:10
+msgid "Retrieves the edit post link for post"
+msgstr ""
+
+#: lib/graphql/post-edit-link.php:16
+msgid "Retrieves the edit post link for page"
+msgstr ""
+
+#: lib/graphql/register-logo.php:9
+msgid "The logo set in the customizer"
+msgstr ""
+
+#: lib/post-types/PageType.php:97
+msgid "The filename of the template"
+msgstr ""
+
+#: lib/post-types/PageType.php:106 lib/post-types/PageType.php:122
+msgid "Filter the connection based on page templates"
+msgstr ""
+
+#: lib/post-types/PageType.php:110
+msgid "Array of page's template filename to filter by"
+msgstr ""
+
+#: lib/post-types/PageType.php:114
+msgid "Array of page's template filename to not be filter by"
+msgstr ""
+
+#: lib/post-types/PostType.php:153
+msgctxt "Reading settings"
+msgid "Related posts"
+msgstr ""
+
+#: lib/post-types/PostType.php:155
+msgctxt "Related posts settings"
+msgid "Configure related posts shown at the bottom of a single post page."
+msgstr ""
+
+#: lib/post-types/PostType.php:162
+msgctxt "Related posts settings"
+msgid "Nb related posts:"
+msgstr ""
+
+#: lib/post-types/PostType.php:170
+msgctxt "Related posts settings"
+msgid "Number of posts to show."
+msgstr ""
+
+#: lib/post-types/PostType.php:175
+msgctxt "Related posts settings"
+msgid "Relate by category:"
+msgstr ""
+
+#: lib/post-types/PostType.php:182
+msgctxt "Related posts settings"
+msgid "Should be related by categories?"
+msgstr ""
+
+#: lib/post-types/PostType.php:187
+msgctxt "Related posts settings"
+msgid "Relate by tags:"
+msgstr ""
+
+#: lib/post-types/PostType.php:194
+msgctxt "Related posts settings"
+msgid "Should be related by tags?"
+msgstr ""
+
+#: lib/SuptTheme.php:91
+msgid "Header Primary"
+msgstr ""
+
+#: lib/SuptTheme.php:92
+msgid "Footer"
+msgstr ""
+
+#: lib/SuptTheme.php:93
+msgid "Legal"
+msgstr ""
+
+#: lib/SuptTheme.php:94
+msgid "Social"
+msgstr ""
+
+#. Template Name of the theme
+msgid "404 page"
+msgstr ""

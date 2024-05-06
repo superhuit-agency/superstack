@@ -1,0 +1,28 @@
+.supt-button {
+	display: flex;
+	align-items: center;
+
+	.components-toolbar.is-position-left {
+		order: -1;
+		margin-right: 10px;
+	}
+	.components-toolbar.is-position-right {
+		order: 0;
+		margin-left: 5px;
+	}
+	.components-button.has-icon .dashicon {
+		margin-left: 0;
+		margin-right: 0;
+	}
+
+	.block-editor-plain-text {
+		background: none;
+		padding: 0;
+		height: auto !important;
+		display: block;
+		text-transform: inherit;
+		letter-spacing: inherit;
+		text-align: left;
+		overflow: hidden !important; /* hide the scrollbar */
+	}
+}

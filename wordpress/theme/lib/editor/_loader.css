@@ -1,0 +1,132 @@
+@import '@resources/index.css';
+
+/**
+ * README
+ * ======
+ *
+ * This stylesheet is applied to the block editor
+ * and allows to style the blocks of the post/page
+ * content.
+ * @see https://wordpress.org/gutenberg/handbook/designers-developers/developers/themes/theme-support/#editor-styles
+ */
+
+/* Fonts */
+@import './assets/css/_fonts.css';
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+/* Remove Gutenberg default max-width */
+.wp-block {
+	max-width: none !important;
+	margin-left: 0px !important;
+	margin-right: 0px !important;
+}
+
+/* .wp-block > * {
+	padding: 40px 0 !important;
+} */
+
+.wp-block .supt-form {
+	pointer-events: none;
+}
+
+.block-editor-block-list__layout.is-root-container > .wp-block {
+	margin: 20px 10px !important;
+	border: 1px solid rgba(0 0 0 / 20%);
+	border-radius: 4px;
+	padding: 20px;
+}
+
+/* Reset styles of core blocks */
+.wp-block[data-type='core/list'] ul,
+.wp-block[data-type='core/list'] ol {
+	margin-right: 0px;
+	margin-left: 0px;
+	margin-bottom: 0px;
+	padding-left: 0px;
+}
+
+/* Reset styles of inner blocks wrapper */
+.block-editor-inner-blocks,
+.block-editor-block-list__layout:not(
+		.block-library-block__reusable-block-container,
+		.block-editor-block-list__block
+	) {
+	display: contents;
+}
+
+.post-type-post .edit-post-visual-editor__post-title-wrapper,
+.post-type-page .edit-post-visual-editor__post-title-wrapper {
+	display: none;
+}
+
+/* .editor-styles-wrapper.edit-post-visual-editor p {
+	margin: 0;
+} */
+
+/* Overrides .card WP styles */
+.card {
+	margin-top: 0;
+}
+
+.block-editor-block-icon {
+	width: 42px;
+	height: 42px;
+}
+
+.block-editor-block-icon svg {
+	max-width: 42px;
+	max-height: 42px;
+}
+
+/* Hides Editor Heading Levels 1, 2, 5, and 6 */
+.block-library-heading-level-toolbar .components-button:nth-child(1),
+.block-library-heading-level-toolbar .components-button:nth-child(5),
+.block-library-heading-level-toolbar .components-button:nth-child(6) {
+	display: none;
+}
+
+/* Custom select style */
+.components-custom-select-control__button {
+	font-size: 13px !important;
+	height: 30px !important;
+	width: 100%;
+}
+.components-custom-select-control__button + ul {
+	margin-top: 5px;
+}
+
+.components-custom-select-control__button + ul li {
+	cursor: pointer;
+	border: 1px solid #ccc;
+	margin: 5px;
+
+	transition: opacity 0.3s ease;
+}
+
+.components-custom-select-control__button + ul li:hover {
+	opacity: 0.8;
+}
+
+/* WP button components style */
+.components-button.is-primary,
+.components-button-group .components-button {
+	padding: 0 10px;
+}
+
+/* WP components number control style */
+.components-number-control,
+.components-select-control {
+	height: auto;
+}
+
+/* Force showing instructions for media placeholder on medium sizes */
+.components-placeholder.is-medium .components-placeholder__instructions {
+	display: block !important;
+}
+
+/* CUSTOM EDIT STYLE */

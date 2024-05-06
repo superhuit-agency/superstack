@@ -1,0 +1,5 @@
+@import '@resources/index.css';
+
+.supt-paragraph {
+	@extend %t-paragraph;
+}

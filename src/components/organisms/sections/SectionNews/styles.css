@@ -1,0 +1,39 @@
+@import '@resources/index.css';
+
+.supt-section-news {
+	.supt-section__inner {
+		@extend %grid;
+	}
+
+	.supt-section__headline {
+		grid-column: 1 / span 12;
+		@media (min-width: $sm-breakpoint) {
+			grid-column-end: span 10;
+		}
+		@media (min-width: $md-breakpoint) {
+			grid-column-end: span 8;
+		}
+	}
+
+	.supt-section__content {
+		grid-column: 1 / span 12;
+	}
+
+	.supt-section__link-wrapper {
+		text-align: right;
+	}
+
+	.supt-section__list {
+		@extend %grid-no-margin;
+
+		.supt-card-news {
+			grid-column-end: span 12;
+			@media (min-width: $sm-breakpoint) {
+				grid-column-end: span 6;
+			}
+			@media (min-width: $lg-breakpoint) {
+				grid-column-end: span 4;
+			}
+		}
+	}
+}

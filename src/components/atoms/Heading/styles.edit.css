@@ -1,0 +1,9 @@
+@import '@resources/index.css';
+
+.block-editor-block-toolbar__slot {
+	&:has(.supt-heading-level-dropdown) {
+		& > :nth-child(2):not(.supt-heading-level-dropdown) {
+			display: none;
+		}
+	}
+}

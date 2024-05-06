@@ -1,0 +1,10 @@
+# Ignore artifacts:
+build
+coverage
+public
+.next
+# .storybook
+.vscode
+node_modules
+package.json
+generators/templates/block

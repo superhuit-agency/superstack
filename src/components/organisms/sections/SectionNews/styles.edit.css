@@ -1,0 +1,9 @@
+.supt-section-news {
+	.supt-section__link-inner {
+		display: inline-block;
+
+		textarea {
+			background: none;
+		}
+	}
+}

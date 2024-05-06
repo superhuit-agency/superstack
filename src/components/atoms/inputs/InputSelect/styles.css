@@ -1,0 +1,74 @@
+@import '@resources/index.css';
+
+.supt-input-select {
+	@extend %input-wrapper;
+
+	.supt-input-select__label {
+		@extend %input-label;
+	}
+
+	.supt-input-select__error {
+		@extend %input-error;
+	}
+
+	.supt-input-select__control {
+		@extend %input;
+
+		display: flex;
+		border-radius: 0;
+		box-shadow: none;
+		min-height: auto;
+
+		&:hover {
+			border-color: $color-text;
+		}
+	}
+
+	.supt-input-select__placeholder {
+		color: #00000066;
+		margin: 0;
+	}
+
+	.supt-input-select__value-container {
+		padding: 0;
+	}
+
+	.supt-input-select__input-container {
+		margin: 0;
+		padding: 0;
+	}
+
+	.supt-input-select__single-value {
+		margin: 0;
+		color: $color-text;
+	}
+
+	.supt-input-select__indicators {
+		margin-left: 5px;
+	}
+
+	/* .supt-input-select__menu {
+		z-index: 2;
+	} */
+
+	.supt-input-select__option {
+		@mixin clamp font-size, 13, 16, $xxs-breakpoint, $lg-breakpoint;
+		@mixin clamp line-height, 19, 24, $xxs-breakpoint, $lg-breakpoint;
+
+		&.-is-selected {
+			color: inherit;
+			background-color: $color-neutral-400;
+		}
+		&.-is-focused,
+		&:focus {
+			background-color: $color-neutral-200;
+		}
+	}
+
+
+	&.-error {
+		.supt-input-select__control {
+			border-color: $color-error;
+		}
+	}
+}

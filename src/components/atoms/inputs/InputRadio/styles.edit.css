@@ -1,0 +1,17 @@
+@import '@resources/index.css';
+
+.supt-input-radio {
+	&__optional {
+		@extend %input-optional-edit;
+	}
+	&__wrapper {
+		@extend %input-edit;
+	}
+	&__label {
+		@extend %input-label-edit;
+	}
+}
+
+.wp-block[data-type='supt/input-radio'] {
+	@extend %input-size-edit;
+}
