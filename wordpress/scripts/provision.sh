@@ -207,12 +207,10 @@ if [ -z $($WPCLI config get "WP_AUTO_UPDATE_CORE") ]; then
 	$WPCLI config set "WP_AUTO_UPDATE_CORE" "minor"
 fi
 
-# Add WP Graphql Gutenberg Registry if not yet registered in the db (=> avoids Vercel first deployment to fail)
-$WPCLI option get wp_graphql_gutenberg_block_types &> /dev/null
-if [ $? -ne 0 ]; then
-	$WPCLI option add wp_graphql_gutenberg_block_types --format=json '{"supt/text":{"name":"supt/text","keywords":{},"attributes":{"anchor":{"type":"string"},"className":{"type":"string"}},"providesContext":{},"usesContext":{},"supports":["anchor"],"styles":{},"title":"Text","description":"","category":"spck-content","example":{},"variations":{}}}'
-	$WPCLI post update 2 --post_content='<!-- wp:supt/text {"title":"Home"} --><!-- /wp:supt/text -->'
-fi
+# Update Sample Page to be the Home
+$WPCLI post update 2 --post_title="Home" --post_content='<!-- wp:heading {"level":1} --><h1 class="wp-block-heading">Home</h1><!-- /wp:heading -->'
+$WPCLI option update show_on_front page
+$WPCLI option update page_on_front 2
 
 $WPCLI rewrite structure '/blog/%postname%/'
 $WPCLI rewrite flush --hard --quiet
