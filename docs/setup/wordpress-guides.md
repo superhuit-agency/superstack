@@ -29,7 +29,7 @@ Composer will automatically run while deploying to staging/production.
 ## WP CLI
 
 You can use all the power of **wp-cli** in your terminal by running any wp-cli commands within the docker container.
-For example: `docker exec spck_wp wp user list`
+For example: `docker exec spck_wp wp user list` or with alias **@local** like `wp @local user list`
 
 > [Read more](https://developer.wordpress.org/cli/commands/) about running commands inside WordPress containers.
 

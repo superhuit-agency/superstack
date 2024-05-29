@@ -1,0 +1,10 @@
+# WP-CLI aliases see doc for more info https://make.wordpress.org/cli/handbook/guides/running-commands-remotely/#aliases
+
+# Don't change @local alias structure to have it working with docker
+# ssh value should remain in one line (docker:container_name/wp_install_path)
+@local:
+  ssh: 'docker:spck_wp/var/www/html'
+
+# @staging:
+#     ssh: user@server.com
+#     path: /absolute-path/web/staging
