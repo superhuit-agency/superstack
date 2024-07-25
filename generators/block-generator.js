@@ -138,14 +138,14 @@ module.exports = async function (plop) {
 			}
 
 			if (data.blockAttributes) {
-				data.blockAttributes = data.blockAttributes.map(
-					(attribute, index) => {
+				data.blockAttributes = data.blockAttributes
+					.map((attribute, index) => {
 						return {
 							name: attribute,
 							type: data.blockAttributesTypes[index],
 						};
-					}
-				);
+					})
+					.sort((a, b) => a.name.localeCompare(b.name));
 			}
 
 			// Cleanup data

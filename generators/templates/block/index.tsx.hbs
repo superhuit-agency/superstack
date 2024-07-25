@@ -1,4 +1,4 @@
-import { FC{{#ifNot (equals blockType "organisms")}}, HTMLProps{{/ifNot}} } from "react";
+import { FC } from "react";
 // internal imports
 {{#if (equals blockType "organisms")}}
 import { Section } from '@/helpers/Section';
@@ -7,25 +7,6 @@ import block from './block.json';
 // styles
 import "./styles.css";
 
-/**
- * TYPINGS
- */
-export interface {{ pascalCase blockTitle }}Props extends {{#if (equals blockType "organisms")}}SectionProps{{else}}HTMLProps<HTMLDivElement>{{/if}} {
-	{{#each blockAttributes as |attribute|}}
-	{{attribute.name}}: {{attribute.type}};
-	{{/each}}
-	{{#if supportsData}}
-	data?: any;
-	{{/if}}
-	{{#if supportsData}}
-	queryVars?: any;
-	{{/if}}
-};
-
-
-/**
- * COMPONENT
- */
 export const {{pascalCase blockTitle}}: FC<{{pascalCase blockTitle}}Props> & BlockConfigs = ({
 	{{#if (equals blockType "organisms")}}
 	anchor,

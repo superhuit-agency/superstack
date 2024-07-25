@@ -8,11 +8,11 @@ export const slug = block.slug;
 /**
  * Dynamic data formatter/parser.
  *
- * @param {unknown}     data      Data from GraphQL query response
+ * @param {Graphql{{ pascalCase blockTitle }}Fields}     data      Data from GraphQL query response
  * @param {boolean} isEditor  Wheter the formatter function is executed within the WP block editor.
  * @returns             The transformed/formatted/parsed data
  */
-export const formatter = (data: unknown, isEditor = false) => {
+export const formatter = (data: Graphql{{ pascalCase blockTitle }}Fields, isEditor = false) => {
 	return data; // Format data as you need
 };
 
@@ -22,14 +22,14 @@ export const formatter = (data: unknown, isEditor = false) => {
  *
  * @param {FetchApiFuncType} fetcher    The context based function to request the GraphQl endpoint.
  *                                Arguments: - {string} query, [{any} variables].
- * @param {Record<string, object> | null}      attributes The attributes of the block
+ * @param {{{ pascalCase blockTitle }}Attributes}      attributes The attributes of the block
  * @param {boolean}  isEditor   Wheter the context is within the WP block editor.
  */
 export const getData = async (
 	fetcher: FetchApiFuncType,
-	attributes: Record<string, object> | null = null,
+	attributes: {{ pascalCase blockTitle }}Attributes | null = null,
 	isEditor: boolean = false
-): Promise<any> => {
+): Promise<{{ pascalCase blockTitle }}Data> => {
 	// declare the GraphQL query string.
 	const query = gql`
 		query {{camelCase blockTitle}}Query {

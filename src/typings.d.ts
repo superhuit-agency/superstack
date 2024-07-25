@@ -100,13 +100,27 @@ type FetchApiFuncType = (
 	}
 ) => Promise<any>;
 
-interface SectionProps extends HTMLProps<HTMLDivElement> {
+/**
+ * Generic Block Attrs & Props
+ */
+interface BlockAttributes {
 	anchor?: string;
-	uptitle?: string;
-	title?: string;
-	introduction?: string;
+	className?: string;
+	isPreview?: boolean;
 }
 
-type ChildrenProps = {
-	children?: React.ReactNode;
-};
+interface BlockProps extends React.HTMLProps<HTMLDivElement> {
+	level?: number;
+	slug?: string;
+}
+
+/**
+ * Generic Section Props
+ */
+interface SectionAttributes extends BlockAttributes {
+	introduction?: string;
+	title?: string;
+	uptitle?: string;
+}
+
+interface SectionProps extends SectionAttributes, BlockProps {}
