@@ -2,8 +2,6 @@ import { FC, HTMLProps } from 'react';
 import cx from 'classnames';
 
 // Internal dependencies
-import { BlockConfigs } from '@/typings';
-
 import block from './block.json';
 
 // Styles

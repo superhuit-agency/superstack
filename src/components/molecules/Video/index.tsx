@@ -3,7 +3,6 @@
 import { FC, useCallback, useEffect, useState } from 'react';
 import cx from 'classnames';
 
-import { BlockConfigs, ImageProps, VideoProps } from '@/typings';
 import { Image } from '../Image';
 import block from './block.json';
 

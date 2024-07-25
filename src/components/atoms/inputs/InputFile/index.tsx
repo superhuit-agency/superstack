@@ -20,7 +20,6 @@ import {
 	IconInvalid,
 } from '@/components/icons/DocumentIcon';
 import { useTranslation } from '@/hooks/use-translation';
-import { BlockConfigs, InputProps } from '@/typings';
 
 import block from './block.json';
 

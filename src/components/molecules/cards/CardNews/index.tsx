@@ -3,7 +3,6 @@ import { FC, useCallback, useMemo } from 'react';
 import configs from '@/configs.json';
 import { Link } from '@/helpers/Link';
 import { useTranslation } from '@/hooks/use-translation';
-import { BlockConfigs, ImageProps, LinkProps } from '@/typings';
 import { phpToJsDateFormat } from '@/utils';
 
 import { Image } from '../..';

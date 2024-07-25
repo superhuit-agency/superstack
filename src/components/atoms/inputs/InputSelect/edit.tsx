@@ -14,7 +14,7 @@ import { useRef } from '@wordpress/element';
 import { _x } from '@wordpress/i18n';
 
 import { IdControl, NameControl } from '#/components';
-import { WpBlockType } from '@/typings';
+
 import block from './block.json';
 import { InputSelectProps } from '.';
 

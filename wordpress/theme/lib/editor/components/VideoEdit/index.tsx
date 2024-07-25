@@ -16,7 +16,6 @@ import {
 } from '@wordpress/block-editor';
 
 import { Image } from '@/components/molecules/Image';
-import { VideoProps } from '@/typings';
 
 // styles
 import '@/components/molecules/Video/styles.css';

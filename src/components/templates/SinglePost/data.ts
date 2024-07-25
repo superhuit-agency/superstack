@@ -5,7 +5,6 @@ import {
 	translationsFields,
 	seoPostTypeFragment,
 } from '@/lib/fragments';
-import { FetchApiFuncType } from '@/lib/fetch-api';
 import { gql } from '@/utils';
 
 export const slug = 'single-post';

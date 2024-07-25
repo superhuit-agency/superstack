@@ -4,7 +4,7 @@ import { TextControl } from '@wordpress/components';
 import { _x } from '@wordpress/i18n';
 
 import { IdControl } from '#/components';
-import { WpBlockType } from '@/typings';
+
 import block from './block.json';
 import { RadioProps } from '.';
 

@@ -15,7 +15,7 @@ import { _x, sprintf } from '@wordpress/i18n';
 
 import { IdControl, NameControl } from '#/components';
 import { IconDocument } from '@/components/icons/DocumentIcon';
-import { WpBlockType } from '@/typings';
+
 import block from './block.json';
 import { InputFileProps } from '.';
 

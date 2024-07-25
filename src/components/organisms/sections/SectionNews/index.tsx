@@ -3,7 +3,7 @@ import cx from 'classnames';
 
 import { Link } from '@/helpers/Link';
 import { Section } from '@/helpers/Section';
-import { BlockConfigs, SectionProps, LinkProps } from '@/typings';
+
 import { CardNewsProps, CardNews } from '@/components/molecules/cards/CardNews';
 
 import block from './block.json';

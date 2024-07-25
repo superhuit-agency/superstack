@@ -1,4 +1,9 @@
-export interface WpTermRest {
+type useGraphQlApiResponse = {
+	isLoading: boolean;
+	data: any;
+};
+
+interface WpTermRest {
 	id: number;
 	count: number;
 	description: string;
@@ -11,7 +16,20 @@ export interface WpTermRest {
 	_links: any;
 }
 
-export interface WpPostRest {
+type WP_REST_RESPONSE_TYPES =
+	| WpMediaRest
+	| WpPostRest
+	| WpTermRest
+	| Array<WpMediaRest>
+	| Array<WpPostRest>
+	| Array<WpTermRest>;
+
+type useRestAPIResponse<T> = {
+	isLoading: boolean;
+	data: T;
+};
+
+interface WpPostRest {
 	_links: any;
 	acf?: any;
 	author: number;
@@ -50,7 +68,7 @@ export interface WpPostRest {
 	type: string;
 }
 
-export interface WpMediaRest {
+interface WpMediaRest {
 	id: number;
 	date: string;
 	date_gmt: string;
@@ -92,7 +110,7 @@ export interface WpMediaRest {
 	_links: any;
 }
 
-export interface CoreSelector {
+interface CoreSelector {
 	canUser: Function;
 	canUserEditEntityRecord: Function;
 	getAuthors: Function;
@@ -133,7 +151,7 @@ export interface CoreSelector {
 	isSavingEntityRecord: Function;
 }
 
-export interface CoreDispatcher {
+interface CoreDispatcher {
 	addEntities: Function;
 	deleteEntityRecord: Function;
 	editEntityRecord: Function;
@@ -146,7 +164,7 @@ export interface CoreDispatcher {
 	undo: Function;
 }
 
-export interface CoreBlockEditorSelector {
+interface CoreBlockEditorSelector {
 	areInnerBlocksControlled: Function;
 	canEditBlock: Function;
 	canInsertBlocks: Function;
@@ -231,7 +249,7 @@ export interface CoreBlockEditorSelector {
 	wasBlockJustInserted: Function;
 }
 
-export interface CoreBlockEditorDispatcher {
+interface CoreBlockEditorDispatcher {
 	clearSelectedBlock: Function;
 	duplicateBlocks: Function;
 	enterFormattedText: Function;
@@ -284,7 +302,7 @@ export interface CoreBlockEditorDispatcher {
 	validateBlocksToTemplate: Function;
 }
 
-export interface CoreBlocksSelector {
+interface CoreBlocksSelector {
 	getActiveBlockVariation: Function;
 	getBlockStyles: Function;
 	getBlockSupport: Function;
@@ -304,9 +322,9 @@ export interface CoreBlocksSelector {
 	hasChildBlocksWithInserterSupport: Function;
 	isMatchingSearchTerm: Function;
 }
-export interface CoreBlocksDispatcher {}
+interface CoreBlocksDispatcher {}
 
-export interface CoreEditorSelector {
+interface CoreEditorSelector {
 	canInsertBlockType: Function;
 	canUserUseUnfilteredHTML: Function;
 	didPostSaveRequestFail: Function;
@@ -417,7 +435,7 @@ export interface CoreEditorSelector {
 	isValidTemplate: Function;
 }
 
-export interface CoreEditorDispatcher {
+interface CoreEditorDispatcher {
 	autosave: Function;
 	clearSelectedBlock: Function;
 	createUndoLevel: Function;

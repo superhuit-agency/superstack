@@ -2,7 +2,6 @@ import { BlockEditProps } from '@wordpress/blocks';
 import { _x } from '@wordpress/i18n';
 
 import { VideoEdit } from '#/components';
-import { VideoProps, WpBlockType } from '@/typings';
 
 import block from './block.json';
 

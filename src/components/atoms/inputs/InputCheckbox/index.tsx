@@ -11,7 +11,6 @@ import {
 } from 'react';
 
 import { useTranslation } from '@/hooks/use-translation';
-import { BlockConfigs, InputProps } from '@/typings';
 
 import { Checkbox, CheckboxProps } from '../Checkbox';
 import block from './block.json';

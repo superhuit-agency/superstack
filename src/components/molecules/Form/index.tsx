@@ -27,7 +27,6 @@ import {
 	getMaxFilesizeValidator,
 	uploadFile,
 } from '@/components/atoms/inputs/InputFile/helpers';
-import { BlockConfigs } from '@/typings';
 import {
 	Button,
 	FormSectionBreaker,

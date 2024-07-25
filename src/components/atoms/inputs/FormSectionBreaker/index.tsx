@@ -1,6 +1,5 @@
 import { FC } from 'react';
 // internal imports
-import { BlockConfigs } from '@/typings';
 import block from './block.json';
 
 // styles

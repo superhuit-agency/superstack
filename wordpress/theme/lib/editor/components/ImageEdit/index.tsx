@@ -11,9 +11,6 @@ import {
 	RichText,
 } from '@wordpress/block-editor';
 
-import { CoreBlockEditorSelector } from '#/typings';
-import { ImageProps } from '@/typings';
-
 // styles
 import './styles.css';
 

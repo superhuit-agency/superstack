@@ -13,8 +13,6 @@ import { H4Icon } from '#/assets/icons/Heading/H4';
 import { H5Icon } from '#/assets/icons/Heading/H5';
 import { H6Icon } from '#/assets/icons/Heading/H6';
 
-import { WpBlockType, WpFilterType } from '@/typings';
-
 import block from './block.json';
 
 // styles

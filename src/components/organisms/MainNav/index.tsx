@@ -7,7 +7,6 @@ import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import configs from '@/configs.json';
 import { Link } from '@/helpers/Link';
 import { useTranslation } from '@/hooks/use-translation';
-import { BlockConfigs, ImageProps, MenuItemType } from '@/typings';
 
 import { Image } from '../../molecules/Image';
 import block from './block.json';

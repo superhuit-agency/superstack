@@ -2,8 +2,6 @@ import { BlockEditProps } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { ComponentType } from 'react';
 
-// internal imports
-import { WpFilterType } from '@/typings';
 
 import block from './block.json';
 

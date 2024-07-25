@@ -2,8 +2,6 @@ import { RichText } from '@wordpress/block-editor';
 import { BlockEditProps } from '@wordpress/blocks';
 import { _x } from '@wordpress/i18n';
 
-import { WpBlockType } from '@/typings';
-
 import { FormSectionBreakerProps } from '.';
 import block from './block.json';
 

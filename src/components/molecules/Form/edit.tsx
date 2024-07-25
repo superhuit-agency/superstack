@@ -8,8 +8,6 @@ import { useMemo } from 'react';
 
 import icon from '@/components/icons/FormIcon';
 
-import { WpBlockType } from '@/typings';
-
 import { Form, FormProps } from '.';
 import block from './block.json';
 

@@ -14,7 +14,7 @@ import {
 
 // internal imports
 import { useTranslation } from '@/hooks/use-translation';
-import { BlockConfigs, InputProps } from '@/typings';
+
 import block from './block.json';
 
 // styles

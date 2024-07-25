@@ -2,7 +2,6 @@ import { BlockEditProps } from '@wordpress/blocks';
 import { _x } from '@wordpress/i18n';
 
 import { ImageEdit } from '#/components';
-import { ImageProps, WpBlockType } from '@/typings';
 
 import block from './block.json';
 

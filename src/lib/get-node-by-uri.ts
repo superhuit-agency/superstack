@@ -2,8 +2,6 @@ import * as _templatesData from '@/components/templates/data';
 import configs from '@/configs.json';
 import { fetchAPI, formatBlocksJSON } from '@/lib';
 
-import { AuthType } from './fetch-api';
-
 const templatesData: any = _templatesData;
 
 const { singlePostData, singlePageData, singleCategoryData, singleTagData } =

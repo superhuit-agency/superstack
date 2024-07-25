@@ -2,7 +2,6 @@ import cx from 'classnames';
 import { FC, forwardRef, useId } from 'react';
 
 import { useTranslation } from '@/hooks/use-translation';
-import { BlockConfigs, InputProps } from '@/typings';
 import block from './block.json';
 
 // styles

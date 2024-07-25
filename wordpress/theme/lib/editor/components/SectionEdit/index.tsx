@@ -1,7 +1,6 @@
 import React, { FC } from 'react';
 import { _x } from '@wordpress/i18n';
 import { RichText } from '@wordpress/block-editor';
-import { SectionProps } from '@/typings';
 
 type SubcomponentEditProps = {
 	onChange: Function;

@@ -3,7 +3,6 @@ import { FC } from 'react';
 
 import { useTranslation } from '@/hooks/use-translation';
 import { Link } from '@/helpers/Link';
-import { BlockConfigs, MenuItemType } from '@/typings';
 
 import block from './block.json';
 

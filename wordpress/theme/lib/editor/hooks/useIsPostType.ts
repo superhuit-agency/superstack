@@ -1,5 +1,4 @@
 import { useSelect } from '@wordpress/data';
-import { CoreEditorSelector } from '#/typings';
 
 export function useIsPostType(postType: string | Array<string>) {
 	return useSelect((select): boolean => {

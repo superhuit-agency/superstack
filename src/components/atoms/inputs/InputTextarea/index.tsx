@@ -1,7 +1,6 @@
 import cx from 'classnames';
 import { FC, forwardRef, useId } from 'react';
 
-import { BlockConfigs, InputProps } from '@/typings';
 import block from './block.json';
 
 // styles

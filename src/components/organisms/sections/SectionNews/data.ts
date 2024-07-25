@@ -1,6 +1,5 @@
 import * as cardNewsData from '@/components/molecules/cards/CardNews/data';
 
-import { FetchApiFuncType } from '@/lib/fetch-api';
 import { gql } from '@/utils';
 
 import block from './block.json';

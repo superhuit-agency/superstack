@@ -8,9 +8,6 @@ import {
 import { useSelect } from '@wordpress/data';
 import { registerPlugin } from '@wordpress/plugins';
 
-import { CoreEditorSelector } from '#/typings';
-import { PostType, WpBlockType } from '@/typings';
-
 const BlocksWhitelist = () => {
 	const { postType } = useSelect((select) => {
 		const { getCurrentPostType } = select(

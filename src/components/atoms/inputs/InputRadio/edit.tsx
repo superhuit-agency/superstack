@@ -9,8 +9,8 @@ import { useRef } from '@wordpress/element';
 import { _x } from '@wordpress/i18n';
 
 import { IdControl, NameControl } from '#/components';
-import { WpBlockEditProps, WpBlockType } from '@/typings';
 import { RadioBlock } from '../Radio/edit';
+
 import block from './block.json';
 import { InputRadioProps } from '.';
 

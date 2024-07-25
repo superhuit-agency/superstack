@@ -12,13 +12,13 @@ const setNameDebounced = debounce((onChange, name) => {
 }, 1000);
 
 interface NameControlProps {
-	name: string;
+	name?: string;
 	placeholder?: string;
 	onChange: (name: string) => void;
 }
 
 export const NameControl: FC<NameControlProps> = ({
-	name,
+	name = '',
 	placeholder = '',
 	onChange,
 }) => {

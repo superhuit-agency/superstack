@@ -6,7 +6,6 @@ import { Link } from '@/helpers/Link';
 import { Blocks, Container } from '@/components/global';
 import { CardNewsProps } from '@/components/molecules/cards/CardNews';
 import { Pagination, Button, CardNews } from '@/components';
-import { BlockPropsType, LinkProps } from '@/typings';
 
 import { ArchivePostData } from './data';
 import './styles.css';

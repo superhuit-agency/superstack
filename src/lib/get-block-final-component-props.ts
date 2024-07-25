@@ -1,6 +1,5 @@
 import * as blocksData from '@/components/data';
 import { fetchAPI } from '@/lib';
-import { BlockPropsType } from '@/typings';
 
 const blocksDataList: { [key: string]: any } = {};
 for (const key in blocksData) {

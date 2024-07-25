@@ -1,7 +1,5 @@
 import { FC, HTMLProps } from 'react';
 
-import { BlockConfigs } from '@/typings';
-
 import block from './block.json';
 
 // styles

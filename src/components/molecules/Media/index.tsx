@@ -2,7 +2,6 @@ import { FC } from 'react';
 import cx from 'classnames';
 
 // internal imports
-import { BlockConfigs, ImageProps, VideoProps } from '@/typings';
 import { Image } from '../Image';
 import { Video } from '../Video';
 import block from './block.json';

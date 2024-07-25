@@ -3,7 +3,6 @@ import { _x } from '@wordpress/i18n';
 import cx from 'classnames';
 
 import { ButtonEdit } from '#/components';
-import { ButtonProps, WpBlockType } from '@/typings';
 
 import block from './block.json';
 

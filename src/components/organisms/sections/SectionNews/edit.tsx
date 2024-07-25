@@ -9,8 +9,6 @@ import { useGraphQlApi } from '#/hooks';
 import { CardNews, CardNewsProps } from '@/components/molecules/cards/CardNews';
 import EditNewsControls from './EditNewsControls';
 
-import { WpBlockEditProps, WpBlockType } from '@/typings';
-
 // Data
 import { SectionNewsProps } from '.';
 import block from './block.json';

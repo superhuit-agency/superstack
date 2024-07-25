@@ -13,7 +13,7 @@ import { useMemo } from '@wordpress/element';
 import { _x } from '@wordpress/i18n';
 
 import { ImageEdit, VideoEdit } from '#/components';
-import { WpBlockType } from '@/typings';
+
 import block from './block.json';
 import { MediaProps } from '.';
 

@@ -2,8 +2,6 @@ import cx from 'classnames';
 import Img from 'next/image';
 import { FC, forwardRef } from 'react';
 
-import { BlockConfigs, ImageProps } from '@/typings';
-
 import block from './block.json';
 
 // styles
