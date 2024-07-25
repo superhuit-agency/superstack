@@ -20,7 +20,7 @@ interface UrlPickerChangeParams extends LinkControlValueProps {
 	kind?: string;
 }
 
-interface LinkAttributes {
+interface UrlPickerLinkAttributes {
 	title?: string;
 	href?: string;
 	target?: Pick<HtmlProps<HTMLAnchorElement>, 'target'>;
