@@ -1,0 +1,8 @@
+{
+	"http-basic": {
+		"release-belt.superhuit.ch": {
+			"username": "##username##",
+			"password": "##password##"
+		}
+	}
+}

@@ -9,6 +9,7 @@ Follow these steps to install the stack for the 1st time:
 
 ### WordPress
 
+-   `cp ./wordpress/auth.json.example ./wordpress/auth.json && sed -i '' -e 's/##username##/__LOGIN__/g' -e 's/##password##/__PASSWORD__/g' ./wordpress/auth.json` - Setup the auth for pro plugin (do not forget to replace `__LOGIN__` & `__PASSWORD__` with actual credentials)
 -   `cd wordpress`
 -   `npm run build:assets`
 -   `npm run start:wp`
