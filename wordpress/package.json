@@ -9,8 +9,8 @@
   "private": true,
   "scripts": {
     "start:assets": "NEXT_PUBLIC_IS_THIS_NEXT=false NODE_ENV=development webpack server",
-    "start:wp": "THEME_NAME=superstack PROJECT_CODE=spck CONTAINER_NAME=spck_wp ./scripts/mutagen.sh up && docker-compose exec -T wp bash < ./scripts/provision.sh",
-    "stop:wp": "./scripts/mutagen.sh down",
+    "start:wp": "sh ./scripts/start-wp.sh",
+    "stop:wp": "docker compose down",
     "logs": "docker compose logs -f",
     "build:assets": "NEXT_PUBLIC_IS_THIS_NEXT=false NODE_ENV=production webpack",
     "generate:pot": "wp i18n make-pot ./theme theme/languages/supt.pot",
