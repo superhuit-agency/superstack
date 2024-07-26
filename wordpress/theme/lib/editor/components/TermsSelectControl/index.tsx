@@ -74,6 +74,7 @@ const TermsSelectControl = ({
 				suggestions={suggestions}
 				onInputChange={setSearch}
 				displayTransform={escapeHTML}
+				// @ts-ignore
 				onChange={(tokens: Array<string>) => {
 					onChange(
 						tokens

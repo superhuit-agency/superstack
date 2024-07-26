@@ -8,7 +8,7 @@ import {
 import { useSelect } from '@wordpress/data';
 import { registerPlugin } from '@wordpress/plugins';
 
-const BlocksWhitelist = () => {
+const BlocksWhitelist = (): JSX.Element | null => {
 	const { postType } = useSelect((select) => {
 		const { getCurrentPostType } = select(
 			'core/editor'
@@ -46,6 +46,6 @@ const BlocksWhitelist = () => {
 };
 
 registerPlugin('supt-blocks-whitelisting', {
-	icon: () => null,
+	icon: (): null => null,
 	render: BlocksWhitelist,
 });
