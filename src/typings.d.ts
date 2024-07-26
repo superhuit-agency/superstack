@@ -33,39 +33,6 @@ type WpFilterType = {
 		  ) => WpBlockType<any>['settings']);
 };
 
-type InputProps = Omit<HTMLProps<HTMLInputElement>, 'onChange'> & {
-	label: string;
-	name: string;
-	invalid?: boolean | string;
-	inputAttributes?: HTMLAttributes<HTMLInputElement>;
-	onChange?: Function;
-};
-
-interface ImageProps {
-	id?: number;
-	src: string | StaticImageData;
-	alt: string;
-	width: number;
-	height: number;
-	caption?: string | React.ReactNode;
-	className?: string;
-	sizes?: string;
-	priority?: boolean;
-	quality?: number;
-	fill?: boolean;
-	style?: CSSProperties;
-	children?: React.ReactNode;
-}
-
-type VideoProps = Omit<HTMLProps<HTMLVideoElement>, 'poster'> & {
-	id: string;
-	caption: string;
-	poster?: ImageProps;
-	source?: 'youtube' | 'vimeo';
-	src?: string;
-	url?: string;
-};
-
 type BlockConfigs = {
 	slug?: string;
 	title?: string;

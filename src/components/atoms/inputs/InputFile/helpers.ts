@@ -3,7 +3,11 @@ import mime from 'mime';
 
 export const ONE_MEGA_BYTE = 1000 * 1024;
 
-export function uploadFile(file: File, key: string, uniqId: string): Promise<any> {
+export function uploadFile(
+	file: File,
+	key: string,
+	uniqId: string
+): Promise<any> {
 	const sliceSize = ONE_MEGA_BYTE;
 	return new Promise((resolve, reject) => {
 		const reader = new FileReader();

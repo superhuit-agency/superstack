@@ -16,9 +16,9 @@ const DEFAULT_THUMBNAIL_ARGS = {
 };
 
 export const Video: FC<VideoProps> & BlockConfigs = ({
+	caption,
 	id,
 	poster,
-	caption,
 	source,
 	src,
 }) => {

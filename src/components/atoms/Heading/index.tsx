@@ -1,23 +1,12 @@
-import { FC, HTMLProps } from 'react';
+import { FC } from 'react';
 import cx from 'classnames';
 
 import './styles.css';
 
-/**
- * TYPINGS
- */
-interface HeadingProps extends HTMLProps<HTMLHeadingElement> {
-	content: string;
-	level: number;
-}
-
-/**
- * COMPONENT
- */
 export const Heading: FC<HeadingProps> = ({
+	className = '',
 	content,
 	level,
-	className = '',
 }) => {
 	const HTag = `h${level}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
 

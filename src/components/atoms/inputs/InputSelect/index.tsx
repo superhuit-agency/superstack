@@ -22,29 +22,13 @@ import './styles.css';
 
 const Select = dynamic(() => import('react-select'));
 
-/**
- * TYPINGS
- */
-type OptionProps = {
-	label: string;
-	value: string;
-	disabled?: boolean;
-};
-
-const isOptionProps = (value: unknown): value is OptionProps => {
+const isOptionProps = (value: unknown): value is InputSelectOptionProps => {
 	return (
 		typeof value === 'object' &&
 		value !== null &&
 		'label' in value &&
 		'value' in value
 	);
-};
-
-export type InputSelectProps = InputProps & {
-	options: string | Array<OptionProps>;
-	onChange?: Function;
-	onBlur?: Function;
-	value?: string;
 };
 
 /**
@@ -56,9 +40,9 @@ export type InputSelectProps = InputProps & {
  * 4. Create Array with values
  *
  * @param {string} options
- * @returns {Array<OptionProps>}
+ * @returns {Array<InputSelectOptionProps>}
  */
-const buildOptionsFromString = (options: string) =>
+const buildOptionsFromString = (options: string = '') =>
 	options.split(';').reduce((acc, element) => {
 		const trimmedElement = element.trim().replace('::', ':'); // Remove white spaces + fix duplicate separators
 
@@ -70,12 +54,15 @@ const buildOptionsFromString = (options: string) =>
 			});
 		}
 		return acc;
-	}, [] as OptionProps[]);
+	}, [] as InputSelectOptionProps[]);
 
 /**
  * COMPONENT
  */
-export const InputSelect: FC<InputSelectProps> & BlockConfigs = forwardRef(
+export const InputSelect: FC<InputSelectProps> & BlockConfigs = forwardRef<
+	HTMLDivElement,
+	InputSelectProps
+>(
 	(
 		{
 			id: initId,
@@ -91,8 +78,8 @@ export const InputSelect: FC<InputSelectProps> & BlockConfigs = forwardRef(
 			onBlur,
 			value,
 			...rest
-		}: InputSelectProps,
-		ref: React.Ref<HTMLInputElement>
+		},
+		ref
 	) => {
 		const defaultId = useId();
 		const id = initId ?? defaultId;
@@ -109,7 +96,7 @@ export const InputSelect: FC<InputSelectProps> & BlockConfigs = forwardRef(
 		);
 
 		const [selectedOption, setSelectedOption] =
-			useState<OptionProps | null>(null);
+			useState<InputSelectOptionProps | null>(null);
 
 		useEffect(() => {
 			setSelectedOption(
@@ -181,7 +168,7 @@ export const InputSelect: FC<InputSelectProps> & BlockConfigs = forwardRef(
 					placeholder={placeholder}
 					options={options}
 					isOptionDisabled={(opt) =>
-						(opt as OptionProps)?.disabled ?? false
+						(opt as InputSelectOptionProps)?.disabled ?? false
 					}
 					aria-invalid={!!invalid}
 					onBlur={onBlur}

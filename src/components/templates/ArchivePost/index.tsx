@@ -4,21 +4,11 @@ import { useMemo } from 'react';
 import { useTranslation } from '@/hooks/use-translation';
 import { Link } from '@/helpers/Link';
 import { Blocks, Container } from '@/components/global';
-import { CardNewsProps } from '@/components/molecules/cards/CardNews';
 import { Pagination, Button, CardNews } from '@/components';
 
-import { ArchivePostData } from './data';
 import './styles.css';
 
-type TaxonomyType = LinkProps & {
-	isActive?: boolean;
-};
-
-interface PageProps {
-	node: ArchivePostData & any;
-}
-
-export default function Page({ node }: PageProps) {
+export default function Page({ node }: ArchivePostProps) {
 	const __t = useTranslation();
 
 	const {
@@ -32,7 +22,7 @@ export default function Page({ node }: PageProps) {
 				total: 1,
 			},
 		},
-	}: ArchivePostData = node ?? {};
+	} = node ?? {};
 
 	// Format categories list
 	const allCategories = useMemo(() => {
@@ -48,10 +38,7 @@ export default function Page({ node }: PageProps) {
 
 	return (
 		<>
-			<Blocks
-				blocks={node.blocksJSON as BlockPropsType[]}
-				includes={/page-header/g}
-			/>
+			<Blocks blocks={node.blocksJSON} includes={/page-header/g} />
 			<Container className="supt-archive-post supt-section">
 				<div className="supt-archive-post__inner">
 					{/* list categories */}

@@ -9,30 +9,14 @@ import { Image } from '../..';
 import block from './block.json';
 import './styles.css';
 
-/**
- * TYPINGS
- */
-export type CardNewsProps = {
-	image?: ImageProps;
-	category?: LinkProps;
-	date: string;
-	title: string;
-	excerpt?: string;
-	uri: string;
-	linkLabel?: string;
-};
-
-/**
- * COMPONENTS
- */
 export const CardNews: FC<CardNewsProps> & BlockConfigs = ({
-	image,
 	category,
 	date,
-	title,
 	excerpt,
-	uri,
 	linkLabel,
+	image,
+	title,
+	uri,
 	...linkProps
 }) => {
 	const locale = configs.staticLang; // TODO :: HANDLE THIS !!!

@@ -7,14 +7,6 @@ import block from './block.json';
 // styles
 import './styles.css';
 
-/**
- * TYPINGS
- */
-export type InputEmailProps = InputProps;
-
-/**
- * COMPONENT
- */
 export const InputEmail: FC<InputEmailProps> & BlockConfigs = forwardRef(
 	(
 		{

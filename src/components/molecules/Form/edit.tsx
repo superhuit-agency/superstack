@@ -8,15 +8,8 @@ import { useMemo } from 'react';
 
 import icon from '@/components/icons/FormIcon';
 
-import { Form, FormProps } from '.';
+import { Form } from '.';
 import block from './block.json';
-
-type FormType = {
-	id: number;
-	title: string;
-	strings: any;
-	fields: any;
-};
 
 /**
  * COMPONENT EDIT
@@ -43,7 +36,7 @@ const Edit = (props: BlockEditProps<FormProps>) => {
 	const noFormAvailable = forms.length === 0;
 
 	const form = useMemo(() => {
-		return id ? forms.find((f: FormType) => f.id === id) : false;
+		return id ? forms.find((f: WpFormTypeRest) => f.id === id) : false;
 	}, [id, forms]);
 
 	return (
@@ -82,10 +75,12 @@ const Edit = (props: BlockEditProps<FormProps>) => {
 														'supt'
 													),
 												},
-												...forms.map((f: FormType) => ({
-													value: f.id,
-													label: f.title,
-												})),
+												...forms.map(
+													(f: WpFormTypeRest) => ({
+														value: f.id,
+														label: f.title,
+													})
+												),
 											] as any
 										}
 										onChange={(value: string) => {
@@ -156,14 +151,6 @@ export const FormBlock: WpBlockType<FormProps> = {
 			id: {
 				type: 'number',
 				default: undefined,
-			},
-			fields: {
-				type: 'object',
-				default: {},
-			},
-			opt_ins: {
-				type: 'boolean',
-				default: false,
 			},
 		},
 		keywords: [],

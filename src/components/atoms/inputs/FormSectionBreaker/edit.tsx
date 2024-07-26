@@ -2,7 +2,6 @@ import { RichText } from '@wordpress/block-editor';
 import { BlockEditProps } from '@wordpress/blocks';
 import { _x } from '@wordpress/i18n';
 
-import { FormSectionBreakerProps } from '.';
 import block from './block.json';
 
 // styles
@@ -12,7 +11,7 @@ import './styles.edit.css';
 /**
  * COMPONENT EDITOR
  */
-const Edit = (props: BlockEditProps<FormSectionBreakerProps>) => {
+const Edit = (props: BlockEditProps<FormSectionBreakerAttributes>) => {
 	const { title } = props.attributes;
 
 	return (
@@ -36,24 +35,25 @@ const Edit = (props: BlockEditProps<FormSectionBreakerProps>) => {
 /**
  * WORDPRESS BLOCK
  */
-export const FormSectionBreakerBlock: WpBlockType<FormSectionBreakerProps> = {
-	slug: block.slug,
-	settings: {
-		title: block.title,
-		description: _x(
-			'Form Section Breaker',
-			'Block FormSectionBreaker description',
-			'supt'
-		),
-		icon: 'editor-textcolor',
-		category: 'common',
-		postTypes: ['form'],
-		attributes: {
-			title: {
-				type: 'string',
+export const FormSectionBreakerBlock: WpBlockType<FormSectionBreakerAttributes> =
+	{
+		slug: block.slug,
+		settings: {
+			title: block.title,
+			description: _x(
+				'Form Section Breaker',
+				'Block FormSectionBreaker description',
+				'supt'
+			),
+			icon: 'editor-textcolor',
+			category: 'common',
+			postTypes: ['form'],
+			attributes: {
+				title: {
+					type: 'string',
+				},
 			},
+			edit: Edit,
+			save: () => null,
 		},
-		edit: Edit,
-		save: () => null,
-	},
-};
+	};

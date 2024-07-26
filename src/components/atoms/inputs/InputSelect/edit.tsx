@@ -16,7 +16,6 @@ import { _x } from '@wordpress/i18n';
 import { IdControl, NameControl } from '#/components';
 
 import block from './block.json';
-import { InputSelectProps } from '.';
 
 // styles
 import './styles.css';
@@ -25,14 +24,14 @@ import './styles.edit.css';
 /**
  * COMPONENT EDITOR
  */
-const Edit = (props: BlockEditProps<InputSelectProps>) => {
+const Edit = (props: BlockEditProps<InputSelectAttributes>) => {
 	const {
 		name,
 		label,
 		required,
 		id = '',
 		placeholder,
-		options,
+		options = '',
 	} = props.attributes;
 	const refEl = useRef(null);
 
@@ -171,12 +170,10 @@ export const InputSelectBlock: WpBlockType<InputSelectProps> = {
 		),
 		postTypes: ['form'],
 		attributes: {
-			options: {
-				type: 'string',
-			},
 			id: { type: 'string' },
 			label: { type: 'string' },
 			name: { type: 'string' },
+			options: { type: 'string' },
 			placeholder: { type: 'string' },
 			required: { type: 'boolean', default: false },
 		},

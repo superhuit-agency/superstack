@@ -12,7 +12,6 @@ import { IdControl, NameControl } from '#/components';
 import { RadioBlock } from '../Radio/edit';
 
 import block from './block.json';
-import { InputRadioProps } from '.';
 
 // styles
 import './styles.css';
@@ -21,7 +20,7 @@ import './styles.edit.css';
 /**
  * COMPONENT EDITOR
  */
-const Edit = (props: WpBlockEditProps<InputRadioProps>) => {
+const Edit = (props: WpBlockEditProps<InputRadioAttributes>) => {
 	const refEl = useRef(null);
 
 	const { id = '', label, name, required } = props.attributes;
@@ -91,7 +90,7 @@ const Edit = (props: WpBlockEditProps<InputRadioProps>) => {
 /**
  * WORDPRESS BLOCK
  */
-export const InputRadioBlock: WpBlockType<InputRadioProps> = {
+export const InputRadioBlock: WpBlockType<InputRadioAttributes> = {
 	slug: block.slug,
 	settings: {
 		title: block.title,
@@ -146,14 +145,8 @@ export const InputRadioBlock: WpBlockType<InputRadioProps> = {
 				type: 'boolean',
 				default: false,
 			},
-			options: {
-				type: 'array',
-				default: [],
-			},
 		},
 		edit: Edit,
-		save: function () {
-			return <InnerBlocks.Content />;
-		},
+		save: () => <InnerBlocks.Content />,
 	},
 };

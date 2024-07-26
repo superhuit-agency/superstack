@@ -11,7 +11,6 @@ import { _x } from '@wordpress/i18n';
 import { IdControl, NameControl } from '#/components';
 
 import block from './block.json';
-import { InputTextareaProps } from '.';
 
 // styles
 import './styles.css';
@@ -20,7 +19,7 @@ import './styles.edit.css';
 /**
  * COMPONENT EDITOR
  */
-const Edit = (props: BlockEditProps<InputTextareaProps>) => {
+const Edit = (props: BlockEditProps<InputTextareaAttributes>) => {
 	const { name, label, required, id = '', placeholder } = props.attributes;
 	const refEl = useRef(null);
 
@@ -87,7 +86,7 @@ const Edit = (props: BlockEditProps<InputTextareaProps>) => {
 /**
  * WORDPRESS BLOCK
  */
-export const InputTextareaBlock: WpBlockType<InputTextareaProps> = {
+export const InputTextareaBlock: WpBlockType<InputTextareaAttributes> = {
 	slug: block.slug,
 	settings: {
 		title: block.title,

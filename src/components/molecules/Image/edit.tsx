@@ -8,7 +8,7 @@ import block from './block.json';
 /**
  * COMPONENT EDIT
  */
-const Edit = (props: BlockEditProps<ImageProps>) => {
+const Edit = (props: BlockEditProps<ImageAttributes>) => {
 	return (
 		<ImageEdit
 			attributes={{
@@ -28,7 +28,7 @@ const Edit = (props: BlockEditProps<ImageProps>) => {
 /**
  * WORDPRESS BLOCK
  */
-export const ImageBlock: WpBlockType<ImageProps> = {
+export const ImageBlock: WpBlockType<ImageAttributes> = {
 	slug: block.slug,
 	settings: {
 		title: block.title,
@@ -37,24 +37,12 @@ export const ImageBlock: WpBlockType<ImageProps> = {
 		category: 'media',
 		postTypes: ['post'],
 		attributes: {
-			id: {
-				type: 'number',
-			},
-			src: {
-				type: 'string',
-			},
-			alt: {
-				type: 'string',
-			},
-			width: {
-				type: 'number',
-			},
-			height: {
-				type: 'number',
-			},
-			caption: {
-				type: 'string',
-			},
+			alt: { type: 'string' },
+			caption: { type: 'string' },
+			height: { type: 'number' },
+			id: { type: 'number' },
+			src: { type: 'string' },
+			width: { type: 'number' },
 		},
 		edit: Edit,
 		save: () => null,

@@ -10,9 +10,8 @@ import { registerPlugin } from '@wordpress/plugins';
 
 const BlocksWhitelist = (): JSX.Element | null => {
 	const { postType } = useSelect((select) => {
-		const { getCurrentPostType } = select(
-			'core/editor'
-		) as CoreEditorSelector;
+		const { getCurrentPostType } = select('core/editor');
+		//@ts-expect-error
 		const postType = getCurrentPostType();
 
 		return {

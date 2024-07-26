@@ -87,9 +87,9 @@ export default async function getNodeByURI(
 	if (blockEnrichment) {
 		const { blocksJSON, templateData } = await Promise.allSettled([
 			formatBlocksJSON(
-				(previewDraft
+				previewDraft
 					? node.preview?.node?.blocksJSON ?? ''
-					: node?.blocksJSON ?? '') as string
+					: node?.blocksJSON ?? ''
 			),
 			getTemplateData(node),
 		])

@@ -8,20 +8,6 @@ import { useState, useCallback, useEffect } from '@wordpress/element';
 
 import { UrlPicker } from '..';
 
-type ButtonEditProps = {
-	attrs: ButtonProps;
-	isSelected?: boolean;
-	wrapperClass?: string;
-	rootClass?: string;
-	onChange: Function;
-	linkSettings?: object;
-	placeholder?: string;
-	toolbarPosition?: 'left' | 'right';
-	minCols?: number;
-	maxCols?: number;
-	inBlockControls?: boolean;
-};
-
 export default function ButtonEdit({
 	attrs,
 	onChange,

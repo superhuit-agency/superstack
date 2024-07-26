@@ -10,7 +10,6 @@ import { _x } from '@wordpress/i18n';
 
 import { IdControl, NameControl } from '#/components';
 import block from './block.json';
-import { InputEmailProps } from '.';
 
 // styles
 import './styles.css';
@@ -19,7 +18,7 @@ import './styles.edit.css';
 /**
  * COMPONENT EDITOR
  */
-const Edit = (props: BlockEditProps<InputEmailProps>) => {
+const Edit = (props: BlockEditProps<InputEmailAttributes>) => {
 	const { name, label, required, id, placeholder } = props.attributes;
 	const refEl = useRef(null);
 
@@ -86,7 +85,7 @@ const Edit = (props: BlockEditProps<InputEmailProps>) => {
 /**
  * WORDPRESS BLOCK
  */
-export const InputEmailBlock: WpBlockType<InputEmailProps> = {
+export const InputEmailBlock: WpBlockType<InputEmailAttributes> = {
 	slug: block.slug,
 	settings: {
 		title: block.title,

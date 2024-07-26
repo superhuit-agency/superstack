@@ -1,6 +1,5 @@
 import { gql } from '@/utils';
 import block from './block.json';
-import { CardNewsProps } from '.';
 
 export const slug = block.slug;
 

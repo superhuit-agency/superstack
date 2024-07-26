@@ -44,25 +44,10 @@ import block from './block.json';
 // styles
 import './styles.css';
 
-/**
- * TYPINGS
- */
-export type FormProps = {
-	id?: number; // id of the form in the backend
-	strings?: {
-		[id: string]: string;
-	};
-	fields: Array<any>;
-	opt_ins: Array<any>;
-};
-
-/**
- * COMPONENT
- */
 export const Form: FC<FormProps> & BlockConfigs = ({
+	fields = [],
 	id,
 	strings: { submitLabel = 'Send' } = {},
-	fields = [],
 	opt_ins = [],
 }) => {
 	const {

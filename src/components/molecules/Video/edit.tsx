@@ -8,7 +8,7 @@ import block from './block.json';
 /**
  * COMPONENT EDITOR
  */
-const Edit = (props: BlockEditProps<VideoProps>) => {
+const Edit = (props: BlockEditProps<VideoAttributes>) => {
 	return (
 		<VideoEdit
 			attributes={{ ...props.attributes }}
@@ -22,7 +22,7 @@ const Edit = (props: BlockEditProps<VideoProps>) => {
 /**
  * WORDPRESS BLOCK
  */
-export const VideoBlock: WpBlockType<VideoProps> = {
+export const VideoBlock: WpBlockType<VideoAttributes> = {
 	slug: block.slug,
 	settings: {
 		title: block.title,
@@ -31,18 +31,10 @@ export const VideoBlock: WpBlockType<VideoProps> = {
 		category: 'media',
 		postTypes: ['post'],
 		attributes: {
-			id: {
-				type: 'string',
-			},
-			source: {
-				type: 'string',
-			},
-			poster: {
-				type: 'object',
-			},
-			caption: {
-				type: 'string',
-			},
+			caption: { type: 'string' },
+			id: { type: 'string' },
+			poster: { type: 'object' },
+			source: { type: 'string' },
 		},
 		edit: Edit,
 		save: () => null,

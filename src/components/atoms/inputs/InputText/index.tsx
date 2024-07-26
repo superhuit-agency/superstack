@@ -8,14 +8,6 @@ import block from './block.json';
 // styles
 import './styles.css';
 
-/**
- * TYPINGS
- */
-export type InputTextProps = InputProps;
-
-/**
- * COMPONENT
- */
 export const InputText: FC<InputTextProps> & BlockConfigs = forwardRef(
 	(
 		{

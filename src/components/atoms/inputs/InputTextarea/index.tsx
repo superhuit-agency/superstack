@@ -7,14 +7,6 @@ import block from './block.json';
 import { useTranslation } from '@/hooks/use-translation';
 import './styles.css';
 
-/**
- * TYPINGS
- */
-export type InputTextareaProps = InputProps;
-
-/**
- * COMPONENT
- */
 export const InputTextarea: FC<InputTextareaProps> & BlockConfigs = forwardRef(
 	(
 		{

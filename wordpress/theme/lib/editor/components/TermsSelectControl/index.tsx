@@ -10,14 +10,6 @@ import { escapeHTML } from '#/utils';
 
 import './styles.css';
 
-// @ts-ignore
-interface TermsSelectControllProps extends FormTokenField.Props {
-	onChange: (tokens: Array<any>) => void;
-	taxonomy?: string;
-	values?: Array<any>;
-	label?: string;
-}
-
 const TermsSelectControl = ({
 	onChange,
 	taxonomy = CATEGORY_TAX_NAME,

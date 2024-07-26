@@ -2,11 +2,6 @@ import React, { FC } from 'react';
 import { _x } from '@wordpress/i18n';
 import { RichText } from '@wordpress/block-editor';
 
-type SubcomponentEditProps = {
-	onChange: Function;
-	attribute?: string;
-};
-
 /**
  * SUBCOMPONENTS
  */

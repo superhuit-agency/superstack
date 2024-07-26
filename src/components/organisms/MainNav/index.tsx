@@ -15,14 +15,6 @@ import './styles.css';
 
 const NAV_MOBILE_BREAKPOINT = 600;
 
-export interface MainNavProps {
-	menus: {
-		header: { items: MenuItemType[] };
-	};
-	siteTitle: string;
-	logo?: Omit<ImageProps, 'alt'> & { alt?: string };
-}
-
 export const MainNav: FC<MainNavProps> & BlockConfigs = ({
 	menus,
 	siteTitle,

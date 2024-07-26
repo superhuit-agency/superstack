@@ -5,16 +5,6 @@ import block from './block.json';
 // styles
 import './styles.css';
 
-/**
- * TYPINGS
- */
-export type FormSectionBreakerProps = {
-	title: string;
-};
-
-/**
- * COMPONENT
- */
 export const FormSectionBreaker: FC<FormSectionBreakerProps> & BlockConfigs = ({
 	title,
 	...rest

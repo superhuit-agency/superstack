@@ -9,24 +9,11 @@ import block from './block.json';
 // styles
 import './styles.css';
 
-/**
- * TYPINGS
- */
-export type MediaProps = {
-	mediaType?: 'image' | 'video';
-	image?: ImageProps;
-	video?: VideoProps;
-	// isSticky?: boolean;
-};
-
-/**
- * COMPONENT
- */
 export const Media: FC<MediaProps> & BlockConfigs = ({
-	mediaType = 'image',
 	image,
-	video,
 	// isSticky,
+	mediaType = 'image',
+	video,
 }) => {
 	return (
 		<div

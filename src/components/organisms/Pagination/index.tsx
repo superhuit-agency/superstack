@@ -6,12 +6,6 @@ import { useTranslation } from '@/hooks/use-translation';
 import block from './block.json';
 import './styles.css';
 
-export type PaginationProps = {
-	baseUri: string;
-	currentPagination: number;
-	totalPages: number;
-};
-
 export const Pagination: FC<PaginationProps> & BlockConfigs = ({
 	baseUri,
 	currentPagination,

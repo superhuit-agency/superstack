@@ -12,25 +12,12 @@ import {
 
 import { useTranslation } from '@/hooks/use-translation';
 
-import { Checkbox, CheckboxProps } from '../Checkbox';
+import { Checkbox } from '../Checkbox';
 import block from './block.json';
 
 // styles
 import './styles.css';
 
-/**
- * TYPINGS
- */
-export type InputCheckboxProps = InputProps & {
-	title?: string;
-	// CHANGE: rename children to options as children is a reserved keyword in react-dom making the storybook fail
-	options: Array<{ attrs: CheckboxProps }>;
-	value?: Array<string>;
-};
-
-/**
- * COMPONENT
- */
 export const InputCheckbox: FC<InputCheckboxProps> & BlockConfigs = forwardRef(
 	(
 		{

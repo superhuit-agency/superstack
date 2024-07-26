@@ -6,24 +6,13 @@ import block from './block.json';
 // styles
 import './styles.css';
 
-/**
- * TYPINGS
- */
-export type CheckboxProps = InputProps & {
-	value?: string;
-	defaultChecked?: boolean;
-};
-
-/**
- * COMPONENT
- */
 export const Checkbox: FC<CheckboxProps> & BlockConfigs = forwardRef<
 	HTMLInputElement,
 	CheckboxProps
 >(
 	(
 		{
-			label,
+			label = '',
 			name,
 			id: initId,
 			value,

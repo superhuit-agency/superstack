@@ -10,23 +10,13 @@ import { escapeHTML } from '#/utils';
 
 import './styles.css';
 
-// @ts-ignore
-interface PostsSelectControlProps extends FormTokenField.Props {
-	onChange: (tokens: Array<any>) => void;
-	postType?: string;
-	values?: Array<any>;
-	label?: string;
-}
-
 const PostsSelectControl = ({
 	onChange,
 	postType = POST_PT_NAME,
 	values,
 	...rest
 }: PostsSelectControlProps) => {
-	const { getCurrentPostId, getCurrentPostType } = select(
-		'core/editor'
-	) as CoreEditorSelector;
+	const { getCurrentPostId, getCurrentPostType } = select('core/editor');
 	const [search, setSearch] = useState('');
 
 	const selectedArgs = useMemo(

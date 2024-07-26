@@ -8,19 +8,6 @@ import block from './block.json';
 
 import './styles.css';
 
-export interface FooterDataType {
-	siteTitle: string;
-	menus: {
-		footer: { items: MenuItemType[] };
-		legal: { items: MenuItemType[] };
-		social: { items: MenuItemType[] };
-	};
-}
-
-interface FooterProps extends FooterDataType {
-	isHome?: boolean;
-}
-
 export const Footer: FC<FooterProps> & BlockConfigs = ({
 	siteTitle,
 	menus,

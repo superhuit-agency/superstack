@@ -9,7 +9,6 @@ import { _x } from '@wordpress/i18n';
 
 import { IdControl, NameControl } from '#/components';
 import { CheckboxBlock } from '../Checkbox/edit';
-import { InputCheckboxProps } from '.';
 import block from './block.json';
 
 // styles
@@ -19,7 +18,7 @@ import './styles.edit.css';
 /**
  * COMPONENT EDITOR
  */
-const Edit = (props: WpBlockEditProps<InputCheckboxProps>) => {
+const Edit = (props: WpBlockEditProps<InputCheckboxAttributes>) => {
 	const { id, label, name, required } = props.attributes;
 
 	return (
@@ -82,7 +81,7 @@ const Edit = (props: WpBlockEditProps<InputCheckboxProps>) => {
 /**
  * WORDPRESS BLOCK
  */
-export const InputCheckboxBlock: WpBlockType<InputCheckboxProps> = {
+export const InputCheckboxBlock: WpBlockType<InputCheckboxAttributes> = {
 	slug: block.slug,
 	settings: {
 		title: block.title,
@@ -116,19 +115,17 @@ export const InputCheckboxBlock: WpBlockType<InputCheckboxProps> = {
 			name: {
 				type: 'string',
 			},
-			required: {
-				type: 'boolean',
-				default: false,
-			},
 			options: {
 				type: 'array',
 				default: [],
 			},
+			required: {
+				type: 'boolean',
+				default: false,
+			},
 		},
 		supports: { customClassName: false },
 		edit: Edit,
-		save: function () {
-			return <InnerBlocks.Content />;
-		},
+		save: () => <InnerBlocks.Content />,
 	},
 };

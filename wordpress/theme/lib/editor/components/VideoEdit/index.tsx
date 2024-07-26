@@ -21,18 +21,6 @@ import { Image } from '@/components/molecules/Image';
 import '@/components/molecules/Video/styles.css';
 import './styles.css';
 
-/**
- * TYPINGS
- */
-type VideoEditProps = {
-	attributes: VideoProps;
-	onChange: Function;
-	posterOnly?: boolean;
-};
-
-/**
- * COMPONENT
- */
 const VideoEdit = ({ attributes, onChange, posterOnly }: VideoEditProps) => {
 	const { id, source, poster, caption } = attributes;
 
@@ -58,7 +46,7 @@ const VideoEdit = ({ attributes, onChange, posterOnly }: VideoEditProps) => {
 							/>
 							<TextControl
 								label={_x('Video ID', 'Video', 'supt')}
-								value={id}
+								value={String(id)}
 								onChange={(id: string) => onChange({ id })}
 								help={
 									<span>

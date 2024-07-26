@@ -13,7 +13,7 @@ import './styles.edit.css';
 /**
  * COMPONENT EDITOR
  */
-const Edit = (props: BlockEditProps<ButtonProps>) => {
+const Edit = (props: BlockEditProps<ButtonAttributes>) => {
 	const { variant } = props.attributes;
 
 	return (
@@ -31,7 +31,7 @@ const Edit = (props: BlockEditProps<ButtonProps>) => {
 /**
  * WORDPRESS BLOCK
  */
-export const ButtonBlock: WpBlockType<ButtonProps> = {
+export const ButtonBlock: WpBlockType<ButtonAttributes> = {
 	slug: block.slug,
 	settings: {
 		title: block.title,
@@ -40,13 +40,13 @@ export const ButtonBlock: WpBlockType<ButtonProps> = {
 		category: 'text',
 		postTypes: ['post'],
 		attributes: {
-			title: {
-				type: 'string',
-			},
 			href: {
 				type: 'string',
 			},
 			target: {
+				type: 'string',
+			},
+			title: {
 				type: 'string',
 			},
 			variant: {
