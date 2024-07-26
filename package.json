@@ -40,6 +40,7 @@
     "@types/sprintf-js": "^1.1.4",
     "@types/wordpress__block-editor": "^11.5.15",
     "@types/wordpress__blocks": "^12.5.13",
+    "@wordpress/api-fetch": "^7.4.0",
     "eslint": "^8",
     "eslint-config-next": "14.0.4",
     "eslint-plugin-storybook": "^0.8.0",
