@@ -8,6 +8,7 @@
   "license": "MIT",
   "private": true,
   "scripts": {
+    "prestart": "sh ./scripts/pre-start.sh",
     "dev": "NEXT_PUBLIC_IS_THIS_NEXT=false NODE_ENV=development webpack server",
     "start": "THEME_NAME=superstack PROJECT_CODE=spck CONTAINER_NAME=spck_wp ./scripts/mutagen.sh up && docker-compose exec -T wp bash < ./scripts/provision.sh",
     "stop": "./scripts/mutagen.sh down",
