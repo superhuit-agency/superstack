@@ -3,8 +3,17 @@ import { fetchAPI } from '@/lib';
 
 const blocksDataList: { [key: string]: any } = {};
 for (const key in blocksData) {
-	const blkData = blocksData[key as keyof typeof blocksData];
-	blocksDataList[blkData.slug] = blkData;
+	const blkData = blocksData[key as keyof typeof blocksData] as any;
+
+	if (blkData?.slug) {
+		blocksDataList[blkData.slug] = blkData;
+	} else {
+		if (process.env.NODE_ENV === 'development') {
+			console.warn(
+				`Missing exported slug for block's ${key} data.ts file.`
+			);
+		}
+	}
 }
 
 /**
