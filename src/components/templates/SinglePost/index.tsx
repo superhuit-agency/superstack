@@ -59,7 +59,7 @@ export default function Post({ node }: any) {
 					{node?.featuredImage?.node?.src ? (
 						<div className="supt-single-post__image">
 							<Image
-								src={node.featuredImage.node.src}
+								src={node.featuredImage.node.sourceUrl}
 								width={
 									node.featuredImage.node.mediaDetails?.width
 								}

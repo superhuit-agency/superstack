@@ -1,4 +1,4 @@
-import * as cardNewsData from '@/components/molecules/cards/CardNews/data';
+import { cardNewsData, imageData } from '@/components/molecules/data';
 
 import {
 	languageFields,
@@ -19,13 +19,7 @@ export const fragment = gql`
 
 		featuredImage {
 			node {
-				src: sourceUrl
-				caption
-				altText
-				mediaDetails {
-					height
-					width
-				}
+				...imageFragment
 			}
 		}
 
@@ -64,6 +58,7 @@ export const fragment = gql`
 		${languageFields}
 		${translationsFields}
 	}
+	${imageData.fragment}
 	${seoPostTypeFragment}
 `;
 
