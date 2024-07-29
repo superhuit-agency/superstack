@@ -48,7 +48,7 @@ export const Form: FC<FormProps> & BlockConfigs = ({
 	fields = [],
 	id,
 	strings: { submitLabel = 'Send' } = {},
-	opt_ins = [],
+	optIns = [],
 }) => {
 	const {
 		register,
@@ -366,15 +366,15 @@ export const Form: FC<FormProps> & BlockConfigs = ({
 			</div>
 			<div className="supt-form__footer">
 				<div className="supt-form__opt-ins">
-					{opt_ins.map((opt_in, index) => (
+					{optIns.map((f, index) => (
 						<Controller
 							control={control}
 							defaultValue={[]}
 							key={index}
-							name={opt_in.name}
+							name={f.name}
 							rules={{
 								required: {
-									value: opt_in.required,
+									value: f.required,
 									message: __t(
 										'form-input-error-empty',
 										'Please fill out this field.'
@@ -385,19 +385,19 @@ export const Form: FC<FormProps> & BlockConfigs = ({
 								<div className="supt-form__opt-in">
 									<Checkbox
 										{...field}
-										required={opt_in.required}
-										label={opt_in.label}
+										required={f.required}
+										label={f.label}
 									/>
 
-									{errors?.[opt_in.name]?.message &&
-									typeof errors?.[opt_in.name]?.message ===
+									{errors?.[f.name]?.message &&
+									typeof errors?.[f.name]?.message ===
 										'string' ? (
 										<span
 											role="alert"
 											className="supt-input-checkbox__error supt-input-field__error"
 										>
 											{
-												errors?.[opt_in.name]
+												errors?.[f.name]
 													?.message as ReactNode
 											}
 										</span>

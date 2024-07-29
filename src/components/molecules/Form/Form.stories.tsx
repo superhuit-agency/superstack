@@ -18,7 +18,9 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
 	args: {
 		id: 125,
-		opt_ins: [],
+		version: 1,
+		name: 'Form',
+		optIns: [],
 		fields: [
 			{
 				block: 'supt/input-text',
