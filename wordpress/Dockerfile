@@ -3,7 +3,7 @@
 # This file is for dev purpose only!
 #====================================
 
-FROM wordpress:6.4-php8.2-apache
+FROM wordpress:6.5-php8.2-apache
 
 # Add sudo in order to run wp-cli as the www-data user
 RUN apt-get -qq update && apt-get -qq install -y \

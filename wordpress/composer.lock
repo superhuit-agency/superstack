@@ -545,12 +545,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/superhuit-agency/wp-graphql-gutenberg.git",
-                "reference": "ea208b1268a867afbb0a0cb23465b45ce0238bd0"
+                "reference": "26311bece84745d8a3a7835a72f01bbaa776abcb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/superhuit-agency/wp-graphql-gutenberg/zipball/ea208b1268a867afbb0a0cb23465b45ce0238bd0",
-                "reference": "ea208b1268a867afbb0a0cb23465b45ce0238bd0",
+                "url": "https://api.github.com/repos/superhuit-agency/wp-graphql-gutenberg/zipball/26311bece84745d8a3a7835a72f01bbaa776abcb",
+                "reference": "26311bece84745d8a3a7835a72f01bbaa776abcb",
                 "shasum": ""
             },
             "require": {
@@ -583,9 +583,9 @@
             },
             "description": "Query gutenberg blocks with wp-graphql",
             "support": {
-                "source": "https://github.com/superhuit-agency/wp-graphql-gutenberg/tree/supt-v0.4.2"
+                "source": "https://github.com/superhuit-agency/wp-graphql-gutenberg/tree/master"
             },
-            "time": "2023-11-06T09:42:52+00:00"
+            "time": "2024-07-19T09:45:32+00:00"
         },
         {
             "name": "squizlabs/php_codesniffer",
@@ -742,16 +742,16 @@
         },
         {
             "name": "symfony/css-selector",
-            "version": "v6.4.3",
+            "version": "v6.4.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/css-selector.git",
-                "reference": "ee0f7ed5cf298cc019431bb3b3977ebc52b86229"
+                "reference": "4b61b02fe15db48e3687ce1c45ea385d1780fe08"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/css-selector/zipball/ee0f7ed5cf298cc019431bb3b3977ebc52b86229",
-                "reference": "ee0f7ed5cf298cc019431bb3b3977ebc52b86229",
+                "url": "https://api.github.com/repos/symfony/css-selector/zipball/4b61b02fe15db48e3687ce1c45ea385d1780fe08",
+                "reference": "4b61b02fe15db48e3687ce1c45ea385d1780fe08",
                 "shasum": ""
             },
             "require": {
@@ -787,7 +787,7 @@
             "description": "Converts CSS selectors to XPath expressions",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/css-selector/tree/v6.4.3"
+                "source": "https://github.com/symfony/css-selector/tree/v6.4.8"
             },
             "funding": [
                 {
@@ -803,7 +803,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-01-23T14:51:35+00:00"
+            "time": "2024-05-31T14:49:08+00:00"
         },
         {
             "name": "valu/wp-graphql-offset-pagination",
