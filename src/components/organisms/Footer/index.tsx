@@ -1,5 +1,5 @@
 import cx from 'classnames';
-import { FC } from 'react';
+import { FC, useMemo } from 'react';
 
 import { useTranslation } from '@/hooks/use-translation';
 import { Link } from '@/helpers/Link';
@@ -9,11 +9,13 @@ import block from './block.json';
 import './styles.css';
 
 export const Footer: FC<FooterProps> & BlockConfigs = ({
-	siteTitle,
-	menus,
 	isHome,
+	menus,
+	siteTitle,
 }) => {
 	const __t = useTranslation();
+
+	const year = useMemo(() => new Date().getFullYear(), []);
 
 	return (
 		<footer className="supt-footer">
@@ -100,7 +102,7 @@ export const Footer: FC<FooterProps> & BlockConfigs = ({
 				</div>
 				<div className="supt-footer__bottom">
 					<div className="supt-footer__copyright">
-						© {new Date().getFullYear()} {siteTitle}
+						© {year} {siteTitle}
 					</div>
 					<div className="supt-footer__credits">
 						{__t('footer-made-by', 'Made by')}{' '}
