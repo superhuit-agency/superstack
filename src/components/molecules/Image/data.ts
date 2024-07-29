@@ -1,5 +1,10 @@
 import { gql } from '@/utils';
 
+import block from './block.json';
+
+// Export block slug for identification
+export const slug = block.slug;
+
 const isValidData = (data: GraphQLImageFields): boolean => {
 	return !!data && typeof data === 'object' && 'sourceUrl' in data;
 };
@@ -13,13 +18,18 @@ const isValidData = (data: GraphQLImageFields): boolean => {
  * @returns {any}            The transformed/formatted/parsed data
  */
 export const formatter = (
-	data: GraphQLImageFields | GraphQLMediaFields,
+	data: GraphQLImageFields | GraphQLMediaFields | null,
 	isEditor = false,
 	extraProps: any = {}
-): undefined | ImageProps => {
-	const img = 'node' in data ? data?.node : data;
+): null | ImageProps => {
+	const img = data && 'node' in data ? data?.node : data;
 
-	if (!img || !isValidData(img)) throw new Error('Invalid image data');
+	if (!img || !isValidData(img)) {
+		if (process.env.NODE_ENV === 'development') {
+			console.error('Invalid image data');
+		}
+		return null;
+	}
 
 	if (isEditor || !img?.mediaDetails?.width || !img?.mediaDetails?.height) {
 		extraProps.unoptimized = true;
