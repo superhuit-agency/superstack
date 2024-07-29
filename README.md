@@ -47,10 +47,10 @@ An opinionated boilerplate for decoupled (headless) websites that are both perfo
 
 (inside `/wordpress` folder)
 
--   `npm run start:wp` - start WP server
--   `npm run stop:wp` - stop WP server
--   `npm run build:assets` - build Webpack for the assets on WP
--   `npm run start:assets` - start Webpack for the assets on WP (watch + hot reload)
+-   `npm run start` - start WP server
+-   `npm run stop` - stop WP server
+-   `npm run build` - build Webpack for the assets on WP
+-   `npm run dev` - start Webpack for the assets on WP (watch + hot reload)
 
 Open [http://localhost/wp-admin/](http://localhost/wp-admin/) on your browser to access to the admin. (login: **superstack**, password: **superstack**)
 

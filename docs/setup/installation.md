@@ -5,13 +5,12 @@ Follow these steps to install the stack for the 1st time:
 -   `cp .env.local.example .env.local` - make default environment variables available to Next.js, Storybook and WordPress
 -   `nvm use`
 -   `npm install` - install global packages
--   `cd wordpress && npm install` - install WordPress-specific packages
+-   `npm --prefix ./wordpress install` - install WordPress-specific packages
 
 ### WordPress
 
--   `cd wordpress`
--   `npm run build:assets`
--   `npm run start:wp`
+-   `npm --prefix ./wordpress run build`
+-   `npm --prefix ./wordpress run start`
 
 Open [http://localhost/wp-admin/](http://localhost/wp-admin/) on your browser to access to the admin. (login: **superstack**, password: **superstack**)
 
