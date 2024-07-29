@@ -21,7 +21,7 @@ export default function formatMenuItems(menuNodes: MenuItem[]) {
 		};
 	};
 
-	return menuNodes
+	return Array.isArray(menuNodes) ? menuNodes
 		.filter(({ parentId }) => parentId === null) // only loop through 1st level nodes
-		.map(({ parentId, ...item }) => parseItem(item));
+		.map(({ parentId, ...item }) => parseItem(item)) : [];
 }
