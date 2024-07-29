@@ -70,11 +70,7 @@ export const getData = async (
 	const options = { variables: { id: attrs.id } };
 	const data = await fetcher(query, options);
 
-	const finalData = formatter(data?.form, isEditor);
-
-	console.log(finalData);
-
-	return finalData;
+	return formatter(data?.form, isEditor);
 };
 
 /**
