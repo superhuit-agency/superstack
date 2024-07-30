@@ -193,7 +193,7 @@ module.exports = {
 				generator: {
 					publicPath: DEV
 						? undefined
-						: `/wp-content/themes/${process.env.THEME_NAME}/static/`, // Only override the public path specifically for fonts on PRODUCTION
+						: `/wp-content/themes/${process.env?.THEME_NAME ?? 'superstack'}/static/`, // Only override the public path specifically for fonts on PRODUCTION
 				},
 			},
 		],
