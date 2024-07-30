@@ -18,6 +18,7 @@ An opinionated boilerplate for decoupled (headless) websites that are both perfo
 -   Next.js Cache Revalidation (via WordPress Plugin)
 
 **The basics**
+
 -   Typing with TypeScript
 -   Styling with CSS (PostCSS) [why?](./docs/technical-choices.md)
 -   Dynamic styleguide with Storybook
@@ -26,10 +27,10 @@ An opinionated boilerplate for decoupled (headless) websites that are both perfo
 
 **Supported WordPress plugins**
 
-- [Yoast SEO](https://wordpress.org/plugins/wordpress-seo/)
-- [Redirection](https://wordpress.org/plugins/redirection/)
-- [ACF](https://wordpress.org/plugins/advanced-custom-fields/)
-- [Polylang Pro](https://wordpress.org/plugins/polylang/) (coming soon)
+-   [Yoast SEO](https://wordpress.org/plugins/wordpress-seo/)
+-   [Redirection](https://wordpress.org/plugins/redirection/)
+-   [ACF](https://wordpress.org/plugins/advanced-custom-fields/)
+-   [Polylang Pro](https://wordpress.org/plugins/polylang/) (coming soon)
 
 ## Dependencies
 
@@ -103,6 +104,7 @@ Open [http://localhost:4000](http://localhost:4000) with your browser to access 
 
 -   [List of blocks](./docs/resources/blocks.md)
 -   [List of hooks](./docs/resources/hooks.md)
+-   [Debugger](./docs/resources/debugger.md)
 
 ## Learning path
 
