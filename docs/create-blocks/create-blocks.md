@@ -128,14 +128,13 @@ interface ExampleBlockProps extends ExampleBlockAttributes, BlockProps {
 ```
 
 ### Best Practices
+
 1. Keep types as specific as possible to ensure type safety.
 2. Use union types for attributes that can have multiple types.
 3. Make use of optional properties (?) for non-required attributes or props.
 4. Consider using utility types like `Partial<T>` or `Pick<T, K>` when appropriate.
-5. By following these guidelines, you can ensure that your block's typing is accurate, comprehensive, and helpful for development.
 
 By following these guidelines, you can ensure that your block's typing is accurate, comprehensive, and helpful for development.
-
 
 ## How are Blocks Rendered?
 
