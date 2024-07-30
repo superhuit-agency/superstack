@@ -94,7 +94,7 @@ export const ButtonBlock: WpBlockType<ButtonAttributes> = {
 
 ## 🏷️ Typing `typings.d.ts`
 
-When you create a new block, a TypeScript typing file  is automatically generated. This file provides a basic structure for your block's types, but it's important to note that you should modify and adapt these types according to the specific needs of your block.
+When you create a new block, a TypeScript typing file is automatically generated. This file provides a basic structure for your block's types, but it's important to note that you should modify and adapt these types according to the specific needs of your block.
 
 The generated typing file typically includes:
 
@@ -110,7 +110,7 @@ As you develop your block, you should regularly update the typing file to reflec
 
 ### Important to note
 
-1. No Imports or Exports: The typing file should not include any import or export statements. This is crucial because TypeScript automatically loads these typings, and including imports or exports can cause TypeScript to fail in recognizing these types. 
+1. No Imports or Exports: The typing file should not include any import or export statements. This is crucial because TypeScript automatically loads these typings, and including imports or exports can cause TypeScript to fail in recognizing these types.
 2. Extending Base Types: Your block's types often extend base types like `BlockAttributes` or `BlockProps`. These base types are globally available, so you don't need to import them.
 3. Custom Types: If your block requires custom types, define them within the same file.
 4. Attribute Types: Ensure that the types in the `Attributes` interface accurately reflect the data types used in your block's `attributes` definition in the `edit.tsx` file.
@@ -119,13 +119,13 @@ Here's an example of how your typing file might look:
 
 ```ts
 interface ExampleBlockAttributes extends BlockAttributes {
-    title: string;
-    content: string;
-    isActive: boolean;
+	title: string;
+	content: string;
+	isActive: boolean;
 }
 
 interface ExampleBlockProps extends ExampleBlockAttributes, BlockProps {
-    customProp?: number;
+	customProp?: number;
 }
 ```
 
