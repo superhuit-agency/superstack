@@ -2,7 +2,7 @@
 	"Clamp": {
 		"prefix": ["clamp","fluid","responsive"],
 		"body": "@mixin ${1|clamp|} ${2:property}, ${3:min size}, ${4:max size}, ${5|$xxs-breakpoint,$xs-breakpoint,$sm-breakpoint,$md-breakpoint,$lg-breakpoint,$xl-breakpoint,$xxl-breakpoint|}, ${6|$xxl-breakpoint,$xl-breakpoint,$lg-breakpoint,$md-breakpoint,$sm-breakpoint,$xs-breakpoint,$xxs-breakpoint|};",
-		"description": "Mixin to returns a fluid sizing for any property. This is useful to handle fluid responsive values"
+		"description": "Mixin to return a fluid sizing for any property. This is useful to handle fluid responsive values"
 	}
 }
 
