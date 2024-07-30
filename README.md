@@ -18,6 +18,7 @@ An opinionated boilerplate for decoupled (headless) websites that are both perfo
 -   Next.js Cache Revalidation (via WordPress Plugin)
 
 **The basics**
+
 -   Typing with TypeScript
 -   Styling with CSS (PostCSS) [why?](./docs/technical-choices.md)
 -   Dynamic styleguide with Storybook
@@ -26,10 +27,10 @@ An opinionated boilerplate for decoupled (headless) websites that are both perfo
 
 **Supported WordPress plugins**
 
-- [Yoast SEO](https://wordpress.org/plugins/wordpress-seo/)
-- [Redirection](https://wordpress.org/plugins/redirection/)
-- [ACF](https://wordpress.org/plugins/advanced-custom-fields/)
-- [Polylang Pro](https://wordpress.org/plugins/polylang/) (coming soon)
+-   [Yoast SEO](https://wordpress.org/plugins/wordpress-seo/)
+-   [Redirection](https://wordpress.org/plugins/redirection/)
+-   [ACF](https://wordpress.org/plugins/advanced-custom-fields/)
+-   [Polylang Pro](https://wordpress.org/plugins/polylang/) (coming soon)
 
 ## Dependencies
 
@@ -39,7 +40,6 @@ An opinionated boilerplate for decoupled (headless) websites that are both perfo
 | Node           | >= 20.x | [node](https://nodejs.org/)                             |
 | Docker         | >= 23   | [docker](https://www.docker.com/products/docker-engine) |
 | Docker Compose | >= 1.29 | [docker-compose](https://docs.docker.com/compose/)      |
-| Mutagen        | >= 0.17 | [mutagen](https://github.com/mutagen-io/mutagen)        |
 
 ## 📄 Scripts Cheatsheet
 
