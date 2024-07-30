@@ -97,12 +97,14 @@ export const ButtonBlock: WpBlockType<ButtonAttributes> = {
 When you create a new block, a TypeScript typing file  is automatically generated. This file provides a basic structure for your block's types, but it's important to note that you should modify and adapt these types according to the specific needs of your block.
 
 The generated typing file typically includes:
-- An Attributes interface defining the block's attributes.
-- A Props interface extending the Attributes interface and potentially including additional props.  
+
+-   An Attributes interface defining the WordPress block's attributes.
+-   The front-end's block Props interface extending the Attributes interface and potentially including additional props.
 
 Optionnaly the generated file will also include:
-- A GraphQL fields interface for the block's data fetching.
-- A Data interface for the block's formatted data after the fetch.
+
+-   A GraphQL fields interface for the block's data fetching.
+-   A Data interface for the block's formatted data after the fetch.
 
 As you develop your block, you should regularly update the typing file to reflect any changes in your block's structure or props. This helps maintain type safety and improves the development experience with better autocomplete and error detection.
 
