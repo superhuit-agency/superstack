@@ -24,14 +24,12 @@ const config: StorybookConfig = {
 		'../src/**/*.stories.@(js|jsx|mjs|ts|tsx)',
 		'../wordpress/**/*.stories.@(js|jsx|mjs|ts|tsx)',
 	],
-	addons: ['@storybook/addon-essentials'],
+	addons: ['@storybook/addon-essentials', '@chromatic-com/storybook'],
 	framework: {
 		name: '@storybook/nextjs',
 		options: {},
 	},
-	docs: {
-		autodocs: 'tag',
-	},
+	docs: {},
 	// Alias resolution
 	webpackFinal: async (config: any) => {
 		config.resolve.alias = {

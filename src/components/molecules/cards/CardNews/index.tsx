@@ -1,12 +1,12 @@
 import { FC, useCallback, useMemo } from 'react';
 
+import { Image } from '@/components/molecules/Image';
 import configs from '@/configs.json';
 import { Link } from '@/helpers/Link';
 import { useTranslation } from '@/hooks/use-translation';
 import { BlockConfigs, ImageProps, LinkProps } from '@/typings';
 import { phpToJsDateFormat } from '@/utils';
 
-import { Image } from '../..';
 import block from './block.json';
 import './styles.css';
 
