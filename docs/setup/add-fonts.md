@@ -48,7 +48,7 @@ export default function Layout() {
 
 ### Step 1: Import Custom Fonts
 
-If you're using custom fonts that are not hosted by a third-party service (like Google Fonts), you'll need to add them to `wordpress/theme/lib/editor/assets/fonts` directory.
+If you're using custom fonts that are not hosted by a third-party service (like Google Fonts), you'll need to add them to `src/fonts` directory if not already added previously.
 
 ### Step 2: Define Your Fonts in CSS
 
@@ -58,8 +58,8 @@ In `_fonts.css` file located in `wordpress/theme/lib/editor/assets/css/`. Add yo
 @font-face {
 	font-family: 'My custom font';
 	src:
-		url('../editor/assets/fonts/my-custom-font.woff2') format('woff2'),
-		url('../editor/assets/fonts/my-custom-font.woff') format('woff');
+		url('../../../../src/my-custom-font.woff2') format('woff2'),
+		url('../../../../src/my-custom-font.woff') format('woff');
 	font-weight: 400;
 	font-style: normal;
 	font-display: swap;
