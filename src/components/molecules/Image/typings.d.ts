@@ -32,3 +32,6 @@ interface GraphQLImageFields {
 		height: number;
 	};
 }
+interface GraphQLMediaFields {
+	node: GraphQLImageFields | null;
+}

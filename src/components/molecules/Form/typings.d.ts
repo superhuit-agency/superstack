@@ -1,18 +1,46 @@
-interface WpFormTypeRest {
+interface GraphQlFormFields {
+	fields?: string;
 	id: number;
-	title: string;
-	strings: any;
-	fields: any;
+	modified?: string;
+	name?: string;
+	optIns?: Array<FormOptIn>;
+	strings?: FormStrings;
+	title?: string;
 }
+
+interface GraphQlFormQuery {
+	form: GraphQlFormFields;
+}
+interface GraphQlFormsLisResp extends Array<GraphQlFormFields> {}
 
 interface FormAttributes extends BlockAttributes {
 	id?: number; // id of the form in the backend
 }
 
-interface FormProps extends FormAttributes, BlockProps {
-	fields: Array<any>;
-	opt_ins: Array<any>;
-	strings?: {
-		[id: string]: string;
-	};
+interface FormField {
+	attributes: Record<string, any>;
+	block: string;
+	children?: Array<any>;
 }
+
+interface FormOptIn {
+	id: string;
+	label: string;
+	name: string;
+	required: boolean;
+}
+
+interface FormStrings {
+	[id: string]: string;
+}
+
+interface FormComponentData {
+	fields: Array<FormField>;
+	id: number;
+	name: string;
+	optIns: Array<FormOptIn>;
+	strings?: FormStrings;
+	version: number;
+}
+
+interface FormProps extends FormComponentData, FormAttributes, BlockProps {}

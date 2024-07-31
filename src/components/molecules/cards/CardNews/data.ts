@@ -1,6 +1,8 @@
 import { gql } from '@/utils';
 import block from './block.json';
 
+import * as imageData from '@/components/molecules/Image/data';
+
 export const slug = block.slug;
 
 /**
@@ -17,13 +19,7 @@ export const fragment = gql`
 
 		image: featuredImage {
 			node {
-				src: sourceUrl
-				caption
-				altText
-				mediaDetails {
-					height
-					width
-				}
+				...imageFragment
 			}
 		}
 
@@ -34,33 +30,23 @@ export const fragment = gql`
 			}
 		}
 	}
+	${imageData.fragment}
 `;
 
-const isValidData = (
-	data: unknown
-): data is {
-	title: string;
-	image: {
-		node: {
-			src: string;
-			altText: string;
-			mediaDetails: { width: number; height: number };
-		};
-	};
-	categories: { nodes: { title: string; href: string }[] };
-	status: string;
-	date: string;
-	uri: string;
-} => !!data && typeof data === 'object' && 'title' in data && 'status' in data;
+const isValidData = (data: GraphQLCardNewsFields) =>
+	!!data && typeof data === 'object' && 'title' in data && 'status' in data;
 
 /**
  * Dynamic data formatter/parser.
  *
- * @param {unknown}     data  Data from GraphQL query response
+ * @param {GraphQLCardNewsFields}     data  Data from GraphQL query response
  * @param {boolean} isEditor  Whether the formatter function is being called within the WP block editor.
  * @returns {CardNewsData}    The transformed/formatted/parsed data
  */
-export const formatter = (props: unknown, isEditor = false): CardNewsProps => {
+export const formatter = (
+	props: GraphQLCardNewsFields,
+	isEditor = false
+): CardNewsProps => {
 	if (!isValidData(props)) throw new Error('Invalid card news data');
 
 	const { title, image, categories, status, ...rest } = props;
@@ -68,14 +54,7 @@ export const formatter = (props: unknown, isEditor = false): CardNewsProps => {
 	return {
 		...rest,
 		title,
-		image: image?.node?.src
-			? {
-					src: image.node.src,
-					alt: image.node.altText || '',
-					width: image.node.mediaDetails.width,
-					height: image.node.mediaDetails.height,
-				}
-			: undefined,
+		image: imageData.formatter(image),
 		category:
 			categories?.nodes && categories.nodes?.length > 0
 				? categories.nodes[0]

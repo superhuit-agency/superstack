@@ -1,0 +1,17 @@
+@import '@resources/index.css';
+
+.supt-form {
+	.supt-radio-icon {
+		&__icon {
+			margin: 0;
+		}
+	}
+
+	&__submit {
+		.supt-button__inner {
+			&::before {
+				display: none;
+			}
+		}
+	}
+}

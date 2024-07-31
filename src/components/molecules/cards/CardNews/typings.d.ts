@@ -9,13 +9,19 @@ interface CardNewsProps {
 }
 
 interface GraphQLCardNewsFields {
-	id: number;
-	title: string;
-	date: string;
-	uri: string;
 	blocksJSON: string;
-	image: MediaNodeType;
+	categories: {
+		nodes: Array<{
+			title: string;
+			href: string;
+		}>;
+	};
+	date: string;
+	id: number;
+	image: GraphQLMediaFields;
 	postAcf: {
 		excerpt: string;
 	};
+	title: string;
+	uri: string;
 }
