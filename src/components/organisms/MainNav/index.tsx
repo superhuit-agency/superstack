@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { FC, useCallback, useEffect, useRef, useState } from 'react';
 
 import configs from '@/configs.json';
-import { Link } from '@/helpers/Link';
+import { Link } from '@/components/atoms';
 import { useTranslation } from '@/hooks/use-translation';
 
 import { Image } from '../../molecules/Image';

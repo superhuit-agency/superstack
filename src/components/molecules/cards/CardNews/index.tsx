@@ -2,7 +2,7 @@ import { FC, useCallback, useMemo } from 'react';
 
 import { Image } from '@/components/molecules/Image';
 import configs from '@/configs.json';
-import { Link } from '@/helpers/Link';
+import { Link } from '@/components/atoms';
 import { useTranslation } from '@/hooks/use-translation';
 import { phpToJsDateFormat } from '@/utils';
 

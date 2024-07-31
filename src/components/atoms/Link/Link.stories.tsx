@@ -13,8 +13,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
 	args: {
-		href: '',
-		prefetch: '',
-		scroll: '',
+		href: '#actualités',
+		children: 'Actualités',
 	},
 };

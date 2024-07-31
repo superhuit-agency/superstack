@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import cx from 'classnames';
 
-import { Link } from '@/helpers/Link';
+import { Link } from '@/components/atoms';
 import { Section } from '@/helpers/Section';
 
 import { CardNews } from '@/components/molecules/cards/CardNews';
