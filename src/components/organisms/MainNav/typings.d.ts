@@ -3,7 +3,7 @@ interface GraphQLMainNavFields {
 		title: string;
 	};
 	logo: GraphQLImageFields | null;
-	header: { nodes: NestedMenuItem[] };
+	header: { nodes: GraphQLMenuItemFields[] };
 
 	node: null | {
 		isFrontPage: boolean;
@@ -11,7 +11,7 @@ interface GraphQLMainNavFields {
 }
 interface MainNavData {
 	isHome?: boolean;
-	logo: ImageProps | null;
+	logo?: ImageProps | null;
 	menus: {
 		header: { items: NestedMenuItem[] };
 	};

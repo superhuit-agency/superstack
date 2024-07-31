@@ -215,12 +215,12 @@ export const Form: FC<FormProps> & BlockConfigs = ({
 			<div className="supt-form__fields">
 				{fields.map(({ block, attributes, children }, i) => {
 					const attrs = {
-						...attributes,
+						...(attributes as InputProps),
 						inputAttributes: {
 							disabled: isSubmitting || isSubmitSuccessful,
 						},
 						invalid: errors?.[attributes.name]
-							? errors?.[attributes.name]?.message
+							? String(errors?.[attributes.name]?.message)
 							: false,
 					};
 
@@ -300,7 +300,11 @@ export const Form: FC<FormProps> & BlockConfigs = ({
 									<InputCheckbox
 										{...attrs}
 										{...field}
-										options={children}
+										options={
+											children as {
+												attrs: CheckboxProps;
+											}[]
+										}
 									/>
 								)}
 							/>
@@ -318,7 +322,9 @@ export const Form: FC<FormProps> & BlockConfigs = ({
 									<InputRadio
 										{...attrs}
 										{...field}
-										options={children}
+										options={
+											children as { attrs: RadioProps }[]
+										}
 									/>
 								)}
 							/>
@@ -326,7 +332,12 @@ export const Form: FC<FormProps> & BlockConfigs = ({
 					}
 					if (block === 'supt/input-file') {
 						registerAttrs.validate = {};
-						if (attrs.maxFilesize && attrs.maxFilesize > 0) {
+						if (
+							'maxFilesize' in attrs &&
+							attrs.maxFilesize &&
+							typeof attrs.maxFilesize === 'number' &&
+							attrs.maxFilesize > 0
+						) {
 							registerAttrs.validate.maxFilesize =
 								getMaxFilesizeValidator(
 									attrs.maxFilesize,

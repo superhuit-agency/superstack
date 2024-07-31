@@ -2,7 +2,7 @@ interface CardNewsProps {
 	category?: LinkProps;
 	date: string;
 	excerpt?: string;
-	image?: ImageProps;
+	image?: ImageProps | null;
 	linkLabel?: string;
 	title: string;
 	uri: string;
@@ -22,6 +22,7 @@ interface GraphQLCardNewsFields {
 	postAcf: {
 		excerpt: string;
 	};
+	status: string;
 	title: string;
 	uri: string;
 }
