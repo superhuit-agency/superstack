@@ -122,7 +122,7 @@ class SuptTheme {
 		// OR webpack-dev-server is not running
 		// -> try to load from the filesystem  [/wp-content/themes/superstack/static/manifest.json]
 		elseif ( file_exists(THEME_PATH . '/static/manifest.json') && $manifest = json_decode(file_get_contents(THEME_PATH . '/static/manifest.json', true)) ) {
-			$assets_uri = THEME_URI . '/static/';
+			$assets_uri = THEME_URI . '/static';
 		}
 
 		// Manifest not found…
