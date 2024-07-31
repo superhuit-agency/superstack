@@ -103,6 +103,7 @@ Open [http://localhost:4000](http://localhost:4000) with your browser to access 
 
 -   [List of blocks](./docs/resources/blocks.md)
 -   [List of hooks](./docs/resources/hooks.md)
+-   [Debugger](./docs/resources/debugger.md)
 
 ## Learning path
 

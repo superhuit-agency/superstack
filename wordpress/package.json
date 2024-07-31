@@ -8,6 +8,7 @@
   "license": "MIT",
   "private": true,
   "scripts": {
+    "prestart": "sh ./scripts/pre-start.sh",
     "dev": "NEXT_PUBLIC_IS_THIS_NEXT=false NODE_ENV=development webpack server",
     "start": "sh ./scripts/start-wp.sh",
     "stop": "docker compose down",
