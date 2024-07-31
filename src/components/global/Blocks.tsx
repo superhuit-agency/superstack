@@ -21,7 +21,8 @@ import {
 	Radio,
 	SectionNews,
 	Video,
-	// -- GENERATOR IMPORT SLOT --
+	Link,
+// -- GENERATOR IMPORT SLOT --
 } from '..';
 
 const blocksList: BlocksType = {
@@ -47,7 +48,8 @@ const blocksList: BlocksType = {
 	'supt/radio': Radio,
 	'supt/section-news': SectionNews,
 	'supt/video': Video,
-	// -- GENERATOR BLOCK SLOT --
+	'supt/link': Link,
+		// -- GENERATOR BLOCK SLOT --
 };
 
 type BlocksType = Record<string, FC<any>>;
