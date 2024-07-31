@@ -15,7 +15,7 @@ runs:
 
     - name: Build assets
       shell: bash
-      run: npm run build:assets
+      run: npm run build
       working-directory: ./wordpress
 
     # - name: Execute script to update translation file
