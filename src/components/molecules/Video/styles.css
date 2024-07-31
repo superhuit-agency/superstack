@@ -59,8 +59,8 @@
 	}
 
 	&__play-icon {
-		@mixin clamp width, 32, 48, $xxs-breakpoint, $lg-breakpoint;
-		@mixin clamp height, 32, 48, $xxs-breakpoint, $lg-breakpoint;
+		@mixin clamp width, 32, 48, $breakpoint-xxs, $breakpoint-lg;
+		@mixin clamp height, 32, 48, $breakpoint-xxs, $breakpoint-lg;
 
 		position: absolute;
 		z-index: 1;

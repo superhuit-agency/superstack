@@ -8,10 +8,10 @@
 	&__content,
 	&__meta {
 		grid-column: 1 / span 12;
-		@media (min-width: $sm-breakpoint) {
+		@media (min-width: $breakpoint-sm) {
 			grid-column: 2 / span 10;
 		}
-		@media (min-width: $md-breakpoint) {
+		@media (min-width: $breakpoint-md) {
 			grid-column: 3 / span 8;
 		}
 	}
@@ -39,17 +39,17 @@
 
 	> .supt-figure,
 	> .supt-video {
-		@mixin clamp padding-top, 40, 60, $xs-breakpoint, $lg-breakpoint;
-		@mixin clamp padding-bottom, 40, 60, $xs-breakpoint, $lg-breakpoint;
+		@mixin clamp padding-top, 40, 60, $breakpoint-xs, $breakpoint-lg;
+		@mixin clamp padding-bottom, 40, 60, $breakpoint-xs, $breakpoint-lg;
 
 		& + .supt-figure,
 		& + .supt-video {
-			@mixin clamp margin-top, -40, -60, $xs-breakpoint, $lg-breakpoint;
+			@mixin clamp margin-top, -40, -60, $breakpoint-xs, $breakpoint-lg;
 		}
 	}
 
 	&__image {
-		@mixin clamp margin-top, 20, 40, $xs-breakpoint, $lg-breakpoint;
-		@mixin clamp margin-bottom, 20, 40, $xs-breakpoint, $lg-breakpoint;
+		@mixin clamp margin-top, 20, 40, $breakpoint-xs, $breakpoint-lg;
+		@mixin clamp margin-bottom, 20, 40, $breakpoint-xs, $breakpoint-lg;
 	}
 }

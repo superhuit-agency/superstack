@@ -4,10 +4,10 @@
 	@extend %input-wrapper;
 
 	&__inner {
-		@mixin clamp padding-top, 12, 25, $xxs-breakpoint, $lg-breakpoint;
-		@mixin clamp padding-right, 12, 25, $xxs-breakpoint, $lg-breakpoint;
-		@mixin clamp padding-bottom, 16, 30, $xxs-breakpoint, $lg-breakpoint;
-		@mixin clamp padding-left, 16, 30, $xxs-breakpoint, $lg-breakpoint;
+		@mixin clamp padding-top, 12, 25, $breakpoint-xxs, $breakpoint-lg;
+		@mixin clamp padding-right, 12, 25, $breakpoint-xxs, $breakpoint-lg;
+		@mixin clamp padding-bottom, 16, 30, $breakpoint-xxs, $breakpoint-lg;
+		@mixin clamp padding-left, 16, 30, $breakpoint-xxs, $breakpoint-lg;
 
 		border: 1px solid $color-text;
 		display: flex;

@@ -11,8 +11,8 @@
 	&__inner {
 		@extend %container;
 
-		@mixin clamp padding-top, 16, 32, $xxs-breakpoint, $lg-breakpoint;
-		@mixin clamp padding-bottom, 16, 32, $xxs-breakpoint, $lg-breakpoint;
+		@mixin clamp padding-top, 16, 32, $breakpoint-xxs, $breakpoint-lg;
+		@mixin clamp padding-bottom, 16, 32, $breakpoint-xxs, $breakpoint-lg;
 
 		display: flex;
 		align-items: center;
@@ -24,7 +24,7 @@
 		margin-right: auto;
 
 		&__img {
-			@mixin clamp width, 100, 120, $xxs-breakpoint, $lg-breakpoint;
+			@mixin clamp width, 100, 120, $breakpoint-xxs, $breakpoint-lg;
 
 			display: block;
 			height: auto;

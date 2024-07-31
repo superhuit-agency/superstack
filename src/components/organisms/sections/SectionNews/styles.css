@@ -7,10 +7,10 @@
 
 	.supt-section__headline {
 		grid-column: 1 / span 12;
-		@media (min-width: $sm-breakpoint) {
+		@media (min-width: $breakpoint-sm) {
 			grid-column-end: span 10;
 		}
-		@media (min-width: $md-breakpoint) {
+		@media (min-width: $breakpoint-md) {
 			grid-column-end: span 8;
 		}
 	}
@@ -28,10 +28,10 @@
 
 		.supt-card-news {
 			grid-column-end: span 12;
-			@media (min-width: $sm-breakpoint) {
+			@media (min-width: $breakpoint-sm) {
 				grid-column-end: span 6;
 			}
-			@media (min-width: $lg-breakpoint) {
+			@media (min-width: $breakpoint-lg) {
 				grid-column-end: span 4;
 			}
 		}

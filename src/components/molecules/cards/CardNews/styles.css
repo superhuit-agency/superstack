@@ -24,7 +24,7 @@
 	}
 
 	&__inner {
-		@mixin clamp padding, 10, 20, $xxs-breakpoint, $lg-breakpoint;
+		@mixin clamp padding, 10, 20, $breakpoint-xxs, $breakpoint-lg;
 
 		display: flex;
 		flex-direction: column;

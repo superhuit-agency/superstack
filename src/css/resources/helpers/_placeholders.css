@@ -24,17 +24,17 @@
 	margin-left: $container-min-offset;
 	margin-right: $container-min-offset;
 
-	@media (min-width: $sm-breakpoint) {
+	@media (min-width: $breakpoint-sm) {
 		margin-left: $container-tablet-offset;
 		margin-right: $container-tablet-offset;
 	}
 
-	@media (min-width: $md-breakpoint) {
+	@media (min-width: $breakpoint-md) {
 		margin-left: $container-laptop-offset;
 		margin-right: $container-laptop-offset;
 	}
 
-	@media (min-width: $lg-breakpoint) {
+	@media (min-width: $breakpoint-lg) {
 		margin-left: $container-desktop-offset;
 		margin-right: $container-desktop-offset;
 	}
