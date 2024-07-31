@@ -190,6 +190,11 @@ module.exports = {
 				test: /\.(woff|woff2|eot|ttf|otf)$/i,
 				include: path.resolve(__dirname, '../src/assets/fonts'),
 				type: 'asset',
+				generator: {
+					publicPath: DEV
+						? undefined
+						: `/wp-content/themes/${process.env?.THEME_NAME ?? 'superstack'}/static/`, // Only override the public path specifically for fonts on PRODUCTION
+				},
 			},
 		],
 	},
