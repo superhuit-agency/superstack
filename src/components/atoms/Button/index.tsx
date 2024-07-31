@@ -1,7 +1,6 @@
 import { FC } from 'react';
 import cx from 'classnames';
 
-import { BlockConfigs, ButtonProps } from '@/typings';
 import { Link } from '@/helpers/Link';
 
 import block from './block.json';

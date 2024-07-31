@@ -2,7 +2,7 @@ import { Container, Blocks } from '@/components/global';
 
 import './styles.css';
 
-export default function Page({ node }: any) {
+export default function Page({ node }: SinglePageProps) {
 	return (
 		<>
 			<Blocks

@@ -14,9 +14,9 @@ export const fragment = gql`
 		uri
 		isFrontPage
 		archivePage {
-			type
 			baseUri
 			perPage
+			type
 		}
 		editLink @include(if: $isPreview)
 		preview @include(if: $isPreviewDraft) {

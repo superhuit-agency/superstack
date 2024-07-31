@@ -13,20 +13,17 @@ import { useMemo } from '@wordpress/element';
 import { _x } from '@wordpress/i18n';
 
 import { ImageEdit, VideoEdit } from '#/components';
-import { WpBlockType } from '@/typings';
+
 import block from './block.json';
-import { MediaProps } from '.';
 
 // styles
 import './styles.css';
 import './styles.edit.css';
 
-type MediaUpload = any;
-
 /**
  * COMPONENT EDITOR
  */
-const Edit = (props: BlockEditProps<MediaProps>) => {
+const Edit = (props: BlockEditProps<MediaAttributes>) => {
 	const { mediaType, image, video /*, isSticky*/ } = props.attributes;
 
 	const getYoutubeVideoIdFromUrl = useCallback((url: string) => {
@@ -48,7 +45,7 @@ const Edit = (props: BlockEditProps<MediaProps>) => {
 	}, []);
 
 	const onSelectImage = useCallback(
-		(media: MediaUpload) => {
+		(media: MediaUploadType) => {
 			props.setAttributes({
 				image: {
 					id: media.id,
@@ -64,10 +61,10 @@ const Edit = (props: BlockEditProps<MediaProps>) => {
 	);
 
 	const onSelectVideo = useCallback(
-		(media: MediaUpload) => {
+		(media: MediaUploadType) => {
 			props.setAttributes({
 				video: {
-					src: media.url,
+					src: media.src,
 					id: media.id,
 					poster:
 						media.image !== media.icon ? media.image : undefined,
@@ -93,7 +90,7 @@ const Edit = (props: BlockEditProps<MediaProps>) => {
 
 			props.setAttributes({
 				video: {
-					url,
+					src: url,
 					source: source,
 					id: videoId || '',
 					poster: { src: '', alt: '', width: 0, height: 0 },
@@ -139,7 +136,7 @@ const Edit = (props: BlockEditProps<MediaProps>) => {
 				value: {
 					...video,
 					id: Number.parseInt(video?.id || '0', 10),
-					url: video?.url as string,
+					url: video?.src ?? '',
 				},
 				accept: 'video/*',
 				allowedTypes: ['video'],
@@ -177,7 +174,7 @@ const Edit = (props: BlockEditProps<MediaProps>) => {
 								value: 'video',
 							},
 						]}
-						onChange={(mediaType: MediaUpload) => {
+						onChange={(mediaType: MediaUploadType) => {
 							props.setAttributes({
 								mediaType,
 							});
@@ -211,7 +208,7 @@ const Edit = (props: BlockEditProps<MediaProps>) => {
 				<BlockControls>
 					<MediaReplaceFlow
 						mediaId={Number.parseInt(video.id, 10)}
-						mediaURL={video.url}
+						mediaURL={video.src}
 						allowedTypes={['video']}
 						accept="video/*"
 						onSelect={onSelectVideo}
@@ -276,7 +273,7 @@ const Edit = (props: BlockEditProps<MediaProps>) => {
 /**
  * WORDPRESS BLOCK
  */
-export const MediaBlock: WpBlockType<MediaProps> = {
+export const MediaBlock: WpBlockType<MediaAttributes> = {
 	slug: block.slug,
 	settings: {
 		title: block.title,
@@ -285,10 +282,6 @@ export const MediaBlock: WpBlockType<MediaProps> = {
 		icon: 'admin-media',
 		postTypes: ['page'],
 		attributes: {
-			mediaType: {
-				type: 'string',
-				default: 'image',
-			},
 			image: {
 				type: 'object',
 				default: {
@@ -296,6 +289,14 @@ export const MediaBlock: WpBlockType<MediaProps> = {
 					src: '',
 					alt: '',
 				},
+			},
+			// isSticky: {
+			// 	type: 'boolean',
+			// 	default: false,
+			// },
+			mediaType: {
+				type: 'string',
+				default: 'image',
 			},
 			video: {
 				type: 'object',
@@ -306,10 +307,6 @@ export const MediaBlock: WpBlockType<MediaProps> = {
 					caption: '',
 				},
 			},
-			// isSticky: {
-			// 	type: 'boolean',
-			// 	default: false,
-			// },
 		},
 		edit: Edit,
 		save: () => null,

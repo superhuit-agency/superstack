@@ -1,6 +1,5 @@
 import * as cardNewsData from '@/components/molecules/cards/CardNews/data';
 import { termNodeFragment } from '@/components/templates/SingleCategory/data';
-import { FetchApiFuncType } from '@/lib/fetch-api';
 import { gql } from '@/utils';
 
 export const slug = 'archive-post';
@@ -11,15 +10,18 @@ export const slug = 'archive-post';
 
 const NB_PER_PAGE = 9;
 
-export const formatter = (data: any, node: any) => {
+export const formatter = (
+	data: ArchivePostFormatterArgs,
+	node: ArchivePostNodeProps
+): ArchivePostData => {
 	const { posts, categories, tags, currentPage } = data;
 
 	const { uri, archivePage } = node;
 
 	return {
 		archivePage: {
-			perPage: NB_PER_PAGE,
 			...archivePage,
+			perPage: archivePage?.perPage ?? NB_PER_PAGE,
 			posts: posts.nodes.map((n: any) => cardNewsData.formatter(n)),
 			pagination: {
 				current: currentPage,
@@ -38,8 +40,6 @@ export const formatter = (data: any, node: any) => {
 		},
 	};
 };
-
-export type ArchivePostData = ReturnType<typeof formatter>;
 
 /**
  * GraphQL data fetching.

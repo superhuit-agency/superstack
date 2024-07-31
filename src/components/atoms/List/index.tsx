@@ -1,24 +1,10 @@
-import { FC, HTMLProps } from 'react';
-
-import { BlockConfigs } from '@/typings';
+import { FC } from 'react';
 
 import block from './block.json';
 
 // styles
 import './styles.css';
 
-/**
- * TYPINGS
- */
-export interface ListProps extends HTMLProps<HTMLUListElement> {
-	ordered: boolean;
-	reversed?: boolean;
-	start?: number;
-}
-
-/**
- * COMPONENT
- */
 export const List: FC<ListProps> & BlockConfigs = ({
 	ordered,
 	reversed,

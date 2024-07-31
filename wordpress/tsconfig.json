@@ -2,18 +2,24 @@
 	"extends": "@tsconfig/node20/tsconfig.json",
 	"compilerOptions": {
 		"lib": ["dom"],
+		"module": "esnext",
+		"moduleResolution": "Node",
+		"allowJs": true,
+		"noImplicitAny": true,
+		"strictNullChecks": true,
+		"resolveJsonModule": true,
+		"isolatedModules": true,
+		"jsx": "preserve",
+		"incremental": true,
+		"baseUrl": ".",
 		"outDir": "./theme/static",
 		"preserveConstEnums": true,
 		"allowSyntheticDefaultImports": true,
-		"noImplicitAny": true,
-		"jsx": "react",
-		"allowJs": true,
-		"baseUrl": ".",
 		"paths": {
 			"@/*": ["../src/*"],
 			"#/*": ["./theme/lib/editor/*"]
 		}
 	},
-	"include": ["theme/**/*.ts", "theme/**/*.tsx"],
+	"include": ["theme/**/*.ts", "theme/**/*.tsx", "../src/**/*.d.ts"],
 	"exclude": ["node_modules"]
 }

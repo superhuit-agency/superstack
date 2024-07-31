@@ -4,9 +4,7 @@ import { TextControl } from '@wordpress/components';
 import { _x } from '@wordpress/i18n';
 
 import { IdControl } from '#/components';
-import { WpBlockType } from '@/typings';
 import block from './block.json';
-import { CheckboxProps } from '.';
 
 // styles
 import './styles.css';
@@ -14,7 +12,7 @@ import './styles.css';
 /**
  * COMPONENT EDITOR
  */
-const Edit = (props: BlockEditProps<CheckboxProps>) => {
+const Edit = (props: BlockEditProps<CheckboxAttributes>) => {
 	const { name, label, id, value } = props.attributes;
 
 	return (
@@ -62,7 +60,7 @@ const Edit = (props: BlockEditProps<CheckboxProps>) => {
 /**
  * WORDPRESS BLOCK
  */
-export const CheckboxBlock: WpBlockType<CheckboxProps> = {
+export const CheckboxBlock: WpBlockType<CheckboxAttributes> = {
 	slug: block.slug,
 	settings: {
 		title: block.title,

@@ -9,11 +9,6 @@ declare global {
 	}
 }
 
-export type useGraphQlApiResponse = {
-	isLoading: boolean;
-	data: any;
-};
-
 /**
  * Hook to retrieve dynamic data through the GraphQL API endpoint
  *

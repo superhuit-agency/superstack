@@ -1,5 +1,4 @@
 import { FC } from 'react';
-import { SectionProps } from '@/typings';
 
 type SubcomponentProps = {
 	text: string;

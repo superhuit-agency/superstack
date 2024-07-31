@@ -1,19 +1,17 @@
 declare module '@wordpress/block-editor' {
-	import { BlockControls as OriginalBlockControls } from '@wordpress/block-editor';
-
 	module '@wordpress/block-editor' {
-		export interface BlockControlsProps
+		interface BlockControlsProps
 			extends React.ComponentProps<typeof OriginalBlockControls> {
 			group?: string;
 			controls?: string[];
 			children: React.ReactNode;
 		}
 
-		export interface InspectorAdvancedControlsProps {
+		interface InspectorAdvancedControlsProps {
 			children: React.ReactNode;
 		}
 
-		export interface RichTextProps {
+		interface RichTextProps {
 			className?: string;
 			tagName?: string;
 			placeholder?: string;
@@ -23,9 +21,9 @@ declare module '@wordpress/block-editor' {
 			allowedFormats?: string[];
 		}
 
-		export interface InspectorControlsProps {}
+		interface InspectorControlsProps {}
 
-		export interface PlainTextProps {
+		interface PlainTextProps {
 			className?: string;
 			placeholder?: string;
 			value?: string;
@@ -35,17 +33,17 @@ declare module '@wordpress/block-editor' {
 			multiline?: string;
 		}
 
-		export interface InnerBlocksProps {
+		interface InnerBlocksProps {
 			allowedBlocks?: string[];
 			template?: Array<Array<any>>;
 			templateLock?: boolean | 'all' | 'insert' | 'replace';
 		}
 
-		export const InnerBlocks: React.ComponentType<InnerBlocksProps> & {
+		const InnerBlocks: React.ComponentType<InnerBlocksProps> & {
 			Content: React.ComponentType;
 		};
 
-		export interface MediaReplaceFlowProps {
+		interface MediaReplaceFlowProps {
 			mediaId: number;
 			mediaType?: 'image' | 'video' | 'audio';
 			mediaURL?: string;
@@ -55,7 +53,7 @@ declare module '@wordpress/block-editor' {
 			onSelectURL?: (url: string) => void;
 		}
 
-		export interface MediaPlaceholderProps {
+		interface MediaPlaceholderProps {
 			icon?: string;
 			labels?: {
 				title?: string;
@@ -71,11 +69,11 @@ declare module '@wordpress/block-editor' {
 			isSelected?: boolean;
 		}
 
-		export interface MediaUploadCheckProps {
+		interface MediaUploadCheckProps {
 			children: React.ReactNode;
 		}
 
-		export interface MediaUploadProps {
+		interface MediaUploadProps {
 			onSelect: (media: { id: number; url: string }) => void;
 			value?: number;
 			allowedTypes: string[];
@@ -83,14 +81,14 @@ declare module '@wordpress/block-editor' {
 			title?: string;
 		}
 
-		export const BlockControls: React.ComponentType<BlockControlsProps>;
-		export const InspectorAdvancedControls: React.ComponentType<InspectorAdvancedControlsProps>;
-		export const RichText: React.ComponentType<RichTextProps>;
-		export const InspectorControls: React.ComponentType<InspectorAdvancedControlsProps>;
-		export const PlainText: React.ComponentType<PlainTextProps>;
-		export const MediaPlaceholder: React.ComponentType<MediaPlaceholderProps>;
-		export const MediaReplaceFlow: React.ComponentType<MediaReplaceFlowProps>;
-		export const MediaUpload: React.ComponentType<MediaUploadProps>;
-		export const MediaUploadCheck: React.ComponentType<MediaUploadCheckProps>;
+		const BlockControls: React.ComponentType<BlockControlsProps>;
+		const InspectorAdvancedControls: React.ComponentType<InspectorAdvancedControlsProps>;
+		const RichText: React.ComponentType<RichTextProps>;
+		const InspectorControls: React.ComponentType<InspectorAdvancedControlsProps>;
+		const PlainText: React.ComponentType<PlainTextProps>;
+		const MediaPlaceholder: React.ComponentType<MediaPlaceholderProps>;
+		const MediaReplaceFlow: React.ComponentType<MediaReplaceFlowProps>;
+		const MediaUpload: React.ComponentType<MediaUploadProps>;
+		const MediaUploadCheck: React.ComponentType<MediaUploadCheckProps>;
 	}
 }

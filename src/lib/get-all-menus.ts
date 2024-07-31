@@ -1,9 +1,6 @@
-import { FooterDataType } from '@/components/organisms/Footer';
-import { MainNavProps } from '@/components/organisms/MainNav';
 import configs from '@/configs.json';
 import { fetchAPI, formatMenuItems } from '@/lib';
 import { MenuItem, menuItemFragment } from '@/lib/fragments';
-import { MenuItemType } from '@/typings';
 import { gql } from '@/utils';
 
 type Menus = MainNavProps & FooterDataType;

@@ -6,18 +6,9 @@ import { FormTokenField, Spinner } from '@wordpress/components';
 
 import { POST_PT_NAME } from '#/constants';
 import { useRestAPI } from '#/hooks';
-import { WpPostRest, CoreEditorSelector } from '#/typings';
 import { escapeHTML } from '#/utils';
 
 import './styles.css';
-
-// @ts-ignore
-interface PostsSelectControlProps extends FormTokenField.Props {
-	onChange: (tokens: Array<any>) => void;
-	postType?: string;
-	values?: Array<any>;
-	label?: string;
-}
 
 const PostsSelectControl = ({
 	onChange,
@@ -25,9 +16,7 @@ const PostsSelectControl = ({
 	values,
 	...rest
 }: PostsSelectControlProps) => {
-	const { getCurrentPostId, getCurrentPostType } = select(
-		'core/editor'
-	) as CoreEditorSelector;
+	const { getCurrentPostId, getCurrentPostType } = select('core/editor');
 	const [search, setSearch] = useState('');
 
 	const selectedArgs = useMemo(

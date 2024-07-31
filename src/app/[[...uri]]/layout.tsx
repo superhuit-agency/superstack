@@ -2,8 +2,6 @@ import { Metadata, Viewport } from 'next';
 import { Inter, Roboto_Mono } from 'next/font/google';
 
 import { Footer, MainNav } from '@/components/index';
-import { FooterDataType } from '@/components/organisms/Footer';
-import { MainNavProps } from '@/components/organisms/MainNav';
 import { getWpUriFromNextPath, getAllMenus } from '@/lib';
 
 import '@/css/base/index.css';

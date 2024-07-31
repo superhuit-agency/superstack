@@ -1,6 +1,4 @@
-import { HtmlProps } from 'next/dist/shared/lib/html-context.shared-runtime';
-
-export interface LinkControlValueProps {
+interface LinkControlValueProps {
 	title?: string;
 	url?: string;
 	opensInNewTab?: boolean;
@@ -16,13 +14,13 @@ interface UrlPickerProps {
 	linkControlProps?: any;
 }
 
-export interface UrlPickerChangeParams extends LinkControlValueProps {
+interface UrlPickerChangeParams extends LinkControlValueProps {
 	id?: number;
 	type?: string;
 	kind?: string;
 }
 
-export interface LinkAttributes {
+interface UrlPickerLinkAttributes {
 	title?: string;
 	href?: string;
 	target?: Pick<HtmlProps<HTMLAnchorElement>, 'target'>;

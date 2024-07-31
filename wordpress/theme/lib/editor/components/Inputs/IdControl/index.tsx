@@ -11,14 +11,6 @@ const setIdDebounced = debounce((onChange, id) => {
 	onChange(isEmpty(id) ? '' : slugify(id, SLUGIFY_ARGS));
 }, 1000);
 
-interface IdControlProps {
-	blockId: string;
-	id: string;
-	name?: string;
-	label?: string;
-	onChange: (id: string) => void;
-}
-
 export const IdControl: FC<IdControlProps> = ({
 	blockId,
 	id,

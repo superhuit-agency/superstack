@@ -2,8 +2,6 @@ import * as _templatesData from '@/components/templates/data';
 import configs from '@/configs.json';
 import { fetchAPI, formatBlocksJSON } from '@/lib';
 
-import { AuthType } from './fetch-api';
-
 const templatesData: any = _templatesData;
 
 const { singlePostData, singlePageData, singleCategoryData, singleTagData } =
@@ -89,9 +87,9 @@ export default async function getNodeByURI(
 	if (blockEnrichment) {
 		const { blocksJSON, templateData } = await Promise.allSettled([
 			formatBlocksJSON(
-				(previewDraft
+				previewDraft
 					? node.preview?.node?.blocksJSON ?? ''
-					: node?.blocksJSON ?? '') as string
+					: node?.blocksJSON ?? ''
 			),
 			getTemplateData(node),
 		])

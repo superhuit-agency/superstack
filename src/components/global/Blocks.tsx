@@ -1,6 +1,5 @@
 import React, { FC } from 'react';
 
-import { BlockPropsType } from '@/typings';
 import {
 	Button,
 	Checkbox,

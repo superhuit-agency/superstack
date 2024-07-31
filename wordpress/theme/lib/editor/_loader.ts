@@ -29,7 +29,6 @@ import './blocks-whitelist';
  */
 import * as blocks from '@/components/edit';
 import * as filters from '@/components/filters';
-import { WpBlockType, WpFilterType } from '@/typings';
 
 // Register blocks for WP editor
 for (const key in blocks) {

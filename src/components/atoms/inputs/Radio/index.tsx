@@ -3,31 +3,17 @@ import slugify from 'slugify';
 
 // internal imports
 import { SLUGIFY_ARGS } from '@/components/atoms/inputs/constants';
-import { BlockConfigs, InputProps } from '@/typings';
 
 import block from './block.json';
 
 // styles
 import './styles.css';
 
-/**
- * TYPINGS
- */
-export type RadioProps = InputProps & {
-	value: string;
-	defaultChecked?: boolean;
-	onChange?: Function;
-	onBlur?: Function;
-};
-
-/**
- * COMPONENT
- */
 export const Radio: FC<RadioProps> & BlockConfigs = forwardRef(
 	(
 		{
 			id: initId,
-			label,
+			label = '',
 			name,
 			value,
 			disabled = false,

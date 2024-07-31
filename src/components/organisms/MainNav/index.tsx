@@ -7,7 +7,6 @@ import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import configs from '@/configs.json';
 import { Link } from '@/helpers/Link';
 import { useTranslation } from '@/hooks/use-translation';
-import { BlockConfigs, ImageProps, MenuItemType } from '@/typings';
 
 import { Image } from '../../molecules/Image';
 import block from './block.json';
@@ -15,14 +14,6 @@ import block from './block.json';
 import './styles.css';
 
 const NAV_MOBILE_BREAKPOINT = 600;
-
-export interface MainNavProps {
-	menus: {
-		header: { items: MenuItemType[] };
-	};
-	siteTitle: string;
-	logo?: Omit<ImageProps, 'alt'> & { alt?: string };
-}
 
 export const MainNav: FC<MainNavProps> & BlockConfigs = ({
 	menus,

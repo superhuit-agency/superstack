@@ -7,17 +7,8 @@ import { FormTokenField, Spinner } from '@wordpress/components';
 import { CATEGORY_TAX_NAME } from '#/constants';
 import { useRestAPI } from '#/hooks';
 import { escapeHTML } from '#/utils';
-import { WpTermRest } from '#/typings';
 
 import './styles.css';
-
-// @ts-ignore
-interface TermsSelectControllProps extends FormTokenField.Props {
-	onChange: (tokens: Array<any>) => void;
-	taxonomy?: string;
-	values?: Array<any>;
-	label?: string;
-}
 
 const TermsSelectControl = ({
 	onChange,
@@ -75,6 +66,7 @@ const TermsSelectControl = ({
 				suggestions={suggestions}
 				onInputChange={setSearch}
 				displayTransform={escapeHTML}
+				// @ts-ignore
 				onChange={(tokens: Array<string>) => {
 					onChange(
 						tokens

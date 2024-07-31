@@ -3,20 +3,6 @@ import { addQueryArgs } from '@wordpress/url';
 import { useState, useMemo, useEffect } from '@wordpress/element';
 
 import { POST_PT_NAME } from '#/constants';
-import { WpMediaRest, WpPostRest, WpTermRest } from '#/typings';
-
-type WP_REST_RESPONSE_TYPES =
-	| WpMediaRest
-	| WpPostRest
-	| WpTermRest
-	| Array<WpMediaRest>
-	| Array<WpPostRest>
-	| Array<WpTermRest>;
-
-export type useRestAPIResponse<T> = {
-	isLoading: boolean;
-	data: T;
-};
 
 export const useRestAPI = <T extends WP_REST_RESPONSE_TYPES>(
 	endpoint = POST_PT_NAME,

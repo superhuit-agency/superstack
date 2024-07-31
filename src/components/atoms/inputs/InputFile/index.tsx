@@ -20,27 +20,12 @@ import {
 	IconInvalid,
 } from '@/components/icons/DocumentIcon';
 import { useTranslation } from '@/hooks/use-translation';
-import { BlockConfigs, InputProps } from '@/typings';
 
 import block from './block.json';
 
 // styles
 import './styles.css';
 
-/**
- * TYPINGS
- */
-export type InputFileProps = InputProps & {
-	description?: string;
-	title?: string;
-	nbFiles?: number;
-	maxFilesize?: number;
-	accept?: string;
-};
-
-/**
- * COMPONENT
- */
 export const InputFile: FC<InputFileProps> & BlockConfigs = forwardRef(
 	(
 		{
@@ -75,7 +60,7 @@ export const InputFile: FC<InputFileProps> & BlockConfigs = forwardRef(
 				const newFiles = isMultiple ? [...files] : [];
 
 				if (target.files) {
-					[...target.files].forEach((file) => {
+					Array.from(target.files).forEach((file) => {
 						if (
 							newFiles.findIndex(
 								({ name }) => name === file.name
@@ -162,7 +147,7 @@ export const InputFile: FC<InputFileProps> & BlockConfigs = forwardRef(
 						// translators: %s is the maximum number of files
 						__t('input-file-max-files', 'Maximum %s files.'),
 						nbFiles
-				  )
+					)
 				: __t('input-file-max-one-file', '1 file only.');
 
 			if (maxFilesize) {
@@ -171,15 +156,15 @@ export const InputFile: FC<InputFileProps> & BlockConfigs = forwardRef(
 					sprintf(
 						isMultiple
 							? // translators: %d is the maximum size of a file
-							  __t(
+								__t(
 									'input-file-multi-max-filesize',
 									'Limited to %d MB per file.'
-							  )
+								)
 							: // translators: %d is the maximum size of a file
-							  __t(
+								__t(
 									'input-file-max-filesize',
 									'Limited to %d MB.'
-							  ),
+								),
 						maxFilesize
 					);
 			}
@@ -238,8 +223,8 @@ export const InputFile: FC<InputFileProps> & BlockConfigs = forwardRef(
 								isInvalid
 									? undefined
 									: required
-									? ''
-									: __t('form-input-optional', 'optional')
+										? ''
+										: __t('form-input-optional', 'optional')
 							}
 						>
 							{title}
@@ -304,7 +289,7 @@ export const InputFile: FC<InputFileProps> & BlockConfigs = forwardRef(
 														: `.${ext.replace(
 																/^[\s\.]*|[\s\.]*$/,
 																''
-														  )}` // trim whitespaces & `.`
+															)}` // trim whitespaces & `.`
 											)
 											.join(',')
 									: null

@@ -4,12 +4,6 @@ import { removeHtmlTags } from '#/utils';
 
 import './styles.css';
 
-interface CharacterLimitProps {
-	value: string;
-	onChange: (value: string) => void;
-	limit: number;
-}
-
 export const CharacterLimit: FC<CharacterLimitProps> = ({
 	value,
 	onChange,

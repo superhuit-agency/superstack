@@ -1,17 +1,7 @@
-import { FC, HTMLProps } from 'react';
-import { BlockConfigs } from '@/typings';
+import { FC } from 'react';
+
 import block from './block.json';
 
-/**
- * TYPINGS
- */
-interface ListItemProps extends HTMLProps<HTMLLIElement> {
-	content: string;
-}
-
-/**
- * COMPONENT
- */
 export const ListItem: FC<ListItemProps> & BlockConfigs = ({
 	content,
 	children,

@@ -1,10 +1,4 @@
-import { ChangeEventHandler, FocusEventHandler, HTMLProps, Ref } from 'react';
-import { Argument as cxArgument } from 'classnames';
-import { StaticImageData } from 'next/image';
-import { Block, BlockConfiguration } from '@wordpress/blocks';
-import { BlockEditProps } from '@wordpress/blocks';
-
-export interface WpBlockType<T> {
+interface WpBlockType<T> {
 	slug: string;
 	settings: Omit<BlockConfiguration<T>, 'attributes'> &
 		Pick<Block<T & { isPreview?: boolean }>, 'attributes'> & {
@@ -13,21 +7,20 @@ export interface WpBlockType<T> {
 		};
 }
 
-export type PostType = 'page' | 'post' | 'form';
+type PostType = 'page' | 'post' | 'form';
 
-export interface WpBlockEditProps<T>
-	extends Omit<BlockEditProps<T>, 'attributes'> {
+interface WpBlockEditProps<T> extends Omit<BlockEditProps<T>, 'attributes'> {
 	name?: string;
 	readonly attributes: Readonly<T & { isPreview?: boolean }>;
 }
 
-export type BlockPropsType = {
+type BlockPropsType = {
 	name: string;
 	attributes: Record<string, unknown>;
 	innerBlocks: Array<any>;
 };
 
-export type WpFilterType = {
+type WpFilterType = {
 	hook: string;
 	namespace: string;
 	callback:
@@ -40,52 +33,19 @@ export type WpFilterType = {
 		  ) => WpBlockType<any>['settings']);
 };
 
-export type InputProps = Omit<HTMLProps<HTMLInputElement>, 'onChange'> & {
-	label: string;
-	name: string;
-	invalid?: boolean | string;
-	inputAttributes?: HTMLAttributes<HTMLInputElement>;
-	onChange?: Function;
-};
-
-export interface ImageProps {
-	id?: number;
-	src: string | StaticImageData;
-	alt: string;
-	width: number;
-	height: number;
-	caption?: string | React.ReactNode;
-	className?: string;
-	sizes?: string;
-	priority?: boolean;
-	quality?: number;
-	fill?: boolean;
-	style?: CSSProperties;
-	children?: React.ReactNode;
-}
-
-export type VideoProps = Omit<HTMLProps<HTMLVideoElement>, 'poster'> & {
-	id: string;
-	caption: string;
-	poster?: ImageProps;
-	source?: 'youtube' | 'vimeo';
-	src?: string;
-	url?: string;
-};
-
-export type BlockConfigs = {
+type BlockConfigs = {
 	slug?: string;
 	title?: string;
 };
 
-export type MenuItemType = LinkProps & {
+type MenuItemType = LinkProps & {
 	label: string;
 	path: string;
 	cssClasses?: cxArgument[];
 	items?: MenuItemType[];
 };
 
-export type LinkProps = HTMLProps<HTMLAnchorElement> & {
+type LinkProps = React.HTMLProps<HTMLAnchorElement> & {
 	scroll?: boolean;
 	prefetch?: boolean;
 	ref?: Ref<HTMLAnchorElement>;
@@ -93,17 +53,41 @@ export type LinkProps = HTMLProps<HTMLAnchorElement> & {
 	// download?: boolean;
 };
 
-export interface ButtonProps extends LinkProps {
-	variant?: 'primary' | 'secondary' | 'link';
-}
-
-export interface SectionProps extends HTMLProps<HTMLDivElement> {
-	anchor?: string;
-	uptitle?: string;
-	title?: string;
-	introduction?: string;
-}
-
-export type ChildrenProps = {
-	children?: React.ReactNode;
+type AuthType = {
+	authToken?: string;
 };
+
+type FetchApiFuncType = (
+	query: string,
+	options?: {
+		variables?: any;
+		auth?: AuthType;
+		endpoint?: string;
+		headers?: any;
+	}
+) => Promise<any>;
+
+/**
+ * Generic Block Attrs & Props
+ */
+interface BlockAttributes {
+	anchor?: string;
+	className?: string;
+	isPreview?: boolean;
+}
+
+interface BlockProps extends React.HTMLProps<HTMLDivElement> {
+	level?: number;
+	slug?: string;
+}
+
+/**
+ * Generic Section Props
+ */
+interface SectionAttributes extends BlockAttributes {
+	introduction?: string;
+	title?: string;
+	uptitle?: string;
+}
+
+interface SectionProps extends SectionAttributes, BlockProps {}

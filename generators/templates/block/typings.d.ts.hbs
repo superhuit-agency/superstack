@@ -1,0 +1,31 @@
+{{#if supportsData}}
+interface Graphql{{ pascalCase blockTitle }}QueryArgs {
+	// TODO: Add graphql query args
+}
+
+interface Graphql{{ pascalCase blockTitle }}Fields {
+	data: Record<string, unknown>;
+}
+{{/if}}
+
+interface {{ pascalCase blockTitle }}Attributes extends {{#if (equals blockType "organisms")}}SectionAttributes{{else}}BlockAttributes{{/if}} {
+{{#each blockAttributes as |attribute|}}
+	{{attribute.name}}: {{attribute.type}};
+{{/each}}
+{{#if supportsData}}
+	queryVars?: {
+		[key:string]: Graphql{{ pascalCase blockTitle }}QueryArgs;
+	};
+{{/if}}
+}
+
+{{#if supportsData}}
+interface {{ pascalCase blockTitle }}Data {
+	data: Record<string, unknown>;
+}
+{{/if}}
+
+interface {{ pascalCase blockTitle }}Props
+	extends {{ pascalCase blockTitle }}Attributes,
+	{{#if supportsData}} {{ pascalCase blockTitle }}Data,{{/if}}
+	{{#if (equals blockType "organisms")}}SectionProps{{else}}BlockProps{{/if}} {}

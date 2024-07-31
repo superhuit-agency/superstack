@@ -6,13 +6,10 @@ import { _x } from '@wordpress/i18n';
 import { PreviewBlockImage, SectionEdit, ButtonEdit } from '#/components';
 import { useGraphQlApi } from '#/hooks';
 
-import { CardNews, CardNewsProps } from '@/components/molecules/cards/CardNews';
+import { CardNews } from '@/components/molecules/cards/CardNews';
 import EditNewsControls from './EditNewsControls';
 
-import { WpBlockEditProps, WpBlockType } from '@/typings';
-
 // Data
-import { SectionNewsProps } from '.';
 import block from './block.json';
 import { getData } from './data';
 
@@ -20,25 +17,19 @@ import { getData } from './data';
 import './styles.css';
 import './styles.edit.css';
 
-declare global {
-	interface Window {
-		pll_block_editor_plugin_settings: any;
-	}
-}
-
 /**
  * COMPONENT EDIT
  */
-const Edit = (props: WpBlockEditProps<SectionNewsProps>) => {
+const Edit = (props: WpBlockEditProps<SectionNewsAttributes>) => {
 	const slug = props.name;
 
 	const {
-		uptitle,
-		title,
 		introduction,
-		queryVars = {},
 		postLinkLabel,
+		queryVars = {},
 		seeAllLink,
+		title,
+		uptitle,
 	} = props.attributes;
 
 	const variables = useMemo(() => ({ queryVars }), [queryVars]);
@@ -129,7 +120,7 @@ const Edit = (props: WpBlockEditProps<SectionNewsProps>) => {
 
 						<div className="supt-section__link-wrapper">
 							<ButtonEdit
-								attrs={seeAllLink}
+								attrs={seeAllLink as ButtonAttributes}
 								onChange={(attrs: object) =>
 									props.setAttributes({
 										seeAllLink: attrs,
@@ -158,7 +149,7 @@ const Edit = (props: WpBlockEditProps<SectionNewsProps>) => {
 /**
  * WORDPRESS BLOCK
  */
-export const SectionNewsBlock: WpBlockType<SectionNewsProps> = {
+export const SectionNewsBlock: WpBlockType<SectionNewsAttributes> = {
 	slug: block.slug,
 	settings: {
 		title: block.title,
@@ -181,25 +172,19 @@ export const SectionNewsBlock: WpBlockType<SectionNewsProps> = {
 			anchor: true,
 		},
 		attributes: {
-			anchor: {
-				type: 'string',
-			},
-			title: {
-				type: 'string',
-			},
-			uptitle: {
-				type: 'string',
-			},
-			introduction: {
-				type: 'string',
-			},
-			queryVars: {
-				type: 'object',
-				default: {},
+			anchor: { type: 'string' },
+			introduction: { type: 'string' },
+			isPreview: {
+				type: 'boolean',
+				default: false,
 			},
 			postLinkLabel: {
 				type: 'string',
 				default: 'Read',
+			},
+			queryVars: {
+				type: 'object',
+				default: {},
 			},
 			seeAllLink: {
 				type: 'object',
@@ -208,14 +193,8 @@ export const SectionNewsBlock: WpBlockType<SectionNewsProps> = {
 					href: '',
 				},
 			},
-			isPreview: {
-				type: 'boolean',
-				default: false,
-			},
-			posts: {
-				type: 'array',
-				default: [],
-			},
+			title: { type: 'string' },
+			uptitle: { type: 'string' },
 		},
 		example: {
 			viewportWidth: 1280,
