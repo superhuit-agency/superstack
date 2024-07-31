@@ -21,9 +21,8 @@
 
 /* Remove Gutenberg default max-width */
 .wp-block {
-	max-width: none !important;
-	margin-left: 0px !important;
-	margin-right: 0px !important;
+	max-width: none;
+	margin: 20px 0px;
 }
 
 /* .wp-block > * {
@@ -34,11 +33,47 @@
 	pointer-events: none;
 }
 
-.block-editor-block-list__layout.is-root-container > .wp-block {
-	margin: 20px 10px !important;
-	border: 1px solid rgba(0 0 0 / 20%);
-	border-radius: 4px;
-	padding: 20px;
+.block-editor-block-list__layout {
+	&.is-root-container {
+		.wp-block {
+			border-radius: 4px;
+			padding: 10px;
+			outline: 1px solid rgba(0 0 0 / 0%);
+			transition: outline $transition-fast ease-in-out;
+
+			&:hover {
+				outline-color: rgba(0 0 0 / 10%);
+			}
+
+			&.block-list-appender {
+				outline: none;
+				padding: 0;
+			}
+		}
+
+		> .wp-block {
+			margin: 20px 10px;
+			outline-color: rgba(0 0 0 / 20%);
+			padding: 20px;
+		}
+	}
+
+	.block-list-appender {
+		position: initial;
+		margin: 20px auto;
+		display: flex;
+		gap: 10px;
+		align-items: center;
+
+		&::before,
+		&::after {
+			content: '';
+			display: block;
+			height: 1px;
+			width: 100%;
+			background-color: lightgray;
+		}
+	}
 }
 
 /* Reset styles of core blocks */
