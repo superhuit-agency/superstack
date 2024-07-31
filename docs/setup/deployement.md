@@ -1,5 +1,28 @@
 # Deployement
 
+## Automatic Github Actions
+
+Automatic Github Actions are available but disabled by default.
+To enable them, uncomment the relevant blocks in the `.github/workflows/deploy-preview.yml` and `.github/workflows/deploy-production.yml` files.
+
+> _Example below of what you should uncomment to enable automatic deployment_
+
+```
+name: Deploy WP & Nextjs to Production - builds and deploys
+on:
+  # ######## Uncomment below block to enable automatic deployment <======= 🗑️ remove
+  # push:                                                         <======= 📣 uncomment
+  #   branches:                                                   <======= 📣 uncomment
+  #     - 'production'                                            <======= 📣 uncomment
+  #   # # Only run workflow if push a server tag                  <======= 📣 uncomment
+  #   # tags:                                                     <======= 📣 uncomment
+  #   #   - 'v*.*.*'                                              <======= 📣 uncomment
+  # ########                                                      <======= 🗑️ remove
+[...]
+```
+
+## 🔐 Github Actions secrets
+
 In order for the Github workflows to correctly execute, you need to configure [Actions secrets](https://docs.github.com/en/rest/actions/secrets).
 You can for sure define them manually in the Github GUI, but the easiest way to do it is through the CLI. Here are the steps to achieve it:
 
