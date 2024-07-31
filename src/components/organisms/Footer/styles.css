@@ -21,8 +21,8 @@
 	&__top {
 		@extend %grid-no-margin;
 
-		@mixin clamp padding-top, 40, 60, $xxs-breakpoint, $lg-breakpoint;
-		@mixin clamp padding-bottom, 20, 40, $xxs-breakpoint, $lg-breakpoint;
+		@mixin clamp padding-top, 40, 60, $breakpoint-xxs, $breakpoint-lg;
+		@mixin clamp padding-bottom, 20, 40, $breakpoint-xxs, $breakpoint-lg;
 	}
 
 	&__menu {
@@ -30,10 +30,10 @@
 
 		grid-column: 1 / span 12;
 
-		@media (min-width: $sm-breakpoint) {
+		@media (min-width: $breakpoint-sm) {
 			grid-column: 1 / span 5;
 		}
-		@media (min-width: $md-breakpoint) {
+		@media (min-width: $breakpoint-md) {
 			grid-column: 1 / span 4;
 		}
 	}
@@ -43,10 +43,10 @@
 
 		grid-column: 1 / span 12;
 
-		@media (min-width: $sm-breakpoint) {
+		@media (min-width: $breakpoint-sm) {
 			grid-column: 7 / span 5;
 		}
-		@media (min-width: $md-breakpoint) {
+		@media (min-width: $breakpoint-md) {
 			grid-column: 5 / span 4;
 		}
 	}
@@ -57,10 +57,10 @@
 		gap: 6px;
 		grid-column: 1 / span 12;
 
-		@media (min-width: $sm-breakpoint) {
+		@media (min-width: $breakpoint-sm) {
 			grid-column: 1 / span 5;
 		}
-		@media (min-width: $md-breakpoint) {
+		@media (min-width: $breakpoint-md) {
 			grid-column: 9 / span 4;
 		}
 
@@ -70,8 +70,8 @@
 	}
 
 	&__bottom {
-		@mixin clamp padding-top, 20, 40, $xxs-breakpoint, $lg-breakpoint;
-		@mixin clamp padding-bottom, 40, 60, $xxs-breakpoint, $lg-breakpoint;
+		@mixin clamp padding-top, 20, 40, $breakpoint-xxs, $breakpoint-lg;
+		@mixin clamp padding-bottom, 40, 60, $breakpoint-xxs, $breakpoint-lg;
 
 		border-top: 1px solid $color-neutral-000;
 		display: flex;
@@ -79,7 +79,7 @@
 		align-items: flex-start;
 		gap: 10px;
 
-		@media (min-width: $sm-breakpoint) {
+		@media (min-width: $breakpoint-sm) {
 			flex-direction: row;
 			align-items: center;
 			justify-content: space-between;

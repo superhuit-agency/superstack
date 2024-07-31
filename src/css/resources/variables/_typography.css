@@ -1,42 +1,42 @@
 %t-h1 {
 	font-family: var(--font-primary);
-	@mixin clamp font-size, 36, 54, $xxs-breakpoint, $lg-breakpoint;
-	@mixin clamp line-height, 40, 65, $xxs-breakpoint, $lg-breakpoint;
+	@mixin clamp font-size, 36, 54, $breakpoint-xxs, $breakpoint-lg;
+	@mixin clamp line-height, 40, 65, $breakpoint-xxs, $breakpoint-lg;
 	font-weight: 500;
 }
 
 %t-h2 {
 	font-family: var(--font-primary);
-	@mixin clamp font-size, 32, 36, $xxs-breakpoint, $lg-breakpoint;
-	@mixin clamp line-height, 34, 38, $xxs-breakpoint, $lg-breakpoint;
+	@mixin clamp font-size, 32, 36, $breakpoint-xxs, $breakpoint-lg;
+	@mixin clamp line-height, 34, 38, $breakpoint-xxs, $breakpoint-lg;
 	font-weight: 700;
 }
 
 %t-h3 {
 	font-family: var(--font-primary);
-	@mixin clamp font-size, 24, 28, $xxs-breakpoint, $lg-breakpoint;
-	@mixin clamp line-height, 26, 30, $xxs-breakpoint, $lg-breakpoint;
+	@mixin clamp font-size, 24, 28, $breakpoint-xxs, $breakpoint-lg;
+	@mixin clamp line-height, 26, 30, $breakpoint-xxs, $breakpoint-lg;
 	font-weight: 700;
 }
 
 %t-h4 {
 	font-family: var(--font-primary);
-	@mixin clamp font-size, 22, 24, $xxs-breakpoint, $lg-breakpoint;
-	@mixin clamp line-height, 24, 26, $xxs-breakpoint, $lg-breakpoint;
+	@mixin clamp font-size, 22, 24, $breakpoint-xxs, $breakpoint-lg;
+	@mixin clamp line-height, 24, 26, $breakpoint-xxs, $breakpoint-lg;
 	font-weight: 500;
 }
 
 %t-h5 {
 	font-family: var(--font-primary);
-	@mixin clamp font-size, 18, 20, $xxs-breakpoint, $lg-breakpoint;
-	@mixin clamp line-height, 20, 22, $xxs-breakpoint, $lg-breakpoint;
+	@mixin clamp font-size, 18, 20, $breakpoint-xxs, $breakpoint-lg;
+	@mixin clamp line-height, 20, 22, $breakpoint-xxs, $breakpoint-lg;
 	font-weight: 500;
 }
 
 %t-h6 {
 	font-family: var(--font-primary);
-	@mixin clamp font-size, 14, 14, $xxs-breakpoint, $lg-breakpoint;
-	@mixin clamp line-height, 16, 16, $xxs-breakpoint, $lg-breakpoint;
+	@mixin clamp font-size, 14, 14, $breakpoint-xxs, $breakpoint-lg;
+	@mixin clamp line-height, 16, 16, $breakpoint-xxs, $breakpoint-lg;
 	letter-spacing: 1px;
 	font-weight: 400;
 	text-transform: uppercase;
@@ -44,37 +44,37 @@
 
 %t-introduction {
 	font-family: var(--font-secondary);
-	@mixin clamp font-size, 16, 18, $xxs-breakpoint, $lg-breakpoint;
-	@mixin clamp line-height, 18, 20, $xxs-breakpoint, $lg-breakpoint;
+	@mixin clamp font-size, 16, 18, $breakpoint-xxs, $breakpoint-lg;
+	@mixin clamp line-height, 18, 20, $breakpoint-xxs, $breakpoint-lg;
 	font-weight: 400;
 }
 
 %t-paragraph {
 	font-family: var(--font-secondary);
-	@mixin clamp font-size, 14, 16, $xxs-breakpoint, $lg-breakpoint;
-	@mixin clamp line-height, 16, 18, $xxs-breakpoint, $lg-breakpoint;
+	@mixin clamp font-size, 14, 16, $breakpoint-xxs, $breakpoint-lg;
+	@mixin clamp line-height, 16, 18, $breakpoint-xxs, $breakpoint-lg;
 	font-weight: 400;
 }
 
 %t-caption {
 	font-family: var(--font-secondary);
-	@mixin clamp font-size, 12, 12, $xxs-breakpoint, $lg-breakpoint;
-	@mixin clamp line-height, 14, 14, $xxs-breakpoint, $lg-breakpoint;
+	@mixin clamp font-size, 12, 12, $breakpoint-xxs, $breakpoint-lg;
+	@mixin clamp line-height, 14, 14, $breakpoint-xxs, $breakpoint-lg;
 	font-weight: 300;
 }
 
 %t-button {
 	font-family: var(--font-primary);
-	@mixin clamp font-size, 16, 18, $xxs-breakpoint, $lg-breakpoint;
-	@mixin clamp line-height, 18, 20, $xxs-breakpoint, $lg-breakpoint;
+	@mixin clamp font-size, 16, 18, $breakpoint-xxs, $breakpoint-lg;
+	@mixin clamp line-height, 18, 20, $breakpoint-xxs, $breakpoint-lg;
 	font-weight: 500;
 	text-transform: uppercase;
 }
 
 %t-link {
 	font-family: var(--font-secondary);
-	@mixin clamp font-size, 11, 11, $xxs-breakpoint, $lg-breakpoint;
-	@mixin clamp line-height, 13, 13, $xxs-breakpoint, $lg-breakpoint;
+	@mixin clamp font-size, 11, 11, $breakpoint-xxs, $breakpoint-lg;
+	@mixin clamp line-height, 13, 13, $breakpoint-xxs, $breakpoint-lg;
 	letter-spacing: 1px;
 	font-weight: 300;
 	text-transform: uppercase;

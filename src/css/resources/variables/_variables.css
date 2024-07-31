@@ -1,11 +1,11 @@
 /* Breakpoints */
-$xxs-breakpoint: 375px;
-$xs-breakpoint: 600px;
-$sm-breakpoint: 768px;
-$md-breakpoint: 1024px;
-$lg-breakpoint: 1440px;
-$xl-breakpoint: 1680px;
-$xxl-breakpoint: 2500px;
+$breakpoint-xxs: 375px;
+$breakpoint-xs: 600px;
+$breakpoint-sm: 768px;
+$breakpoint-md: 1024px;
+$breakpoint-lg: 1440px;
+$breakpoint-xl: 1680px;
+$breakpoint-xxl: 2500px;
 
 /* z-index */
 $z-index-nav: 9;

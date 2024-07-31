@@ -1,8 +1,8 @@
 @import '@resources/index.css';
 
 .supt-pagination {
-	@mixin clamp margin-top, 20, 40, $xxs-breakpoint, $lg-breakpoint;
-	@mixin clamp margin-bottom, 20, 40, $xxs-breakpoint, $lg-breakpoint;
+	@mixin clamp margin-top, 20, 40, $breakpoint-xxs, $breakpoint-lg;
+	@mixin clamp margin-bottom, 20, 40, $breakpoint-xxs, $breakpoint-lg;
 
 	display: flex;
 	align-items: center;
@@ -14,7 +14,7 @@
 		width: 100%;
 		margin-top: 15px;
 
-		@media (min-width: $xs-breakpoint) {
+		@media (min-width: $breakpoint-xs) {
 			order: 0;
 			width: auto;
 			margin-top: 0;
@@ -40,8 +40,8 @@
 	}
 
 	&__link {
-		@mixin clamp width, 20, 30, $xxs-breakpoint, $lg-breakpoint;
-		@mixin clamp height, 20, 30, $xxs-breakpoint, $lg-breakpoint;
+		@mixin clamp width, 20, 30, $breakpoint-xxs, $breakpoint-lg;
+		@mixin clamp height, 20, 30, $breakpoint-xxs, $breakpoint-lg;
 
 		@extend %t-introduction;
 

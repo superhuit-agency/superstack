@@ -52,8 +52,8 @@
 	} */
 
 	.supt-input-select__option {
-		@mixin clamp font-size, 13, 16, $xxs-breakpoint, $lg-breakpoint;
-		@mixin clamp line-height, 19, 24, $xxs-breakpoint, $lg-breakpoint;
+		@mixin clamp font-size, 13, 16, $breakpoint-xxs, $breakpoint-lg;
+		@mixin clamp line-height, 19, 24, $breakpoint-xxs, $breakpoint-lg;
 
 		&.-is-selected {
 			color: inherit;
@@ -64,7 +64,6 @@
 			background-color: $color-neutral-200;
 		}
 	}
-
 
 	&.-error {
 		.supt-input-select__control {
