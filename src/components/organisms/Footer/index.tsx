@@ -2,7 +2,7 @@ import cx from 'classnames';
 import { FC, useMemo } from 'react';
 
 import { useTranslation } from '@/hooks/use-translation';
-import { Link } from '@/helpers/Link';
+import { Link } from '@/components/atoms';
 
 import block from './block.json';
 

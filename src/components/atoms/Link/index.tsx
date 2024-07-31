@@ -1,8 +1,13 @@
-import { FC, forwardRef } from 'react';
 import NextLink from 'next/link';
+import { FC, forwardRef } from 'react';
 
+import block from './block.json';
+import './styles.css';
 
-export const Link = forwardRef<HTMLAnchorElement, LinkProps>(
+export const Link: FC<LinkProps> & BlockConfigs = forwardRef<
+	HTMLAnchorElement,
+	LinkProps
+>(
 	(
 		{
 			href = '',
@@ -16,6 +21,7 @@ export const Link = forwardRef<HTMLAnchorElement, LinkProps>(
 	) => {
 		const linkProps: any = {
 			...props,
+			// className: cx('supt-link', props?.className), // Set supt-link if you need all links with the same class
 			ref,
 		};
 
@@ -79,3 +85,5 @@ export const Link = forwardRef<HTMLAnchorElement, LinkProps>(
 );
 
 Link.displayName = 'Link';
+Link.slug = block.slug;
+Link.title = block.title;
