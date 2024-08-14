@@ -49,7 +49,7 @@ export const formatter = (
 ): CardNewsProps => {
 	if (!isValidData(props)) throw new Error('Invalid card news data');
 
-	const { title, image, categories, status, ...rest } = props;
+	const { title, image, categories, ...rest } = props;
 
 	return {
 		...rest,

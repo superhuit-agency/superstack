@@ -3,10 +3,10 @@ interface GraphQLMenuItemFields {
 	parentId?: string;
 	label: string;
 	path: string;
-	target: string;
-	cssClasses: string;
+	target?: string;
+	cssClasses?: string;
 }
 
 interface NestedMenuItem extends Omit<GraphQLMenuItemFields, 'parentId'> {
-	items: NestedMenuItem[];
+	items?: NestedMenuItem[];
 }

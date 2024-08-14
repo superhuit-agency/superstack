@@ -22,6 +22,7 @@ export const Default: Story = {
 				items: [],
 			},
 		},
+		logo: null,
 		siteTitle: 'Site Title',
 	},
 };
