@@ -21,14 +21,14 @@ export const formatter = (
 	data: GraphQLImageFields | GraphQLMediaFields | null,
 	isEditor = false,
 	extraProps: any = {}
-): null | ImageProps => {
+): ImageProps | undefined => {
 	const img = data && 'node' in data ? data?.node : data;
 
 	if (!img || !isValidData(img)) {
 		if (process.env.NODE_ENV === 'development') {
 			console.error('Invalid image data');
 		}
-		return null;
+		return undefined;
 	}
 
 	if (isEditor || !img?.mediaDetails?.width || !img?.mediaDetails?.height) {
