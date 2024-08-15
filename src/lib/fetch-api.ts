@@ -28,35 +28,64 @@ const fetchAPI: FetchApiFuncType = async (query, options) => {
 	// // Debug performances
 	// const perfsId = fetchAPITester.markStart(`${type} - ${name}`);
 
+	let dedupedQuery = dedupeFragments(query);
+
 	try {
 		const res = await fetch(endpoint, {
 			method: 'POST',
 			headers,
 			body: JSON.stringify({
-				query: dedupeFragments(query),
+				query: dedupedQuery,
 				variables,
 			}),
 		});
 
-		const { data, errors } = await res.json();
+		let resText;
+		let data, errors;
 
-		if (errors) {
-			const limit = '=================';
-			const sep = '-----------------';
-			const date = new Date().toISOString();
-			const vars = JSON.stringify(variables, null, 2);
-			const errs = errors
-				.map((e: any) => `   - ${e.message} [${e.extensions.category}]`)
-				.join('\n');
-
+		try {
+			// We first convert the response to text,
+			// to be able to console.error the response
+			// in case the JSON parsing fails
+			resText = await res.text();
+			const resJson = JSON.parse(resText);
+			data = resJson.data;
+			errors = resJson.errors;
+		} catch (error) {
 			throw new Error(
-				`\n${limit}\nGraphQl API error\n${sep}\n== date: ${date}\n== errors: \n${errs}\n== query: ${name}\n== variables: ${vars}\n${limit}\n`
+				`\t- Could not parse json response. \n\t- ${error}\n\t- Text response: \n\t${resText?.slice(0, 1000)}...`
 			);
 		}
+
+		if (errors) {
+			const errs = errors
+				.map((e: any) => `\t- ${e.message} [${e.extensions.category}]`)
+				.join('\n');
+
+			throw new Error(errs);
+		}
+
 		result = data;
 	} catch (errors) {
+		const limit = '=================';
+		const sep = '-----------------';
+		const vars = JSON.stringify(variables);
+
 		(Array.isArray(errors) ? errors : [errors]).map((err) =>
-			console.error(err.message)
+			console.error(`
+${limit}
+GraphQl API error
+${sep}
+== date:\t  ${new Date().toISOString()}
+== endpoint: ${endpoint}
+== query:
+	- name:       ${name}
+	- variables:  ${vars ?? '-'}
+	- full query: "${dedupedQuery.replace(/[\n\t\s]+/g, ' ')}"
+== error:
+${err.message}
+${limit}
+`)
 		);
 	}
 
