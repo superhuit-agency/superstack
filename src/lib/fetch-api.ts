@@ -58,7 +58,7 @@ const fetchAPI: FetchApiFuncType = async (query, options) => {
 		}
 
 		// Make sure to return the data if any
-		// event if there are some errors
+		// even if there are some errors
 		if (!!data) result = data;
 
 		if (errors) {
