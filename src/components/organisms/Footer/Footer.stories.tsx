@@ -26,14 +26,17 @@ export const Default: Story = {
 			footer: {
 				items: [
 					{
+						id: 'home',
 						label: 'Home',
 						path: '/',
 					},
 					{
+						id: 'about',
 						label: 'About',
 						path: '/about',
 					},
 					{
+						id: 'contact',
 						label: 'Contact',
 						path: '/contact',
 					},
@@ -42,10 +45,12 @@ export const Default: Story = {
 			legal: {
 				items: [
 					{
+						id: 'privacy policy',
 						label: 'Privacy Policy',
 						path: '/privacy-policy',
 					},
 					{
+						id: 'terms of service',
 						label: 'Terms of Service',
 						path: '/terms-of-service',
 					},

@@ -18,7 +18,11 @@ interface FormAttributes extends BlockAttributes {
 }
 
 interface FormField {
-	attributes: Record<string, any>;
+	attributes: Record<string, any> & {
+		name: string;
+		maxFilesize?: number;
+		accept?: string;
+	};
 	block: string;
 	children?: Array<any>;
 }
