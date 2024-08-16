@@ -15,9 +15,9 @@ RUN apt-get -qq update && apt-get -qq install -y \
 	unzip \
 	mariadb-client
 
-## Enable Xdebug
-RUN pecl install xdebug && docker-php-ext-enable xdebug
-RUN echo "xdebug.mode=develop,debug\nxdebug.start_with_request=yes\nxdebug.client_port=9003\nxdebug.client_host=host.docker.internal\nxdebug.log_level=0" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+## Enable Xdebug -> uncomment if needed
+# RUN pecl install xdebug && docker-php-ext-enable xdebug
+# RUN echo "xdebug.mode=develop,debug\nxdebug.start_with_request=yes\nxdebug.client_port=9003\nxdebug.client_host=host.docker.internal\nxdebug.log_level=0" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
 # PHP extensions -> uncomment if needed
 # RUN apt-get -qq install -y libxml2-dev

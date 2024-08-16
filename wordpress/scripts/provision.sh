@@ -215,6 +215,9 @@ $WPCLI option update page_on_front 2
 $WPCLI rewrite structure '/blog/%postname%/'
 $WPCLI rewrite flush --hard --quiet
 
+# Fake register of Gutenberg components
+$WPCLI option add wp_graphql_gutenberg_block_types --format=json '{"supt/text":{"name":"supt/text","keywords":{},"attributes":{"anchor":{"type":"string"},"className":{"type":"string"}},"providesContext":{},"usesContext":{},"supports":["anchor"],"styles":{},"title":"Text","description":"","category":"spck-content","example":{},"variations":{}}}'
+
 echo
 echo "----------------------------------"
 echo "       Installation complete      "

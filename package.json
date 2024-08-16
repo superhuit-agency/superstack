@@ -12,7 +12,7 @@
     "generate:block": "plop --plopfile ./generators/plopfile.js block"
   },
   "dependencies": {
-    "@hcaptcha/react-hcaptcha": "^1.10.1",
+    "@hcaptcha/react-hcaptcha": "^1.10.3",
     "classnames": "^2.5.1",
     "filesize": "^10.1.0",
     "js-cookie": "^3.0.5",

@@ -1,0 +1,40 @@
+name: Build and test solution
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build WP Theme
+        uses: ./.github/actions/build-theme
+
+      - name: Start WP
+        shell: bash
+        run: npm run start
+        working-directory: ./wordpress
+
+      # Call the wordpress backend to trigger some initialization:
+      # - GraphQL Gutenberg Block registration
+      # - Copy .env files
+
+      - name: Wordpress first use
+        shell: bash
+        run: |
+          cp .env.local.example .env.local
+
+      - name: Build Next Frontend
+        uses: ./.github/actions/build-frontend
+
+      - name: Start Next as a thread
+        shell: bash
+        run: 'npm run start -- -p 3000 &'
+
+      - name: Simple HTTP Test
+        shell: bash
+        run: |
+          sleep 5
+          sh ./.github/actions/tests/simple-http-test.sh
