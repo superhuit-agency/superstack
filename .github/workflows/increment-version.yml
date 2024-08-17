@@ -1,0 +1,40 @@
+name: Build and test solution
+on:
+  push:
+    branches:
+      - 'main'
+    paths-ignore:
+      - composer.json'
+      - package.json'
+
+jobs:
+  increment_version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Getting version from Next NPM
+        run: echo "NEW_VERSION=$(./.github/actions/automated/increment-semver.sh ./package.json patch --out)" >> $GITHUB_ENV
+
+      - name: Patch project version in Next NPM
+        run: bash ./.github/actions/automated/increment-semver.sh "./package.json" ${{ env.NEW_VERSION }}
+
+      - name: Patch project version in WP Composer
+        run: bash ./.github/actions/automated/increment-semver.sh "./wordpress/composer.json" ${{ env.NEW_VERSION }}
+
+      - name: Patch project version in WP NPM
+        run: bash ./.github/actions/automated/increment-semver.sh "./wordpress/package.json" ${{ env.NEW_VERSION }}
+
+      - name: Set up Git
+        run: |
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Action"
+
+      - name: Commit changes
+        shell: bash
+        run: |
+          git commit -m "ship: 🚀 Updated version number to ${{ env.NEW_VERSION }}"
+          git push origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
