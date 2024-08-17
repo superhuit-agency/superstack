@@ -1,4 +1,4 @@
-name: Build and test solution
+name: Auto-increment versioning (PATCH)
 on:
   push:
     branches:
@@ -34,6 +34,9 @@ jobs:
       - name: Commit changes
         shell: bash
         run: |
+          git add ./package.json
+          git add ./wordpress/composer.json
+          git add ./wordpress/package.json
           git commit -m "ship: 🚀 Updated version number to ${{ env.NEW_VERSION }}"
           git push origin main
         env:
