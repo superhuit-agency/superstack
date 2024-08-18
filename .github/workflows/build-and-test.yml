@@ -4,7 +4,7 @@ on:
     types: [opened, reopened, synchronize]
 
 jobs:
-  build_and_test:
+  build_run_test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -38,3 +38,7 @@ jobs:
         run: |
           sleep 5
           sh ./.github/actions/tests/simple-http-test.sh
+
+      - name: Jest Unit Tests
+        shell: bash
+        run: 'npm run test -u'
