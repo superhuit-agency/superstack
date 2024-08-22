@@ -51,9 +51,6 @@ jobs:
           git commit -m "ship: 🚀 upgrade to version ${{ env.NEW_VERSION }}"
           git push origin main
 
-      - name: Read description
-        run: bash ./.github/actions/automated/check-changelog.sh "./CHANGELOG.md" 0.0.0 --desc
-
       # - name: Write Draft release
       #   run: bash ./.github/actions/automated/git-release.sh "${{ github.repository }}" "${{ secrets.GITHUB_TOKEN }}" "${{ env.NEW_VERSION }}" "./CHANGELOG.md" --draft
 

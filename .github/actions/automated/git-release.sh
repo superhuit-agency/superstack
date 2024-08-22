@@ -13,7 +13,8 @@ VERSION=$3 # New version used for the release (excluding the v prefix)
 changelogfile=$4 # Path to the changelog to read the description
 draft_mode=$5 # Path to the changelog to read the description
 
-DESCRIPTION=$(.github/actions/automated/check-changelog.sh $changelogfile $VERSION --desc)
+# Read the description of last version written in the changelog
+DESCRIPTION=$(.github/actions/automated/check-changelog.sh $changelogfile 0.0.0 --desc)
 
 is_draft=false
 if [[ "$draft_mode" == "--draft" ]]; then
@@ -30,7 +31,7 @@ RELEASE_DATA=$(jq -n \
                   --arg tag "v$VERSION" \
                   --arg name "$PR_TITLE" \
                   --arg body "$DESCRIPTION" \
-                  --arg draft "$is_draft" \
+                  --arg draft $is_draft \
 									'{tag_name: $tag, name: $name, body: $body, draft: $draft}')
 
 curl -H "Authorization: token $TOKEN" \
