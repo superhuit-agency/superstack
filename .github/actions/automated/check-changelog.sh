@@ -55,8 +55,9 @@ while IFS= read -r line || [[ -n "$line" ]]; do
     fi
 
     new_version="${BASH_REMATCH[1]}"
+
     comparison_result=$(compare_versions $new_version $last_version)
-    if [[ $comparison_result -eq 0 || $comparison_result -eq -1 ]]; then
+    if [[ $comparison_result -eq 1 ]]; then
       # Start capturing the description for the next version found
       new_version_found=true
     else
@@ -99,7 +100,7 @@ case "$mode" in
     fi
     # Error of Do nothing if no mode specified
 		if ! $new_version_found; then
-			echo "Error - The changelog file doesn't conain any entry over $last_version."
+			echo "Error - The changelog file doesn't contain any information over $last_version."
       exit 1
 		fi
 		echo "Success - A changelog entry was found for v$new_version. Good job!"

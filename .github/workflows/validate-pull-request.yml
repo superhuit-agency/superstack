@@ -57,7 +57,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Getting version from Next NPM
-        run: echo "NEW_VERSION=$(./.github/actions/automated/increment-semver.sh ./package.json self --out)" >> $GITHUB_ENV
+        run: echo "CURRENT_VERSION=$(./.github/actions/automated/increment-semver.sh ./package.json self --out)" >> $GITHUB_ENV
 
       - name: Check if changelog contains description
-        run: bash ./.github/actions/automated/check-changelog.sh "./CHANGELOG.md" ${{ env.NEW_VERSION }}
+        run: bash ./.github/actions/automated/check-changelog.sh "./CHANGELOG.md" ${{ env.CURRENT_VERSION }}
