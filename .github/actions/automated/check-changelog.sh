@@ -74,7 +74,7 @@ done < "$changelog_path"
 case "$mode" in
   "--version")
 		# Check if a new version was found
-		if ! $new_version_found; then
+		if $new_version_found; then
 	    echo "$new_version"
 		else
 			echo "patch"

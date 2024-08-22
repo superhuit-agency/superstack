@@ -16,7 +16,7 @@ draft_mode=$5 # Path to the changelog to read the description
 DESCRIPTION=$(.github/actions/automated/check-changelog.sh $changelogfile $VERSION --desc)
 
 is_draft=false
-if [[ "$draft_mode" == "--draft"]]; then
+if [[ "$draft_mode" == "--draft" ]]; then
 	is_draft=true
 fi
 
