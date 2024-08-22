@@ -14,7 +14,7 @@ mode=$3
 
 # Read the changelog file
 if [ ! -f "$changelog_path" ]; then
-  echo "Changelog file does not exist."
+  echo "$changelog_path file was not found or could not be opened."
   exit 1
 fi
 
