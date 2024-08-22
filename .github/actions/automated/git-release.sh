@@ -29,9 +29,9 @@ PR_TITLE=$(curl -H "Authorization: token $TOKEN" \
 
 RELEASE_DATA=$(jq -n \
                   --arg tag "v$VERSION" \
-                  --arg name "$PR_TITLE" \
+                  --arg name "v$VERSION - $PR_TITLE" \
                   --arg body "$DESCRIPTION" \
-                  --arg draft $is_draft \
+                  --argjson draft $is_draft \
 									'{tag_name: $tag, name: $name, body: $body, draft: $draft}')
 
 curl -H "Authorization: token $TOKEN" \
