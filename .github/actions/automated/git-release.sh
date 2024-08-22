@@ -2,7 +2,7 @@
 
 # Check input parameters
 if [ "$#" -lt 4 ]; then
-  echo "Usage: $0 <repository> <github_token> <version> <changelog_path>"
+  echo "Usage: $0 <repository> <github_token> <version> <changelog_path> [--draft]"
   exit 1
 fi
 
@@ -11,8 +11,14 @@ REPO=$1 # Repo should be the 1st argument
 TOKEN=$2  # Pass GitHub token as the second script argument
 VERSION=$3 # New version used for the release (excluding the v prefix)
 changelogfile=$4 # Path to the changelog to read the description
+draft_mode=$5 # Path to the changelog to read the description
 
 DESCRIPTION=$(.github/actions/automated/check-changelog.sh $changelogfile $VERSION --desc)
+
+is_draft=false
+if [[ "$draft_mode" == "--draft"]]; then
+	is_draft=true
+fi
 
 # Get the latest merged PR
 PR_TITLE=$(curl -H "Authorization: token $TOKEN" \
@@ -24,7 +30,8 @@ RELEASE_DATA=$(jq -n \
                   --arg tag "v$VERSION" \
                   --arg name "$PR_TITLE" \
                   --arg body "$DESCRIPTION" \
-									'{tag_name: $tag, name: $name, body: $body, draft: true}')
+                  --arg draft "$is_draft" \
+									'{tag_name: $tag, name: $name, body: $body, draft: $draft}')
 
 curl -H "Authorization: token $TOKEN" \
      -H "Content-Type: application/json" \
