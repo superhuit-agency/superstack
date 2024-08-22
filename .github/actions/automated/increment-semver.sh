@@ -11,7 +11,7 @@ do
             output_version=true
             ;;
         --help)
-				    echo "Usage: $0 filepath {major|minor|patch|x.x.x} [--out]"
+				    echo "Usage: $0 filepath {major|minor|patch|self|x.x.x} [--out]"
 						exit 0
             ;;
         *)
@@ -35,6 +35,9 @@ IFS='.' read -r major minor patch <<< "$current_version"
 # Construct the new version
 new_version="$version_type"
 case $version_type in
+    self)
+			new_version="$major.$minor.$patch"
+			;;
     major)
 			new_version="$((major + 1)).0.0"
 			;;

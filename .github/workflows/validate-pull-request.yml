@@ -1,9 +1,14 @@
-name: Build and test solution
+name: Test and Validate Pull Request
 on:
   pull_request:
     types: [opened, reopened, synchronize]
+    branches:
+      - '*' # Trigger on pull requests targeting any branch
 
 jobs:
+  # Run the test procedure to validate the code being pushed.
+  # Like development tests, Start the dockers and build.
+  # Finally, run the JEST Unit test script using `npm run test`
   build_run_test:
     runs-on: ubuntu-latest
     steps:
@@ -42,3 +47,17 @@ jobs:
       - name: Jest Unit Tests
         shell: bash
         run: 'npm run test -u'
+
+  # Pull requests made on the MAIN branch must contain a changelog description.
+  # The version and description written will be used to trigger new tags & releases.
+  check_changelog:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.base.ref == 'main'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Getting version from Next NPM
+        run: echo "NEW_VERSION=$(./.github/actions/automated/increment-semver.sh ./package.json self --out)" >> $GITHUB_ENV
+
+      - name: Check if changelog contains description
+        run: bash ./.github/actions/automated/check-changelog.sh "./CHANGELOG.md" ${{ env.NEW_VERSION }}
