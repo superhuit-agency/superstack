@@ -1,0 +1,63 @@
+name: Test and Validate Pull Request
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+    branches:
+      - '*' # Trigger on pull requests targeting any branch
+
+jobs:
+  # Run the test procedure to validate the code being pushed.
+  # Like development tests, Start the dockers and build.
+  # Finally, run the JEST Unit test script using `npm run test`
+  build_run_test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build WP Theme
+        uses: ./.github/actions/build-theme
+
+      - name: Start WP
+        shell: bash
+        run: npm run start
+        working-directory: ./wordpress
+
+      # Call the wordpress backend to trigger some initialization:
+      # - GraphQL Gutenberg Block registration
+      # - Copy .env files
+
+      - name: Wordpress first use
+        shell: bash
+        run: |
+          cp .env.local.example .env.local
+
+      - name: Build Next Frontend
+        uses: ./.github/actions/build-frontend
+
+      - name: Start Next as a thread
+        shell: bash
+        run: 'npm run start -- -p 3000 &'
+
+      - name: Simple HTTP Test
+        shell: bash
+        run: |
+          sleep 5
+          sh ./.github/actions/tests/simple-http-test.sh
+
+      - name: Jest Unit Tests
+        shell: bash
+        run: 'npm run test -u'
+
+  # Pull requests made on the MAIN branch must contain a changelog description.
+  # The version and description written will be used to trigger new tags & releases.
+  check_changelog:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.base.ref == 'main'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Getting version from Next NPM
+        run: echo "CURRENT_VERSION=$(./.github/actions/automated/increment-semver.sh ./package.json self --out)" >> $GITHUB_ENV
+
+      - name: Check if changelog contains description
+        run: bash ./.github/actions/automated/check-changelog.sh "./CHANGELOG.md" ${{ env.CURRENT_VERSION }}

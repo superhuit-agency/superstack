@@ -1,0 +1,38 @@
+#!/bin/bash
+
+# Check input parameters
+if [ "$#" -lt 4 ]; then
+  echo "Usage: $0 <repository> <github_token> <version> <changelog_path>"
+  exit 1
+fi
+
+# Variables
+REPO=$1 # Repo should be the 1st argument
+TOKEN=$2  # Pass GitHub token as the second script argument
+VERSION=$3 # New version used for the release (excluding the v prefix)
+changelogfile=$4 # Path to the changelog to read the description
+
+DESCRIPTION=$(.github/actions/automated/check-changelog.sh $changelogfile $VERSION --desc)
+
+# Get the latest merged PR
+PR_TITLE=$(curl -H "Authorization: token $TOKEN" \
+                -H "Accept: application/vnd.github.v3+json" \
+                "https://api.github.com/repos/$REPO/pulls?state=closed&base=main&sort=updated&direction=desc" \
+                -s | jq -r '[.[] | select(.merged_at != null)][0].title')
+
+RELEASE_DATA=$(jq -n \
+                  --arg tag "v$VERSION" \
+                  --arg name "$PR_TITLE" \
+                  --arg body "$DESCRIPTION" \
+									'{tag_name: $tag, name: $name, body: $body, draft: true}')
+
+curl -H "Authorization: token $TOKEN" \
+     -H "Content-Type: application/json" \
+     -H "Accept: application/vnd.github.v3+json" \
+     -X POST \
+     -d "$RELEASE_DATA" \
+     "https://api.github.com/repos/$REPO/releases"
+
+echo "A draft release for v$VERSION was sent to $REPO with the following content:"
+echo "$PR_TITLE"
+echo "$DESCRIPTION"
