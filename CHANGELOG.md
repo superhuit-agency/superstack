@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.0 - 2024-08-22
+
+Test Minor update
+
 ## 1.0.1 - 2024-08-22
 
 Implementing CI scripts for better code quality
