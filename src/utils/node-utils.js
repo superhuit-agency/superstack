@@ -1,6 +1,14 @@
-// const configs = require('../configs.json');
-// const fetch = require('node-fetch');
-
+class environmentConfig {
+	wordpress = {
+		url: '',
+		forms_secret: '',
+	};
+	next = {
+		url: '',
+		wp_content_url: '',
+		extra_content_domains: {},
+	};
+}
 /**
  * Get the current environment
  * Useful for preview deployments, to connect with a given WordPress endpoint for example.
@@ -8,13 +16,22 @@
  * - environment variables (WORDPRESS_URL,…)
  * - a hardcoded fallback for local development (localhost)
  *
- * @returns {Object}
+ * @returns {environmentConfig}
  */
 const getEnvironmentConfig = () => {
 	return {
 		wordpress: {
 			url: process.env.WORDPRESS_URL ?? 'http://localhost',
 			forms_secret: process.env.WORDPRESS_FORMS_SECRET ?? 'spck',
+		},
+		next: {
+			url: process.env.NEXT_URL ?? 'http://localhost:3000',
+			wp_content_url:
+				process.env.NEXT_WP_CONTENT_URL ??
+				'http://localhost:3000/wp_content',
+			extra_content_domains: process.env.NEXT_EXTRA_CONTENT_DOMAINS
+				? JSON.parse(process.env.NEXT_EXTRA_CONTENT_DOMAINS)
+				: {},
 		},
 	};
 };
@@ -41,7 +58,16 @@ const getWpDomain = () => {
 	const url = getWpUrl();
 	return url.replace('http://', '').replace('https://', '').split(/[/?#]/)[0];
 };
+const getWpContentUrl = () => {
+	return getEnvironmentConfig().next.wp_content_url;
+};
 
+const getImageDomains = () => {
+	return [
+		getWpDomain(),
+		...Object.values(getEnvironmentConfig().next.extra_content_domains),
+	];
+};
 // const getWpLocales = async () => {
 // 	if (!configs.isMultilang) return null; // Return early if it's not multilang
 
@@ -82,5 +108,7 @@ module.exports = {
 	getWpGraphqlUrl,
 	getWpDomain,
 	getWpFormsSecret,
+	getWpContentUrl,
+	getImageDomains,
 	// getWpLocales,
 };

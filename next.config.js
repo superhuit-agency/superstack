@@ -1,23 +1,23 @@
 const {
-	getWpDomain,
 	getWpUrl,
 	getWpFormsSecret,
+	getWpContentUrl,
+	getImageDomains,
 } = require('./src/utils/node-utils.js');
 
-console.log('images domains:', getWpDomain());
+console.log('images domains:', getImageDomains());
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
 	trailingSlash: true, // to match wp links format
 	images: {
-		remotePatterns: [
-			{
-				hostname: getWpDomain(),
-			},
-		],
+		remotePatterns: getImageDomains().map((domain) => ({
+			hostname: domain,
+		})),
 	},
 	rewrites() {
 		const wpUrl = getWpUrl();
+		const wpContentUrl = getWpContentUrl();
 		const formSecrets = getWpFormsSecret();
 
 		return [
@@ -26,10 +26,10 @@ const nextConfig = {
 				source: '/sitemap:type*.xml',
 				destination: `/api/sitemap`,
 			},
-			// Poxy for WP uploads to not expose the WP domain
+			// Proxy for WP uploads to not expose the WP domain
 			{
 				source: '/wp-content/uploads/:path*',
-				destination: `${wpUrl}/wp-content/uploads/:path*`,
+				destination: `${wpContentUrl}/uploads/:path*`,
 			},
 			// Proxy for WP forms
 			{

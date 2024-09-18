@@ -32,5 +32,5 @@
 		}
 	},
 	"include": ["next-env.d.ts", "**/*.jsx", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "jest.config.js"],
-	"exclude": ["node_modules"]
+	"exclude": ["node_modules", "wordpress"]
 }
