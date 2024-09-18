@@ -45,4 +45,4 @@ echo ""
 echo "Authenticating Composer to release belt..."
 echo "-------"
 sleep 1
-$COMPOSE exec wp composer config http-basic.release-belt.superhuit.ch ${RELEASE_BELT_USER} ${RELEASE_BELT_PWD}
+composer config http-basic.release-belt.superhuit.ch ${RELEASE_BELT_USER} ${RELEASE_BELT_PWD}
