@@ -14,6 +14,30 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Check github environment secrets
+        run: |
+          missing_vars=0
+          for var in WORDPRESS_THEME_NAME RELEASE_BELT_USER RELEASE_BELT_PWD; do
+            if [ -z "${!var}" ]; then
+              echo "$var is not set."
+              missing_vars=$((missing_vars+1))
+            else
+              echo "$var is set to '${!var}'."
+            fi
+          done
+
+          if [ $missing_vars -ne 0 ]; then
+            echo "inputs_checked=false" >> $GITHUB_OUTPUT
+            echo "Error: $missing_vars variables are missing."
+            exit 1
+          else
+            echo "inputs_checked=true" >> $GITHUB_OUTPUT
+          fi
+        env:
+          WORDPRESS_THEME_NAME: ${{ secrets.WORDPRESS_THEME_NAME }}
+          RELEASE_BELT_USER: ${{ secrets.RELEASE_BELT_USER }}
+          RELEASE_BELT_PWD: ${{ secrets.RELEASE_BELT_PWD }}
+
       - name: Build WP Theme
         uses: ./.github/actions/build-theme
 
