@@ -8,6 +8,8 @@
 ###
 
 WP_PATH="./.data/wp"
+RELEASE_BELT_USER=${RELEASE_BELT_USER}
+RELEASE_BELT_PWD=${RELEASE_BELT_PWD}
 
 # Extract WordPress version from Dockerfile
 WP_VERSION=$(grep "^FROM wordpress:" ./Dockerfile | sed -E 's/FROM wordpress:([0-9.]+).*/\1/')
@@ -44,3 +46,5 @@ echo "Authenticating Composer to release belt..."
 echo "-------"
 sleep 1
 composer config http-basic.release-belt.superhuit.ch $RELEASE_BELT_USER $RELEASE_BELT_PWD
+# Display result:
+composer config http-basic.release-belt.superhuit.ch
