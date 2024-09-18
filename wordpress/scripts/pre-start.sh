@@ -40,11 +40,3 @@ mkdir -p $WP_PATH
 curl -s -L https://wordpress.org/wordpress-$WP_VERSION.tar.gz | tar xz -C $WP_PATH --strip-components=1
 
 echo "WordPress $WP_VERSION downloaded successfully"
-
-echo ""
-echo "Authenticating Composer to release belt..."
-echo "-------"
-sleep 1
-$COMPOSE exec wp composer config http-basic.release-belt.superhuit.ch $RELEASE_BELT_USER $RELEASE_BELT_PWD
-# Display result:
-$COMPOSE exec wp composer config http-basic.release-belt.superhuit.ch
