@@ -44,10 +44,10 @@ jobs:
 
       - name: Pre-start WP
         shell: bash
-        run: npm run prestart
+        run: RELEASE_BELT_USER=${{ secrets.RELEASE_BELT_USER }} RELEASE_BELT_PWD=${{ secrets.RELEASE_BELT_PWD }} THEME_NAME=${{ secrets.WORDPRESS_THEME_NAME }} npm run prestart
         working-directory: ./wordpress
         env:
-          THEME_NAME: ${{ secrets.WORDPRESS_THEME_NAME }}
+          WORDPRESS_THEME_NAME: ${{ secrets.WORDPRESS_THEME_NAME }}
           RELEASE_BELT_USER: ${{ secrets.RELEASE_BELT_USER }}
           RELEASE_BELT_PWD: ${{ secrets.RELEASE_BELT_PWD }}
 
