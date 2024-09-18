@@ -9,8 +9,6 @@
 
 COMPOSE="docker compose"
 WP_PATH="./.data/wp"
-RELEASE_BELT_USER=${RELEASE_BELT_USER}
-RELEASE_BELT_PWD=${RELEASE_BELT_PWD}
 
 # Extract WordPress version from Dockerfile
 WP_VERSION=$(grep "^FROM wordpress:" ./Dockerfile | sed -E 's/FROM wordpress:([0-9.]+).*/\1/')

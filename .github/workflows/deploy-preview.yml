@@ -46,7 +46,7 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           STAGING_WORDPRESS_PATH: ${{ secrets.STAGING_WORDPRESS_PATH }}
           STAGING_NEXT_URL: ${{ secrets.STAGING_NEXT_URL }}
-          WORDPRESS_THEME_NAME: ${{ secrets.WORDPRESS_THEME_NAME }}
+          WORDPRESS_THEME_NAME: ${{ vars.WORDPRESS_THEME_NAME }}
 
       - uses: styfle/cancel-workflow-action@0.12.1
         with:
@@ -79,7 +79,7 @@ jobs:
       SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       WORDPRESS_PATH: ${{ secrets.STAGING_WORDPRESS_PATH }}
       NEXT_URL: ${{ secrets.STAGING_NEXT_URL }}
-      WORDPRESS_THEME_NAME: ${{ secrets.WORDPRESS_THEME_NAME }}
+      WORDPRESS_THEME_NAME: ${{ vars.WORDPRESS_THEME_NAME }}
 
   deploy_next:
     runs-on: ubuntu-latest

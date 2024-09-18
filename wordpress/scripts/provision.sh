@@ -140,6 +140,7 @@ echo "✔"
 
 echo $en "- Activating plugins $ec"
 $WPCLI plugin activate $($WPCLI plugin list --status=inactive --field=name --skip-update-check) --quiet &> /dev/null
+$WPCLI plugin list
 echo "✔"
 
 # Multilang
