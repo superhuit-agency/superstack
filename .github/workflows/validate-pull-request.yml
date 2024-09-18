@@ -14,9 +14,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check github environment secrets
+      - name: Check github environment secrets and variables
         run: |
-          echo "Checking secrets for '${{ matrix.environment }}.' environment..."
+          echo "Checking secrets and variables for '${{ matrix.environment }}.' environment..."
           missing_vars=0
           for var in WORDPRESS_THEME_NAME RELEASE_BELT_USER RELEASE_BELT_PWD; do
             if [ -z "${!var}" ]; then
@@ -35,8 +35,8 @@ jobs:
             echo "inputs_checked=true" >> $GITHUB_OUTPUT
           fi
         env:
-          WORDPRESS_THEME_NAME: ${{ secrets.WORDPRESS_THEME_NAME }}
-          RELEASE_BELT_USER: ${{ secrets.RELEASE_BELT_USER }}
+          WORDPRESS_THEME_NAME: ${{ vars.WORDPRESS_THEME_NAME }}
+          RELEASE_BELT_USER: ${{ vars.RELEASE_BELT_USER }}
           RELEASE_BELT_PWD: ${{ secrets.RELEASE_BELT_PWD }}
 
       - name: Build WP Theme
@@ -47,9 +47,9 @@ jobs:
         run: npm run start
         working-directory: ./wordpress
         env:
-          RELEASE_BELT_USER: ${{ secrets.RELEASE_BELT_USER }}
+          RELEASE_BELT_USER: ${{ vars.RELEASE_BELT_USER }}
           RELEASE_BELT_PWD: ${{ secrets.RELEASE_BELT_PWD }}
-
+          COMPOSER_GITHUB_TOKEN: ${{ secrets.COMPOSER_GITHUB_TOKEN }}
       # Call the wordpress backend to trigger some initialization:
       # - GraphQL Gutenberg Block registration
       # - Copy .env files

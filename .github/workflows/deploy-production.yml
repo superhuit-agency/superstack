@@ -51,8 +51,8 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           PRODUCTION_WORDPRESS_PATH: ${{ secrets.PRODUCTION_WORDPRESS_PATH }}
           PRODUCTION_NEXT_URL: ${{ secrets.PRODUCTION_NEXT_URL }}
-          WORDPRESS_THEME_NAME: ${{ secrets.WORDPRESS_THEME_NAME }}
-          RELEASE_BELT_USER: ${{ secrets.RELEASE_BELT_USER }}
+          WORDPRESS_THEME_NAME: ${{ vars.WORDPRESS_THEME_NAME }}
+          RELEASE_BELT_USER: ${{ vars.RELEASE_BELT_USER }}
           RELEASE_BELT_PWD: ${{ secrets.RELEASE_BELT_PWD }}
 
       - uses: styfle/cancel-workflow-action@0.12.1
@@ -86,7 +86,7 @@ jobs:
       SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       WORDPRESS_PATH: ${{ secrets.PRODUCTION_WORDPRESS_PATH }}
       NEXT_URL: ${{ secrets.PRODUCTION_NEXT_URL }}
-      WORDPRESS_THEME_NAME: ${{ secrets.WORDPRESS_THEME_NAME }}
+      WORDPRESS_THEME_NAME: ${{ vars.WORDPRESS_THEME_NAME }}
 
   deploy_next:
     runs-on: ubuntu-latest
