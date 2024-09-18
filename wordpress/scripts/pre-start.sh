@@ -7,6 +7,7 @@
 # See `pathMappings` property in `.vscode/launch.json` pathMappings
 ###
 
+COMPOSE="docker compose"
 WP_PATH="./.data/wp"
 RELEASE_BELT_USER=${RELEASE_BELT_USER}
 RELEASE_BELT_PWD=${RELEASE_BELT_PWD}
@@ -40,11 +41,10 @@ curl -s -L https://wordpress.org/wordpress-$WP_VERSION.tar.gz | tar xz -C $WP_PA
 
 echo "WordPress $WP_VERSION downloaded successfully"
 
-
 echo ""
 echo "Authenticating Composer to release belt..."
 echo "-------"
 sleep 1
-composer config http-basic.release-belt.superhuit.ch $RELEASE_BELT_USER $RELEASE_BELT_PWD
+$COMPOSE exec wp composer config http-basic.release-belt.superhuit.ch $RELEASE_BELT_USER $RELEASE_BELT_PWD
 # Display result:
-composer config http-basic.release-belt.superhuit.ch
+$COMPOSE exec wp composer config http-basic.release-belt.superhuit.ch
