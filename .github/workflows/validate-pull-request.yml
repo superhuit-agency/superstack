@@ -4,6 +4,8 @@ on:
     types: [opened, reopened, synchronize]
     branches:
       - '*' # Trigger on pull requests targeting any branch
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
 
 jobs:
   # Run the test procedure to validate the code being pushed.
@@ -18,7 +20,7 @@ jobs:
         run: |
           echo "Checking secrets and variables for '${{ matrix.environment }}.' environment..."
           missing_vars=0
-          for var in WORDPRESS_THEME_NAME RELEASE_BELT_USER RELEASE_BELT_PWD; do
+          for var in COMPOSER_GITHUB_TOKEN WORDPRESS_THEME_NAME RELEASE_BELT_USER RELEASE_BELT_PWD; do
             if [ -z "${!var}" ]; then
               echo "$var is not set."
               missing_vars=$((missing_vars+1))
@@ -38,6 +40,7 @@ jobs:
           WORDPRESS_THEME_NAME: ${{ vars.WORDPRESS_THEME_NAME }}
           RELEASE_BELT_USER: ${{ vars.RELEASE_BELT_USER }}
           RELEASE_BELT_PWD: ${{ secrets.RELEASE_BELT_PWD }}
+          COMPOSER_GITHUB_TOKEN: ${{ secrets.COMPOSER_GITHUB_TOKEN }}
 
       - name: Build WP Theme
         uses: ./.github/actions/build-theme
