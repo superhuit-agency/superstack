@@ -12,6 +12,6 @@
 	}
 }
 
-.wp-block[data-type='supt/input-radio'] {
+.wp-block[data-type='supt/radio'] {
 	@extend %input-size-edit;
 }

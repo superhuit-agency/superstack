@@ -73,6 +73,10 @@
 			width: 100%;
 			background-color: lightgray;
 		}
+
+		&:empty {
+			display: none;
+		}
 	}
 }
 

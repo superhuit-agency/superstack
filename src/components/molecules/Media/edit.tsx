@@ -67,7 +67,9 @@ const Edit = (props: BlockEditProps<MediaAttributes>) => {
 					src: media.src,
 					id: media.id,
 					poster:
-						media.image !== media.icon ? media.image : undefined,
+						media.image?.src !== media.icon
+							? media.image
+							: undefined,
 					caption: media.caption,
 				},
 			});
