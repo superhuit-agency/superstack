@@ -40,19 +40,19 @@
 			left: 0;
 			width: 100%;
 		}
+	}
 
-		&__actions {
-			display: flex;
-			justify-content: flex-end;
-		}
+	&__actions {
+		display: flex;
+		justify-content: flex-end;
+	}
 
-		&__submit {
-			cursor: pointer;
+	&__submit {
+		cursor: pointer;
 
-			&[disabled] {
-				opacity: 0.7;
-				cursor: not-allowed;
-			}
+		&[disabled] {
+			opacity: 0.7;
+			cursor: not-allowed;
 		}
 	}
 }
