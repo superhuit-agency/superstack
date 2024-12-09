@@ -47,6 +47,7 @@ export const Default: Story = {
 				block: 'supt/form-section-breaker',
 				attributes: {
 					title: 'Form section',
+					name: 'breaker',
 				},
 			},
 			{

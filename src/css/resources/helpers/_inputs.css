@@ -1,10 +1,10 @@
 %input {
 	@extend %t-paragraph;
 
-	@mixin clamp padding-top, 6, 9, $xxs-breakpoint, $lg-breakpoint;
-	@mixin clamp padding-right, 9, 12, $xxs-breakpoint, $lg-breakpoint;
-	@mixin clamp padding-bottom, 6, 9, $xxs-breakpoint, $lg-breakpoint;
-	@mixin clamp padding-left, 9, 12, $xxs-breakpoint, $lg-breakpoint;
+	@mixin clamp padding-top, 6, 9, $breakpoint-xxs, $breakpoint-lg;
+	@mixin clamp padding-right, 9, 12, $breakpoint-xxs, $breakpoint-lg;
+	@mixin clamp padding-bottom, 6, 9, $breakpoint-xxs, $breakpoint-lg;
+	@mixin clamp padding-left, 9, 12, $breakpoint-xxs, $breakpoint-lg;
 
 	border: 1px solid $color-text;
 	appearance: none;

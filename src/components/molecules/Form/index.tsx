@@ -17,6 +17,9 @@ import {
 	Controller,
 	SubmitHandler,
 	FieldValues,
+	FieldError,
+	Merge,
+	FieldErrorsImpl,
 } from 'react-hook-form';
 import HCaptcha from '@hcaptcha/react-hcaptcha';
 
@@ -193,6 +196,18 @@ export const Form: FC<FormProps> & BlockConfigs = ({
 		setSuccessMessage('');
 	}, [reset]);
 
+	/**
+	 * Gets a readable version of the error preventing a form to be submitted.
+	 * @param error Error from the formState
+	 * @returns a string description of the current errors, or a boolean is not description is available
+	 */
+	const getFormErrorMessage = function (
+		error?: FieldError | Merge<FieldError, FieldErrorsImpl<any>>
+	): string | boolean {
+		if (!errors) return false;
+		else return error?.message?.toString() ?? false;
+	};
+
 	// Triggered once hCaptcha token changed (means it's been validated/verified)
 	useEffect(() => {
 		if (token) {
@@ -215,13 +230,11 @@ export const Form: FC<FormProps> & BlockConfigs = ({
 			<div className="supt-form__fields">
 				{fields.map(({ block, attributes, children }, i) => {
 					const attrs = {
-						...attributes,
+						...(attributes as InputProps),
 						inputAttributes: {
 							disabled: isSubmitting || isSubmitSuccessful,
 						},
-						invalid: errors?.[attributes.name]
-							? errors?.[attributes.name]?.message
-							: false,
+						invalid: getFormErrorMessage(errors?.[attributes.name]),
 					};
 
 					const registerAttrs: RegisterOptions = {
@@ -300,6 +313,7 @@ export const Form: FC<FormProps> & BlockConfigs = ({
 									<InputCheckbox
 										{...attrs}
 										{...field}
+										//@ts-ignore: Let the component deal with unwanted children
 										options={children}
 									/>
 								)}
@@ -318,6 +332,7 @@ export const Form: FC<FormProps> & BlockConfigs = ({
 									<InputRadio
 										{...attrs}
 										{...field}
+										//@ts-ignore: Let the component deal with unwanted children
 										options={children}
 									/>
 								)}
@@ -326,7 +341,12 @@ export const Form: FC<FormProps> & BlockConfigs = ({
 					}
 					if (block === 'supt/input-file') {
 						registerAttrs.validate = {};
-						if (attrs.maxFilesize && attrs.maxFilesize > 0) {
+						if (
+							'maxFilesize' in attrs &&
+							attrs.maxFilesize &&
+							typeof attrs.maxFilesize === 'number' &&
+							attrs.maxFilesize > 0
+						) {
 							registerAttrs.validate.maxFilesize =
 								getMaxFilesizeValidator(
 									attrs.maxFilesize,
