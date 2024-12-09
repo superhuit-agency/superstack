@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import cx from 'classnames';
 
-import { Link } from '@/helpers/Link';
+import { Link } from '@/components/atoms/Link';
 
 import block from './block.json';
 

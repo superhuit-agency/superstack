@@ -2,9 +2,8 @@ import cx from 'classnames';
 import { useMemo } from 'react';
 
 import { useTranslation } from '@/hooks/use-translation';
-import { Link } from '@/helpers/Link';
 import { Blocks, Container } from '@/components/global';
-import { Pagination, Button, CardNews } from '@/components';
+import { Link, Pagination, Button, CardNews } from '@/components';
 
 import './styles.css';
 

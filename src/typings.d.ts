@@ -45,14 +45,6 @@ type MenuItemType = LinkProps & {
 	items?: MenuItemType[];
 };
 
-type LinkProps = React.HTMLProps<HTMLAnchorElement> & {
-	scroll?: boolean;
-	prefetch?: boolean;
-	ref?: Ref<HTMLAnchorElement>;
-	// target?: string;
-	// download?: boolean;
-};
-
 type AuthType = {
 	authToken?: string;
 };

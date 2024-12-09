@@ -13,4 +13,5 @@ export { Radio } from './inputs/Radio';
 export { List } from './List';
 export { ListItem } from './ListItem';
 export { Paragraph } from './Paragraph';
+export { Link } from './Link';
 // -- GENERATOR EXPORT SLOT --
