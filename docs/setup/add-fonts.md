@@ -58,8 +58,8 @@ In `_fonts.css` file located in `wordpress/theme/lib/editor/assets/css/`. Add yo
 @font-face {
 	font-family: 'My custom font';
 	src:
-		url('../../../../src/my-custom-font.woff2') format('woff2'),
-		url('../../../../src/my-custom-font.woff') format('woff');
+		url('../../../../src/fonts/my-custom-font.woff2') format('woff2'),
+		url('../../../../src/fonts/my-custom-font.woff') format('woff');
 	font-weight: 400;
 	font-style: normal;
 	font-display: swap;
