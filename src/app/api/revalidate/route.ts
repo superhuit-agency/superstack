@@ -16,7 +16,9 @@ export async function GET(request: NextRequest) {
 
 	if (path) {
 		revalidatePath(path); // Only purges the cache
-		await fetch(`${request.nextUrl.origin}${path}`); // We need to simulate the 1st request to put the new response in the cache (so the 1st user gets the new cached response)
+
+		const nextUrl = process.env.NEXT_URL || request.nextUrl.origin;
+		await fetch(`${nextUrl}${path}`); // We need to simulate the 1st request to put the new response in the cache (so the 1st user gets the new cached response)
 		return Response.json({ revalidated: true, now: Date.now() });
 	}
 

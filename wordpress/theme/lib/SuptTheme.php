@@ -56,7 +56,8 @@ class SuptTheme {
 		add_action( 'init', [$this, 'register_menu_locations'] );
 		add_action( 'init', [$this, 'register_assets'] );
 		add_action( 'admin_enqueue_scripts', [$this, 'enqueue_admin_assets'] );
-		add_action( 'enqueue_block_editor_assets',	[$this, 'enqueue_editor_assets'] );
+		add_action( 'enqueue_block_assets',	[$this, 'enqueue_editor_assets'] );
+		add_action( 'after_setup_theme', [$this, 'disable_gutenberg_color_settings'] );
 
 		add_filter( 'wp_is_application_passwords_available', [$this, 'wp_is_application_passwords_available'] );
 
