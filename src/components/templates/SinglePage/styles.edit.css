@@ -6,12 +6,12 @@
 	.block-editor-block-list__layout {
 	.single-page {
 		.supt-section {
-			@mixin clamp padding-top, 80, 120, $xs-breakpoint, $lg-breakpoint;
-			@mixin clamp padding-bottom, 80, 120, $xs-breakpoint, $lg-breakpoint;
+			@mixin clamp padding-top, 80, 120, $breakpoint-xs, $breakpoint-lg;
+			@mixin clamp padding-bottom, 80, 120, $breakpoint-xs, $breakpoint-lg;
 		}
 
 		.supt-section.-default + .supt-section.-default {
-			@mixin clamp margin-top, -40, -60, $xs-breakpoint, $lg-breakpoint;
+			@mixin clamp margin-top, -40, -60, $breakpoint-xs, $breakpoint-lg;
 		}
 	}
 }
