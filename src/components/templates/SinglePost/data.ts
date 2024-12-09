@@ -1,11 +1,10 @@
-import * as cardNewsData from '@/components/molecules/cards/CardNews/data';
+import { cardNewsData, imageData } from '@/components/molecules/data';
 
 import {
 	languageFields,
 	translationsFields,
 	seoPostTypeFragment,
 } from '@/lib/fragments';
-import { FetchApiFuncType } from '@/lib/fetch-api';
 import { gql } from '@/utils';
 
 export const slug = 'single-post';
@@ -20,13 +19,7 @@ export const fragment = gql`
 
 		featuredImage {
 			node {
-				src: sourceUrl
-				caption
-				altText
-				mediaDetails {
-					height
-					width
-				}
+				...imageFragment
 			}
 		}
 
@@ -65,6 +58,7 @@ export const fragment = gql`
 		${languageFields}
 		${translationsFields}
 	}
+	${imageData.fragment}
 	${seoPostTypeFragment}
 `;
 

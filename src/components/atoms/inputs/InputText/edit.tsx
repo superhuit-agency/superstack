@@ -9,9 +9,8 @@ import { useRef } from '@wordpress/element';
 import { _x } from '@wordpress/i18n';
 
 import { IdControl, NameControl } from '#/components';
-import { WpBlockType } from '@/typings';
+
 import block from './block.json';
-import { InputTextProps } from '.';
 
 // styles
 import './styles.css';
@@ -20,7 +19,7 @@ import './styles.edit.css';
 /**
  * COMPONENT EDITOR
  */
-const Edit = (props: BlockEditProps<InputTextProps>) => {
+const Edit = (props: BlockEditProps<InputTextAttributes>) => {
 	const { name, label, required, id = '', placeholder } = props.attributes;
 	const refEl = useRef(null);
 
@@ -88,7 +87,7 @@ const Edit = (props: BlockEditProps<InputTextProps>) => {
 /**
  * WORDPRESS COMPONENTS
  */
-export const InputTextBlock: WpBlockType<InputTextProps> = {
+export const InputTextBlock: WpBlockType<InputTextAttributes> = {
 	slug: block.slug,
 	settings: {
 		title: block.title,

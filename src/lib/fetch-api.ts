@@ -2,24 +2,10 @@ import { getWpGraphqlUrl } from '@/utils/node-utils';
 import { dedupeFragments } from '@/utils';
 import { getQueryAttrs } from '#/utils';
 
-export type AuthType = {
-	authToken?: string;
-};
-
 const WP_GRAPHQL_URL = getWpGraphqlUrl();
 
 // // Debug performances
 // export const fetchAPITester = PerfsTester();
-
-export type FetchApiFuncType = (
-	query: string,
-	options?: {
-		variables?: any;
-		auth?: AuthType;
-		endpoint?: string;
-		headers?: any;
-	}
-) => Promise<any>;
 
 const fetchAPI: FetchApiFuncType = async (query, options) => {
 	const {

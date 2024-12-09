@@ -2,16 +2,9 @@ import { FC, useCallback } from 'react';
 import cx from 'classnames';
 
 import { useTranslation } from '@/hooks/use-translation';
-import { BlockConfigs } from '@/typings';
+
 import block from './block.json';
-
 import './styles.css';
-
-export type PaginationProps = {
-	baseUri: string;
-	currentPagination: number;
-	totalPages: number;
-};
 
 export const Pagination: FC<PaginationProps> & BlockConfigs = ({
 	baseUri,

@@ -1,21 +1,12 @@
 import cx from 'classnames';
 import { FC, forwardRef, useId } from 'react';
 
-import { BlockConfigs, InputProps } from '@/typings';
 import block from './block.json';
 
 // styles
 import { useTranslation } from '@/hooks/use-translation';
 import './styles.css';
 
-/**
- * TYPINGS
- */
-export type InputTextareaProps = InputProps;
-
-/**
- * COMPONENT
- */
 export const InputTextarea: FC<InputTextareaProps> & BlockConfigs = forwardRef(
 	(
 		{

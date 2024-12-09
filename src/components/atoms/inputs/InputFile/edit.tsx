@@ -15,9 +15,8 @@ import { _x, sprintf } from '@wordpress/i18n';
 
 import { IdControl, NameControl } from '#/components';
 import { IconDocument } from '@/components/icons/DocumentIcon';
-import { WpBlockType } from '@/typings';
+
 import block from './block.json';
-import { InputFileProps } from '.';
 
 // styles
 import './styles.css';
@@ -26,7 +25,7 @@ import './styles.edit.css';
 /**
  * COMPONENT EDITOR
  */
-const Edit = (props: BlockEditProps<InputFileProps>) => {
+const Edit = (props: BlockEditProps<InputFileAttributes>) => {
 	const {
 		name,
 		label,
@@ -212,7 +211,7 @@ const Edit = (props: BlockEditProps<InputFileProps>) => {
 /**
  * WORDPRESS BLOCK
  */
-export const InputFileBlock: WpBlockType<InputFileProps> = {
+export const InputFileBlock: WpBlockType<InputFileAttributes> = {
 	slug: block.slug,
 	settings: {
 		title: block.title,
@@ -225,14 +224,14 @@ export const InputFileBlock: WpBlockType<InputFileProps> = {
 		category: 'spck-form',
 		postTypes: ['form'],
 		attributes: {
+			accept: { type: 'string', default: '' },
+			description: { type: 'string' },
 			id: { type: 'string' },
 			label: { type: 'string' },
-			name: { type: 'string' },
-			description: { type: 'string' },
-			nbFiles: { type: 'number', default: 1 },
 			maxFilesize: { type: 'number' },
+			name: { type: 'string' },
+			nbFiles: { type: 'number', default: 1 },
 			required: { type: 'boolean', default: false },
-			accept: { type: 'string', default: '' },
 		},
 		// keywords: [__('text'),	__('email'),	__('date')],
 		supports: { customClassName: false },

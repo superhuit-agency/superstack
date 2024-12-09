@@ -3,31 +3,14 @@ import cx from 'classnames';
 
 import { Link } from '@/helpers/Link';
 import { Section } from '@/helpers/Section';
-import { BlockConfigs, SectionProps, LinkProps } from '@/typings';
-import { CardNewsProps, CardNews } from '@/components/molecules/cards/CardNews';
+
+import { CardNews } from '@/components/molecules/cards/CardNews';
 
 import block from './block.json';
 
 // styles
 import './styles.css';
 
-/**
- * TYPINGS
- */
-
-export interface SectionNewsPost {
-	posts: Array<CardNewsProps>;
-}
-
-export interface SectionNewsProps extends SectionNewsPost, SectionProps {
-	seeAllLink: LinkProps;
-	postLinkLabel?: string;
-	queryVars?: Record<string, any>;
-}
-
-/**
- * COMPONENT
- */
 export const SectionNews: FC<SectionNewsProps> & BlockConfigs = ({
 	anchor,
 	className,

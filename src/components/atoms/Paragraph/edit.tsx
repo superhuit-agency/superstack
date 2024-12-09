@@ -5,7 +5,6 @@ import { unregisterFormatType } from '@wordpress/rich-text';
 import { BlockEditProps } from '@wordpress/blocks';
 
 // internal imports
-import { WpBlockType, WpFilterType } from '@/typings';
 import block from './block.json';
 
 // styles

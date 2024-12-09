@@ -6,26 +6,7 @@ import { Icon } from '@wordpress/components';
 import { BlockControls, PlainText } from '@wordpress/block-editor';
 import { useState, useCallback, useEffect } from '@wordpress/element';
 
-import {
-	LinkControlValueProps,
-	UrlPickerChangeParams,
-} from '../UrlPicker/typings';
 import { UrlPicker } from '..';
-import { ButtonProps } from '@/typings';
-
-type ButtonEditProps = {
-	attrs: ButtonProps;
-	isSelected?: boolean;
-	wrapperClass?: string;
-	rootClass?: string;
-	onChange: Function;
-	linkSettings?: object;
-	placeholder?: string;
-	toolbarPosition?: 'left' | 'right';
-	minCols?: number;
-	maxCols?: number;
-	inBlockControls?: boolean;
-};
 
 export default function ButtonEdit({
 	attrs,

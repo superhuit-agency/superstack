@@ -11,32 +11,9 @@ import {
 	RichText,
 } from '@wordpress/block-editor';
 
-import { CoreBlockEditorSelector } from '#/typings';
-import { ImageProps } from '@/typings';
-
 // styles
 import './styles.css';
 
-/**
- * TYPINGS
- */
-type ImageEditProps = {
-	attributes: ImageProps & { id: number };
-	isSelected: boolean;
-	onChange: Function;
-	hasCaption?: boolean;
-	isCover?: boolean;
-	canDelete?: boolean;
-	ratioWidth?: number;
-	ratioHeight?: number;
-	className?: string;
-};
-
-type MediaUpload = any;
-
-/**
- * COMPONENT
- */
 const ImageEdit = ({
 	attributes,
 	isSelected,
@@ -65,9 +42,7 @@ const ImageEdit = ({
 
 	// Upload on drop file
 	const mediaUpload = useSelect((select: Function) => {
-		const { getSettings } = select(
-			'core/block-editor'
-		) as CoreBlockEditorSelector;
+		const { getSettings } = select('core/block-editor');
 		return getSettings().mediaUpload;
 	}, []);
 
@@ -76,7 +51,7 @@ const ImageEdit = ({
 			mediaUpload({
 				allowedTypes: ['image'],
 				filesList,
-				onFileChange([media]: MediaUpload[]) {
+				onFileChange([media]: MediaUploadType[]) {
 					if (isBlobURL(media?.url)) {
 						setIsLoading(true);
 						return;
@@ -115,7 +90,7 @@ const ImageEdit = ({
 		>
 			<MediaUploadCheck>
 				<MediaUpload
-					onSelect={(media: MediaUpload) => {
+					onSelect={(media: MediaUploadType) => {
 						onChange({
 							id: media.id,
 							src: media.url,

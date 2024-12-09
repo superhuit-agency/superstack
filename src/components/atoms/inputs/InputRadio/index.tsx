@@ -1,25 +1,12 @@
 import cx from 'classnames';
-import { FC, forwardRef, Ref, useId } from 'react';
+import { FC, forwardRef, useId } from 'react';
 // internal imports
 import { useTranslation } from '@/hooks/use-translation';
-import { BlockConfigs, InputProps } from '@/typings';
-import { Radio, RadioProps } from '../Radio';
+import { Radio } from '../Radio';
 import block from './block.json';
 // styles
 import './styles.css';
 
-/**
- * TYPINGS
- */
-export type InputRadioProps = InputProps & {
-	onChange?: Function;
-	onBlur?: Function;
-	options: Array<{ attrs: RadioProps }>;
-};
-
-/**
- * COMPONENT
- */
 export const InputRadio: FC<InputRadioProps> & BlockConfigs = forwardRef<
 	HTMLInputElement,
 	InputRadioProps

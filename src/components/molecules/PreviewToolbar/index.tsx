@@ -8,11 +8,6 @@ import { useTranslation } from '@/hooks/use-translation';
 
 import './styles.css';
 
-interface PreviewToolbarProps {
-	isDraft: boolean;
-	editLink?: string;
-}
-
 export function PreviewToolbar({ isDraft, editLink }: PreviewToolbarProps) {
 	const [viewport, setViewport] = useState<{ w: number; h: number }>();
 	const [isDraftPreview, setIsDraftPreview] = useState(isDraft);

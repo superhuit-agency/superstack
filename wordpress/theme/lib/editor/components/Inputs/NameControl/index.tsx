@@ -11,14 +11,8 @@ const setNameDebounced = debounce((onChange, name) => {
 	onChange(isEmpty(name) ? '' : slugify(name, SLUGIFY_ARGS));
 }, 1000);
 
-interface NameControlProps {
-	name: string;
-	placeholder?: string;
-	onChange: (name: string) => void;
-}
-
 export const NameControl: FC<NameControlProps> = ({
-	name,
+	name = '',
 	placeholder = '',
 	onChange,
 }) => {

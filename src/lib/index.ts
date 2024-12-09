@@ -1,10 +1,8 @@
 import fetchAPI from './fetch-api';
 import formatBlocksJSON from './format-blocks-json';
-import formatMenuItems from './format-menu-items';
 
 import getBlockFinalComponentProps from './get-block-final-component-props';
 import getAllURIs from './get-all-uris';
-import { getAllMenus } from './get-all-menus';
 import getAuthToken from './get-auth-token';
 
 import getFunkyWpUploadsURI from './get-funky-wp-uploads-uri';
@@ -20,9 +18,7 @@ export const PREVIEW_STATI = ['PUBLISH', 'DRAFT', 'FUTURE', 'PRIVATE'];
 
 export {
 	fetchAPI,
-	formatMenuItems,
 	formatBlocksJSON,
-	getAllMenus,
 	getAllURIs,
 	getAuthToken,
 	getBlockFinalComponentProps,

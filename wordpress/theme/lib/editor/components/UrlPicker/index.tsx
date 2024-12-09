@@ -15,9 +15,6 @@ import {
 import { __experimentalLinkControl as LinkControl } from '@wordpress/block-editor';
 import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
 
-import { UrlPickerProps } from './typings';
-
-
 export const UrlPicker = ({
 	value,
 	onChange,

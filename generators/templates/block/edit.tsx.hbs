@@ -17,9 +17,7 @@ import { getData } from './data';
 {{/if}}
 
 // block
-import { WpBlockEditProps, WpBlockType } from '@/typings';
 import block from './block.json';
-import { {{ pascalCase blockTitle }}Props } from '.';
 
 // styles
 import './styles.css';
@@ -28,7 +26,7 @@ import './styles.edit.css';
 /**
  * COMPONENT EDITOR
  */
-const Edit = (props: WpBlockEditProps<{{ pascalCase blockTitle }}Props>) => {
+const Edit = (props: WpBlockEditProps<{{ pascalCase blockTitle }}Attributes>) => {
 	{{#if (equals blockType "organisms")}}
 	const slug = props.name;
 	{{/if}}
@@ -106,7 +104,7 @@ const Edit = (props: WpBlockEditProps<{{ pascalCase blockTitle }}Props>) => {
 /**
  * WORDPRESS BLOCK
  */
-export const {{pascalCase blockTitle}}Block: WpBlockType<{{ pascalCase blockTitle }}Props> = {
+export const {{pascalCase blockTitle}}Block: WpBlockType<{{ pascalCase blockTitle }}Attributes> = {
 	slug: block.slug,
 	settings: {
 		title: block.title,

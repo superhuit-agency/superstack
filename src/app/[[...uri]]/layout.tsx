@@ -1,10 +1,10 @@
 import { Metadata, Viewport } from 'next';
 import { Inter, Roboto_Mono } from 'next/font/google';
 
-import { Footer, MainNav } from '@/components/index';
-import { FooterDataType } from '@/components/organisms/Footer';
-import { MainNavProps } from '@/components/organisms/MainNav';
-import { getWpUriFromNextPath, getAllMenus } from '@/lib';
+import { Footer, MainNav } from '@/components/organisms';
+import * as footerData from '@/components/organisms/Footer/data';
+import * as mainNavData from '@/components/organisms/MainNav/data';
+import { getWpUriFromNextPath } from '@/lib';
 
 import '@/css/base/index.css';
 
@@ -42,13 +42,21 @@ export default async function Layout({
 	children: React.ReactNode;
 	params: { uri: string[] };
 }) {
-	const menus: MainNavProps & FooterDataType = await getAllMenus();
-
 	const uri = getWpUriFromNextPath(
 		params.uri ?? []
 		// params.lang,
 		// defaultLocale
 	);
+
+	const [navPromise, footerPromise] = await Promise.allSettled([
+		mainNavData.getData(uri),
+		footerData.getData(uri),
+	]);
+
+	const mainNavProps =
+		navPromise.status === 'fulfilled' ? navPromise.value : null;
+	const footerProps =
+		footerPromise.status === 'fulfilled' ? footerPromise.value : null;
 
 	const languageCode = 'FR'; // TODO: get from next i18n
 
@@ -60,15 +68,9 @@ export default async function Layout({
 			<body>
 				<div className="app">
 					<div className="main">
-						<MainNav {...menus} />
+						{mainNavProps && <MainNav {...mainNavProps} />}
 						<div>{children}</div>
-						<Footer
-							{...menus}
-							isHome={
-								uri === '/' ||
-								uri === `/${languageCode.toLowerCase()}/`
-							}
-						/>
+						{footerProps && <Footer {...footerProps} />}
 					</div>
 				</div>
 			</body>

@@ -2,8 +2,6 @@ import cx from 'classnames';
 import Img from 'next/image';
 import { FC, forwardRef } from 'react';
 
-import { BlockConfigs, ImageProps } from '@/typings';
-
 import block from './block.json';
 
 // styles
@@ -13,23 +11,23 @@ import './styles.css';
  * COMPONENT
  */
 export const Image: FC<ImageProps> & BlockConfigs = forwardRef<
-	HTMLElement,
+	HTMLImageElement,
 	ImageProps
 >(
 	(
 		{
-			alt,
-			src,
-			width,
-			height,
+			alt = '',
 			caption,
+			children,
 			className = '',
+			fill = false,
+			height,
+			id,
 			priority = false,
 			quality = 95,
-			fill = false,
+			src,
 			style,
-			children,
-			id,
+			width,
 			...props // rest of the props that get passed to the netxjs image
 		},
 		ref
@@ -45,14 +43,14 @@ export const Image: FC<ImageProps> & BlockConfigs = forwardRef<
 				{/* {!width && !height && !fill ? (
 					// no need to optimise (we are either rendering an svg or outside of Next.js context)
 					<img
-						src={src as string}
-						alt={alt ?? ''}
+						src={src}
+						alt={alt}
 						className="supt-figure__image"
 					/>
 				) : ( */}
 				<Img
-					src={src as string}
-					alt={alt ?? ''}
+					src={src}
+					alt={alt}
 					className="supt-figure__image"
 					width={fill ? undefined : width}
 					height={fill ? undefined : height}

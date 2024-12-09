@@ -3,7 +3,6 @@
 import { FC, useCallback, useEffect, useState } from 'react';
 import cx from 'classnames';
 
-import { BlockConfigs, ImageProps, VideoProps } from '@/typings';
 import { Image } from '../Image';
 import block from './block.json';
 
@@ -17,9 +16,9 @@ const DEFAULT_THUMBNAIL_ARGS = {
 };
 
 export const Video: FC<VideoProps> & BlockConfigs = ({
+	caption,
 	id,
 	poster,
-	caption,
 	source,
 	src,
 }) => {

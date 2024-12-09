@@ -1,39 +1,22 @@
 import { FC, useCallback, useMemo } from 'react';
 
+import { Image } from '@/components/molecules/Image';
 import configs from '@/configs.json';
 import { Link } from '@/helpers/Link';
 import { useTranslation } from '@/hooks/use-translation';
-import { BlockConfigs, ImageProps, LinkProps } from '@/typings';
 import { phpToJsDateFormat } from '@/utils';
 
-import { Image } from '../..';
 import block from './block.json';
 import './styles.css';
 
-/**
- * TYPINGS
- */
-export type CardNewsProps = {
-	image?: ImageProps;
-	category?: LinkProps;
-	date: string;
-	title: string;
-	excerpt?: string;
-	uri: string;
-	linkLabel?: string;
-};
-
-/**
- * COMPONENTS
- */
 export const CardNews: FC<CardNewsProps> & BlockConfigs = ({
-	image,
 	category,
 	date,
-	title,
 	excerpt,
-	uri,
 	linkLabel,
+	image,
+	title,
+	uri,
 	...linkProps
 }) => {
 	const locale = configs.staticLang; // TODO :: HANDLE THIS !!!

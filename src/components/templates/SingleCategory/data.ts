@@ -5,7 +5,6 @@ import {
 	translationsFields,
 	seoTaxFragment,
 } from '@/lib/fragments';
-import { FetchApiFuncType } from '@/lib/fetch-api';
 import { gql } from '@/utils';
 
 import { singlePageData, archivePostData } from '@/components/templates/data';

@@ -1,52 +1,69 @@
-import apiFetch from '@wordpress/api-fetch';
 import { InspectorControls } from '@wordpress/block-editor';
 import { BlockEditProps } from '@wordpress/blocks';
 import { PanelBody, PanelRow, SelectControl } from '@wordpress/components';
-import { useEffect, useState } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 import { _x } from '@wordpress/i18n';
 import { useMemo } from 'react';
 
 import icon from '@/components/icons/FormIcon';
+import { useGraphQlApi } from '#/hooks';
 
-import { WpBlockType } from '@/typings';
-
-import { Form, FormProps } from '.';
+import { Form } from '.';
 import block from './block.json';
-
-type FormType = {
-	id: number;
-	title: string;
-	strings: any;
-	fields: any;
-};
+import { getData, getFormsList } from './data';
+import './styles.css';
+import './styles.edit.css';
 
 /**
  * COMPONENT EDIT
  */
-const Edit = (props: BlockEditProps<FormProps>) => {
-	const [forms, setForms] = useState([]);
-	const [didFetch, setDidFetch] = useState(false);
+const Edit = ({ attributes, setAttributes }: BlockEditProps<FormProps>) => {
+	const { isLoading: isLoadingFormsList, data: formsList } =
+		useGraphQlApi(getFormsList);
 
-	useEffect(() => {
-		apiFetch({ path: '/wp/v2/form' }).then((results: unknown) => {
-			setForms(
-				(results as any).map((item: any) => ({
-					id: item.id,
-					title: item.title.rendered,
-					strings: item.strings,
-					fields: item.fields,
-				}))
-			);
-			setDidFetch(true);
-		});
-	}, []);
+	const formsListSelectOptions = useMemo(
+		() =>
+			formsList &&
+			Array.isArray(formsList) &&
+			formsList.reduce(
+				(
+					opts: Array<{ value: string; label: string }>,
+					f: GraphQlFormFields
+				) => [
+					...opts,
+					{
+						value: f.id,
+						label: f.title,
+					},
+				],
+				[
+					{
+						value: null,
+						label: _x('Pick a form', 'Form block settings', 'supt'),
+					},
+				]
+			),
+		[formsList]
+	);
 
-	const { id } = props.attributes;
-	const noFormAvailable = forms.length === 0;
+	const handleOnFormSelect = useCallback(
+		(value: string) => {
+			const id = parseInt(value);
 
-	const form = useMemo(() => {
-		return id ? forms.find((f: FormType) => f.id === id) : false;
-	}, [id, forms]);
+			setAttributes({
+				id: isNaN(id) ? undefined : id,
+			});
+		},
+		[setAttributes]
+	);
+
+	const { id, isPreview } = attributes;
+
+	const variables = useMemo(() => ({ id }), [id]);
+	const { data: form } = useGraphQlApi(getData, variables);
+
+	// For block preview
+	if (isPreview) return null;
 
 	return (
 		<>
@@ -54,19 +71,10 @@ const Edit = (props: BlockEditProps<FormProps>) => {
 				<PanelBody
 					title={_x('Settings', 'Form block settings', 'supt')}
 				>
-					{didFetch && (
+					{!isLoadingFormsList && (
 						<>
 							<PanelRow>
-								{noFormAvailable && (
-									<strong>
-										{_x(
-											'⚠️ No form exists. Please create one in "Forms > Add New".',
-											'Form block settings',
-											'supt'
-										)}
-									</strong>
-								)}
-								{!noFormAvailable && (
+								{formsList.length ? (
 									<SelectControl
 										label={_x(
 											'Form',
@@ -74,30 +82,17 @@ const Edit = (props: BlockEditProps<FormProps>) => {
 											'supt'
 										)}
 										value={id?.toString()}
-										options={
-											[
-												{
-													value: null,
-													label: _x(
-														'Pick a form',
-														'Form block settings',
-														'supt'
-													),
-												},
-												...forms.map((f: FormType) => ({
-													value: f.id,
-													label: f.title,
-												})),
-											] as any
-										}
-										onChange={(value: string) => {
-											const id = parseInt(value);
-
-											props.setAttributes({
-												id: isNaN(id) ? undefined : id,
-											});
-										}}
+										options={formsListSelectOptions}
+										onChange={handleOnFormSelect}
 									/>
+								) : (
+									<strong>
+										{_x(
+											'⚠️ No form exists. Please create one in "Forms > Add New".',
+											'Form block settings',
+											'supt'
+										)}
+									</strong>
 								)}
 							</PanelRow>
 						</>
@@ -107,7 +102,7 @@ const Edit = (props: BlockEditProps<FormProps>) => {
 
 			<div className="form-block">
 				{form ? (
-					<Form {...(form as any)} />
+					<Form {...form} />
 				) : (
 					<div className="components-placeholder">
 						<div className="components-placeholder__label">
@@ -159,17 +154,18 @@ export const FormBlock: WpBlockType<FormProps> = {
 				type: 'number',
 				default: undefined,
 			},
-			fields: {
-				type: 'object',
-				default: {},
-			},
-			opt_ins: {
+			isPreview: {
 				type: 'boolean',
 				default: false,
 			},
 		},
 		keywords: [],
 		supports: { customClassName: false },
+		example: {
+			attributes: {
+				isPreview: true,
+			},
+		},
 		edit: Edit,
 		save: () => null,
 	},

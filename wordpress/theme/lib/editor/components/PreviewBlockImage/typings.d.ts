@@ -1,0 +1,3 @@
+interface PreviewBlockImageType {
+	slug: string;
+}

@@ -4,9 +4,8 @@ import { TextControl } from '@wordpress/components';
 import { _x } from '@wordpress/i18n';
 
 import { IdControl } from '#/components';
-import { WpBlockType } from '@/typings';
+
 import block from './block.json';
-import { RadioProps } from '.';
 
 // styles
 import './styles.css';
@@ -15,7 +14,7 @@ import './styles.css';
  * COMPONENT EDITOR
  */
 const Edit = (props: BlockEditProps<RadioProps>) => {
-	const { id = '', label, name, value } = props.attributes;
+	const { id = '', label, name, value = '' } = props.attributes;
 
 	return (
 		<>
