@@ -3,8 +3,8 @@ interface GraphQLMenuItemFields {
 	parentId?: string;
 	label: string;
 	path: string;
-	target: string;
-	cssClasses: string;
+	target?: string;
+	cssClasses?: string;
 }
 
 interface MenuItem extends Omit<GraphQLMenuItemFields, 'parentId'> {
