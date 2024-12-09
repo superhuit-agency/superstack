@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "postinstall": "npm --prefix ./wordpress install",
     "dev": "next dev",
     "build": "next build",
     "build:analyzer": "ANALYZE=true npm run build",
