@@ -25,9 +25,10 @@ export const formatter = (
 			posts: posts.nodes.map((n: any) => cardNewsData.formatter(n)),
 			pagination: {
 				current: currentPage,
-				total:
+				total: Math.ceil(
 					posts.pageInfo.offsetPagination.total /
-					(archivePage?.perPage || NB_PER_PAGE),
+						(archivePage?.perPage || NB_PER_PAGE)
+				),
 			},
 			categories: categories.nodes.map((t: any) => ({
 				...t,
