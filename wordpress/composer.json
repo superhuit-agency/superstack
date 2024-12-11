@@ -24,7 +24,7 @@
 		"ashhitch/wp-graphql-yoast-seo": "4.22.5",
 		"advanced-custom-fields/advanced-custom-fields-pro": "6.3.6",
 		"php": "^8.1 || ^8.2",
-		"pristas-peter/wp-graphql-gutenberg": "0.4.1",
+		"superhuit-agency/wp-graphql-gutenberg": "dev-master",
 		"superhuit/wp-graphql-redirection": "1.1.0",
 		"superhuit-agency/nextjs-revalidate": "1.6.4",
 		"superhuit-agency/starterpack-forms": "1.0.17",
@@ -74,6 +74,18 @@
 				"type": "wordpress-plugin",
 				"dist": {
 					"url": "https://github.com/superhuit-agency/starterpack-forms/releases/download/v1.0.17/starterpack-forms-v1.0.17.zip",
+					"type": "zip"
+				}
+			}
+		},
+		{
+			"type": "package",
+			"package": {
+				"name": "superhuit-agency/wp-graphql-gutenberg",
+				"version": "dev-master",
+				"type": "wordpress-plugin",
+				"dist": {
+					"url": "https://github.com/superhuit-agency/wp-graphql-gutenberg/archive/refs/tags/v0.4.1.supt-fix.zip",
 					"type": "zip"
 				}
 			}

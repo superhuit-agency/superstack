@@ -9,6 +9,7 @@
     "lint": "next lint",
     "storybook": "storybook dev -p 4000",
     "test": "jest",
+    "test:workflow": "act -j build_run_test --container-architecture linux/amd64 --var-file .github/local.variables --secret-file .github/local.secrets",
     "build-storybook": "storybook build",
     "generate:block": "plop --plopfile ./generators/plopfile.js block"
   },

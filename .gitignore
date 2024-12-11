@@ -44,3 +44,5 @@ next-env.d.ts
 
 # tests with jest
 *.js.snap
+wordpress/yarn.lock
+wordpress/uploads/*
