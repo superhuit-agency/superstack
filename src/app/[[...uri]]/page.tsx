@@ -4,7 +4,6 @@ import { notFound, permanentRedirect, redirect } from 'next/navigation';
 
 import { Templates } from '@/components/global/Templates';
 import { PreviewToolbar } from '@/components/molecules/PreviewToolbar';
-import { useCanonical as getCanonicalUrl } from '@/hooks/use-canonical';
 import {
 	getAllURIs,
 	getAuthToken,
@@ -12,6 +11,7 @@ import {
 	getRedirection,
 	getWpUriFromNextPath,
 } from '@/lib';
+import { MultilingualPageNode } from '@/types/pagenodes';
 
 // see https://nextjs.org/docs/app/api-reference/file-conventions/route-segment-config
 export const revalidate = 3600; // revalidate at most every hour
@@ -57,15 +57,6 @@ export async function generateMetadata({
 		node?.siteSEO?.openGraph?.defaultImage?.src ??
 		'';
 
-	const canonical = getCanonicalUrl(node);
-
-	// Fix SEO url for homepage
-	const urlSEO = node?.seo?.opengraphUrl?.startsWith('https')
-		? node?.language
-			? `/${node?.language.code.toLowerCase()}/`
-			: '/'
-		: node?.seo?.opengraphUrl;
-
 	return {
 		metadataBase: new URL(baseUrl),
 		title: node?.seo?.title ?? node?.title,
@@ -73,23 +64,29 @@ export async function generateMetadata({
 			node?.seo?.opengraphDescription ?? node?.seo?.metaDesc ?? '',
 		// Canonical
 		alternates: {
-			canonical: canonical,
-			...node?.translations?.reduce(
-				(acc: Record<string, string>, t: any) => {
-					if (!t.language || !t.language.locale || !t.language.code)
-						return acc;
+			canonical: node?.getCanonicalUrl(),
+			...(node instanceof MultilingualPageNode
+				? node?.translations?.reduce(
+						(acc: Record<string, string>, t: any) => {
+							if (
+								!t.language ||
+								!t.language.locale ||
+								!t.language.code
+							)
+								return acc;
 
-					return {
-						...acc,
-						[t.language.locale]:
-							(node?.baseUrl || '') +
-							(t.uri === '/'
-								? `/${t.language.code.toLowerCase()}/`
-								: t.uri),
-					};
-				},
-				{}
-			),
+							return {
+								...acc,
+								[t.language.locale]:
+									(node?.baseUrl || '') +
+									(t.uri === '/'
+										? `/${t.language.code.toLowerCase()}/`
+										: t.uri),
+							};
+						},
+						{}
+					)
+				: {}),
 		},
 		// Open Graph
 		openGraph: {
@@ -103,7 +100,7 @@ export async function generateMetadata({
 					alt: node?.seo?.title,
 				},
 			],
-			url: urlSEO,
+			url: node?.getSEOUrl(),
 		},
 		// Socials
 		twitter: {
