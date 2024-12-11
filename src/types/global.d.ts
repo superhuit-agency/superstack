@@ -93,6 +93,108 @@ declare global {
 		readonly attributes: Readonly<T & { isPreview?: boolean }>;
 	}
 
+	type RawBlockPropsType = {
+		innerBlocks: Array<RawBlockPropsType>;
+		name: string;
+		postId: number;
+		blockType: {
+			name: string;
+			keywords: Array<string>;
+			attributes: BlockAttributesDefinitionType;
+			providesContext: Array<string>;
+			usesContext: Array<string>;
+			selectors: Array<string>;
+			supports: {
+				anchor?: boolean;
+				align?: boolean | array;
+				alignWide?: boolean;
+				ariaLabel?: boolean;
+				background?: {
+					backgroundImage?: boolean;
+					backgroundSize?: boolean;
+				};
+				className?: boolean;
+				color?: {
+					background?: boolean;
+					button?: boolean;
+					enableContrastChecker?: boolean;
+					__experimentalDuotone?: boolean;
+					gradients?: boolean;
+					heading?: boolean;
+					link?: boolean;
+					text?: boolean;
+				};
+				customClassName?: boolean;
+				dimensions?: {
+					minHeight: boolean;
+				};
+				filter?: {
+					duotone?: boolean;
+				};
+				html?: boolean;
+				inserter?: boolean;
+				interactivity?: boolean | object;
+				layout?:
+					| boolean
+					| {
+							default?: { type: string };
+							allowSwitching?: boolean;
+							allowEditing?: boolean;
+							allowInheriting?: boolean;
+							allowSizingOnChildren?: boolean;
+							allowVerticalAlignment?: boolean;
+							allowJustification?: boolean;
+							allowOrientation?: boolean;
+							allowCustomContentAndWideSize?: boolean;
+					  };
+				lock?: boolean;
+				multiple?: boolean;
+				position?: {
+					sticky?: boolean;
+				};
+				renaming?: boolean;
+				reusable?: boolean;
+				shadow?: boolean;
+				spacing?: {
+					margin: boolean | ['top' | 'right' | 'bottom' | 'left'];
+					padding: boolean | ['top' | 'right' | 'bottom' | 'left'];
+					blockGap: boolean | ['horizontal' | 'vertical'];
+				};
+				typography?: {
+					fontSize?: boolean;
+					lineHeight?: boolean;
+					textAlign?:
+						| boolean
+						| ['left' | 'center' | 'right' | 'justify'];
+				};
+				splitting?: boolean;
+			};
+			styles: {
+				name: string;
+				label: string;
+				isDefault: boolean;
+			};
+			variations: [];
+			blockHooks: [];
+			title: string;
+			description: string;
+			postTypes: Array<string>;
+			category: string;
+			example: {
+				name: string;
+				attributes: BlockAttributesType;
+			};
+			parent: [];
+		};
+		originalContent: string;
+		saveContent: string;
+		order: number;
+		get_parent: {};
+		attributes: BlockAttributesType;
+		attributesType: BlockAttributesDefinitionType;
+		dynamicContent: string;
+	};
+
 	type BlockPropsType = {
 		name: string;
 		attributes: Record<string, unknown>;
