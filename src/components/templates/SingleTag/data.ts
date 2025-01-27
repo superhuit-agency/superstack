@@ -99,13 +99,13 @@ export const getData = async (
 	const { posts, categories, tags, readingSettings } = data as any;
 
 	return {
-		blocksJSON: JSON.parse(readingSettings.postsPage.blocksJSON),
+		blocksJSON: JSON.parse(readingSettings.postsPage?.blocksJSON ?? '[]'),
 		archivePage: {
 			...archivePostData.formatter(
 				{ posts, categories, tags, currentPage: pageNum },
 				node
 			).archivePage,
-			baseUri: readingSettings.postsPage.uri,
+			baseUri: readingSettings.postsPage?.uri ?? undefined,
 		},
 	};
 };
