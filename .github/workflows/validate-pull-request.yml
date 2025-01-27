@@ -99,7 +99,6 @@ jobs:
       - name: Simple HTTP Test
         shell: bash
         run: |
-          sleep 10
           sh ./.github/actions/tests/simple-http-test.sh
 
       - name: Jest Unit Tests
