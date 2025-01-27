@@ -42,6 +42,9 @@ debug.log
 next-env.d.ts
 .vscode/tasks.json
 
+# artifacts from ACT
+.artifacts/*
+
 # tests with jest
 *.js.snap
 wordpress/yarn.lock
