@@ -27,7 +27,7 @@
 		"superhuit-agency/wp-graphql-gutenberg": "dev-master",
 		"superhuit/wp-graphql-redirection": "1.1.0",
 		"superhuit-agency/nextjs-revalidate": "1.6.4",
-		"superhuit-agency/starterpack-forms": "1.1.0",
+		"superhuit-agency/starterpack-forms": "1.1.1",
 		"user-role-editor/user-role-editor-pro": "4.64.2",
 		"valu/wp-graphql-offset-pagination": "dev-master",
 		"wp-graphql/wp-graphql-jwt-authentication": "0.7.0",
