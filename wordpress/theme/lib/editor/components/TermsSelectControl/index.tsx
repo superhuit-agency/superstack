@@ -15,7 +15,7 @@ const TermsSelectControl = ({
 	taxonomy = CATEGORY_TAX_NAME,
 	values,
 	...rest
-}: TermsSelectControllProps) => {
+}: TermsSelectControlProps) => {
 	const [search, setSearch] = useState('');
 
 	const selectedArgs = useMemo(

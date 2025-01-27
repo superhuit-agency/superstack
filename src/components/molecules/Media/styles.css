@@ -5,7 +5,7 @@
 	width: 100%; /* to prevent big images from stretching the grid */
 	margin-bottom: 10px;
 
-	@media (min-width: $sm-breakpoint) {
+	@media (min-width: $breakpoint-sm) {
 		margin-bottom: 0px;
 	}
 
@@ -15,7 +15,7 @@
 	}
 
 	&.-is-sticky {
-		@media (min-width: $sm-breakpoint) {
+		@media (min-width: $breakpoint-sm) {
 			position: sticky;
 			top: 80px;
 			/* For sticky to work */

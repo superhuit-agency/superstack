@@ -124,8 +124,8 @@ export async function generateMetadata({
 		},
 		// Robots
 		robots: {
-			index: !node?.seo?.metaRobotsNoindex,
-			follow: !node?.seo?.metaRobotsNofollow,
+			index: node?.seo?.metaRobotsNoindex === 'index',
+			follow: node?.seo?.metaRobotsNofollow === 'follow',
 		},
 	};
 }

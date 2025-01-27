@@ -44,7 +44,7 @@ export const Video: FC<VideoProps> & BlockConfigs = ({
 				...DEFAULT_THUMBNAIL_ARGS,
 				src: `https://img.youtube.com/vi/${id}/maxresdefault.jpg`,
 			});
-		} else {
+		} else if (source === 'vimeo') {
 			// Vimeo
 			fetch(`https://vimeo.com/api/v2/video/${id}.json`)
 				.then((res) => res.json())

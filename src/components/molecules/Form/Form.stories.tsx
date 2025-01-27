@@ -74,42 +74,42 @@ export const Default: Story = {
 				attributes: {
 					label: 'Plusieurs choix possibles',
 					name: 'multiple',
+					options: [
+						{
+							attrs: {
+								label: 'Choice 1',
+								name: 'Name choice 1',
+							},
+						},
+						{
+							attrs: {
+								label: 'Choice 2',
+								name: 'Name choice 2',
+							},
+						},
+					],
 				},
-				children: [
-					{
-						attrs: {
-							label: 'Choice 1',
-							name: 'Name choice 1',
-						},
-					},
-					{
-						attrs: {
-							label: 'Choice 2',
-							name: 'Name choice 2',
-						},
-					},
-				],
 			},
 			{
 				block: 'supt/input-radio',
 				attributes: {
 					label: 'Un seul choix possible',
 					name: 'one',
+					options: [
+						{
+							attrs: {
+								label: 'Choice 1',
+								name: 'Name choice 1',
+							},
+						},
+						{
+							attrs: {
+								label: 'Choice 2',
+								name: 'Name choice 2',
+							},
+						},
+					],
 				},
-				children: [
-					{
-						attrs: {
-							label: 'Choice 1',
-							name: 'Name choice 1',
-						},
-					},
-					{
-						attrs: {
-							label: 'Choice 2',
-							name: 'Name choice 2',
-						},
-					},
-				],
 			},
 		],
 	},

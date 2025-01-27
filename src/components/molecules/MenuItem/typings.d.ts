@@ -7,6 +7,12 @@ interface GraphQLMenuItemFields {
 	cssClasses?: string;
 }
 
-interface NestedMenuItem extends Omit<GraphQLMenuItemFields, 'parentId'> {
+interface MenuItem extends Omit<GraphQLMenuItemFields, 'parentId'> {
+	id?: string;
+	target?: string;
+	cssClasses?: string;
+}
+
+interface NestedMenuItem extends MenuItem {
 	items?: NestedMenuItem[];
 }
