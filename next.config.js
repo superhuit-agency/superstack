@@ -3,6 +3,7 @@ const {
 	getWpFormsSecret,
 	getWpContentUrl,
 	getImageDomains,
+	getWpDomain,
 } = require('./src/utils/node-utils.js');
 
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
