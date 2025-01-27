@@ -22,6 +22,8 @@ const BlocksWhitelist = (): JSX.Element | null => {
 	const whiteListBlocks = useCallback((postType: PostType) => {
 		const blockTypes = getBlockTypes();
 		blockTypes.forEach((blockType) => {
+			if (blockType.name === 'core/block') return; // Skip core/block as it's used for pattern/reusable blocks
+
 			if (
 				!(
 					blockType as WpBlockType<any>['settings']

@@ -1,11 +1,13 @@
 name: Deploy WP & Nextjs to Production - builds and deploys
 on:
-  push:
-    branches:
-      - 'production'
-    # # Only run workflow if push a server tag
-    # tags:
-    #   - 'v*.*.*'
+  # ######## Uncomment below block to enable automatic deployment
+  # push:
+  #   branches:
+  #     - 'production'
+  #   # # Only run workflow if push a server tag
+  #   # tags:
+  #   #   - 'v*.*.*'
+  # ########
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:

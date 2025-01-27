@@ -7,13 +7,11 @@ import {
 	MediaReplaceFlow,
 	MediaUpload,
 } from '@wordpress/block-editor';
-import { BlockEditProps } from '@wordpress/blocks';
-import { PanelBody, RadioControl, ToggleControl } from '@wordpress/components';
+import { PanelBody, RadioControl } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { _x } from '@wordpress/i18n';
 
 import { ImageEdit, VideoEdit } from '#/components';
-
 import block from './block.json';
 
 // styles
@@ -23,7 +21,7 @@ import './styles.edit.css';
 /**
  * COMPONENT EDITOR
  */
-const Edit = (props: BlockEditProps<MediaAttributes>) => {
+const Edit = (props: WpBlockEditProps<MediaAttributes>) => {
 	const { mediaType, image, video /*, isSticky*/ } = props.attributes;
 
 	const getYoutubeVideoIdFromUrl = useCallback((url: string) => {
@@ -67,7 +65,9 @@ const Edit = (props: BlockEditProps<MediaAttributes>) => {
 					src: media.src,
 					id: media.id,
 					poster:
-						media.image !== media.icon ? media.image : undefined,
+						media.image?.src !== media.icon
+							? media.image
+							: undefined,
 					caption: media.caption,
 				},
 			});

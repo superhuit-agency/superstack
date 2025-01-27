@@ -3,9 +3,6 @@ const helpers = require('./helpers');
 const chalk = require('chalk');
 const { exec } = require('child_process');
 
-const fs = require('fs');
-const path = require('path');
-
 const blockAttributeValidTypes = [
 	'null',
 	'boolean',
@@ -30,8 +27,6 @@ module.exports = async function (plop) {
 	await plop.load('plop-helper-slugify');
 
 	const pascalCase = plop.getHelper('pascalCase');
-	const camelCase = plop.getHelper('camelCase');
-	const dashCase = plop.getHelper('dashCase');
 	const slugify = plop.getHelper('slugify');
 
 	plop.setGenerator('block', {
@@ -180,14 +175,6 @@ module.exports = async function (plop) {
 				pattern: /(\/\/ -- GENERATOR EXPORT SLOT --)/gi,
 				template: `export * from './{{ pascalCase blockTitle }}/edit';\r\n$1`,
 			});
-			if (CONFIG.outputPathType === 'core') {
-				actions.push({
-					type: 'modify',
-					path: `${CONFIG.paths.customRelativePath}/{{blockType}}/edit.ts`,
-					pattern: /(\/\/ -- GENERATOR CORE BLOCKS EXPORT SLOT --)/gi,
-					template: `{{ pascalCase blockTitle }}Block,\r\n\t$1`,
-				});
-			}
 
 			// Export component in packages/blocks/components/{{blockType}}/index.ts
 			actions.push({
@@ -196,14 +183,6 @@ module.exports = async function (plop) {
 				pattern: /(\/\/ -- GENERATOR EXPORT SLOT --)/gi,
 				template: `export { {{ pascalCase blockTitle }} } from './{{ pascalCase blockTitle }}';\r\n$1`,
 			});
-			if (CONFIG.outputPathType === 'core') {
-				actions.push({
-					type: 'modify',
-					path: `${CONFIG.paths.customRelativePath}/{{blockType}}/index.ts`,
-					pattern: /(\/\/ -- GENERATOR CORE BLOCKS EXPORT SLOT --)/gi,
-					template: `{{ pascalCase blockTitle }},\r\n\t$1`,
-				});
-			}
 
 			// Export component in packages/blocks/components/{{blockType}}/data.ts
 			if (supportsData) {
@@ -213,15 +192,6 @@ module.exports = async function (plop) {
 					pattern: /(\/\/ -- GENERATOR EXPORT SLOT --)/gi,
 					template: `export * as {{ camelCase blockTitle }}Data from './{{ pascalCase blockTitle }}/data';\r\n$1`,
 				});
-				if (CONFIG.outputPathType === 'core') {
-					actions.push({
-						type: 'modify',
-						path: `${CONFIG.paths.customRelativePath}/{{blockType}}/data.ts`,
-						pattern:
-							/(\/\/ -- GENERATOR CORE BLOCKS EXPORT SLOT --)/gi,
-						template: `{{ camelCase blockTitle }}Data,\r\n\t$1`,
-					});
-				}
 			}
 
 			// Import component in Blocks.tsx
@@ -266,46 +236,4 @@ module.exports = async function (plop) {
 			return actions;
 		},
 	});
-
-	// Copy a folder (recursive function)
-	function copyDir(src, dest) {
-		fs.mkdirSync(dest, { recursive: true }); // Create new directory
-
-		// Read source directory
-		let entries = fs.readdirSync(src, {
-			withFileTypes: true,
-		});
-
-		for (let entry of entries) {
-			let srcPath = path.join(src, entry.name);
-			let destPath = path.join(dest, entry.name);
-
-			entry.isDirectory()
-				? copyDir(srcPath, destPath)
-				: fs.copyFileSync(srcPath, destPath);
-		}
-	}
-
-	// Look for a folder
-	function findDir(src, dirName, dirPath) {
-		let entries = fs.readdirSync(src, {
-			withFileTypes: true,
-		});
-
-		for (let entry of entries) {
-			if (entry.isDirectory()) {
-				let srcPath = path.join(src, entry.name);
-
-				if (entry.name === dirName) {
-					// It's the directory we're looking for
-					dirPath = srcPath;
-				} else {
-					// Continue to look
-					dirPath = findDir(srcPath, dirName, dirPath);
-				}
-			}
-		}
-
-		return dirPath;
-	}
 };

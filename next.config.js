@@ -5,7 +5,11 @@ const {
 	getImageDomains,
 } = require('./src/utils/node-utils.js');
 
-console.log('images domains:', getImageDomains());
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+	enabled: process.env.ANALYZE === 'true',
+});
+
+console.log('images domains:', getWpDomain());
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -44,4 +48,4 @@ const nextConfig = {
 	},
 };
 
-module.exports = nextConfig;
+module.exports = withBundleAnalyzer(nextConfig);

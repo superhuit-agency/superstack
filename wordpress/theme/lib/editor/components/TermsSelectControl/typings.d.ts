@@ -1,4 +1,4 @@
-interface TermsSelectControllProps extends FormTokenField.Props {
+interface TermsSelectControlProps extends FormTokenField.Props {
 	label?: string;
 	onChange: (tokens: Array<any>) => void;
 	taxonomy?: string;

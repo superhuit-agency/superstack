@@ -13,7 +13,7 @@
     "start": "sh ./scripts/start-wp.sh",
     "stop": "docker compose down",
     "logs": "docker compose logs -f",
-    "build": "NEXT_PUBLIC_IS_THIS_NEXT=false NODE_ENV=production webpack",
+    "build": "THEME_NAME=superstack NEXT_PUBLIC_IS_THIS_NEXT=false NODE_ENV=production webpack",
     "generate:pot": "wp i18n make-pot ./theme theme/languages/supt.pot",
     "generate:json": "wp i18n make-json ./theme/languages/fr_FR.po --no-purge",
     "analyze": "ANALYZE=true NODE_ENV=production webpack"
@@ -48,7 +48,7 @@
     "style-loader": "3.3.2",
     "typescript": "5.0.4",
     "webpack": "5.79.0",
-    "webpack-bundle-analyzer": "4.8.0",
+    "webpack-bundle-analyzer": "4.10.2",
     "webpack-cli": "5.1.4",
     "webpack-dev-server": "4.13.3",
     "webpack-manifest-plugin": "5.0.0"

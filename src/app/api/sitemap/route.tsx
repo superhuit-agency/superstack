@@ -106,10 +106,12 @@ export async function GET(request: NextRequest) {
 
 	const data = await getSitemapData(type, parseInt(page), MAX_NB_URLS);
 
+	const nextUrl = process.env.NEXT_URL || request.nextUrl.origin;
+
 	return new Response(
 		match
-			? createTypeSitemap(data, request.nextUrl.origin)
-			: createIndexSitemap(data, request.nextUrl.origin),
+			? createTypeSitemap(data, nextUrl)
+			: createIndexSitemap(data, nextUrl),
 		{
 			status: 200,
 			headers: {

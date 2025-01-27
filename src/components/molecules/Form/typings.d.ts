@@ -17,11 +17,15 @@ interface FormAttributes extends BlockAttributes {
 	id?: number; // id of the form in the backend
 }
 
+/**
+ * Description of a form field, typically any HTML Input element.
+ */
 interface FormField {
 	attributes: Record<string, any> & {
 		name: string;
 		maxFilesize?: number;
 		accept?: string;
+		// Add more attributes here when needed...
 	};
 	block: string;
 	children?: Array<any>;

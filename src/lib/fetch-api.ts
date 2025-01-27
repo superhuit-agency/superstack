@@ -28,37 +28,70 @@ const fetchAPI: FetchApiFuncType = async (query, options) => {
 	// // Debug performances
 	// const perfsId = fetchAPITester.markStart(`${type} - ${name}`);
 
-	// try {
-	const res = await fetch(endpoint, {
-		method: 'POST',
-		headers,
-		body: JSON.stringify({
-			query: dedupeFragments(query),
-			variables,
-		}),
-	});
+	let dedupedQuery = dedupeFragments(query);
 
-	const { data, errors } = await res.json();
+	try {
+		const res = await fetch(endpoint, {
+			method: 'POST',
+			headers,
+			body: JSON.stringify({
+				query: dedupedQuery,
+				variables,
+			}),
+		});
 
-	if (errors) {
+		let resText;
+		let data, errors;
+
+		try {
+			// We first convert the response to text,
+			// to be able to console.error the response
+			// in case the JSON parsing fails
+			resText = await res.text();
+			const resJson = JSON.parse(resText);
+			data = resJson.data;
+			errors = resJson.errors;
+		} catch (error) {
+			throw new Error(
+				`\t- Could not parse json response. \n\t- ${error}\n\t- Text response: \n\t${resText?.slice(0, 1000)}...`
+			);
+		}
+
+		// Make sure to return the data if any
+		// even if there are some errors
+		if (!!data) result = data;
+
+		if (errors) {
+			const errs = errors
+				.map((e: any) => `\t- ${e.message} [${e.extensions.category}]`)
+				.join('\n');
+
+			throw new Error(errs);
+		}
+
+		result = data;
+	} catch (errors) {
 		const limit = '=================';
 		const sep = '-----------------';
-		const date = new Date().toISOString();
-		const vars = JSON.stringify(variables, null, 2);
-		const errs = errors
-			.map((e: any) => `   - ${e.message} [${e.extensions.category}]`)
-			.join('\n');
+		const vars = JSON.stringify(variables);
 
-		throw new Error(
-			`\n${limit}\nGraphQl API error\n${sep}\n== date: ${date}\n== errors: \n${errs}\n== query: ${name}\n== variables: ${vars}\n${limit}\n`
+		(Array.isArray(errors) ? errors : [errors]).map((err) =>
+			console.error(`
+${limit}
+GraphQl API error
+${sep}
+== date:\t  ${new Date().toISOString()}
+== endpoint: ${endpoint}
+== query:
+	- name:       ${name}
+	- variables:  ${vars ?? '-'}
+	- full query: "${dedupedQuery.replace(/[\n\t\s]+/g, ' ')}"
+== error:
+${err.message}
+${limit}
+`)
 		);
 	}
-	result = data;
-	// } catch (errors) {
-	// 	(Array.isArray(errors) ? errors : [errors]).map((err) =>
-	// 		console.error(err.message)
-	// 	);
-	// }
 
 	// // Debug performances
 	// fetchAPITester.markEnd(perfsId);

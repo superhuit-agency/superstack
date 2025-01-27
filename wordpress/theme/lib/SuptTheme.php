@@ -34,18 +34,20 @@ class SuptTheme {
 
 		// Disable some theme features
 		add_theme_support( 'disable-custom-colors' );
+		add_theme_support( 'disable-custom-font-sizes' );
+		add_theme_support( 'disable-custom-gradients' );
 		add_theme_support( 'editor-color-palette', [] );
 		add_theme_support( 'editor-font-sizes', [] );
-		add_theme_support( 'disable-custom-font-sizes' );
-		add_theme_support( 'disable-drop-cap' ); // this does not seems to work
-		add_theme_support( 'disable-font-sizes' ); // this does not seems to work
+		add_theme_support( 'editor-gradient-presets', [] );
 		remove_theme_support( 'core-block-patterns' );
+
 
 		// Filters
 		// -> more info: https://developer.wordpress.org/reference/functions/add_filter/
 		add_filter( 'graphql_jwt_auth_secret_key', [$this, 'graphql_jwt_auth_secret_key'] );
 		add_filter( 'graphql_jwt_auth_expire', [$this, 'graphql_jwt_auth_expire'], 10 );
 		add_filter( 'i_order_terms_taxonomies', [$this, 'i_order_terms_taxonomies'] );
+
 
 		add_filter( 'spckforms_site_url', 'SUPT\get_next_url' );
 
@@ -54,7 +56,7 @@ class SuptTheme {
 		add_action( 'init', [$this, 'register_menu_locations'] );
 		add_action( 'init', [$this, 'register_assets'] );
 		add_action( 'admin_enqueue_scripts', [$this, 'enqueue_admin_assets'] );
-		add_action( 'enqueue_block_editor_assets',	[$this, 'enqueue_editor_assets'] );
+		add_action( 'enqueue_block_assets',	[$this, 'enqueue_editor_assets'] );
 		add_action( 'after_setup_theme', [$this, 'disable_gutenberg_color_settings'] );
 
 		add_filter( 'wp_is_application_passwords_available', [$this, 'wp_is_application_passwords_available'] );
@@ -122,7 +124,7 @@ class SuptTheme {
 		// OR webpack-dev-server is not running
 		// -> try to load from the filesystem  [/wp-content/themes/superstack/static/manifest.json]
 		elseif ( file_exists(THEME_PATH . '/static/manifest.json') && $manifest = json_decode(file_get_contents(THEME_PATH . '/static/manifest.json', true)) ) {
-			$assets_uri = THEME_URI . '/static/';
+			$assets_uri = THEME_URI . '/static';
 		}
 
 		// Manifest not found…
@@ -165,19 +167,6 @@ class SuptTheme {
 
 			wp_set_script_translations('supt-editor-script', 'supt', THEME_PATH . '/languages');
 		}
-	}
-
-
-
-	/**
-	 * Remove default color settings in WP sidebar for core blocks
-	 */
-	function disable_gutenberg_color_settings() {
-		add_theme_support( 'disable-custom-colors' );
-		add_theme_support( 'disable-custom-colors' );
-		add_theme_support( 'editor-color-palette' );
-		add_theme_support( 'editor-gradient-presets', [] );
-		add_theme_support( 'disable-custom-gradients' );
 	}
 
 	/**
