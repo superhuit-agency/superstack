@@ -1,13 +1,26 @@
 #!/bin/sh
 
+mkdir ./http-test
+
+# curl --write-out "%{http_code}" -k --silent --output ./http-test/home http://localhost:3000/
+# curl --write-out "%{http_code}" -k --silent --output ./http-test/blog http://localhost:3000/blog/
+# curl --write-out "%{http_code}" -k --silent --output ./http-test/hello-world http://localhost:3000/blog/hello-world/
+URL="http://localhost/wp-admin/"
+echo "calling: $URL"
+response=$(curl --write-out "%{http_code}" -k --silent --output ./http-test/wp-admin $URL)
+response_content=`cat ./http-test/wp-admin`
+echo "$response_content"
+echo ""
+
 # URL of the page to check
 URL="http://localhost:3000/blog/hello-world/"
 CONTENT="Hello world!"
 
 # Perform the HTTP request, capturing the HTTP status and response content separately
 # Do not forget the -k option to bypass localhost CA issues
-response=$(curl --write-out "%{http_code}" -k --silent --output response.txt $URL)
-response_content=`cat response.txt`
+echo "calling: $URL"
+response=$(curl --write-out "%{http_code}" -k --silent --output ./http-test/hello-world $URL)
+response_content=`cat ./http-test/hello-world`
 
 # Check for HTTP status 200
 if [ ! "$response" -eq 200 ]; then
