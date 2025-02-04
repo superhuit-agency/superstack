@@ -15,15 +15,16 @@ runs:
 
     - name: Build assets
       shell: bash
-      run: npm --prefix ./wordpress run build
+      run: npm run build
+      working-directory: ./wordpress
 
     # - name: Execute script to update translation file
     #   shell: bash
     #   run: sh ./.github/actions/build-theme/update-wp-translation-files.sh
 
-    # - name: Save built artifacts
-    #   uses: actions/upload-artifact@v4
-    #   with:
-    #     name: wp-theme-assets
-    #     path: |
-    #       ./wordpress/theme/static
+    - name: Save built artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: wp-theme-assets
+        path: |
+          ./wordpress/theme/static
