@@ -12,28 +12,6 @@ if [ ! "$response" -eq 200 ]; then
 fi
 echo "WordPress test passed (HTTP $response)"
 
-# Test Next.js
-URL="http://localhost:3000/blog/"
-CONTENT="Blog"
-echo "Testing Next.js page: $URL"
-
-response=$(curl -L --write-out "%{http_code}" -k --silent --output ./http-test/blog "$URL")
-if [ ! "$response" -eq 200 ]; then
-    echo "Warning: Next.js returned HTTP $response"
-    cat ./http-test/blog
-fi
-
-response_content=$(cat ./http-test/blog)
-if echo "$response_content" | grep -q "$CONTENT"; then
-    echo "Success - Content check passed (HTTP $response)"
-    exit 0
-else
-    echo "Error - Content check failed. Page does not contain '$CONTENT'"
-    echo "Received content:"
-    echo "$response_content"
-fi
-
-
 # Test Next.js again
 URL="http://localhost:3000/blog/hello-world/"
 CONTENT="Hello world!"
@@ -53,6 +31,6 @@ else
     echo "Error - Content check failed. Page does not contain '$CONTENT'"
     echo "Received content:"
     echo "$response_content"
+		exit 1
 fi
 
-exit 0
