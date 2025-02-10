@@ -1,6 +1,6 @@
 {
 	"name": "superhuit/superstack",
-	"version": "1.1.1",
+	"version": "1.2.0",
 	"type": "project",
 	"authors": [
 		{
@@ -70,7 +70,7 @@
 			"type": "package",
 			"package": {
 				"name": "superhuit-agency/starterpack-forms",
-				"version": "1.1.1",
+				"version": "1.2.0",
 				"type": "wordpress-plugin",
 				"dist": {
 					"url": "https://github.com/superhuit-agency/starterpack-forms/releases/download/v1.1.0/starterpack-forms-v1.1.0.zip",

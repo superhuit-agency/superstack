@@ -1,6 +1,6 @@
 {
   "name": "superstack-wp",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "starter website backend - frontend built on Next.js",
   "main": "index.js",
   "repository": "https://github.com/superhuit-agency/superstack",
