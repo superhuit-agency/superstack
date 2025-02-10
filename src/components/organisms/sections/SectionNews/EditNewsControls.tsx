@@ -23,7 +23,7 @@ const EditNewsControls: FC<EditNewsControls> = ({
 	children,
 }) => {
 	const [manual, setManual] = useState(
-		!!(vars?.postIn && vars.postIn.length) ?? false
+		!!(vars?.postIn && vars.postIn.length)
 	);
 
 	return (
@@ -65,7 +65,9 @@ const EditNewsControls: FC<EditNewsControls> = ({
 						'Section news settings',
 						'supt'
 					)}
-					onChange={(postIn) => onChange({ ...vars, postIn })}
+					onChange={(postIn: number[]) =>
+						onChange({ ...vars, postIn })
+					}
 				/>
 			) : (
 				<div>
@@ -76,7 +78,9 @@ const EditNewsControls: FC<EditNewsControls> = ({
 						taxonomy={TAG_TAX_NAME}
 						values={vars?.tagIn}
 						label={_x('Tags', 'Section news settings', 'supt')}
-						onChange={(tagIn) => onChange({ ...vars, tagIn })}
+						onChange={(tagIn: number[]) =>
+							onChange({ ...vars, tagIn })
+						}
 					/>
 					<TermsSelectControl
 						taxonomy={CATEGORY_TAX_NAME}
@@ -86,7 +90,7 @@ const EditNewsControls: FC<EditNewsControls> = ({
 							'Section news settings',
 							'supt'
 						)}
-						onChange={(categoryIn) =>
+						onChange={(categoryIn: number[]) =>
 							onChange({ ...vars, categoryIn })
 						}
 					/>

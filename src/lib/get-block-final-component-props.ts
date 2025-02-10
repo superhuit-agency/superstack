@@ -22,25 +22,18 @@ for (const key in blocksData) {
  * @param block A block object coming from Wp GraphQl's blocksJSON
  * @returns the same block, with only necessary data
  */
-export default function getBlockFinalComponentProps({
-	name,
-	attributes,
-	innerBlocks,
-}: {
-	name: string;
-	attributes: object;
-	innerBlocks: Array<BlockPropsType>;
-}): Promise<BlockPropsType> {
+export default function getBlockFinalComponentProps(
+	rawProps: RawBlockPropsType
+): Promise<BlockPropsType> {
 	return new Promise(async (res, rej) => {
 		const props: BlockPropsType = {
-			name,
+			name: rawProps.name,
 			attributes: {},
 			innerBlocks: [],
 		};
-
 		Promise.allSettled([
-			getAttributes(name, attributes),
-			getInnerBlocks(innerBlocks),
+			getAttributes(rawProps.name, rawProps.attributes),
+			getInnerBlocks(rawProps.innerBlocks),
 		]).then(([attrs, blks]) => {
 			if (attrs.status === 'fulfilled')
 				props.attributes =
@@ -49,6 +42,15 @@ export default function getBlockFinalComponentProps({
 			if (blks.status === 'fulfilled') {
 				props.innerBlocks =
 					(blks?.value as BlockPropsType['innerBlocks']) ?? [];
+			}
+
+			// content support for core blocks with originalContent
+			if (
+				props.attributes &&
+				!props.attributes.content &&
+				rawProps.originalContent
+			) {
+				props.attributes.content = rawProps.originalContent;
 			}
 
 			res(props);
@@ -75,7 +77,7 @@ const getAttributes = (name: string, attributes: object) =>
 		}
 	});
 
-const getInnerBlocks = (blocks: Array<BlockPropsType>) =>
+const getInnerBlocks = (blocks: Array<RawBlockPropsType>) =>
 	new Promise((res, rej) => {
 		if (!(blocks?.length > 0)) rej([]);
 		else {

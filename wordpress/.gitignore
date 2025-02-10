@@ -5,6 +5,10 @@
 auth.json
 /vendor
 
+# Lock files
+composer.lock
+package-lock.json
+
 # Plugins: track only those that cannot be installed by the bootstrap script
 !/plugins
 /plugins/*

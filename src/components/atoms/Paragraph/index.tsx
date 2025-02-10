@@ -14,10 +14,10 @@ export const Paragraph: FC<ParagraphProps> & BlockConfigs = ({
 	if (!content) return null;
 
 	return (
-		<p
+		<div
 			className={cx('supt-paragraph', className)}
 			dangerouslySetInnerHTML={{ __html: content }}
-		/>
+		></div>
 	);
 };
 

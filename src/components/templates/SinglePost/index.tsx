@@ -92,10 +92,14 @@ export default function Post({ node }: any) {
 				{node?.relatedPosts?.length ? (
 					<SectionNews
 						uptitle={__t('post-related-news', 'Related news')}
-						seeAllLink={{
-							title: __t('post-see-all', 'See all'),
-							href: node?.postsPage.uri,
-						}}
+						seeAllLink={
+							node?.postsPage?.uri
+								? {
+										title: __t('post-see-all', 'See all'),
+										href: node.postsPage.uri,
+									}
+								: undefined
+						}
 						posts={node.relatedPosts}
 					/>
 				) : null}

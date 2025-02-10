@@ -40,7 +40,9 @@ const Edit = (props: BlockEditProps<InputTextareaAttributes>) => {
 						<NameControl
 							name={name}
 							placeholder={label}
-							onChange={(name) => props.setAttributes({ name })}
+							onChange={(name: string) =>
+								props.setAttributes({ name })
+							}
 						/>
 					</PanelRow>
 				</PanelBody>
@@ -51,7 +53,7 @@ const Edit = (props: BlockEditProps<InputTextareaAttributes>) => {
 					id={id}
 					name={name}
 					label={label}
-					onChange={(id) => props.setAttributes({ id })}
+					onChange={(id: string) => props.setAttributes({ id })}
 				/>
 			</InspectorAdvancedControls>
 

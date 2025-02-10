@@ -68,6 +68,10 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 Open [http://localhost:4000](http://localhost:4000) with your browser to access to Storybook.
 
+### Tests
+
+-   `npm run test` - Run unit tests using Jest
+
 ### Additional commands
 
 -   `npm run generate:block` - create a new block (interactive prompt)

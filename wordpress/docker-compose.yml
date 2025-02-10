@@ -9,7 +9,7 @@ services:
       - '80:80'
     volumes:
       - './composer.json:/var/www/html/composer.json'
-      - './composer.lock:/var/www/html/composer.lock'
+      # - './composer.lock:/var/www/html/composer.lock'
       - './theme:/var/www/html/wp-content/themes/${THEME_NAME:-superstack}'
       - './plugins:/var/www/html/wp-content/plugins'
       - './uploads:/var/www/html/wp-content/uploads'

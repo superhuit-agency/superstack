@@ -140,6 +140,7 @@ echo "✔"
 
 echo $en "- Activating plugins $ec"
 $WPCLI plugin activate $($WPCLI plugin list --status=inactive --field=name --skip-update-check) --quiet &> /dev/null
+$WPCLI plugin list
 echo "✔"
 
 # Multilang
@@ -220,6 +221,9 @@ fi
 
 $WPCLI rewrite structure '/blog/%postname%/'
 $WPCLI rewrite flush --hard --quiet
+
+# Fake register of Gutenberg components
+$WPCLI option add wp_graphql_gutenberg_block_types --format=json '{"supt/text":{"name":"supt/text","keywords":{},"attributes":{"anchor":{"type":"string"},"className":{"type":"string"}},"providesContext":{},"usesContext":{},"supports":["anchor"],"styles":{},"title":"Text","description":"","category":"spck-content","example":{},"variations":{}}}'
 
 echo
 echo "----------------------------------"

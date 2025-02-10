@@ -1,0 +1,16 @@
+name: 'Build Frontend'
+runs:
+  using: 'composite'
+  steps:
+    - name: Install node
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+
+    - name: Install node dependencies
+      shell: bash
+      run: npm install --frozen-lockfile
+
+    - name: Build assets
+      shell: bash
+      run: npm run build --verbose

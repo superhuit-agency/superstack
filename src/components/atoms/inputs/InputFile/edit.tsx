@@ -86,7 +86,9 @@ const Edit = (props: BlockEditProps<InputFileAttributes>) => {
 						<NameControl
 							name={name}
 							placeholder={label}
-							onChange={(name) => props.setAttributes({ name })}
+							onChange={(name: string) =>
+								props.setAttributes({ name })
+							}
 						/>
 					</PanelRow>
 					<PanelRow>
@@ -162,7 +164,7 @@ const Edit = (props: BlockEditProps<InputFileAttributes>) => {
 					id={id}
 					name={name}
 					label={label}
-					onChange={(id) => props.setAttributes({ id })}
+					onChange={(id: string) => props.setAttributes({ id })}
 				/>
 			</InspectorAdvancedControls>
 
