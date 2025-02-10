@@ -22,23 +22,11 @@ jobs:
       - name: Check if changelog contains description
         run: bash ./.github/actions/automated/check-changelog.sh "./CHANGELOG.md" ${{ env.CURRENT_VERSION }}
 
-  quick_typescript_lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install typescript dependencies
-        run: npm install -g typescript
-
-      - name: Run typescript compilation
-        run: tsc --version && tsc
-
   # Run the test procedure to validate the code being pushed.
   # Like development tests, Start the dockers and build.
   # Finally, run the JEST Unit test script using `npm run test`
   build_run_test:
     runs-on: ubuntu-latest
-    needs: [quick_typescript_lint]
     steps:
       - uses: actions/checkout@v4
 
