@@ -147,7 +147,11 @@ class Post extends TypeWithArchive {
 			'type'        => Page::GRAPHQL_TYPE_NAME,
 			'description' => _x('Page for posts', 'Posts page GraphQl field', 'supt'),
 			'resolve'     => function() {
-				return new GraphQlPost(get_post( $this->get_archive_page_id() ) );
+				$home_id = $this->get_archive_page_id();
+				if( $home_id && is_numeric( $home_id ) ) {
+					return new GraphQlPost(get_post( $home_id ) );
+				}
+				return null;
 			}
 		]);
 	}

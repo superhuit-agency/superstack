@@ -7,6 +7,7 @@
 # See `pathMappings` property in `.vscode/launch.json` pathMappings
 ###
 
+COMPOSE="docker compose"
 WP_PATH="./.data/wp"
 
 # Extract WordPress version from Dockerfile

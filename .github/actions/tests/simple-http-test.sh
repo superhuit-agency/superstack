@@ -1,26 +1,36 @@
 #!/bin/sh
 
-# URL of the page to check
+mkdir -p ./http-test
+
+# Test WordPress
+URL="http://localhost/wp-admin/"
+echo "Testing WordPress admin: $URL"
+response=$(curl -L --write-out "%{http_code}" -k --silent --output ./http-test/wp-admin "$URL")
+if [ ! "$response" -eq 200 ]; then
+    echo "Warning: WordPress returned HTTP $response"
+    cat ./http-test/wp-admin
+fi
+echo "WordPress test passed (HTTP $response)"
+
+# Test Next.js again
 URL="http://localhost:3000/blog/hello-world/"
 CONTENT="Hello world!"
+echo "Testing Next.js page: $URL"
 
-# Perform the HTTP request, capturing the HTTP status and response content separately
-# Do not forget the -k option to bypass localhost CA issues
-response=$(curl --write-out "%{http_code}" -k --silent --output response.txt $URL)
-response_content=`cat response.txt`
-
-# Check for HTTP status 200
+response=$(curl -L --write-out "%{http_code}" -k --silent --output ./http-test/hello-world "$URL")
 if [ ! "$response" -eq 200 ]; then
-	echo "WARNING: HTTP status is not 200, but $response."
+    echo "Warning: Next.js returned HTTP $response"
+    cat ./http-test/hello-world
 fi
 
-# Check if the content contains the desired text
+response_content=$(cat ./http-test/hello-world)
 if echo "$response_content" | grep -q "$CONTENT"; then
-	echo "Success - Content check passed."
-	exit 0 # Success
+    echo "Success - Content check passed (HTTP $response)"
+    exit 0
 else
-	echo "Error - Content check failed. Page does not contain '$CONTENT'"
-	echo "$response_content"  # Optionally, show response content for other statuses
-	exit 1 # Fail
+    echo "Error - Content check failed. Page does not contain '$CONTENT'"
+    echo "Received content:"
+    echo "$response_content"
+		exit 1
 fi
 

@@ -8,12 +8,12 @@ export const Heading: FC<HeadingProps> = ({
 	content,
 	level,
 }) => {
-	const HTag = `h${level}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+	//const HTag = `h${level}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
 
 	if (!content) return null;
 
 	return (
-		<HTag
+		<div
 			className={cx('supt-heading', className)}
 			dangerouslySetInnerHTML={{ __html: content }}
 		/>

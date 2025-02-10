@@ -36,7 +36,7 @@ const Edit = (props: BlockEditProps<RadioProps>) => {
 					id={id}
 					name={name}
 					label={label}
-					onChange={(id) => props.setAttributes({ id })}
+					onChange={(id: string) => props.setAttributes({ id })}
 				/>
 			</InspectorAdvancedControls>
 

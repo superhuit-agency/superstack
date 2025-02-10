@@ -1,6 +1,11 @@
 import * as _templatesData from '@/components/templates/data';
 import configs from '@/configs.json';
 import { fetchAPI, formatBlocksJSON } from '@/lib';
+import {
+	MultilingualTemplateNode,
+	TemplateNode,
+	MultilingualPageNode,
+} from '@/types/pagenodes';
 
 const templatesData: any = _templatesData;
 
@@ -25,7 +30,7 @@ export default async function getNodeByURI(
 	lang: string,
 	previewDraft: boolean,
 	blockEnrichment = true
-) {
+): Promise<TemplateNode | null> {
 	// uri = getUriWithoutPagination(uri); // Removes '/page/...' from uri if needed
 
 	// The slug may be the id of an unpublished post
@@ -47,79 +52,33 @@ export default async function getNodeByURI(
 
 	const query = isId ? nodeByIdQuery(lang) : nodeByUriQuery(lang);
 
-	let response = await fetchAPI(query, {
+	let response: AppNodeQueryResponse = await fetchAPI(query, {
 		variables,
 		auth,
 	});
 
-	let { node, seo, generalSettings } = response;
+	if (!response?.node) return null;
 
-	if (!node) return null;
+	let templateNode: TemplateNode;
 
-	node.fullUri = uri; // Needed for the archive pagination
-
-	/**
-	 * Adjust node for Multilang
-	 */
-	if (configs.isMultilang) {
-		const { __typename, translation } = node;
-		node = { __typename, ...translation };
-
-		// Update translations to push current uri in translations
-		if (configs.hasCurrentLocaleInLangSwitcher) {
-			if (!node.translations) node.translations = [];
-
-			if (!node.language?.locale || !node.language?.code) return;
-
-			node.translations.unshift({
-				uri: node.uri,
-				language: {
-					locale: node.language.locale,
-					code: node.language.code,
-				},
-			});
-		}
+	// TODO: Test multilingual
+	if (configs.isMultilang && response.node instanceof MultilingualPageNode) {
+		templateNode = new MultilingualTemplateNode(response, uri, configs);
+	} else {
+		templateNode = new TemplateNode(response, uri);
 	}
 
 	/**
 	 * Enrich & format node blocksJSON prop + archive
 	 */
 	if (blockEnrichment) {
-		const { blocksJSON, templateData } = await Promise.allSettled([
-			formatBlocksJSON(
-				previewDraft
-					? node.preview?.node?.blocksJSON ?? ''
-					: node?.blocksJSON ?? ''
-			),
-			getTemplateData(node),
-		])
-			.then(([bProm, tProm]) => ({
-				blocksJSON: bProm.status === 'fulfilled' ? bProm.value : [],
-				templateData: tProm.status === 'fulfilled' ? tProm.value : {},
-			}))
-			.catch(() => {
-				console.error(
-					'Error while enriching & formatting blocksJSON and templateData'
-				);
-				return { blocksJSON: [], templateData: {} };
-			});
-
-		if (node.preview) delete node.preview;
-
-		return {
-			...node,
-			blocksJSON,
-			...templateData,
-			siteSEO: seo,
-			siteSettings: generalSettings,
-		};
+		const blocksJSON = previewDraft
+			? response.node.preview?.node?.blocksJSON ?? ''
+			: response.node?.blocksJSON ?? '';
+		await templateNode.enrichBlocks(blocksJSON);
 	}
 
-	return {
-		...node,
-		siteSEO: seo,
-		siteSettings: generalSettings,
-	};
+	return templateNode;
 }
 
 const commonFields = `
@@ -232,7 +191,7 @@ for (const key in templatesData) {
 	}
 }
 
-const getTemplateData = async (node: any) => {
+export const getTemplateData = async (node: any) => {
 	const type =
 		node.archivePage && node.__typename === 'Page'
 			? `archive-${node.archivePage.type}`

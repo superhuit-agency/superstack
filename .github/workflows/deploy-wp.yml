@@ -34,7 +34,7 @@ jobs:
       - uses: ./.github/actions/deploy-theme
         with:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          WORDPRESS_THEME_NAME: ${{ secrets.WORDPRESS_THEME_NAME }}
+          WORDPRESS_THEME_NAME: ${{ vars.WORDPRESS_THEME_NAME }}
           REMOTE_USER: ${{ secrets.SSH_USER }}
           REMOTE_HOST: ${{ secrets.SSH_HOST }}
           REMOTE_PORT: ${{ secrets.SSH_PORT }}
@@ -74,7 +74,7 @@ jobs:
         run: |
           ssh ${{ steps.ssh.outputs.SERVER }} \
             "cd ${{ secrets.WORDPRESS_PATH }}; \
-            env THEME_NAME=${{ secrets.WORDPRESS_THEME_NAME }} \
+            env THEME_NAME=${{ vars.WORDPRESS_THEME_NAME }} \
             NEXT_URL=${{ secrets.NEXT_URL }} \
             WORDPRESS_PATH=${{ secrets.WORDPRESS_PATH }} \
             /bin/bash -s " < ./wordpress/scripts/provision.sh
