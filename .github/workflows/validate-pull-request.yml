@@ -22,7 +22,6 @@ jobs:
       - name: Check if changelog contains description
         run: bash ./.github/actions/automated/check-changelog.sh "./CHANGELOG.md" ${{ env.CURRENT_VERSION }}
 
-  #
   # quick_typescript_lint:
   #   runs-on: ubuntu-latest
   #   steps:
@@ -35,7 +34,7 @@ jobs:
   #       run: tsc --version && tsc
 
   # Run the test procedure to validate the code being pushed.
-  # Like development tests, Start the dockers and build.
+  # Like development tests, Start the dockers and build.
   # Finally, run the JEST Unit test script using `npm run test`
   build_run_test:
     runs-on: ubuntu-latest
@@ -74,32 +73,56 @@ jobs:
 
       - name: Start WP
         shell: bash
-        run: npm run start
-        working-directory: ./wordpress
+        run: |
+          cd wordpress
+          docker compose down -v
+          npm run start
         env:
+          THEME_NAME: ${{ vars.WORDPRESS_THEME_NAME }}
           RELEASE_BELT_USER: ${{ vars.RELEASE_BELT_USER }}
           RELEASE_BELT_PWD: ${{ secrets.RELEASE_BELT_PWD }}
           COMPOSER_GITHUB_TOKEN: ${{ secrets.COMPOSER_GITHUB_TOKEN }}
-      # Call the wordpress backend to trigger some initialization:
-      # - GraphQL Gutenberg Block registration
-      # - Copy .env files
 
-      - name: Wordpress first use
+      - name: Wait for WordPress
         shell: bash
         run: |
-          cp .env.local.example .env.local
+          echo "Waiting for WordPress to be ready..."
+          timeout=300
+          while ! curl -s http://localhost/wp-admin/ > /dev/null; do
+            if [ $timeout -le 0 ]; then
+              echo "Timeout waiting for WordPress"
+              exit 1
+            fi
+            echo "Waiting... ($timeout seconds remaining)"
+            sleep 5
+            timeout=$((timeout-5))
+          done
+
+      - name: Copy environment file
+        run: cp .env.local.example .env.local
 
       - name: Build Next Frontend
         uses: ./.github/actions/build-frontend
 
       - name: Start Next as a thread
         shell: bash
-        run: npm run start -- -p 3000 &
+        run: |
+          nohup npm run start -- -p 3000 > next.log 2>&1 &
+          echo "Waiting for Next.js to be ready..."
+          timeout=60
+          while ! curl -s http://localhost:3000/ > /dev/null; do
+            if [ $timeout -le 0 ]; then
+              echo "Timeout waiting for Next.js"
+              exit 1
+            fi
+            echo "Waiting... ($timeout seconds remaining)"
+            sleep 2
+            timeout=$((timeout-2))
+          done
 
       - name: Simple HTTP Test
         shell: bash
-        run: |
-          sh ./.github/actions/tests/simple-http-test.sh
+        run: sh ./.github/actions/tests/simple-http-test.sh
 
       - name: Jest Unit Tests
         shell: bash
