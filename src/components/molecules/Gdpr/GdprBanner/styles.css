@@ -1,0 +1,75 @@
+@import '@resources/index.css';
+
+.supt-gdpr-banner {
+	@mixin clamp padding, 24, 32, $breakpoint-xxs, $breakpoint-lg;
+
+	position: fixed;
+	z-index: $z-index-gdpr-banner;
+	bottom: 20px;
+	right: 20px;
+
+	width: 520px;
+	max-width: calc(100% - 20px * 2);
+	overflow: hidden;
+
+	background-color: $color-neutral-200;
+
+	animation: fade-in-slide-up 0.3s forwards;
+
+	&__inner {
+		display: flex;
+		flex-direction: column;
+		gap: 24px;
+	}
+
+	&__group {
+		display: flex;
+		flex-direction: column;
+		gap: 9px;
+	}
+
+	&__title {
+		@extend %t-paragraph;
+		font-weight: 500;
+	}
+
+	&__message {
+		@extend %t-paragraph;
+		width: 100%;
+	}
+
+	&__reject-button {
+		@extend %reset-button, %t-button;
+	}
+
+	&__buttons {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 24px;
+
+		button {
+			cursor: pointer;
+			white-space: nowrap;
+		}
+
+		@media (min-width: $breakpoint-sm) {
+			flex-wrap: unset;
+		}
+	}
+
+	.supt-button:not(.supt-gdpr-banner__accept-button) {
+		font-weight: 300;
+	}
+
+	/**
+	 * STATES
+	 */
+	&[aria-hidden='true'] {
+		display: none;
+	}
+
+	&.-fade-out {
+		animation: fade-out-slide-down 0.3s forwards;
+	}
+}
