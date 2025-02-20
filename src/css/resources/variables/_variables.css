@@ -9,6 +9,8 @@ $breakpoint-xxl: 2500px;
 
 /* z-index */
 $z-index-nav: 9;
+$z-index-gdpr-banner: 14;
+$z-index-gdpr-modal: 15;
 
 /* Shared */
 /* $box-shadow: 0px 0px 20px 0px rgba(#000, 0.06); */

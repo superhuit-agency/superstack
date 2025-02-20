@@ -1,6 +1,7 @@
 import { Metadata, Viewport } from 'next';
 import { Inter, Roboto_Mono } from 'next/font/google';
 
+import { Gdpr } from '@/components/molecules/Gdpr';
 import { Footer, MainNav } from '@/components/organisms';
 import * as footerData from '@/components/organisms/Footer/data';
 import * as mainNavData from '@/components/organisms/MainNav/data';
@@ -71,6 +72,7 @@ export default async function Layout({
 						{mainNavProps && <MainNav {...mainNavProps} />}
 						<div>{children}</div>
 						{footerProps && <Footer {...footerProps} />}
+						<Gdpr />
 					</div>
 				</div>
 			</body>

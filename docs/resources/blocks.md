@@ -30,6 +30,7 @@ To get more information on blocks and how to create them check the [How to creat
 -   cards
     -   CardNews
 -   Form
+-   Gdpr
 -   Image
 -   Media
 -   Video
