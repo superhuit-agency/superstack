@@ -12,4 +12,5 @@ export * from './inputs/InputTextarea/edit';
 export * from './inputs/Radio/edit';
 export * from './List/edit';
 export * from './Paragraph/edit';
+export * from './Link/edit';
 // -- GENERATOR EXPORT SLOT --
