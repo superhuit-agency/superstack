@@ -1,9 +1,11 @@
+'use client';
+
 import { FC, useCallback, useMemo } from 'react';
 
+import { useLocale } from '@/contexts/locale-context';
 import { Image } from '@/components/molecules/Image';
 import configs from '@/configs.json';
 import { Link } from '@/helpers/Link';
-import { useTranslation } from '@/hooks/use-translation';
 import { phpToJsDateFormat } from '@/utils';
 
 import block from './block.json';
@@ -19,17 +21,17 @@ export const CardNews: FC<CardNewsProps> & BlockConfigs = ({
 	uri,
 	...linkProps
 }) => {
-	const locale = configs.staticLang; // TODO :: HANDLE THIS !!!
-
-	const __t = useTranslation();
+	const { dictionary, locale } = useLocale();
 
 	const formatDate = useCallback(
 		(date: string) =>
 			new Date(date.replace(' ', 'T')).toLocaleDateString(
 				locale,
-				phpToJsDateFormat(__t('date_format', configs.dateFormat ?? ''))
+				phpToJsDateFormat(
+					dictionary.date?.dateFormat ?? configs.dateFormat
+				)
 			),
-		[__t, locale]
+		[dictionary, locale]
 	);
 	const removeTags = useCallback((str: string) => {
 		if (str === null || str === '') return false;
@@ -84,7 +86,7 @@ export const CardNews: FC<CardNewsProps> & BlockConfigs = ({
 					)}
 				</div>
 				<p className="supt-card-news__read">
-					{linkLabel || __t('card-news-read', 'Read')}
+					{linkLabel || dictionary.cardNews?.read}
 				</p>
 			</div>
 		</article>

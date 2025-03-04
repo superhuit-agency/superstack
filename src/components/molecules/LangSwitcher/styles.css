@@ -1,0 +1,10 @@
+.supt-lang-switcher {
+	display: flex;
+	gap: 10px;
+
+	&__item {
+		&.-is-current {
+			font-weight: 700;
+		}
+	}
+}

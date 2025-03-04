@@ -1,0 +1,23 @@
+@import '@resources/index.css';
+
+.supt-section-404 {
+	.supt-section__inner {
+		@extend %grid;
+	}
+
+	.supt-section__content {
+		grid-column: 1 / span 12;
+
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 16px;
+	}
+
+	.supt-section__title {
+		@extend %t-h1;
+	}
+	.supt-section__description {
+		@extend %t-introduction;
+	}
+}

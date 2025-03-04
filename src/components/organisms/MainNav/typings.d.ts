@@ -4,18 +4,13 @@ interface GraphQLMainNavFields {
 	};
 	logo: GraphQLImageFields | null;
 	header: { nodes: GraphQLMenuItemFields[] };
-
-	node: null | {
-		isFrontPage: boolean;
-	};
 }
 interface MainNavData {
-	isHome?: boolean;
 	logo?: ImageProps | null;
-	menus: {
+	menus?: {
 		header: { items: NestedMenuItem[] };
 	};
-	siteTitle: string;
+	siteTitle?: string;
 }
 
 interface MainNavProps extends MainNavData {}

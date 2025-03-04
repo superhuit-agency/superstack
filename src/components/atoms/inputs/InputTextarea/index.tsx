@@ -1,10 +1,9 @@
 import cx from 'classnames';
 import { FC, forwardRef, useId } from 'react';
 
+import { useLocale } from '@/contexts/locale-context';
 import block from './block.json';
 
-// styles
-import { useTranslation } from '@/hooks/use-translation';
 import './styles.css';
 
 export const InputTextarea: FC<InputTextareaProps> & BlockConfigs = forwardRef(
@@ -26,7 +25,7 @@ export const InputTextarea: FC<InputTextareaProps> & BlockConfigs = forwardRef(
 		const defaultId = useId();
 		const id = initId ?? defaultId;
 
-		const __t = useTranslation();
+		const { dictionary } = useLocale();
 
 		return (
 			<div
@@ -42,7 +41,7 @@ export const InputTextarea: FC<InputTextareaProps> & BlockConfigs = forwardRef(
 					htmlFor={id}
 					className="supt-input-textarea__label supt-input-field__label"
 					data-optional={
-						required ? '' : __t('form-input-optional', 'optional')
+						required ? '' : dictionary.form?.input.optional
 					}
 				>
 					{label}

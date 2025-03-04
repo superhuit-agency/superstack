@@ -1,7 +1,7 @@
 import { FC, useCallback } from 'react';
 import cx from 'classnames';
 
-import { useTranslation } from '@/hooks/use-translation';
+import { useLocale } from '@/contexts/locale-context';
 
 import block from './block.json';
 import './styles.css';
@@ -11,7 +11,7 @@ export const Pagination: FC<PaginationProps> & BlockConfigs = ({
 	currentPagination,
 	totalPages,
 }) => {
-	const __t = useTranslation();
+	const { dictionary } = useLocale();
 
 	const pageItem = useCallback(
 		(page: number) => {
@@ -27,9 +27,7 @@ export const Pagination: FC<PaginationProps> & BlockConfigs = ({
 							'-is-active': currentPagination === page,
 						})}
 						aria-label={
-							__t('pagination-go-to-aria-label', 'Go to page') +
-							' ' +
-							page
+							dictionary.pagination?.goToAriaLabel + ' ' + page
 						}
 						aria-current={
 							page === currentPagination ? true : undefined
@@ -40,7 +38,7 @@ export const Pagination: FC<PaginationProps> & BlockConfigs = ({
 				</li>
 			);
 		},
-		[baseUri, currentPagination, __t]
+		[baseUri, currentPagination, dictionary]
 	);
 
 	return (
@@ -63,14 +61,11 @@ export const Pagination: FC<PaginationProps> & BlockConfigs = ({
 						fillRule="evenodd"
 					/>
 				</svg>
-				<span>{__t('pagination-previous', 'Previous')}</span>
+				<span>{dictionary.pagination?.previous}</span>
 			</a>
 			<nav
 				role="navigation"
-				aria-label={__t(
-					'pagination-aria-label',
-					'Pagination navigation'
-				)}
+				aria-label={dictionary.pagination?.ariaLabel}
 			>
 				<ul>
 					{Array.from({ length: totalPages }, (_, i) => i + 1).map(
@@ -131,7 +126,7 @@ export const Pagination: FC<PaginationProps> & BlockConfigs = ({
 				})}
 				rel={currentPagination >= totalPages ? undefined : 'next'}
 			>
-				<span>{__t('pagination-next', 'Next')}</span>
+				<span>{dictionary.pagination?.next}</span>
 				<svg width="6" height="10" xmlns="http://www.w3.org/2000/svg">
 					<path
 						d="M1 .7574 5.2426 5 1 9.2426"

@@ -1,6 +1,7 @@
 import * as cardNewsData from '@/components/molecules/cards/CardNews/data';
 import { termNodeFragment } from '@/components/templates/SingleCategory/data';
 import { gql } from '@/utils';
+import configs from '@/configs.json';
 
 export const slug = 'archive-post';
 
@@ -57,7 +58,10 @@ export const getData = async (
 	const query = gql`
 		query archivePostQuery($size: Int = 10, $offset: Int = 0) {
 			posts(
-				where: { offsetPagination: { size: $size, offset: $offset } }
+				where: {
+					offsetPagination: { size: $size, offset: $offset }
+					${configs.isMultilang ? `, language: ${node.language.code}` : ''}
+				}
 			) {
 				nodes {
 					...cardNewsFragment
@@ -68,12 +72,24 @@ export const getData = async (
 					}
 				}
 			}
-			categories(first: 99, where: { hideEmpty: true }) {
+			categories(
+				first: 99
+				where: {
+					hideEmpty: true
+					${configs.isMultilang ? `, language: ${node.language.code}` : ''}
+				}
+			) {
 				nodes {
 					...termNodeFragment
 				}
 			}
-			tags(first: 99, where: { hideEmpty: true }) {
+			tags(
+				first: 99
+				where: {
+					hideEmpty: true
+					${configs.isMultilang ? `, language: ${node.language.code}` : ''}
+				}
+			) {
 				nodes {
 					...termNodeFragment
 				}

@@ -1,7 +1,9 @@
+'use client';
+
 import cx from 'classnames';
 import { useMemo } from 'react';
 
-import { useTranslation } from '@/hooks/use-translation';
+import { useLocale } from '@/contexts/locale-context';
 import { Link } from '@/helpers/Link';
 import { Blocks, Container } from '@/components/global';
 import { Pagination, Button, CardNews } from '@/components';
@@ -9,7 +11,7 @@ import { Pagination, Button, CardNews } from '@/components';
 import './styles.css';
 
 export default function Page({ node }: ArchivePostProps) {
-	const __t = useTranslation();
+	const { dictionary } = useLocale();
 
 	const {
 		archivePage: {
@@ -28,13 +30,13 @@ export default function Page({ node }: ArchivePostProps) {
 	const allCategories = useMemo(() => {
 		return [
 			{
-				title: __t('archive-post-all', 'Toutes'),
+				title: dictionary.archivePost?.all,
 				href: baseUri,
 				isActive: baseUri === node.uri,
 			},
 			...categories,
 		];
-	}, [categories, baseUri, node.uri, __t]);
+	}, [categories, baseUri, node.uri, dictionary]);
 
 	return (
 		<>
@@ -63,7 +65,7 @@ export default function Page({ node }: ArchivePostProps) {
 					{/* list tags */}
 					{tags.length ? (
 						<div className="supt-archive-post__tags">
-							<span>{__t('archive-post-tags', 'Tags')}:</span>
+							<span>{dictionary.archivePost?.tags}:</span>
 							{tags.map(
 								({
 									id,

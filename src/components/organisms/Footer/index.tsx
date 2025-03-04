@@ -1,7 +1,9 @@
+'use client';
+
 import cx from 'classnames';
 import { FC, useMemo } from 'react';
 
-import { useTranslation } from '@/hooks/use-translation';
+import { useLocale } from '@/contexts/locale-context';
 import { Link } from '@/helpers/Link';
 
 import block from './block.json';
@@ -9,11 +11,10 @@ import block from './block.json';
 import './styles.css';
 
 export const Footer: FC<FooterProps> & BlockConfigs = ({
-	isHome,
 	menus,
 	siteTitle,
 }) => {
-	const __t = useTranslation();
+	const { dictionary } = useLocale();
 
 	const year = useMemo(() => new Date().getFullYear(), []);
 
@@ -105,12 +106,11 @@ export const Footer: FC<FooterProps> & BlockConfigs = ({
 						© {year} {siteTitle}
 					</div>
 					<div className="supt-footer__credits">
-						{__t('footer-made-by', 'Made by')}{' '}
+						{dictionary.footer?.madeBy}{' '}
 						<a
 							className="supt-footer__logo"
 							href="https://superhuit.ch"
 							target="_blank"
-							rel={isHome ? undefined : 'nofollow'}
 						>
 							<svg
 								width="106"

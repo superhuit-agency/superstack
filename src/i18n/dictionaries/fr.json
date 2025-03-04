@@ -1,0 +1,70 @@
+{
+	"archivePost": {
+		"all": "Toutes",
+		"tags": "Tags"
+	},
+	"cardNews": {
+		"read": "Lire"
+	},
+	"date": {
+		"dateFormat": "d/m/Y"
+	},
+	"footer": {
+		"madeBy": "Créé par"
+	},
+	"form": {
+		"error": {
+			"accept": "Votre fichier est invalide. Les fichiers autorisés sont %s.",
+			"email": "Veuillez entrer une adresse e-mail valide.",
+			"empty": "Veuillez remplir le formulaire pour l'envoyer.",
+			"inputEmpty": "Veuillez remplir ce champ.",
+			"filesize": "Votre fichier est trop lourd. La taille maximale est de %dMo.",
+			"message": "Une erreur est survenue et votre message n'a probablement pas été reçu, désolé. Veuillez réessayer plus tard ou nous contacter directement par e-mail"
+		},
+		"input": {
+			"optional": "Optionnel"
+		},
+		"inputFile": {
+			"accepts": "Types acceptés: %s.",
+			"fileInfos": "%(size)s – %(extension)s fichier – %(name)s",
+			"labelAdd": "Ajouter un fichier",
+			"labelInvalid": "Ajouter un autre fichier",
+			"labelInvalidMulti": "Ajouter d'autres fichiers",
+			"labelMaxFiles": "Vous ne pouvez ajouter que 5 fichiers",
+			"maxFiles": "Maximum %s fichiers.",
+			"maxFilesize": "Limite à %d Mo.",
+			"maxOneFile": "Un seul fichier.",
+			"multiMaxFilesize": "Limite à %d Mo par fichier."
+		},
+		"status": {
+			"pending": "Envoi...",
+			"success": "Message envoyé"
+		},
+		"submitLabel": "Envoyer"
+	},
+	"mainNav": {
+		"closeMenu": "Fermer le menu",
+		"openMenu": "Ouvrir le menu"
+	},
+	"page404": {
+		"title": "Page 404",
+		"description": "La page que vous cherchez n'existe pas.",
+		"buttonLabel": "Accueil"
+	},
+	"pagination": {
+		"ariaLabel": "Navigation de la pagination",
+		"goToAriaLabel": "Aller à la page",
+		"next": "Suivant",
+		"previous": "Précédent"
+	},
+	"post": {
+		"relatedNews": "Actualités liées",
+		"seeAll": "Toutes"
+	},
+	"previewToolbar": {
+		"backEditor": "Retour à l'éditeur",
+		"screenWidth": "Largeur de l'écran:",
+		"switchDraft": "Passer à la page actuelle",
+		"title": "Cette page est une prévisualisation."
+	}
+}

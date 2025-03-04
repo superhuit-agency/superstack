@@ -10,10 +10,10 @@ import {
 } from 'react';
 import cx from 'classnames';
 
+import { useLocale } from '@/contexts/locale-context';
 import { Button } from '@/components/atoms';
 import { CloseIcon } from '@/components/icons';
 import gdprConfigs from '@/gdpr-configs.json';
-import configs from '@/configs.json';
 
 import { GdprCategory } from '../GdprCategory';
 
@@ -51,7 +51,7 @@ export const GdprModal = forwardRef(
 		const categoriesRef = useRef<any[]>([]);
 		const id = useRef('');
 
-		const locale = configs.staticLang; // TODO :: HANDLE THIS !!!
+		const { locale } = useLocale();
 
 		useEffect(() => {
 			id.current = genId();

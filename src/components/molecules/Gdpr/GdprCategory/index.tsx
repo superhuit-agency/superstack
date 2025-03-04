@@ -10,8 +10,8 @@ import {
 } from 'react';
 import cx from 'classnames';
 
+import { useLocale } from '@/contexts/locale-context';
 import { ChevronIcon } from '@/components/icons';
-import configs from '@/configs.json';
 
 import './styles.css';
 
@@ -31,7 +31,7 @@ export const GdprCategory = forwardRef(
 		const [isCollapsed, setIsCollapsed] = useState(true);
 		const [isEnabled, setIsEnabled] = useState(cat['enabled']);
 
-		const locale = configs.staticLang; // TODO :: HANDLE THIS !!!
+		const { locale } = useLocale();
 
 		useEffect(() => {
 			handleChange({

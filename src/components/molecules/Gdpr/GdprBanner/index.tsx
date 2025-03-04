@@ -9,8 +9,8 @@ import {
 	useCallback,
 } from 'react';
 
+import { useLocale } from '@/contexts/locale-context';
 import gdprConfigs from '@/gdpr-configs.json';
-import configs from '@/configs.json';
 
 import { Button } from '@/components/atoms';
 
@@ -38,7 +38,7 @@ export const GdprBanner: FC<GdprBannerProps> = ({
 	const [isHidden, setIsHidden] = useState(true);
 	const [isUnmounting, setIsUnmounting] = useState(false);
 
-	const locale = configs.staticLang; // TODO :: HANDLE THIS !!!
+	const { locale } = useLocale();
 
 	const ref = useRef(null);
 

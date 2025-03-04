@@ -5,13 +5,9 @@ interface GraphQLFooterFields {
 	generalSettings: {
 		title: string;
 	};
-	node: null | {
-		isFrontPage: boolean;
-	};
 }
 
 interface FooterData {
-	isHome: boolean;
 	menus: {
 		footer: { items: NestedMenuItem[] };
 		legal: { items: NestedMenuItem[] };

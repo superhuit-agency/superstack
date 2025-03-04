@@ -4,8 +4,8 @@ import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import Cookies from 'js-cookie';
 import Script from 'next/script';
 
+import { useLocale } from '@/contexts/locale-context';
 import gdprConfigs from '@/gdpr-configs.json';
-import configs from '@/configs.json';
 
 import { GdprBanner } from './GdprBanner';
 import { GdprModal, GdprModalProps } from './GdprModal';
@@ -31,7 +31,8 @@ export const Gdpr: FC<GdprProps> & BlockConfigs = () => {
 	const [gdprServices, setGdprServices] = useState<Record<string, boolean>>(
 		{}
 	);
-	const locale = configs.staticLang; // TODO :: HANDLE THIS !!!
+
+	const { locale } = useLocale();
 
 	const services = useRef({});
 

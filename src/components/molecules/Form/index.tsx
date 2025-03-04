@@ -23,8 +23,7 @@ import {
 } from 'react-hook-form';
 import HCaptcha from '@hcaptcha/react-hcaptcha';
 
-// internal
-import { useTranslation } from '@/hooks/use-translation';
+import { useLocale } from '@/contexts/locale-context';
 import {
 	getAcceptValidator,
 	getMaxFilesizeValidator,
@@ -44,7 +43,6 @@ import {
 } from '@/components/atoms';
 import block from './block.json';
 
-// styles
 import './styles.css';
 
 export const Form: FC<FormProps> & BlockConfigs = ({
@@ -68,18 +66,13 @@ export const Form: FC<FormProps> & BlockConfigs = ({
 
 	const uniqueId = useId();
 
-	const __t = useTranslation();
+	const { dictionary } = useLocale();
 
 	const [successMessage, setSuccessMessage] = useState<string>();
 	const [token, setToken] = useState<string | null>(null); // hCaptcha token
 
 	const captchaRef = useRef<HCaptcha | null>(null);
-	const defaultErrorMessage = useRef(
-		__t(
-			'form-error-message',
-			"There was an error and your message probably didn't get to us, sorry. Please try later or contact us directly by e-mail"
-		)
-	);
+	const defaultErrorMessage = useRef(dictionary.form?.error.message);
 
 	const { errors, isSubmitting, isSubmitSuccessful, isSubmitted } = formState;
 
@@ -240,10 +233,7 @@ export const Form: FC<FormProps> & BlockConfigs = ({
 					const registerAttrs: RegisterOptions = {
 						required: {
 							value: attributes.required,
-							message: __t(
-								'form-input-error-empty',
-								'Please fill out this field.'
-							),
+							message: dictionary.form?.error.inputEmpty,
 						},
 					};
 
@@ -263,10 +253,7 @@ export const Form: FC<FormProps> & BlockConfigs = ({
 						// add react-hook-form validation constraint
 						registerAttrs.pattern = {
 							value: /\S+@\S+\.\S+/,
-							message: __t(
-								'form-input-error-email',
-								'Please enter a valid email address.'
-							),
+							message: dictionary.form?.error.email,
 						};
 						return (
 							<InputEmail
@@ -350,20 +337,14 @@ export const Form: FC<FormProps> & BlockConfigs = ({
 							registerAttrs.validate.maxFilesize =
 								getMaxFilesizeValidator(
 									attrs.maxFilesize,
-									__t(
-										'form-input-error-filesize',
-										'Your file size is larger than %dMB.'
-									)
+									dictionary.form?.error.filesize
 								);
 						}
 
 						if (attrs.accept && attrs.accept !== '') {
 							registerAttrs.validate.accept = getAcceptValidator(
 								attrs.accept,
-								__t(
-									'form-input-error-accept',
-									'Your file is invalid. Allowed files are %s.'
-								)
+								dictionary.form?.error.accept
 							);
 						}
 						return (
@@ -395,10 +376,7 @@ export const Form: FC<FormProps> & BlockConfigs = ({
 							rules={{
 								required: {
 									value: f.required,
-									message: __t(
-										'form-input-error-empty',
-										'Please fill out this field.'
-									),
+									message: dictionary.form?.error.inputEmpty,
 								},
 							}}
 							render={({ field }) => (
@@ -436,11 +414,11 @@ export const Form: FC<FormProps> & BlockConfigs = ({
 						})}
 						title={
 							isSubmitSuccessful
-								? __t('form-status-success', 'Sent')
+								? dictionary.form?.status.success
 								: isSubmitting
-									? __t('form-status-pending', 'Sending…')
+									? dictionary.form?.status.pending
 									: submitLabel ||
-										__t('form-submit-label', 'Submit')
+										dictionary.form?.submitLabel
 						}
 						disabled={
 							isSubmitting ||
@@ -459,10 +437,7 @@ export const Form: FC<FormProps> & BlockConfigs = ({
 						>
 							<p>
 								{(errors?.__global?.message as ReactNode) ??
-									__t(
-										'form-error-empty',
-										'Please fill out the form entirely to be able to send it.'
-									)}
+									dictionary.form?.error.empty}
 							</p>
 						</div>
 					) : null}

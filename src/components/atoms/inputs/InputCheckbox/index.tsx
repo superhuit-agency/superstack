@@ -10,8 +10,7 @@ import {
 	useState,
 } from 'react';
 
-import { useTranslation } from '@/hooks/use-translation';
-
+import { useLocale } from '@/contexts/locale-context';
 import { Checkbox } from '../Checkbox';
 import block from './block.json';
 
@@ -38,7 +37,7 @@ export const InputCheckbox: FC<InputCheckboxProps> & BlockConfigs = forwardRef(
 		const defaultId = useId();
 		const id = initId ?? defaultId;
 
-		const __t = useTranslation();
+		const { dictionary } = useLocale();
 
 		// Keep a local state of the checked items
 		const [checkedItems, setCheckedItems] = useState<string[]>(value ?? []);
@@ -69,9 +68,7 @@ export const InputCheckbox: FC<InputCheckboxProps> & BlockConfigs = forwardRef(
 					<legend
 						className="supt-input-field__label supt-input-checkbox__label"
 						data-optional={
-							required
-								? ''
-								: __t('form-input-optional', 'optional')
+							required ? '' : dictionary.form?.input.optional
 						}
 					>
 						{label}

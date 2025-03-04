@@ -1,0 +1,1 @@
+interface Section404Props {}

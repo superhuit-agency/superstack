@@ -12,6 +12,7 @@ import {
 	getRedirection,
 	getWpUriFromNextPath,
 } from '@/lib';
+import configs from '@/configs.json';
 
 // see https://nextjs.org/docs/app/api-reference/file-conventions/route-segment-config
 export const revalidate = 3600; // revalidate at most every hour
@@ -30,13 +31,13 @@ export async function generateStaticParams() {
 export async function generateMetadata({
 	params,
 }: {
-	params: { uri: string[] };
+	params: { uri: string[]; lang: Locale };
 }): Promise<Metadata> {
 	const uri = getWpUriFromNextPath(params.uri ?? []);
 
 	let auth = {};
 
-	const languageCode = 'FR'; // TODO: get from next i18n
+	const languageCode = params.lang || configs.staticLang;
 
 	const baseUrl =
 		process.env.NEXT_URL ??
@@ -74,7 +75,7 @@ export async function generateMetadata({
 		// Canonical
 		alternates: {
 			canonical: canonical,
-			...node?.translations?.reduce(
+			languages: node?.translations?.reduce(
 				(acc: Record<string, string>, t: any) => {
 					if (!t.language || !t.language.locale || !t.language.code)
 						return acc;
@@ -130,7 +131,11 @@ export async function generateMetadata({
 	};
 }
 
-export default async function Page({ params }: { params: { uri: string[] } }) {
+export default async function Page({
+	params,
+}: {
+	params: { uri: string[]; lang: Locale };
+}) {
 	const { isEnabled: isDraftModeEnable } = draftMode();
 
 	let isDraft = false,
@@ -143,7 +148,7 @@ export default async function Page({ params }: { params: { uri: string[] } }) {
 	);
 	let auth: { authToken?: string } = {};
 
-	const languageCode = 'FR'; // TODO: get from next i18n
+	const languageCode = params.lang || configs.staticLang;
 
 	if (isDraftModeEnable) {
 		// We are now in dynamic rendering

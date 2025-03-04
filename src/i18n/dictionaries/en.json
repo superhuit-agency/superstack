@@ -1,0 +1,70 @@
+{
+	"archivePost": {
+		"all": "All",
+		"tags": "Tags"
+	},
+	"cardNews": {
+		"read": "Read"
+	},
+	"date": {
+		"dateFormat": "m/d/Y"
+	},
+	"footer": {
+		"madeBy": "Made by"
+	},
+	"form": {
+		"error": {
+			"accept": "Your file is invalid. Allowed files are %s.",
+			"email": "Please enter a valid email address.",
+			"empty": "Please fill out the form entirely to be able to send it.",
+			"inputEmpty": "Please fill out this field.",
+			"filesize": "Your file size is larger than %dMB.",
+			"message": "There was an error and your message probably didn't get to us, sorry. Please try later or contact us directly by e-mail"
+		},
+		"input": {
+			"optional": "Optional"
+		},
+		"inputFile": {
+			"accepts": "Allowed types: %s.",
+			"fileInfos": "%(size)s – %(extension)s file – %(name)s",
+			"labelAdd": "Add file",
+			"labelInvalid": "Add another file",
+			"labelInvalidMulti": "Add other files",
+			"labelMaxFiles": "You can only add up to 5 files",
+			"maxFiles": "Maximum %s files.",
+			"maxFilesize": "Limited to %d MB.",
+			"maxOneFile": "1 file only.",
+			"multiMaxFilesize": "Limited to %d MB per file."
+		},
+		"status": {
+			"pending": "Sending...",
+			"success": "Message sent"
+		},
+		"submitLabel": "Send"
+	},
+	"mainNav": {
+		"closeMenu": "Close menu",
+		"openMenu": "Open menu"
+	},
+	"page404": {
+		"title": "Page 404",
+		"description": "The page you are looking for does not exist.",
+		"buttonLabel": "Home"
+	},
+	"pagination": {
+		"ariaLabel": "Pagination navigation",
+		"goToAriaLabel": "Go to page",
+		"next": "Next",
+		"previous": "Previous"
+	},
+	"post": {
+		"relatedNews": "Related news",
+		"seeAll": "See all"
+	},
+	"previewToolbar": {
+		"backEditor": "Back to editor",
+		"screenWidth": "Screen width:",
+		"switchDraft": "Switch to current page",
+		"title": "This page is a preview."
+	}
+}

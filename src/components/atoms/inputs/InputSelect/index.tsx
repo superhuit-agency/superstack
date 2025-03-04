@@ -12,12 +12,9 @@ import {
 	useState,
 } from 'react';
 
-// internal imports
-import { useTranslation } from '@/hooks/use-translation';
-
+import { useLocale } from '@/contexts/locale-context';
 import block from './block.json';
 
-// styles
 import './styles.css';
 
 const Select = dynamic(() => import('react-select'));
@@ -84,7 +81,8 @@ export const InputSelect: FC<InputSelectProps> & BlockConfigs = forwardRef<
 		const defaultId = useId();
 		const id = initId ?? defaultId;
 
-		const __t = useTranslation();
+		const { dictionary } = useLocale();
+
 		const labelId = useId();
 
 		const options = useMemo(
@@ -132,7 +130,7 @@ export const InputSelect: FC<InputSelectProps> & BlockConfigs = forwardRef<
 					className="supt-input-select__label supt-input-field__label"
 					id={labelId}
 					data-optional={
-						required ? '' : __t('form-input-optional', 'optional')
+						required ? '' : dictionary.form?.input.optional
 					}
 				>
 					{label}

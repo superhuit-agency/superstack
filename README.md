@@ -97,7 +97,7 @@ Open [http://localhost:4000](http://localhost:4000) with your browser to access 
 -   [Helpers](./docs/features/helpers.md)
 -   [Blocks Whitelisting](./docs/features/blocks-whitelisting.md)
 -   [Forms](./docs/features/forms.md)
--   Multilang (TODO)
+-   [Multilang](./docs/features/multilang.md)
 
 ## 📚 Resources
 

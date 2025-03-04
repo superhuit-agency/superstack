@@ -1,7 +1,7 @@
 import cx from 'classnames';
 import { FC, forwardRef, useId } from 'react';
 
-import { useTranslation } from '@/hooks/use-translation';
+import { useLocale } from '@/contexts/locale-context';
 import block from './block.json';
 
 // styles
@@ -26,7 +26,7 @@ export const InputEmail: FC<InputEmailProps> & BlockConfigs = forwardRef(
 		const defaultId = useId();
 		const id = initId ?? defaultId;
 
-		const __t = useTranslation();
+		const { dictionary } = useLocale();
 
 		return (
 			<div
@@ -42,7 +42,7 @@ export const InputEmail: FC<InputEmailProps> & BlockConfigs = forwardRef(
 					htmlFor={id}
 					className="supt-input-email__label supt-input-field__label"
 					data-optional={
-						required ? '' : __t('form-input-optional', 'optional')
+						required ? '' : dictionary.form?.input.optional
 					}
 				>
 					{label}

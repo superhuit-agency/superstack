@@ -91,3 +91,8 @@ interface SectionAttributes extends BlockAttributes {
 }
 
 interface SectionProps extends SectionAttributes, BlockProps {}
+
+type NextLayoutParams = {
+	uri: string[];
+	lang: Locale;
+};

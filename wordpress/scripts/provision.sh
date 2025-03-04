@@ -29,7 +29,7 @@
 #
 #===========================================
 
-IS_MULTILANG=${IS_MULTILANG:=false}
+IS_MULTILANG=${IS_MULTILANG:=true}
 THEME_NAME=${THEME_NAME:="superstack"}
 
 # #===========================================
@@ -143,18 +143,18 @@ $WPCLI plugin activate $($WPCLI plugin list --status=inactive --field=name --ski
 echo "✔"
 
 # Multilang
-# __dir="$(dirname "${BASH_SOURCE[0]:-$0}")"
-# if [ "$IS_MULTILANG" = true ]; then
-# 	if ! $WPCLI plugin is-active polylang-pro; then $WPCLI plugin polylang-pro --quiet &> /dev/null; fi
-# 	if ! $WPCLI plugin is-active acf-options-for-polylang; then $WPCLI plugin activate acf-options-for-polylang --quiet &> /dev/null; fi
-# 	if ! $WPCLI plugin is-active wp-graphql-polylang; then $WPCLI plugin activate wp-graphql-polylang --quiet &> /dev/null; fi
-# 	if ! $WPCLI plugin is-active starterpack-i18n; then $WPCLI plugin activate starterpack-i18n --quiet &> /dev/null; fi
-# else
-# 	if $WPCLI plugin is-active acf-options-for-polylang; then $WPCLI plugin deactivate acf-options-for-polylang --quiet &> /dev/null; fi
-# 	if $WPCLI plugin is-active wp-graphql-polylang; then $WPCLI plugin deactivate wp-graphql-polylang --quiet &> /dev/null; fi
-# 	if $WPCLI plugin is-active starterpack-i18n; then $WPCLI plugin deactivate starterpack-i18n --quiet &> /dev/null; fi
-# 	if $WPCLI plugin is-active polylang-pro; then $WPCLI plugin deactivate polylang-pro --quiet &> /dev/null; fi
-# fi
+__dir="$(dirname "${BASH_SOURCE[0]:-$0}")"
+if [ "$IS_MULTILANG" = true ]; then
+	if ! $WPCLI plugin is-active polylang; then $WPCLI plugin polylang --quiet &> /dev/null; fi
+	if ! $WPCLI plugin is-active acf-options-for-polylang; then $WPCLI plugin activate acf-options-for-polylang --quiet &> /dev/null; fi
+	if ! $WPCLI plugin is-active wp-graphql-polylang; then $WPCLI plugin activate wp-graphql-polylang --quiet &> /dev/null; fi
+	if ! $WPCLI plugin is-active starterpack-i18n; then $WPCLI plugin activate starterpack-i18n --quiet &> /dev/null; fi
+else
+	if $WPCLI plugin is-active acf-options-for-polylang; then $WPCLI plugin deactivate acf-options-for-polylang --quiet &> /dev/null; fi
+	if $WPCLI plugin is-active wp-graphql-polylang; then $WPCLI plugin deactivate wp-graphql-polylang --quiet &> /dev/null; fi
+	if $WPCLI plugin is-active starterpack-i18n; then $WPCLI plugin deactivate starterpack-i18n --quiet &> /dev/null; fi
+	if $WPCLI plugin is-active polylang; then $WPCLI plugin deactivate polylang --quiet &> /dev/null; fi
+fi
 
 echo
 echo "----------------------------------"
@@ -208,9 +208,9 @@ if [ -z $($WPCLI config get "WP_AUTO_UPDATE_CORE") ]; then
 fi
 
 # Update Sample Page to be the Home
-$WPCLI post update 2 --post_title="Home" --post_content='<!-- wp:heading {"level":1} --><h1 class="wp-block-heading">Home</h1><!-- /wp:heading -->'
-$WPCLI option update show_on_front page
-$WPCLI option update page_on_front 2
+# $WPCLI post update 2 --post_title="Home" --post_content='<!-- wp:heading {"level":1} --><h1 class="wp-block-heading">Home</h1><!-- /wp:heading -->'
+# $WPCLI option update show_on_front page
+# $WPCLI option update page_on_front 2
 
 # Add WP Graphql Gutenberg Registry if not yet registered in the db (=> avoids Vercel first deployment to fail)
 $WPCLI option get wp_graphql_gutenberg_block_types &> /dev/null

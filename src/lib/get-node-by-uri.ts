@@ -56,8 +56,6 @@ export default async function getNodeByURI(
 
 	if (!node) return null;
 
-	node.fullUri = uri; // Needed for the archive pagination
-
 	/**
 	 * Adjust node for Multilang
 	 */
@@ -80,6 +78,8 @@ export default async function getNodeByURI(
 			});
 		}
 	}
+
+	node.fullUri = uri; // Needed for the archive pagination
 
 	/**
 	 * Enrich & format node blocksJSON prop + archive
@@ -181,7 +181,7 @@ const nodeByUriQuery = (lang: string) => `
 				.map(({ type, fields }) =>
 					configs.isMultilang
 						? `...on ${type} {
-					translation(language: ${lang}) {
+					translation(language: ${lang.toUpperCase()}) {
 						...${fields}
 					}
 				}`
@@ -207,7 +207,7 @@ const nodeByIdQuery = (lang: string) => `
 				.map(({ type, fields }) =>
 					configs.isMultilang
 						? `...on ${type} {
-					translation(language: ${lang}) {
+					translation(language: ${lang.toUpperCase()}) {
 						...${fields}
 					}
 				}`

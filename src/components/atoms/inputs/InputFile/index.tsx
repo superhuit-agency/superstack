@@ -14,12 +14,12 @@ import {
 } from 'react';
 import { sprintf } from 'sprintf-js';
 
+import { useLocale } from '@/contexts/locale-context';
 import {
 	IconDelete,
 	IconDocument,
 	IconInvalid,
 } from '@/components/icons/DocumentIcon';
-import { useTranslation } from '@/hooks/use-translation';
 
 import block from './block.json';
 
@@ -44,7 +44,7 @@ export const InputFile: FC<InputFileProps> & BlockConfigs = forwardRef(
 		},
 		ref
 	) => {
-		const __t = useTranslation();
+		const { dictionary } = useLocale();
 
 		const [files, setFiles] = useState<File[]>([]);
 
@@ -125,19 +125,16 @@ export const InputFile: FC<InputFileProps> & BlockConfigs = forwardRef(
 		let label = useMemo(() => {
 			if (isInvalid) {
 				if (isMultiple) {
-					return __t(
-						'input-file-label-invalid-multi',
-						'Add other files'
-					);
+					return dictionary.form?.inputFile.labelInvalidMulti;
 				} else {
-					return __t('input-file-label-invalid', 'Add another file');
+					return dictionary.form?.inputFile.labelInvalid;
 				}
 			} else if (hasMaxFiles) {
-				return __t('input-file-label-max-files', 'Maximum reached');
+				return dictionary.form?.inputFile.labelMaxFiles;
 			} else {
-				return __t('input-file-label-add', 'Add a file');
+				return dictionary.form?.inputFile.labelAdd;
 			}
-		}, [isInvalid, isMultiple, hasMaxFiles, __t]);
+		}, [isInvalid, isMultiple, hasMaxFiles, dictionary]);
 
 		const descr = useMemo(() => {
 			if (description) return description;
@@ -145,10 +142,10 @@ export const InputFile: FC<InputFileProps> & BlockConfigs = forwardRef(
 			let _description = isMultiple
 				? sprintf(
 						// translators: %s is the maximum number of files
-						__t('input-file-max-files', 'Maximum %s files.'),
+						dictionary.form?.inputFile.maxFiles,
 						nbFiles
 					)
-				: __t('input-file-max-one-file', '1 file only.');
+				: dictionary.form?.inputFile.maxOneFile;
 
 			if (maxFilesize) {
 				_description +=
@@ -156,15 +153,9 @@ export const InputFile: FC<InputFileProps> & BlockConfigs = forwardRef(
 					sprintf(
 						isMultiple
 							? // translators: %d is the maximum size of a file
-								__t(
-									'input-file-multi-max-filesize',
-									'Limited to %d MB per file.'
-								)
+								dictionary.form?.inputFile.multiMaxFilesize
 							: // translators: %d is the maximum size of a file
-								__t(
-									'input-file-max-filesize',
-									'Limited to %d MB.'
-								),
+								dictionary.form?.inputFile.maxFilesize,
 						maxFilesize
 					);
 			}
@@ -174,13 +165,13 @@ export const InputFile: FC<InputFileProps> & BlockConfigs = forwardRef(
 					'<br/>' +
 					sprintf(
 						// translators: %s is the type of files accepted
-						__t('input-file-accepts', 'Allowed types: %s.'),
+						dictionary.form?.inputFile.accepts,
 						accept.split(',').join(', ')
 					);
 			}
 
 			return _description;
-		}, [description, isMultiple, nbFiles, maxFilesize, accept, __t]);
+		}, [description, isMultiple, nbFiles, maxFilesize, accept, dictionary]);
 
 		const infoFiles = useMemo(
 			() => getFilesInfo(files),
@@ -224,7 +215,7 @@ export const InputFile: FC<InputFileProps> & BlockConfigs = forwardRef(
 									? undefined
 									: required
 										? ''
-										: __t('form-input-optional', 'optional')
+										: dictionary.form?.input.optional
 							}
 						>
 							{title}
@@ -256,10 +247,8 @@ export const InputFile: FC<InputFileProps> & BlockConfigs = forwardRef(
 										<span>
 											{/* Translators: available variables for the file: `name`, `basename`, `extension`, `size` */}
 											{sprintf(
-												__t(
-													'input-file-file-infos',
-													'%(size)s – %(extension)s file – %(name)s'
-												),
+												dictionary.form?.inputFile
+													.fileInfos,
 												file
 											)}
 										</span>

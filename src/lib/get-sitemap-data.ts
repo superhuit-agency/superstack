@@ -159,7 +159,6 @@ async function getSitemapTypeUrls(type = 'posts', page = 1, size = 1000) {
 										status: PUBLISH
 										orderby: {field: DATE, order: ASC},
 										${configs.isMultilang ? ', language: DEFAULT' : ''}
-										${type === 'pages' ? ', template: {notIn: ["template-404.php"]}' : ''}
 										offsetPagination: {size: ${GRAPHQL_MAX_SIZE}, offset: ${
 											(page - 1) * size +
 											i * GRAPHQL_MAX_SIZE
@@ -211,7 +210,6 @@ async function getSitemapTypeUrls(type = 'posts', page = 1, size = 1000) {
 					status: PUBLISH
 					orderby: {field: DATE, order: ASC},
 					${configs.isMultilang ? ', language: DEFAULT' : ''}
-					${type === 'pages' ? ', template: {notIn: ["template-404.php"]}' : ''}
 					offsetPagination: {size: ${size}, offset: ${(page - 1) * size}}
 				}
 			) {
