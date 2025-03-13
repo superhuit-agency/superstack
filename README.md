@@ -23,7 +23,7 @@ An opinionated boilerplate for decoupled (headless) websites that are both perfo
 -   Styling with CSS (PostCSS) [why?](./docs/technical-choices.md)
 -   Dynamic styleguide with Storybook
 -   Dockerized
--   ~~Multilang~~ (coming soon)
+-   Multilang support
 
 **Supported WordPress plugins**
 

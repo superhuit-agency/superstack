@@ -1,51 +1,65 @@
-# Multilanguage Support
-
-This document explains how to set up and manage multilanguage support in your website.
+# 🌍 Multilang
 
 ## Overview
 
-Multilang is based on Polylang plugin on WP side, and NextJS is handling the routing and fetching of the correct content based on the URL.
+Multilang is based on Polylang plugin on WP side, and NextJS is handling the routing and fetching of the correct content based on the pathname.
 
 ## Implementation Details
 
-### WordPress Setup
+We've created a plop script that simplifies the process of migrating between single language and multilanguage setups.
 
-1. Install and activate Polylang plugin
-2. Configure your desired languages in WordPress admin (Settings > Languages)
-3. Set your default language
+### Step 1 : Run the script
 
-### Frontend Implementation
+Run the script that will update the code and files depending on if your website supports multilang or not :
 
-1. Set `isMultilang` to `true` in `./src/configs.json`
-2. Create a folder named `[lang]` inside `./src/app/` and move `[[...uri]]` folder inside of it (and all files that are inside)
-3. Create a `middleware.ts` file in `./src/`
-4. Update `./src/app/layout.tsx` to handle multilang support
-   a. Add `LocaleProvider` to the `Layout` component that wraps the `MainNav` and `Footer` components, as well as the `children`
-   b. Send the `locale` to the `LocaleProvider` that comes from the page `params`
-   c. Add `dictionaries` to the `Layout` component that comes from the `getDictionaries` helper, and pass it to the `LocaleProvider`
+```bash
+npm run generate:language-migration
+```
 
-### Development Guidelines
+Follow the prompts to choose the migration type and enter the required information.
+
+### Step 2 : Restart Docker
+
+After running the migration script, you may need to re-run the `provision.sh` script to activate/deactivate the appropriate plugins depending on your multilang configuration.
+
+### Step 3 : Set your languages on WP
+
+On WP admin, set the languages and the default one in Polylang settings
+
+## Development Guidelines
+
+If working on a multilang website :
 
 -   Use language-aware data fetching in GraphQL queries
--   Use the `useLocale` hook to get the current locale and the `dictionary` object to get the static strings translations
+-   Use the `useLocale` hook to get the current `locale`, and the `dictionary` object to get the static strings translations
+-   If you need to add static strings translations, set them on the `[language].json` file which is located inside the `src/i18n/dictionaries/` folder. The locales used in here are the ones set on WP Polylang plugin.
 -   Any component that needs to use the `useLocale` hook will need to be a Client component
 -   For the language switcher, we use the `<link rel="alternate" hrefLang="x" href="url">` tags to get the available translations on each page
--   The 404 page won't have a header or footer, as we can't know which language to use when fetching the datas.
+-   The 404 page won't have a header or footer, as we can't know which language to use when fetching the datas in this specific case.
 
-## Troubleshooting
+## Language Migration Generator
 
-Common issues and solutions:
+If you'd like to go further on how the multilang script is working, here are the steps it follows :
 
-1. URL Issues:
+### Migration Types
 
-    - Verify permalink settings
-    - Check language URL configuration in Polylang
-    - Clear permalink cache after configuration changes
+1. **Single language to multilanguage**
 
-2. Data fetching issues:
+    This migration type will:
 
-    - Ensure GraphQL requests include language parameters
+    - Create a `[lang]` folder in the app directory
+    - Create a `layout.tsx` file in the `[lang]` folder based on the template set in `generators/templates/lang-migration`
+    - Update the root `layout.tsx` file for multilanguage support
+    - Move the `[[...uri]]` folder into the `[lang]` folder
+    - Update `src/configs.json` to set `isMultilang` to `true` and `staticLang` to the specified default locale
+    - Update `wordpress/scripts/provision.sh` to set `IS_MULTILANG` to `true`
 
-## Additional Resources
+2. **Multilanguage to single language**
 
--   [Polylang Documentation](https://polylang.pro/doc/)
+    This migration type will:
+
+    - Update the root `layout.tsx` file for single language support
+    - Move the `[[...uri]]` folder out of the `[lang]` folder
+    - Remove the `[lang]` folder
+    - Update `src/configs.json` to set `isMultilang` to `false` and `staticLang` to the specified default locale
+    - Update `wordpress/scripts/provision.sh` to set `IS_MULTILANG` to `false`
