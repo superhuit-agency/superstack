@@ -1,6 +1,6 @@
 {
-	"isMultilang": true,
-	"staticLang": "fr",
+	"isMultilang": false,
+	"staticLang": "en",
 	"hasCurrentLocaleInLangSwitcher": true,
 	"dateFormat": "d/m/Y"
 }

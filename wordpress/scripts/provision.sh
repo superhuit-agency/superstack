@@ -29,7 +29,7 @@
 #
 #===========================================
 
-IS_MULTILANG=${IS_MULTILANG:=true}
+IS_MULTILANG=${IS_MULTILANG:=false}
 THEME_NAME=${THEME_NAME:="superstack"}
 
 # #===========================================

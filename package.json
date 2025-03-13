@@ -11,7 +11,8 @@
     "lint": "next lint",
     "storybook": "storybook dev -p 4000",
     "build-storybook": "storybook build",
-    "generate:block": "plop --plopfile ./generators/plopfile.js block"
+    "generate:block": "plop --plopfile ./generators/plopfile.js block",
+    "generate:language-migration": "plop --plopfile ./generators/plopfile.js language-migration"
   },
   "dependencies": {
     "@formatjs/intl-localematcher": "^0.6.0",

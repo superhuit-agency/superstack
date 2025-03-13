@@ -1,0 +1,38 @@
+import { getDictionary } from '@/i18n/dictionaries';
+import { LocaleProvider } from '@/contexts/locale-context';
+
+import * as footerData from '@/components/organisms/Footer/data';
+import * as mainNavData from '@/components/organisms/MainNav/data';
+import { Footer, MainNav } from '@/components/organisms';
+import { Gdpr } from '@/components/molecules/Gdpr';
+
+export const revalidate = 3600; // revalidate the data at most every hour
+
+export default async function Layout({
+	params,
+	children,
+}: {
+	children: React.ReactNode;
+	params: { lang: Locale };
+}) {
+	const dictionary = await getDictionary(params.lang);
+
+	const [navPromise, footerPromise] = await Promise.allSettled([
+		mainNavData.getData(params.lang),
+		footerData.getData(params.lang),
+	]);
+
+	const mainNavProps =
+		navPromise.status === 'fulfilled' ? navPromise.value : null;
+	const footerProps =
+		footerPromise.status === 'fulfilled' ? footerPromise.value : null;
+
+	return (
+		<LocaleProvider locale={params.lang} dictionary={dictionary}>
+			{mainNavProps ? <MainNav {...mainNavProps} /> : null}
+			<div className="main">{children}</div>
+			{footerProps ? <Footer {...footerProps} /> : null}
+			<Gdpr />
+		</LocaleProvider>
+	);
+}

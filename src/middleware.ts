@@ -4,16 +4,16 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import configs from '@/configs.json';
 
-let locales = ['fr', 'en'];
-let defaultLocale = 'fr';
+const locales = ['en'];
+const defaultLocale = 'en';
 
 // Get the preferred locale of the user depending its browser language preferences
 function getLocale(request: NextRequest) {
-	let headers = {
+	const headers = {
 		'accept-language': request.headers.get('accept-language') || '',
 	};
 
-	let languages = new Negotiator({ headers }).languages();
+	const languages = new Negotiator({ headers }).languages();
 
 	return match(languages, locales, defaultLocale);
 }
