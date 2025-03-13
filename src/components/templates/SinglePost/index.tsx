@@ -1,9 +1,8 @@
 import { useMemo } from 'react';
 
 import { useTranslation } from '@/hooks/use-translation';
-import { Link } from '@/helpers/Link';
 import { Blocks, Container } from '@/components/global';
-import { SectionNews, Image } from '@/components';
+import { Link, SectionNews, Image } from '@/components';
 import configs from '@/configs.json';
 
 import './styles.css';
