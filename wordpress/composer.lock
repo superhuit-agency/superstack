@@ -4,7 +4,7 @@
 		"Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
 		"This file is @generated automatically"
 	],
-	"content-hash": "550ed9da3daa2e14a2901c84a5c7a4bb",
+	"content-hash": "ca07413cd696bbb0935e6366f9781d02",
 	"packages": [
 		{
 			"name": "ashhitch/wp-graphql-yoast-seo",
@@ -34,7 +34,9 @@
 			},
 			"type": "wordpress-plugin",
 			"notification-url": "https://packagist.org/downloads/",
-			"license": ["GPL-3.0-or-later"],
+			"license": [
+				"GPL-3.0-or-later"
+			],
 			"authors": [
 				{
 					"name": "Ash Hitchcock",
@@ -98,7 +100,9 @@
 				}
 			},
 			"notification-url": "https://packagist.org/downloads/",
-			"license": ["MIT"],
+			"license": [
+				"MIT"
+			],
 			"authors": [
 				{
 					"name": "Kyle Robinson Young",
@@ -237,7 +241,9 @@
 				}
 			},
 			"notification-url": "https://packagist.org/downloads/",
-			"license": ["BSD-3-Clause"],
+			"license": [
+				"BSD-3-Clause"
+			],
 			"authors": [
 				{
 					"name": "Neuman Vong",
@@ -252,7 +258,10 @@
 			],
 			"description": "A simple library to encode and decode JSON Web Tokens (JWT) in PHP. Should conform to the current spec.",
 			"homepage": "https://github.com/firebase/php-jwt",
-			"keywords": ["jwt", "php"],
+			"keywords": [
+				"jwt",
+				"php"
+			],
 			"support": {
 				"issues": "https://github.com/firebase/php-jwt/issues",
 				"source": "https://github.com/firebase/php-jwt/tree/v6.10.0"
@@ -299,7 +308,9 @@
 				}
 			},
 			"notification-url": "https://packagist.org/downloads/",
-			"license": ["Apache-2.0"],
+			"license": [
+				"Apache-2.0"
+			],
 			"authors": [
 				{
 					"name": "Sorin Sarca",
@@ -312,7 +323,12 @@
 			],
 			"description": "Json Schema Validator",
 			"homepage": "http://www.opis.io/json-schema",
-			"keywords": ["json", "schema", "validation", "validator"],
+			"keywords": [
+				"json",
+				"schema",
+				"validation",
+				"validator"
+			],
 			"support": {
 				"issues": "https://github.com/opis/json-schema/issues",
 				"source": "https://github.com/opis/json-schema/tree/1.1.0"
@@ -349,7 +365,9 @@
 			},
 			"type": "phpcodesniffer-standard",
 			"notification-url": "https://packagist.org/downloads/",
-			"license": ["LGPL-3.0-or-later"],
+			"license": [
+				"LGPL-3.0-or-later"
+			],
 			"authors": [
 				{
 					"name": "Wim Godden",
@@ -368,7 +386,11 @@
 			],
 			"description": "A set of sniffs for PHP_CodeSniffer that checks for PHP cross-version compatibility.",
 			"homepage": "http://techblog.wimgodden.be/tag/codesniffer/",
-			"keywords": ["compatibility", "phpcs", "standards"],
+			"keywords": [
+				"compatibility",
+				"phpcs",
+				"standards"
+			],
 			"support": {
 				"issues": "https://github.com/PHPCompatibility/PHPCompatibility/issues",
 				"source": "https://github.com/PHPCompatibility/PHPCompatibility"
@@ -403,7 +425,9 @@
 			},
 			"type": "phpcodesniffer-standard",
 			"notification-url": "https://packagist.org/downloads/",
-			"license": ["LGPL-3.0-or-later"],
+			"license": [
+				"LGPL-3.0-or-later"
+			],
 			"authors": [
 				{
 					"name": "Wim Godden",
@@ -472,7 +496,9 @@
 			},
 			"type": "phpcodesniffer-standard",
 			"notification-url": "https://packagist.org/downloads/",
-			"license": ["LGPL-3.0-or-later"],
+			"license": [
+				"LGPL-3.0-or-later"
+			],
 			"authors": [
 				{
 					"name": "Wim Godden",
@@ -540,12 +566,20 @@
 				"psr-4": {
 					"WPGraphqlGutenberg\\": "src/"
 				},
-				"classmap": ["src/"]
+				"classmap": [
+					"src/"
+				]
 			},
 			"scripts": {
-				"phpcs-i": ["@php ./vendor/bin/phpcs -i"],
-				"check-cs": ["@php ./vendor/bin/phpcs"],
-				"fix-cs": ["@php ./vendor/bin/phpcbf"]
+				"phpcs-i": [
+					"@php ./vendor/bin/phpcs -i"
+				],
+				"check-cs": [
+					"@php ./vendor/bin/phpcs"
+				],
+				"fix-cs": [
+					"@php ./vendor/bin/phpcbf"
+				]
 			},
 			"description": "Query gutenberg blocks with wp-graphql",
 			"support": {
@@ -576,7 +610,10 @@
 			"require-dev": {
 				"phpunit/phpunit": "^4.0 || ^5.0 || ^6.0 || ^7.0 || ^8.0 || ^9.3.4"
 			},
-			"bin": ["bin/phpcbf", "bin/phpcs"],
+			"bin": [
+				"bin/phpcbf",
+				"bin/phpcs"
+			],
 			"type": "library",
 			"extra": {
 				"branch-alias": {
@@ -584,7 +621,9 @@
 				}
 			},
 			"notification-url": "https://packagist.org/downloads/",
-			"license": ["BSD-3-Clause"],
+			"license": [
+				"BSD-3-Clause"
+			],
 			"authors": [
 				{
 					"name": "Greg Sherwood",
@@ -601,7 +640,11 @@
 			],
 			"description": "PHP_CodeSniffer tokenizes PHP, JavaScript and CSS files and detects violations of a defined set of coding standards.",
 			"homepage": "https://github.com/PHPCSStandards/PHP_CodeSniffer",
-			"keywords": ["phpcs", "standards", "static analysis"],
+			"keywords": [
+				"phpcs",
+				"standards",
+				"static analysis"
+			],
 			"support": {
 				"issues": "https://github.com/PHPCSStandards/PHP_CodeSniffer/issues",
 				"security": "https://github.com/PHPCSStandards/PHP_CodeSniffer/security/policy",
@@ -677,10 +720,14 @@
 				"psr-4": {
 					"WPGraphQLRedirection\\": "include/"
 				},
-				"classmap": ["include/"]
+				"classmap": [
+					"include/"
+				]
 			},
 			"notification-url": "https://packagist.org/downloads/",
-			"license": ["GPL-3.0-or-later"],
+			"license": [
+				"GPL-3.0-or-later"
+			],
 			"authors": [
 				{
 					"name": "superhuit",
@@ -691,7 +738,11 @@
 			],
 			"description": "Exposes Redirection WP plugin in the WP-GraphQL schema",
 			"homepage": "https://github.com/superhuit-agency/wp-graphql-redirection",
-			"keywords": ["graphql", "redirection", "wordpress"],
+			"keywords": [
+				"graphql",
+				"redirection",
+				"wordpress"
+			],
 			"support": {
 				"issues": "https://github.com/superhuit-agency/wp-graphql-redirection/issues",
 				"source": "https://github.com/superhuit-agency/wp-graphql-redirection/tree/v1.1.0"
@@ -720,10 +771,14 @@
 				"psr-4": {
 					"Symfony\\Component\\CssSelector\\": ""
 				},
-				"exclude-from-classmap": ["/Tests/"]
+				"exclude-from-classmap": [
+					"/Tests/"
+				]
 			},
 			"notification-url": "https://packagist.org/downloads/",
-			"license": ["MIT"],
+			"license": [
+				"MIT"
+			],
 			"authors": [
 				{
 					"name": "Fabien Potencier",
@@ -797,11 +852,20 @@
 				"wp-install": [
 					"wp-install --full --env-file .env --wp-composer-file composer.wp-install.json"
 				],
-				"wpunit": ["codecept run wpunit"],
-				"functional": ["codecept run functional"],
-				"test": ["@wpunit", "@functional"]
+				"wpunit": [
+					"codecept run wpunit"
+				],
+				"functional": [
+					"codecept run functional"
+				],
+				"test": [
+					"@wpunit",
+					"@functional"
+				]
 			},
-			"license": ["GPL-2.0-or-later"],
+			"license": [
+				"GPL-2.0-or-later"
+			],
 			"authors": [
 				{
 					"name": "Esa-Matti Suuronen",
@@ -850,7 +914,9 @@
 				}
 			},
 			"notification-url": "https://packagist.org/downloads/",
-			"license": ["GPL-2.0-or-later"],
+			"license": [
+				"GPL-2.0-or-later"
+			],
 			"authors": [
 				{
 					"name": "Esa-Matti Suuronen",
@@ -899,7 +965,9 @@
 				}
 			},
 			"notification-url": "https://packagist.org/downloads/",
-			"license": ["MIT"],
+			"license": [
+				"MIT"
+			],
 			"authors": [
 				{
 					"name": "dimabdc",
@@ -915,7 +983,11 @@
 			],
 			"description": "Simple HTML DOM package.",
 			"homepage": "http://simplehtmldom.sourceforge.net/",
-			"keywords": ["HTML Parser", "dom", "php dom"],
+			"keywords": [
+				"HTML Parser",
+				"dom",
+				"php dom"
+			],
 			"support": {
 				"issues": "https://github.com/voku/simple_html_dom/issues",
 				"source": "https://github.com/voku/simple_html_dom/tree/4.7.31"
@@ -974,10 +1046,14 @@
 				"psr-4": {
 					"WPGraphQL\\JWT_Authentication\\": "src/"
 				},
-				"classmap": ["src/"]
+				"classmap": [
+					"src/"
+				]
 			},
 			"notification-url": "https://packagist.org/downloads/",
-			"license": ["GPL-3.0+"],
+			"license": [
+				"GPL-3.0+"
+			],
 			"authors": [
 				{
 					"name": "jasonbahl",
@@ -1008,6 +1084,24 @@
 			},
 			"type": "wordpress-plugin",
 			"homepage": "https://wordpress.org/plugins/acf-options-for-polylang/"
+		},
+		{
+			"name": "wpackagist-plugin/advanced-custom-fields",
+			"version": "6.3.12",
+			"source": {
+				"type": "svn",
+				"url": "https://plugins.svn.wordpress.org/advanced-custom-fields/",
+				"reference": "tags/6.3.12"
+			},
+			"dist": {
+				"type": "zip",
+				"url": "https://downloads.wordpress.org/plugin/advanced-custom-fields.6.3.12.zip"
+			},
+			"require": {
+				"composer/installers": "^1.0 || ^2.0"
+			},
+			"type": "wordpress-plugin",
+			"homepage": "https://wordpress.org/plugins/advanced-custom-fields/"
 		},
 		{
 			"name": "wpackagist-plugin/disable-comments",

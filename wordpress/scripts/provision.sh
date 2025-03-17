@@ -145,15 +145,19 @@ echo "✔"
 # Multilang
 __dir="$(dirname "${BASH_SOURCE[0]:-$0}")"
 if [ "$IS_MULTILANG" = true ]; then
-	if ! $WPCLI plugin is-active polylang; then $WPCLI plugin polylang --quiet &> /dev/null; fi
-	if ! $WPCLI plugin is-active acf-options-for-polylang; then $WPCLI plugin activate acf-options-for-polylang --quiet &> /dev/null; fi
-	if ! $WPCLI plugin is-active wp-graphql-polylang; then $WPCLI plugin activate wp-graphql-polylang --quiet &> /dev/null; fi
-	if ! $WPCLI plugin is-active starterpack-i18n; then $WPCLI plugin activate starterpack-i18n --quiet &> /dev/null; fi
+	echo $en "- Activating multilang plugins $ec"
+	if ! $WPCLI plugin is-active polylang; then $WPCLI plugin activate "polylang" --quiet &> /dev/null; fi
+	if ! $WPCLI plugin is-active acf-options-for-polylang; then $WPCLI plugin activate "acf-options-for-polylang" --quiet &> /dev/null; fi
+	if ! $WPCLI plugin is-active wp-graphql-polylang; then $WPCLI plugin activate "wp-graphql-polylang" --quiet &> /dev/null; fi
+	if ! $WPCLI plugin is-active starterpack-i18n; then $WPCLI plugin activate "starterpack-i18n" --quiet &> /dev/null; fi
+	echo "✔"
 else
-	if $WPCLI plugin is-active acf-options-for-polylang; then $WPCLI plugin deactivate acf-options-for-polylang --quiet &> /dev/null; fi
-	if $WPCLI plugin is-active wp-graphql-polylang; then $WPCLI plugin deactivate wp-graphql-polylang --quiet &> /dev/null; fi
-	if $WPCLI plugin is-active starterpack-i18n; then $WPCLI plugin deactivate starterpack-i18n --quiet &> /dev/null; fi
-	if $WPCLI plugin is-active polylang; then $WPCLI plugin deactivate polylang --quiet &> /dev/null; fi
+	echo $en "- Deactivating multilang plugins $ec"
+	if $WPCLI plugin is-active acf-options-for-polylang; then $WPCLI plugin deactivate "acf-options-for-polylang" --quiet &> /dev/null; fi
+	if $WPCLI plugin is-active wp-graphql-polylang; then $WPCLI plugin deactivate "wp-graphql-polylang" --quiet &> /dev/null; fi
+	if $WPCLI plugin is-active starterpack-i18n; then $WPCLI plugin deactivate "starterpack-i18n" --quiet &> /dev/null; fi
+	if $WPCLI plugin is-active polylang; then $WPCLI plugin deactivate "polylang" --quiet &> /dev/null; fi
+	echo "✔"
 fi
 
 echo

@@ -32,6 +32,7 @@
 		"valu/wp-graphql-polylang": "^0.7.0",
 		"wp-graphql/wp-graphql-jwt-authentication": "^0.7.0",
 		"wpackagist-plugin/acf-options-for-polylang": "^1.1",
+		"wpackagist-plugin/advanced-custom-fields": "^6.3",
 		"wpackagist-plugin/disable-comments": "^2.4",
 		"wpackagist-plugin/disable-emojis": "^1.7",
 		"wpackagist-plugin/duplicate-post": "^4.5",
