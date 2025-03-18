@@ -182,12 +182,12 @@ module.exports = async function (plop) {
 
 							// Update the locales and defaultLocale variables
 							middlewareContent = middlewareContent.replace(
-								/let locales = \[.*?\];/,
-								`let locales = ${JSON.stringify(allLocales)};`
+								/const locales = \[.*?\];/,
+								`const locales = ${JSON.stringify(allLocales)};`
 							);
 							middlewareContent = middlewareContent.replace(
-								/let defaultLocale = '.*?';/,
-								`let defaultLocale = '${data.defaultLocale}';`
+								/const defaultLocale = '.*?';/,
+								`const defaultLocale = '${data.defaultLocale}';`
 							);
 
 							fs.writeFileSync(middlewarePath, middlewareContent);

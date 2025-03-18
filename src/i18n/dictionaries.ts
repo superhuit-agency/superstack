@@ -8,13 +8,22 @@ export const getDictionary = async (locale: Locale) => {
 	const dictionaries = locales.reduce(
 		(acc: Record<Locale, () => Promise<any>>, lang: Locale) => {
 			acc[lang] = () =>
-				import(`./dictionaries/${lang}.json`).then(
-					(module) => module.default
-				);
+				import(`./dictionaries/${lang}.json`)
+					.then((module) => module.default)
+					.catch(() => {
+						throw new Error(
+							`Unable to open dictionary, reading "src/i18n/dictionaries/${lang}.json"`
+						);
+					});
 			return acc;
 		},
 		{}
 	);
+	if (!dictionaries[locale]) {
+		throw new Error(
+			`Locale ${locale} was not retreived from GraphQL. Please make sure the locale is setup correctly in the admin panel.`
+		);
+	}
 
 	const dictionary = await dictionaries[locale]();
 
