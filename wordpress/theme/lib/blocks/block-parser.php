@@ -12,6 +12,7 @@ add_filter( 'block_parser_class', function() {
 } );
 
 class BlockParser extends WP_Block_Parser {
+	public $language;
 
 	function parse($document) {
 		parent::parse($document);
