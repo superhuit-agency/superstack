@@ -42,6 +42,35 @@
 		},
 		"submitLabel": "Envoyer"
 	},
+	"gdpr": {
+		"categories": {
+			"necessary": {
+				"title": "Nécessaire",
+				"description": "Les cookies définis dans cette catégorie sont absolument indispensables au fonctionnement du site web. Ces cookies ne collectent pas de données privées.",
+				"alwaysEnabled": "Toujours activé"
+			},
+			"analytics": {
+				"title": "Analytics",
+				"description": "Les cookies analytiques nous aident à comprendre comment nos visiteurs interagissent avec le site web. Ils nous aident à comprendre le nombre de visiteurs, leur provenance et les pages sur lesquelles ils naviguent. Les cookies collectent ces données et sont signalés de manière anonyme.",
+				"enable": "Activer",
+				"disable": "Désactiver",
+				"enabled": "Activé",
+				"disabled": "Désactivé"
+			}
+		},
+		"banner": {
+			"title": "Cookies",
+			"message": "Ce site utilise des cookies pour améliorer votre expérience utilisateur et vous permet de contrôler ce que vous souhaitez activer.",
+			"personalize": "Personnaliser",
+			"acceptAll": "Accepter",
+			"rejectAll": "Rejeter"
+		},
+		"modal": {
+			"title": "Cookies préférences",
+			"description": "Ce site web utilise des cookies pour améliorer votre expérience lorsque vous naviguez sur le site Web. Parmi ces cookies, les cookies classés comme nécessaires sont stockés sur votre navigateur car ils sont essentiels pour le fonctionnement des fonctionnalités de base du site Web. Nous utilisons également des cookies de tiers qui nous aident à analyser et à comprendre comment vous utilisez ce site Web. Ces cookies ne seront stockés dans votre navigateur qu'avec votre consentement. Vous avez également la possibilité de désactiver ces cookies. Toutefois, la désactivation de certains de ces cookies peut avoir un effet sur votre expérience de navigation.",
+			"save": "Accepter et sauvegarder"
+		}
+	},
 	"mainNav": {
 		"closeMenu": "Fermer le menu",
 		"openMenu": "Ouvrir le menu"

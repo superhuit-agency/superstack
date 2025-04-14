@@ -3,76 +3,14 @@
 	"hash": "manage-cookies",
 	"categories": [
 		{
-			"position": 1,
-			"mandatory": true,
 			"id": "necessary",
-			"texts": {
-				"en": {
-					"title": "Necessary",
-					"description": "Necessary cookies are absolutely essential for the website to function properly. This category only includes cookies that ensures basic functionalities and security features of the website. These cookies do not store any personal information.",
-					"alwaysEnabled": "Always enabled"
-				},
-				"fr": {
-					"title": "Nécessaire",
-					"description": "Les cookies définis dans cette catégorie sont absolument indispensables au fonctionnement du site web. Ces cookies ne collectent pas de données privées.",
-					"alwaysEnabled": "Toujours activé"
-				}
-			}
+			"mandatory": true
 		},
 		{
-			"position": 2,
 			"id": "analytics",
-			"texts": {
-				"en": {
-					"title": "Analytics",
-					"description": "Analytics cookies help us understand how our visitors interact with the website. It helps us understand the number of visitors, where the visitors are coming from, and the pages they navigate. The cookies collect this data and are reported anonymously.",
-					"enable": "Enable",
-					"disable": "Disable",
-					"enabled": "Enabled",
-					"disabled": "Disabled"
-				},
-				"fr": {
-					"title": "Analytics",
-					"description": "Les cookies analytiques nous aident à comprendre comment nos visiteurs interagissent avec le site web. Ils nous aident à comprendre le nombre de visiteurs, leur provenance et les pages sur lesquelles ils naviguent. Les cookies collectent ces données et sont signalés de manière anonyme.",
-					"enable": "Activer",
-					"disable": "Désactiver",
-					"enabled": "Activé",
-					"disabled": "Désactivé"
-				}
-			},
-			"services": ["gtm"]
+			"services": [
+				"gtm"
+			]
 		}
-	],
-	"banner": {
-		"texts": {
-			"en": {
-				"title": "Cookies",
-				"message": "This website uses cookies to help improve your user experience and gives you control over what you want to activate.",
-				"personalize": "Personalize",
-				"acceptAll": "Accept",
-				"rejectAll": "Reject"
-			},
-			"fr": {
-				"title": "Cookies",
-				"message": "Ce site utilise des cookies pour améliorer votre expérience utilisateur et vous permet de contrôler ce que vous souhaitez activer.",
-				"personalize": "Personnaliser",
-				"acceptAll": "Accepter",
-				"rejectAll": "Rejeter"
-			}
-		}
-	},
-	"modal": {
-		"texts": {
-			"en": {
-				"title": "Cookies Settings",
-				"description": "This website uses cookies to improve your experience while you navigate through the website. Out of these cookies, the cookies that are categorized as necessary are stored on your browser as they are essential for the working of basic functionalities of the website. We also use third-party cookies that help us analyze and understand how you use this website. These cookies will be stored in your browser only with your consent. You also have the option to opt-out of these cookies. But opting out of some of these cookies may have an effect on your browsing experience.",
-				"save": "Accept and save"
-			},
-			"fr": {
-				"title": "Cookies préférences",
-				"description": "Ce site web utilise des cookies pour améliorer votre expérience lorsque vous naviguez sur le site Web. Parmi ces cookies, les cookies classés comme nécessaires sont stockés sur votre navigateur car ils sont essentiels pour le fonctionnement des fonctionnalités de base du site Web. Nous utilisons également des cookies de tiers qui nous aident à analyser et à comprendre comment vous utilisez ce site Web. Ces cookies ne seront stockés dans votre navigateur qu'avec votre consentement. Vous avez également la possibilité de désactiver ces cookies. Toutefois, la désactivation de certains de ces cookies peut avoir un effet sur votre expérience de navigation.",
-				"save": "Accepter et sauvegarder"
-			}
-		}
-	}
+	]
 }

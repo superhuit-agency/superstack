@@ -13,17 +13,16 @@ import cx from 'classnames';
 import { useLocale } from '@/contexts/locale-context';
 import { Button } from '@/components/atoms';
 import { CloseIcon } from '@/components/icons';
-import gdprConfigs from '@/gdpr-configs.json';
 
-import { GdprCategory } from '../GdprCategory';
+import { GdprCategory, type GdprCategoryType } from '../GdprCategory';
 
 import './styles.css';
 
 /**
  * TYPINGS
  */
-export type GdprModalProps = {
-	categories: Record<string, any>[];
+export interface GdprModalProps {
+	categories: GdprCategoryType[];
 	onCategoryChange: (param: { enabled: boolean; id: string }) => void;
 	onModalSaved: Function;
 	onModalClosed: Function;
@@ -51,7 +50,7 @@ export const GdprModal = forwardRef(
 		const categoriesRef = useRef<any[]>([]);
 		const id = useRef('');
 
-		const { locale } = useLocale();
+		const { dictionary } = useLocale();
 
 		useEffect(() => {
 			id.current = genId();
@@ -202,18 +201,18 @@ export const GdprModal = forwardRef(
 								id="cookie-law-modal:title"
 								className="supt-gdpr-modal__title"
 							>
-								{gdprConfigs.modal.texts[locale].title}
+								{dictionary.gdpr.modal.title}
 							</p>
 						</header>
 						<div className="supt-gdpr-modal__body supt-modal-section">
 							<p className="supt-gdpr-modal__body__text">
-								{gdprConfigs.modal.texts[locale].description}
+								{dictionary.gdpr.modal.description}
 							</p>
 							<ul className="supt-gdpr-modal__categories">
 								{categories.map((cat, index) => (
 									<GdprCategory
 										key={index}
-										cat={{ ...cat, ...cat.texts[locale] }}
+										cat={cat}
 										handleChange={onCategoryChange}
 										ref={(categoryRef) => {
 											if (categoryRef) {
@@ -226,7 +225,7 @@ export const GdprModal = forwardRef(
 							</ul>
 							<footer className="supt-gdpr-modal__footer">
 								<Button
-									title={gdprConfigs.modal.texts[locale].save}
+									title={dictionary.gdpr.modal.save}
 									className="supt-gdpr-modal__save-button"
 									onClick={onSave}
 									variant="link"

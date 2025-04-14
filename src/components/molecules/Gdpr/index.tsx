@@ -8,7 +8,8 @@ import { useLocale } from '@/contexts/locale-context';
 import gdprConfigs from '@/gdpr-configs.json';
 
 import { GdprBanner } from './GdprBanner';
-import { GdprModal, GdprModalProps } from './GdprModal';
+import { GdprModal, type GdprModalProps } from './GdprModal';
+import { type GdprCategoryType } from './GdprCategory';
 import block from './block.json';
 
 /**
@@ -26,7 +27,7 @@ const COOKIE_NAME = 'supt-cookie-law-consent';
  * COMPONENT
  */
 export const Gdpr: FC<GdprProps> & BlockConfigs = () => {
-	const [categories, setCategories] = useState<Record<string, any>[]>([]);
+	const [categories, setCategories] = useState<GdprCategoryType[]>([]);
 	const [bannerDismissed, setBannerDismissed] = useState(true);
 	const [gdprServices, setGdprServices] = useState<Record<string, boolean>>(
 		{}
