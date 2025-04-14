@@ -48,8 +48,8 @@ export default async function Layout({
 	const { defaultLocale } = await getLocales();
 
 	const [navPromise, footerPromise] = await Promise.allSettled([
-		mainNavData.getData(defaultLocale),
-		footerData.getData(defaultLocale),
+		mainNavData.getData({language: defaultLocale}),
+		footerData.getData({language: defaultLocale}),
 	]);
 
 	const mainNavProps =

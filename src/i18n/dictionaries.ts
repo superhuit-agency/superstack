@@ -3,31 +3,35 @@ import 'server-only';
 import { getLocales } from '@/i18n/get-locales';
 
 export const getDictionary = async (locale: Locale) => {
-	const { locales } = await getLocales();
+	const { locales, defaultLocale } = await getLocales();
+
+	let dictionnaryToLoad;
 
 	const dictionaries = locales.reduce(
 		(acc: Record<Locale, () => Promise<any>>, lang: Locale) => {
 			acc[lang] = () =>
 				import(`./dictionaries/${lang}.json`)
 					.then((module) => module.default)
-					.catch(() => {
-						throw new Error(
-							`Unable to open dictionary, reading "src/i18n/dictionaries/${lang}.json"`
+					.catch(async () => {
+						console.warn(
+							`Unable to open dictionary for locale "${lang}", falling back to default locale "${defaultLocale}"`
 						);
+
+						return await dictionaries[defaultLocale]();
 					});
 			return acc;
 		},
 		{}
 	);
+
 	if (!dictionaries[locale]) {
-		throw new Error(
-			`Locale ${locale} was not retreived from GraphQL. Please make sure the locale is setup correctly in the admin panel.`
+		console.warn(
+			`Locale "${locale}" was not retrieved from GraphQL. Falling back to default locale "${defaultLocale}". Please make sure the locale is setup correctly in the admin panel.`
 		);
+		return await dictionaries[defaultLocale]();
 	}
 
-	const dictionary = await dictionaries[locale]();
-
-	return dictionary;
+	return await dictionaries[locale]();
 };
 
 export const getDictionaries = async () => {
@@ -43,7 +47,7 @@ export const getDictionaries = async () => {
 	);
 
 	// Load all dictionaries in parallel
-	await Promise.all(
+	await Promise.allSettled(
 		locales.map(async (locale: Locale) => {
 			const dictionary = await import(
 				`./dictionaries/${locale}.json`

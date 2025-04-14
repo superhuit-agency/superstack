@@ -72,7 +72,6 @@ export const Form: FC<FormProps> & BlockConfigs = ({
 	const [token, setToken] = useState<string | null>(null); // hCaptcha token
 
 	const captchaRef = useRef<HCaptcha | null>(null);
-	const defaultErrorMessage = useRef(dictionary.form?.error.message);
 
 	const { errors, isSubmitting, isSubmitSuccessful, isSubmitted } = formState;
 
@@ -143,7 +142,7 @@ export const Form: FC<FormProps> & BlockConfigs = ({
 		// unhandled error
 		if (res.status !== 200 && !json?.data?.errors) {
 			return setError('__global', {
-				message: defaultErrorMessage.current,
+				message: dictionary.form?.error.message,
 			});
 		}
 
@@ -176,7 +175,7 @@ export const Form: FC<FormProps> & BlockConfigs = ({
 					: submitForm());
 			} catch (e) {
 				return setError('__global', {
-					message: defaultErrorMessage.current,
+					message: dictionary.form?.error.message,
 				});
 			}
 		},

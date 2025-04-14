@@ -18,7 +18,7 @@ export const formatter = (data: GraphQLMainNavFields): MainNavData => ({
 	siteTitle: data.generalSettings?.title ?? 'superstack',
 });
 
-export const getData = async (language: Locale): Promise<MainNavData> => {
+export const getData = async ({language}: {language: Locale}): Promise<MainNavData> => {
 	const query = gql`
 		query mainNavQuery {
 			header: menuItems(
@@ -44,7 +44,7 @@ export const getData = async (language: Locale): Promise<MainNavData> => {
 		${menuItemData.fragment}
 	`;
 
-	const data = await fetchAPI(query, { variables: {} });
+	const data = await fetchAPI(query);
 
 	return formatter(data);
 };

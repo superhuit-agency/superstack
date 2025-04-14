@@ -17,7 +17,7 @@ export const formatter = (data: GraphQLFooterFields): FooterData => ({
 	siteTitle: data.generalSettings?.title ?? 'Superstack',
 });
 
-export const getData = async (language: Locale): Promise<FooterData> => {
+export const getData = async ({language}: {language: Locale}): Promise<FooterData> => {
 	const query = gql`
 		query footerQuery {
 			footer: menuItems(
@@ -60,7 +60,7 @@ export const getData = async (language: Locale): Promise<FooterData> => {
 		${menuItemData.fragment}
 	`;
 
-	const data = await fetchAPI(query, { variables: {} });
+	const data = await fetchAPI(query);
 
 	return formatter(data);
 };

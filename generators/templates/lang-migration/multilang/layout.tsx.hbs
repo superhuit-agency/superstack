@@ -18,8 +18,8 @@ export default async function Layout({
 	const dictionary = await getDictionary(params.lang);
 
 	const [navPromise, footerPromise] = await Promise.allSettled([
-		mainNavData.getData(params.lang),
-		footerData.getData(params.lang),
+		mainNavData.getData({language: params.lang}),
+		footerData.getData({language: params.lang}),
 	]);
 
 	const mainNavProps =
