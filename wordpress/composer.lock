@@ -4,7 +4,7 @@
 		"Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
 		"This file is @generated automatically"
 	],
-	"content-hash": "ca07413cd696bbb0935e6366f9781d02",
+	"content-hash": "0f267c712695d2d4de31ef7186f05228",
 	"packages": [
 		{
 			"name": "ashhitch/wp-graphql-yoast-seo",
@@ -686,15 +686,6 @@
 			"type": "wordpress-plugin"
 		},
 		{
-			"name": "superhuit-agency/starterpack-i18n",
-			"version": "1.0.1",
-			"dist": {
-				"type": "zip",
-				"url": "https://github.com/superhuit-agency/starterpack-i18n/releases/download/v1.0.1/starterpack-i18n.zip"
-			},
-			"type": "wordpress-plugin"
-		},
-		{
 			"name": "superhuit/wp-graphql-redirection",
 			"version": "v1.1.0",
 			"source": {
@@ -881,57 +872,6 @@
 			"time": "2024-03-21T13:02:51+00:00"
 		},
 		{
-			"name": "valu/wp-graphql-polylang",
-			"version": "v0.7.0",
-			"source": {
-				"type": "git",
-				"url": "https://github.com/valu-digital/wp-graphql-polylang.git",
-				"reference": "ca67d22c6a846151989aaaf4e17eb3950f0a3107"
-			},
-			"dist": {
-				"type": "zip",
-				"url": "https://api.github.com/repos/valu-digital/wp-graphql-polylang/zipball/ca67d22c6a846151989aaaf4e17eb3950f0a3107",
-				"reference": "ca67d22c6a846151989aaaf4e17eb3950f0a3107",
-				"shasum": ""
-			},
-			"require-dev": {
-				"bordoni/phpass": "*",
-				"codeception/module-asserts": "^1.0",
-				"codeception/module-cli": "^1.0",
-				"codeception/module-db": "^1.0",
-				"codeception/module-filesystem": "^1.0",
-				"codeception/module-phpbrowser": "^1.0",
-				"codeception/module-rest": "^1.0",
-				"codeception/module-webdriver": "^1.0",
-				"codeception/util-universalframework": "^1.0",
-				"lucatume/wp-browser": "~2.2",
-				"valu/wp-testing-tools": "^0.4.0"
-			},
-			"type": "wordpress-plugin",
-			"autoload": {
-				"psr-4": {
-					"WPGraphQL\\Extensions\\Polylang\\": "src/"
-				}
-			},
-			"notification-url": "https://packagist.org/downloads/",
-			"license": [
-				"GPL-2.0-or-later"
-			],
-			"authors": [
-				{
-					"name": "Esa-Matti Suuronen",
-					"email": "esa-matti.suuronen@valu.fi",
-					"role": "developer"
-				}
-			],
-			"description": "Polylang bindings for wp-graphql",
-			"support": {
-				"issues": "https://github.com/valu-digital/wp-graphql-polylang/issues",
-				"source": "https://github.com/valu-digital/wp-graphql-polylang"
-			},
-			"time": "2024-05-21T10:29:45+00:00"
-		},
-		{
 			"name": "voku/simple_html_dom",
 			"version": "4.7.31",
 			"source": {
@@ -1068,24 +1008,6 @@
 			"time": "2023-03-31T21:57:48+00:00"
 		},
 		{
-			"name": "wpackagist-plugin/acf-options-for-polylang",
-			"version": "1.1.11",
-			"source": {
-				"type": "svn",
-				"url": "https://plugins.svn.wordpress.org/acf-options-for-polylang/",
-				"reference": "tags/1.1.11"
-			},
-			"dist": {
-				"type": "zip",
-				"url": "https://downloads.wordpress.org/plugin/acf-options-for-polylang.1.1.11.zip"
-			},
-			"require": {
-				"composer/installers": "^1.0 || ^2.0"
-			},
-			"type": "wordpress-plugin",
-			"homepage": "https://wordpress.org/plugins/acf-options-for-polylang/"
-		},
-		{
 			"name": "wpackagist-plugin/advanced-custom-fields",
 			"version": "6.3.12",
 			"source": {
@@ -1156,24 +1078,6 @@
 			},
 			"type": "wordpress-plugin",
 			"homepage": "https://wordpress.org/plugins/duplicate-post/"
-		},
-		{
-			"name": "wpackagist-plugin/polylang",
-			"version": "3.6.6",
-			"source": {
-				"type": "svn",
-				"url": "https://plugins.svn.wordpress.org/polylang/",
-				"reference": "tags/3.6.6"
-			},
-			"dist": {
-				"type": "zip",
-				"url": "https://downloads.wordpress.org/plugin/polylang.3.6.6.zip"
-			},
-			"require": {
-				"composer/installers": "^1.0 || ^2.0"
-			},
-			"type": "wordpress-plugin",
-			"homepage": "https://wordpress.org/plugins/polylang/"
 		},
 		{
 			"name": "wpackagist-plugin/redirection",

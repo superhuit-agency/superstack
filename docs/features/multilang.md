@@ -12,6 +12,8 @@ We've created a plop script that simplifies the process of migrating between sin
 
 Run the script that will update the code and files depending on if your website supports multilang or not :
 
+> 💡 You will need to have Docker running before executing this script, by running `npm run start` in `wordpress` folder
+
 ```bash
 npm run generate:language-migration
 ```
@@ -53,6 +55,7 @@ If you'd like to go further on how the multilang script is working, here are the
     - Move the `[[...uri]]` folder into the `[lang]` folder
     - Update `src/configs.json` to set `isMultilang` to `true` and `staticLang` to the specified default locale
     - Update `wordpress/scripts/provision.sh` to set `IS_MULTILANG` to `true`
+    - Require WP plugins through Composer needed for the multilang to work properly (Polylang, etc..)
 
 2. **Multilanguage to single language**
 
@@ -63,3 +66,4 @@ If you'd like to go further on how the multilang script is working, here are the
     - Remove the `[lang]` folder
     - Update `src/configs.json` to set `isMultilang` to `false` and `staticLang` to the specified default locale
     - Update `wordpress/scripts/provision.sh` to set `IS_MULTILANG` to `false`
+    - Remove WP plugins through Composer that are not needed anymore

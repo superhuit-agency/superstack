@@ -65,6 +65,15 @@ module.exports = async function (plop) {
 			const configsJsonPath = 'src/configs.json';
 			const provisionShPath = 'wordpress/scripts/provision.sh';
 			const middlewarePath = 'src/middleware.ts';
+			const wordpressDir = 'wordpress';
+
+			// Define multi-language plugins
+			const multilangPlugins = [
+				'superhuit-agency/starterpack-i18n',
+				'valu/wp-graphql-polylang',
+				'wpackagist-plugin/acf-options-for-polylang',
+				'wpackagist-plugin/polylang'
+			];
 
 			if (data.migrationType === 'toMultilang') {
 				// Create the [lang] folder if it doesn't exist
@@ -199,6 +208,24 @@ module.exports = async function (plop) {
 						return 'middleware.ts file not found, skipping update';
 					}
 				});
+
+				// Add multi-language plugins using composer require
+				actions.push(function (data) {
+					return new Promise((resolve, reject) => {
+						const command = `cd ${wordpressDir} && docker exec spck_wp composer require ${multilangPlugins.join(' ')}`;
+						exec(command, (error, stdout, stderr) => {
+							if (error) {
+								reject(`Error running composer require: ${error.message}`);
+								return;
+							}
+							if (stderr) {
+								console.warn(`Composer stderr: ${stderr}`);
+							}
+							resolve('Successfully installed multi-language plugins via composer');
+						});
+					});
+				});
+
 			} else if (data.migrationType === 'toSinglelang') {
 				// Update the root layout.tsx file using the singlelang template
 				actions.push({
@@ -306,12 +333,12 @@ module.exports = async function (plop) {
 
 							// Update the locales and defaultLocale variables to use only the default locale
 							middlewareContent = middlewareContent.replace(
-								/let locales = \[.*?\];/,
-								`let locales = ['${data.defaultLocale}'];`
+								/const locales = \[.*?\];/,
+								`const locales = ['${data.defaultLocale}'];`
 							);
 							middlewareContent = middlewareContent.replace(
-								/let defaultLocale = '.*?';/,
-								`let defaultLocale = '${data.defaultLocale}';`
+								/const defaultLocale = '.*?';/,
+								`const defaultLocale = '${data.defaultLocale}';`
 							);
 
 							fs.writeFileSync(middlewarePath, middlewareContent);
@@ -322,6 +349,23 @@ module.exports = async function (plop) {
 					} else {
 						return 'middleware.ts file not found, skipping update';
 					}
+				});
+
+				// Remove multi-language plugins using composer remove
+				actions.push(function (data) {
+					return new Promise((resolve, reject) => {
+						const command = `cd ${wordpressDir} && docker exec spck_wp composer remove ${multilangPlugins.join(' ')}`;
+						exec(command, (error, stdout, stderr) => {
+							if (error) {
+								reject(`Error running composer remove: ${error.message}`);
+								return;
+							}
+							if (stderr) {
+								console.warn(`Composer stderr: ${stderr}`);
+							}
+							resolve('Successfully removed multi-language plugins via composer');
+						});
+					});
 				});
 			}
 

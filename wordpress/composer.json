@@ -27,16 +27,12 @@
 		"superhuit/wp-graphql-redirection": "^1.1",
 		"superhuit-agency/nextjs-revalidate": "^1.6.4",
 		"superhuit-agency/starterpack-forms": "^1.1",
-		"superhuit-agency/starterpack-i18n": "^1.0",
 		"valu/wp-graphql-offset-pagination": "dev-master",
-		"valu/wp-graphql-polylang": "^0.7.0",
 		"wp-graphql/wp-graphql-jwt-authentication": "^0.7.0",
-		"wpackagist-plugin/acf-options-for-polylang": "^1.1",
 		"wpackagist-plugin/advanced-custom-fields": "^6.3",
 		"wpackagist-plugin/disable-comments": "^2.4",
 		"wpackagist-plugin/disable-emojis": "^1.7",
 		"wpackagist-plugin/duplicate-post": "^4.5",
-		"wpackagist-plugin/polylang": "^3.6",
 		"wpackagist-plugin/redirection": "^5.3",
 		"wpackagist-plugin/simple-custom-post-order": "^2.5",
 		"wpackagist-plugin/svg-support": "^2.5",
@@ -81,20 +77,36 @@
 			}
 		},
 		{
+			"type": "package",
+			"package": {
+				"name": "superhuit-agency/wp-graphql-gutenberg",
+				"version": "0.4.1",
+				"type": "wordpress-plugin",
+				"dist": {
+					"url": "https://github.com/superhuit-agency/wp-graphql-gutenberg/archive/refs/tags/v0.4.1.supt-fix.zip",
+					"type": "zip"
+				}
+			}
+		},
+		{
+			"type": "package",
+			"package": {
+				"name": "superhuit-agency/wp-graphql-offset-pagination",
+				"version": "0.2.1",
+				"type": "wordpress-plugin",
+				"dist": {
+					"url": "https://github.com/superhuit-agency/wp-graphql-offset-pagination/releases/download/v0.2.1/wp-graphql-offset-pagination.zip",
+					"type": "zip"
+				}
+			}
+		},
+		{
 			"type": "composer",
 			"url": "https://wpackagist.org",
 			"only": [
 				"wpackagist-plugin/*",
 				"wpackagist-theme/*"
 			]
-		},
-		{
-			"type": "vcs",
-			"url": "https://github.com/superhuit-agency/wp-graphql-gutenberg"
-		},
-		{
-			"type": "vcs",
-			"url": "https://github.com/superhuit-agency/wp-graphql-offset-pagination"
 		}
 	]
 }
