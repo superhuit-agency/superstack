@@ -5,19 +5,17 @@ import { getLocales } from '@/i18n/get-locales';
 export const getDictionary = async (locale: Locale) => {
 	const { locales, defaultLocale } = await getLocales();
 
-	let dictionnaryToLoad;
-
 	const dictionaries = locales.reduce(
 		(acc: Record<Locale, () => Promise<any>>, lang: Locale) => {
 			acc[lang] = () =>
 				import(`./dictionaries/${lang}.json`)
 					.then((module) => module.default)
-					.catch(async () => {
+					.catch(() => {
 						console.warn(
 							`Unable to open dictionary for locale "${lang}", falling back to default locale "${defaultLocale}"`
 						);
 
-						return await dictionaries[defaultLocale]();
+						return dictionaries[defaultLocale]();
 					});
 			return acc;
 		},
@@ -28,10 +26,10 @@ export const getDictionary = async (locale: Locale) => {
 		console.warn(
 			`Locale "${locale}" was not retrieved from GraphQL. Falling back to default locale "${defaultLocale}". Please make sure the locale is setup correctly in the admin panel.`
 		);
-		return await dictionaries[defaultLocale]();
+		return dictionaries[defaultLocale]();
 	}
 
-	return await dictionaries[locale]();
+	return dictionaries[locale]();
 };
 
 export const getDictionaries = async () => {

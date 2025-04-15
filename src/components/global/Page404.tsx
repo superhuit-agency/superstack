@@ -15,19 +15,25 @@ interface Page404Props {
 	mainNavProps?: MainNavProps | null;
 	footerProps?: FooterProps | null;
 	dictionaries: Record<Locale, any>;
+	defaultLocale: Locale;
 }
 
 const Page404Wrapper = ({
 	children,
+	defaultLocale,
 	locale,
 	dictionaries,
 }: {
 	children: React.ReactNode;
+	defaultLocale: Locale;
 	locale: Locale;
 	dictionaries: Record<Locale, any>;
 }) =>
 	configs.isMultilang ? (
-		<LocaleProvider locale={locale} dictionary={dictionaries[locale]}>
+		<LocaleProvider
+			locale={locale}
+			dictionary={dictionaries[locale] || dictionaries[defaultLocale]}
+		>
 			{children}
 		</LocaleProvider>
 	) : (
@@ -38,12 +44,14 @@ export const Page404: FC<Page404Props> = ({
 	mainNavProps,
 	footerProps,
 	dictionaries,
+	defaultLocale,
 }) => {
 	const params = useParams();
 
 	return (
 		<Page404Wrapper
 			locale={params.lang as Locale}
+			defaultLocale={defaultLocale}
 			dictionaries={dictionaries}
 		>
 			<MainNav

@@ -11,8 +11,8 @@ async function NotFoundPage() {
 	const dictionaries = await getDictionaries();
 
 	const [navPromise, footerPromise] = await Promise.allSettled([
-		mainNavData.getData({language: defaultLocale}),
-		footerData.getData({language: defaultLocale}),
+		mainNavData.getData({ language: defaultLocale }),
+		footerData.getData({ language: defaultLocale }),
 	]);
 
 	const mainNavProps =
@@ -25,6 +25,7 @@ async function NotFoundPage() {
 			mainNavProps={mainNavProps}
 			footerProps={footerProps}
 			dictionaries={dictionaries}
+			defaultLocale={defaultLocale}
 		/>
 	);
 }
