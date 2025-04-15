@@ -160,7 +160,7 @@ export const Form: FC<FormProps> & BlockConfigs = ({
 		// success!
 		setSuccessMessage(json?.data?.message);
 		return;
-	}, [getValues, setError, token, id, uniqueId]);
+	}, [getValues, setError, token, id, uniqueId, dictionary]);
 
 	// Triggered once the form is submitted
 	const onSubmit: SubmitHandler<FieldValues> = useCallback(
@@ -179,7 +179,7 @@ export const Form: FC<FormProps> & BlockConfigs = ({
 				});
 			}
 		},
-		[setError, submitForm]
+		[setError, submitForm, dictionary]
 	);
 
 	// Reset form
