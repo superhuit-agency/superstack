@@ -78,10 +78,10 @@ module.exports = async function (plop) {
 			if (data.migrationType === 'toMultilang') {
 				// Create the [lang] folder if it doesn't exist
 				actions.push(function (data) {
-					if (!fs.existsSync(relativeLangFolder)) {
-						fs.mkdirSync(relativeLangFolder, { recursive: true });
+					if (!fs.existsSync(rootLangFolder)) {
+						fs.mkdirSync(rootLangFolder, { recursive: true });
 					}
-					return `Created ${relativeLangFolder} directory`;
+					return `Created ${rootLangFolder} directory`;
 				});
 
 				// Add the layout file to the [lang] folder using the template
@@ -256,7 +256,7 @@ module.exports = async function (plop) {
 
 				// Remove the [lang] folder
 				actions.push(function (data) {
-					if (fs.existsSync(relativeLangFolder)) {
+					if (fs.existsSync(rootLangFolder)) {
 						try {
 							// This is a simplified removal and may not handle all edge cases
 							// For a production script, use a more robust directory removal approach
