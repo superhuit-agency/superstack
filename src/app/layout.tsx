@@ -1,11 +1,15 @@
 import { Metadata, Viewport } from 'next';
 import { Inter, Roboto_Mono } from 'next/font/google';
 
-import { Gdpr } from '@/components/molecules/Gdpr';
-import { Footer, MainNav } from '@/components/organisms';
+import { getLocales } from '@/i18n/get-locales';
+import { getDictionary } from '@/i18n/dictionaries';
+
+import { LocaleProvider } from '@/contexts/locale-context';
+
 import * as footerData from '@/components/organisms/Footer/data';
 import * as mainNavData from '@/components/organisms/MainNav/data';
-import { getWpUriFromNextPath } from '@/lib';
+import { Footer, MainNav } from '@/components/organisms';
+import { Gdpr } from '@/components/molecules/Gdpr';
 
 import '@/css/base/index.css';
 
@@ -37,21 +41,15 @@ export const metadata: Metadata = {
 };
 
 export default async function Layout({
-	params,
 	children,
 }: {
 	children: React.ReactNode;
-	params: { uri: string[] };
 }) {
-	const uri = getWpUriFromNextPath(
-		params.uri ?? []
-		// params.lang,
-		// defaultLocale
-	);
+	const { defaultLocale } = await getLocales();
 
 	const [navPromise, footerPromise] = await Promise.allSettled([
-		mainNavData.getData(uri),
-		footerData.getData(uri),
+		mainNavData.getData({language: defaultLocale}),
+		footerData.getData({language: defaultLocale}),
 	]);
 
 	const mainNavProps =
@@ -59,21 +57,24 @@ export default async function Layout({
 	const footerProps =
 		footerPromise.status === 'fulfilled' ? footerPromise.value : null;
 
-	const languageCode = 'FR'; // TODO: get from next i18n
+	const dictionary = await getDictionary(defaultLocale);
 
 	return (
 		<html
-			lang={languageCode}
+			lang={defaultLocale} // Will change on locale change in LocaleProvider
 			className={`${inter.variable} ${roboto_mono.variable}`}
 		>
 			<body>
 				<div className="app">
-					<div className="main">
-						{mainNavProps && <MainNav {...mainNavProps} />}
-						<div>{children}</div>
-						{footerProps && <Footer {...footerProps} />}
+					<LocaleProvider
+						locale={defaultLocale}
+						dictionary={dictionary}
+					>
+						{mainNavProps ? <MainNav {...mainNavProps} /> : null}
+						<div className="main">{children}</div>
+						{footerProps ? <Footer {...footerProps} /> : null}
 						<Gdpr />
-					</div>
+					</LocaleProvider>
 				</div>
 			</body>
 		</html>

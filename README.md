@@ -23,7 +23,7 @@ An opinionated boilerplate for decoupled (headless) websites that are both perfo
 -   Styling with CSS (PostCSS) [why?](./docs/technical-choices.md)
 -   Dynamic styleguide with Storybook
 -   Dockerized
--   ~~Multilang~~ (coming soon)
+-   Multilang support
 
 **Supported WordPress plugins**
 
@@ -97,7 +97,7 @@ Open [http://localhost:4000](http://localhost:4000) with your browser to access 
 -   [Helpers](./docs/features/helpers.md)
 -   [Blocks Whitelisting](./docs/features/blocks-whitelisting.md)
 -   [Forms](./docs/features/forms.md)
--   Multilang (TODO)
+-   [Multilang](./docs/features/multilang.md)
 
 ## 📚 Resources
 

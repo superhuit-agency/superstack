@@ -1,1169 +1,1187 @@
 {
-    "_readme": [
-        "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
-        "This file is @generated automatically"
-    ],
-    "content-hash": "550ed9da3daa2e14a2901c84a5c7a4bb",
-    "packages": [
-        {
-            "name": "ashhitch/wp-graphql-yoast-seo",
-            "version": "v4.22.5",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/ashhitch/wp-graphql-yoast-seo.git",
-                "reference": "56600b12d3c2a0b73cb3b73020e23d4d9d5ad858"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/ashhitch/wp-graphql-yoast-seo/zipball/56600b12d3c2a0b73cb3b73020e23d4d9d5ad858",
-                "reference": "56600b12d3c2a0b73cb3b73020e23d4d9d5ad858",
-                "shasum": ""
-            },
-            "require": {
-                "phpcompatibility/phpcompatibility-wp": "^2.1"
-            },
-            "require-dev": {
-                "automattic/vipwpcs": "^2.2",
-                "dealerdirect/phpcodesniffer-composer-installer": "^0.7.0",
-                "squizlabs/php_codesniffer": "^3.5"
-            },
-            "suggest": {
-                "wp-graphql/wp-graphql": "Required to return data via GraphQl",
-                "yoast/wordpress-seo": "Required to provide SEO data to this plugin"
-            },
-            "type": "wordpress-plugin",
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "GPL-3.0-or-later"
-            ],
-            "authors": [
-                {
-                    "name": "Ash Hitchcock",
-                    "email": "hello@ashleyhitchcock.co.uk"
-                }
-            ],
-            "description": "Query Yoast SEO data with wp-graphql",
-            "support": {
-                "issues": "https://github.com/ashhitch/wp-graphql-yoast-seo/issues",
-                "source": "https://github.com/ashhitch/wp-graphql-yoast-seo/tree/v4.22.5"
-            },
-            "funding": [
-                {
-                    "url": "https://www.buymeacoffee.com/hafowuvo",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/ashhitch",
-                    "type": "github"
-                }
-            ],
-            "time": "2023-06-30T20:18:04+00:00"
-        },
-        {
-            "name": "composer/installers",
-            "version": "v2.2.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/composer/installers.git",
-                "reference": "c29dc4b93137acb82734f672c37e029dfbd95b35"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/composer/installers/zipball/c29dc4b93137acb82734f672c37e029dfbd95b35",
-                "reference": "c29dc4b93137acb82734f672c37e029dfbd95b35",
-                "shasum": ""
-            },
-            "require": {
-                "composer-plugin-api": "^1.0 || ^2.0",
-                "php": "^7.2 || ^8.0"
-            },
-            "require-dev": {
-                "composer/composer": "1.6.* || ^2.0",
-                "composer/semver": "^1 || ^3",
-                "phpstan/phpstan": "^0.12.55",
-                "phpstan/phpstan-phpunit": "^0.12.16",
-                "symfony/phpunit-bridge": "^5.3",
-                "symfony/process": "^5"
-            },
-            "type": "composer-plugin",
-            "extra": {
-                "class": "Composer\\Installers\\Plugin",
-                "branch-alias": {
-                    "dev-main": "2.x-dev"
-                },
-                "plugin-modifies-install-path": true
-            },
-            "autoload": {
-                "psr-4": {
-                    "Composer\\Installers\\": "src/Composer/Installers"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Kyle Robinson Young",
-                    "email": "kyle@dontkry.com",
-                    "homepage": "https://github.com/shama"
-                }
-            ],
-            "description": "A multi-framework Composer library installer",
-            "homepage": "https://composer.github.io/installers/",
-            "keywords": [
-                "Dolibarr",
-                "Eliasis",
-                "Hurad",
-                "ImageCMS",
-                "Kanboard",
-                "Lan Management System",
-                "MODX Evo",
-                "MantisBT",
-                "Mautic",
-                "Maya",
-                "OXID",
-                "Plentymarkets",
-                "Porto",
-                "RadPHP",
-                "SMF",
-                "Starbug",
-                "Thelia",
-                "Whmcs",
-                "WolfCMS",
-                "agl",
-                "annotatecms",
-                "attogram",
-                "bitrix",
-                "cakephp",
-                "chef",
-                "cockpit",
-                "codeigniter",
-                "concrete5",
-                "croogo",
-                "dokuwiki",
-                "drupal",
-                "eZ Platform",
-                "elgg",
-                "expressionengine",
-                "fuelphp",
-                "grav",
-                "installer",
-                "itop",
-                "known",
-                "kohana",
-                "laravel",
-                "lavalite",
-                "lithium",
-                "magento",
-                "majima",
-                "mako",
-                "matomo",
-                "mediawiki",
-                "miaoxing",
-                "modulework",
-                "modx",
-                "moodle",
-                "osclass",
-                "pantheon",
-                "phpbb",
-                "piwik",
-                "ppi",
-                "processwire",
-                "puppet",
-                "pxcms",
-                "reindex",
-                "roundcube",
-                "shopware",
-                "silverstripe",
-                "sydes",
-                "sylius",
-                "tastyigniter",
-                "wordpress",
-                "yawik",
-                "zend",
-                "zikula"
-            ],
-            "support": {
-                "issues": "https://github.com/composer/installers/issues",
-                "source": "https://github.com/composer/installers/tree/v2.2.0"
-            },
-            "funding": [
-                {
-                    "url": "https://packagist.com",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/composer",
-                    "type": "github"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/composer/composer",
-                    "type": "tidelift"
-                }
-            ],
-            "time": "2022-08-20T06:45:11+00:00"
-        },
-        {
-            "name": "firebase/php-jwt",
-            "version": "v6.10.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/firebase/php-jwt.git",
-                "reference": "a49db6f0a5033aef5143295342f1c95521b075ff"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/firebase/php-jwt/zipball/a49db6f0a5033aef5143295342f1c95521b075ff",
-                "reference": "a49db6f0a5033aef5143295342f1c95521b075ff",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^7.4||^8.0"
-            },
-            "require-dev": {
-                "guzzlehttp/guzzle": "^6.5||^7.4",
-                "phpspec/prophecy-phpunit": "^2.0",
-                "phpunit/phpunit": "^9.5",
-                "psr/cache": "^1.0||^2.0",
-                "psr/http-client": "^1.0",
-                "psr/http-factory": "^1.0"
-            },
-            "suggest": {
-                "ext-sodium": "Support EdDSA (Ed25519) signatures",
-                "paragonie/sodium_compat": "Support EdDSA (Ed25519) signatures when libsodium is not present"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Firebase\\JWT\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "authors": [
-                {
-                    "name": "Neuman Vong",
-                    "email": "neuman+pear@twilio.com",
-                    "role": "Developer"
-                },
-                {
-                    "name": "Anant Narayanan",
-                    "email": "anant@php.net",
-                    "role": "Developer"
-                }
-            ],
-            "description": "A simple library to encode and decode JSON Web Tokens (JWT) in PHP. Should conform to the current spec.",
-            "homepage": "https://github.com/firebase/php-jwt",
-            "keywords": [
-                "jwt",
-                "php"
-            ],
-            "support": {
-                "issues": "https://github.com/firebase/php-jwt/issues",
-                "source": "https://github.com/firebase/php-jwt/tree/v6.10.0"
-            },
-            "time": "2023-12-01T16:26:39+00:00"
-        },
-        {
-            "name": "opis/json-schema",
-            "version": "1.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/opis/json-schema.git",
-                "reference": "39d8072be8657a329a284339994401066406c43b"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/opis/json-schema/zipball/39d8072be8657a329a284339994401066406c43b",
-                "reference": "39d8072be8657a329a284339994401066406c43b",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=7.0"
-            },
-            "require-dev": {
-                "ext-bcmath": "*",
-                "ext-intl": "*",
-                "ext-json": "*",
-                "ext-mbstring": "*",
-                "opis/string": "^1.4",
-                "phpunit/phpunit": "^6.5 || ^7.0 || ^9.4"
-            },
-            "suggest": {
-                "opis/string": "A standalone library for manipulating multibyte strings"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.0.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Opis\\JsonSchema\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "Apache-2.0"
-            ],
-            "authors": [
-                {
-                    "name": "Sorin Sarca",
-                    "email": "sarca_sorin@hotmail.com"
-                },
-                {
-                    "name": "Marius Sarca",
-                    "email": "marius.sarca@gmail.com"
-                }
-            ],
-            "description": "Json Schema Validator",
-            "homepage": "http://www.opis.io/json-schema",
-            "keywords": [
-                "json",
-                "schema",
-                "validation",
-                "validator"
-            ],
-            "support": {
-                "issues": "https://github.com/opis/json-schema/issues",
-                "source": "https://github.com/opis/json-schema/tree/1.1.0"
-            },
-            "time": "2021-04-14T20:02:50+00:00"
-        },
-        {
-            "name": "phpcompatibility/php-compatibility",
-            "version": "9.3.5",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/PHPCompatibility/PHPCompatibility.git",
-                "reference": "9fb324479acf6f39452e0655d2429cc0d3914243"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/PHPCompatibility/PHPCompatibility/zipball/9fb324479acf6f39452e0655d2429cc0d3914243",
-                "reference": "9fb324479acf6f39452e0655d2429cc0d3914243",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3",
-                "squizlabs/php_codesniffer": "^2.3 || ^3.0.2"
-            },
-            "conflict": {
-                "squizlabs/php_codesniffer": "2.6.2"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "~4.5 || ^5.0 || ^6.0 || ^7.0"
-            },
-            "suggest": {
-                "dealerdirect/phpcodesniffer-composer-installer": "^0.5 || This Composer plugin will sort out the PHPCS 'installed_paths' automatically.",
-                "roave/security-advisories": "dev-master || Helps prevent installing dependencies with known security issues."
-            },
-            "type": "phpcodesniffer-standard",
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "LGPL-3.0-or-later"
-            ],
-            "authors": [
-                {
-                    "name": "Wim Godden",
-                    "homepage": "https://github.com/wimg",
-                    "role": "lead"
-                },
-                {
-                    "name": "Juliette Reinders Folmer",
-                    "homepage": "https://github.com/jrfnl",
-                    "role": "lead"
-                },
-                {
-                    "name": "Contributors",
-                    "homepage": "https://github.com/PHPCompatibility/PHPCompatibility/graphs/contributors"
-                }
-            ],
-            "description": "A set of sniffs for PHP_CodeSniffer that checks for PHP cross-version compatibility.",
-            "homepage": "http://techblog.wimgodden.be/tag/codesniffer/",
-            "keywords": [
-                "compatibility",
-                "phpcs",
-                "standards"
-            ],
-            "support": {
-                "issues": "https://github.com/PHPCompatibility/PHPCompatibility/issues",
-                "source": "https://github.com/PHPCompatibility/PHPCompatibility"
-            },
-            "time": "2019-12-27T09:44:58+00:00"
-        },
-        {
-            "name": "phpcompatibility/phpcompatibility-paragonie",
-            "version": "1.3.3",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/PHPCompatibility/PHPCompatibilityParagonie.git",
-                "reference": "293975b465e0e709b571cbf0c957c6c0a7b9a2ac"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/PHPCompatibility/PHPCompatibilityParagonie/zipball/293975b465e0e709b571cbf0c957c6c0a7b9a2ac",
-                "reference": "293975b465e0e709b571cbf0c957c6c0a7b9a2ac",
-                "shasum": ""
-            },
-            "require": {
-                "phpcompatibility/php-compatibility": "^9.0"
-            },
-            "require-dev": {
-                "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
-                "paragonie/random_compat": "dev-master",
-                "paragonie/sodium_compat": "dev-master"
-            },
-            "suggest": {
-                "dealerdirect/phpcodesniffer-composer-installer": "^1.0 || This Composer plugin will sort out the PHP_CodeSniffer 'installed_paths' automatically.",
-                "roave/security-advisories": "dev-master || Helps prevent installing dependencies with known security issues."
-            },
-            "type": "phpcodesniffer-standard",
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "LGPL-3.0-or-later"
-            ],
-            "authors": [
-                {
-                    "name": "Wim Godden",
-                    "role": "lead"
-                },
-                {
-                    "name": "Juliette Reinders Folmer",
-                    "role": "lead"
-                }
-            ],
-            "description": "A set of rulesets for PHP_CodeSniffer to check for PHP cross-version compatibility issues in projects, while accounting for polyfills provided by the Paragonie polyfill libraries.",
-            "homepage": "http://phpcompatibility.com/",
-            "keywords": [
-                "compatibility",
-                "paragonie",
-                "phpcs",
-                "polyfill",
-                "standards",
-                "static analysis"
-            ],
-            "support": {
-                "issues": "https://github.com/PHPCompatibility/PHPCompatibilityParagonie/issues",
-                "security": "https://github.com/PHPCompatibility/PHPCompatibilityParagonie/security/policy",
-                "source": "https://github.com/PHPCompatibility/PHPCompatibilityParagonie"
-            },
-            "funding": [
-                {
-                    "url": "https://github.com/PHPCompatibility",
-                    "type": "github"
-                },
-                {
-                    "url": "https://github.com/jrfnl",
-                    "type": "github"
-                },
-                {
-                    "url": "https://opencollective.com/php_codesniffer",
-                    "type": "open_collective"
-                }
-            ],
-            "time": "2024-04-24T21:30:46+00:00"
-        },
-        {
-            "name": "phpcompatibility/phpcompatibility-wp",
-            "version": "2.1.5",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/PHPCompatibility/PHPCompatibilityWP.git",
-                "reference": "01c1ff2704a58e46f0cb1ca9d06aee07b3589082"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/PHPCompatibility/PHPCompatibilityWP/zipball/01c1ff2704a58e46f0cb1ca9d06aee07b3589082",
-                "reference": "01c1ff2704a58e46f0cb1ca9d06aee07b3589082",
-                "shasum": ""
-            },
-            "require": {
-                "phpcompatibility/php-compatibility": "^9.0",
-                "phpcompatibility/phpcompatibility-paragonie": "^1.0"
-            },
-            "require-dev": {
-                "dealerdirect/phpcodesniffer-composer-installer": "^1.0"
-            },
-            "suggest": {
-                "dealerdirect/phpcodesniffer-composer-installer": "^1.0 || This Composer plugin will sort out the PHP_CodeSniffer 'installed_paths' automatically.",
-                "roave/security-advisories": "dev-master || Helps prevent installing dependencies with known security issues."
-            },
-            "type": "phpcodesniffer-standard",
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "LGPL-3.0-or-later"
-            ],
-            "authors": [
-                {
-                    "name": "Wim Godden",
-                    "role": "lead"
-                },
-                {
-                    "name": "Juliette Reinders Folmer",
-                    "role": "lead"
-                }
-            ],
-            "description": "A ruleset for PHP_CodeSniffer to check for PHP cross-version compatibility issues in projects, while accounting for polyfills provided by WordPress.",
-            "homepage": "http://phpcompatibility.com/",
-            "keywords": [
-                "compatibility",
-                "phpcs",
-                "standards",
-                "static analysis",
-                "wordpress"
-            ],
-            "support": {
-                "issues": "https://github.com/PHPCompatibility/PHPCompatibilityWP/issues",
-                "security": "https://github.com/PHPCompatibility/PHPCompatibilityWP/security/policy",
-                "source": "https://github.com/PHPCompatibility/PHPCompatibilityWP"
-            },
-            "funding": [
-                {
-                    "url": "https://github.com/PHPCompatibility",
-                    "type": "github"
-                },
-                {
-                    "url": "https://github.com/jrfnl",
-                    "type": "github"
-                },
-                {
-                    "url": "https://opencollective.com/php_codesniffer",
-                    "type": "open_collective"
-                }
-            ],
-            "time": "2024-04-24T21:37:59+00:00"
-        },
-        {
-            "name": "pristas-peter/wp-graphql-gutenberg",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/superhuit-agency/wp-graphql-gutenberg.git",
-                "reference": "26311bece84745d8a3a7835a72f01bbaa776abcb"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/superhuit-agency/wp-graphql-gutenberg/zipball/26311bece84745d8a3a7835a72f01bbaa776abcb",
-                "reference": "26311bece84745d8a3a7835a72f01bbaa776abcb",
-                "shasum": ""
-            },
-            "require": {
-                "opis/json-schema": "^1.0",
-                "voku/simple_html_dom": "~4.7.17"
-            },
-            "require-dev": {
-                "automattic/vipwpcs": "^2.2",
-                "phpcompatibility/phpcompatibility-wp": "^2.1"
-            },
-            "type": "wordpress-plugin",
-            "autoload": {
-                "psr-4": {
-                    "WPGraphqlGutenberg\\": "src/"
-                },
-                "classmap": [
-                    "src/"
-                ]
-            },
-            "scripts": {
-                "phpcs-i": [
-                    "@php ./vendor/bin/phpcs -i"
-                ],
-                "check-cs": [
-                    "@php ./vendor/bin/phpcs"
-                ],
-                "fix-cs": [
-                    "@php ./vendor/bin/phpcbf"
-                ]
-            },
-            "description": "Query gutenberg blocks with wp-graphql",
-            "support": {
-                "source": "https://github.com/superhuit-agency/wp-graphql-gutenberg/tree/master"
-            },
-            "time": "2024-07-19T09:45:32+00:00"
-        },
-        {
-            "name": "squizlabs/php_codesniffer",
-            "version": "3.9.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/PHPCSStandards/PHP_CodeSniffer.git",
-                "reference": "aac1f6f347a5c5ac6bc98ad395007df00990f480"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/PHPCSStandards/PHP_CodeSniffer/zipball/aac1f6f347a5c5ac6bc98ad395007df00990f480",
-                "reference": "aac1f6f347a5c5ac6bc98ad395007df00990f480",
-                "shasum": ""
-            },
-            "require": {
-                "ext-simplexml": "*",
-                "ext-tokenizer": "*",
-                "ext-xmlwriter": "*",
-                "php": ">=5.4.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^4.0 || ^5.0 || ^6.0 || ^7.0 || ^8.0 || ^9.3.4"
-            },
-            "bin": [
-                "bin/phpcbf",
-                "bin/phpcs"
-            ],
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "3.x-dev"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "authors": [
-                {
-                    "name": "Greg Sherwood",
-                    "role": "Former lead"
-                },
-                {
-                    "name": "Juliette Reinders Folmer",
-                    "role": "Current lead"
-                },
-                {
-                    "name": "Contributors",
-                    "homepage": "https://github.com/PHPCSStandards/PHP_CodeSniffer/graphs/contributors"
-                }
-            ],
-            "description": "PHP_CodeSniffer tokenizes PHP, JavaScript and CSS files and detects violations of a defined set of coding standards.",
-            "homepage": "https://github.com/PHPCSStandards/PHP_CodeSniffer",
-            "keywords": [
-                "phpcs",
-                "standards",
-                "static analysis"
-            ],
-            "support": {
-                "issues": "https://github.com/PHPCSStandards/PHP_CodeSniffer/issues",
-                "security": "https://github.com/PHPCSStandards/PHP_CodeSniffer/security/policy",
-                "source": "https://github.com/PHPCSStandards/PHP_CodeSniffer",
-                "wiki": "https://github.com/PHPCSStandards/PHP_CodeSniffer/wiki"
-            },
-            "funding": [
-                {
-                    "url": "https://github.com/PHPCSStandards",
-                    "type": "github"
-                },
-                {
-                    "url": "https://github.com/jrfnl",
-                    "type": "github"
-                },
-                {
-                    "url": "https://opencollective.com/php_codesniffer",
-                    "type": "open_collective"
-                }
-            ],
-            "time": "2024-04-23T20:25:34+00:00"
-        },
-        {
-            "name": "superhuit-agency/nextjs-revalidate",
-            "version": "1.6.4",
-            "dist": {
-                "type": "zip",
-                "url": "https://github.com/superhuit-agency/nextjs-revalidate/releases/download/v1.6.4/nextjs-revalidate-v1.6.4.zip"
-            },
-            "type": "wordpress-plugin"
-        },
-        {
-            "name": "superhuit-agency/starterpack-forms",
-            "version": "1.1.1",
-            "dist": {
-                "type": "zip",
-                "url": "https://github.com/superhuit-agency/starterpack-forms/releases/download/v1.1.1/starterpack-forms-v1.1.1.zip"
-            },
-            "type": "wordpress-plugin"
-        },
-        {
-            "name": "superhuit/wp-graphql-redirection",
-            "version": "v1.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/superhuit-agency/wp-graphql-redirection.git",
-                "reference": "f74c46b839ab66819fcffbf57e4502b97405117e"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/superhuit-agency/wp-graphql-redirection/zipball/f74c46b839ab66819fcffbf57e4502b97405117e",
-                "reference": "f74c46b839ab66819fcffbf57e4502b97405117e",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^7.4 || ^8.0"
-            },
-            "require-dev": {
-                "wp-graphql/wp-graphql": "^1.8",
-                "wpackagist-plugin/redirection": "^5.3"
-            },
-            "type": "wordpress-plugin",
-            "autoload": {
-                "psr-4": {
-                    "WPGraphQLRedirection\\": "include/"
-                },
-                "classmap": [
-                    "include/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "GPL-3.0-or-later"
-            ],
-            "authors": [
-                {
-                    "name": "superhuit",
-                    "email": "tech@superhuit.ch",
-                    "homepage": "https://superhuit.ch",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Exposes Redirection WP plugin in the WP-GraphQL schema",
-            "homepage": "https://github.com/superhuit-agency/wp-graphql-redirection",
-            "keywords": [
-                "graphql",
-                "redirection",
-                "wordpress"
-            ],
-            "support": {
-                "issues": "https://github.com/superhuit-agency/wp-graphql-redirection/issues",
-                "source": "https://github.com/superhuit-agency/wp-graphql-redirection/tree/v1.1.0"
-            },
-            "time": "2023-06-05T14:09:23+00:00"
-        },
-        {
-            "name": "symfony/css-selector",
-            "version": "v6.4.8",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/css-selector.git",
-                "reference": "4b61b02fe15db48e3687ce1c45ea385d1780fe08"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/css-selector/zipball/4b61b02fe15db48e3687ce1c45ea385d1780fe08",
-                "reference": "4b61b02fe15db48e3687ce1c45ea385d1780fe08",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=8.1"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Symfony\\Component\\CssSelector\\": ""
-                },
-                "exclude-from-classmap": [
-                    "/Tests/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
-                },
-                {
-                    "name": "Jean-François Simon",
-                    "email": "jeanfrancois.simon@sensiolabs.com"
-                },
-                {
-                    "name": "Symfony Community",
-                    "homepage": "https://symfony.com/contributors"
-                }
-            ],
-            "description": "Converts CSS selectors to XPath expressions",
-            "homepage": "https://symfony.com",
-            "support": {
-                "source": "https://github.com/symfony/css-selector/tree/v6.4.8"
-            },
-            "funding": [
-                {
-                    "url": "https://symfony.com/sponsor",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/fabpot",
-                    "type": "github"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
-                    "type": "tidelift"
-                }
-            ],
-            "time": "2024-05-31T14:49:08+00:00"
-        },
-        {
-            "name": "valu/wp-graphql-offset-pagination",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/superhuit-agency/wp-graphql-offset-pagination.git",
-                "reference": "c098996d5462f9011f0adad1236f237a8481bc18"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/superhuit-agency/wp-graphql-offset-pagination/zipball/c098996d5462f9011f0adad1236f237a8481bc18",
-                "reference": "c098996d5462f9011f0adad1236f237a8481bc18",
-                "shasum": ""
-            },
-            "require-dev": {
-                "codeception/module-asserts": "^1.0",
-                "codeception/module-cli": "^1.0",
-                "codeception/module-db": "^1.0",
-                "codeception/module-filesystem": "^1.0",
-                "codeception/module-phpbrowser": "^1.0",
-                "codeception/module-rest": "^1.0",
-                "codeception/module-webdriver": "^1.0",
-                "codeception/util-universalframework": "^1.0",
-                "lucatume/wp-browser": "^2.2",
-                "phpunit/phpunit": "^8.0",
-                "valu/wp-testing-tools": "^0.4.0"
-            },
-            "default-branch": true,
-            "type": "wordpress-plugin",
-            "autoload": {
-                "psr-4": {
-                    "WPGraphQL\\Extensions\\OffsetPagination\\": "src/"
-                }
-            },
-            "scripts": {
-                "wp-install": [
-                    "wp-install --full --env-file .env --wp-composer-file composer.wp-install.json"
-                ],
-                "wpunit": [
-                    "codecept run wpunit"
-                ],
-                "functional": [
-                    "codecept run functional"
-                ],
-                "test": [
-                    "@wpunit",
-                    "@functional"
-                ]
-            },
-            "license": [
-                "GPL-2.0-or-later"
-            ],
-            "authors": [
-                {
-                    "name": "Esa-Matti Suuronen",
-                    "email": "esa-matti.suuronen@valu.fi",
-                    "role": "developer"
-                }
-            ],
-            "description": "Add offset pagination to wp-graphql",
-            "support": {
-                "issues": "https://github.com/valu-digital/wp-graphql-offset-pagination/issues",
-                "source": "https://github.com/valu-digital/wp-graphql-offset-pagination"
-            },
-            "time": "2024-03-21T13:02:51+00:00"
-        },
-        {
-            "name": "voku/simple_html_dom",
-            "version": "4.7.31",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/voku/simple_html_dom.git",
-                "reference": "2bc2f89d9124bd2fd4817c73facf29a8b5be3c97"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/voku/simple_html_dom/zipball/2bc2f89d9124bd2fd4817c73facf29a8b5be3c97",
-                "reference": "2bc2f89d9124bd2fd4817c73facf29a8b5be3c97",
-                "shasum": ""
-            },
-            "require": {
-                "ext-dom": "*",
-                "ext-libxml": "*",
-                "ext-simplexml": "*",
-                "php": ">=7.0.0",
-                "symfony/css-selector": "~3.0 || ~4.0 || ~5.0 || ~6.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "~6.0 || ~7.0 || ~9.0"
-            },
-            "suggest": {
-                "voku/portable-utf8": "If you need e.g. UTF-8 fixed output."
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "voku\\helper\\": "src/voku/helper/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "dimabdc",
-                    "email": "support@titor.ru",
-                    "homepage": "http://github.com/dimabdc",
-                    "role": "Developer"
-                },
-                {
-                    "name": "Lars Moelleken",
-                    "homepage": "http://www.moelleken.org/",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Simple HTML DOM package.",
-            "homepage": "http://simplehtmldom.sourceforge.net/",
-            "keywords": [
-                "HTML Parser",
-                "dom",
-                "php dom"
-            ],
-            "support": {
-                "issues": "https://github.com/voku/simple_html_dom/issues",
-                "source": "https://github.com/voku/simple_html_dom/tree/4.7.31"
-            },
-            "funding": [
-                {
-                    "url": "https://www.paypal.me/moelleken",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/voku",
-                    "type": "github"
-                },
-                {
-                    "url": "https://www.patreon.com/voku",
-                    "type": "patreon"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/voku/simple_html_dom",
-                    "type": "tidelift"
-                }
-            ],
-            "time": "2021-12-15T10:38:11+00:00"
-        },
-        {
-            "name": "wp-graphql/wp-graphql-jwt-authentication",
-            "version": "v0.7.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/wp-graphql/wp-graphql-jwt-authentication.git",
-                "reference": "5de35ce97efcae2beeb9118e1ad458480ae6187b"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/wp-graphql/wp-graphql-jwt-authentication/zipball/5de35ce97efcae2beeb9118e1ad458480ae6187b",
-                "reference": "5de35ce97efcae2beeb9118e1ad458480ae6187b",
-                "shasum": ""
-            },
-            "require": {
-                "firebase/php-jwt": "^6.1.0"
-            },
-            "require-dev": {
-                "codeception/module-asserts": "^1.0",
-                "codeception/module-cli": "^1.0",
-                "codeception/module-db": "^1.0",
-                "codeception/module-filesystem": "^1.0",
-                "codeception/module-phpbrowser": "^1.0",
-                "codeception/module-rest": "^1.2",
-                "codeception/module-webdriver": "^1.0",
-                "codeception/util-universalframework": "^1.0",
-                "lucatume/wp-browser": "3.1.0",
-                "phpunit/phpunit": "^8.5"
-            },
-            "type": "wordpress-plugin",
-            "autoload": {
-                "psr-4": {
-                    "WPGraphQL\\JWT_Authentication\\": "src/"
-                },
-                "classmap": [
-                    "src/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "GPL-3.0+"
-            ],
-            "authors": [
-                {
-                    "name": "jasonbahl",
-                    "email": "jasonbahl@mac.com"
-                }
-            ],
-            "description": "JWT Authentication for WPGraphQL",
-            "support": {
-                "issues": "https://github.com/wp-graphql/wp-graphql-jwt-authentication/issues",
-                "source": "https://github.com/wp-graphql/wp-graphql-jwt-authentication/tree/v0.7.0"
-            },
-            "time": "2023-03-31T21:57:48+00:00"
-        },
-        {
-            "name": "wpackagist-plugin/disable-comments",
-            "version": "2.4.6",
-            "source": {
-                "type": "svn",
-                "url": "https://plugins.svn.wordpress.org/disable-comments/",
-                "reference": "tags/2.4.6"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://downloads.wordpress.org/plugin/disable-comments.2.4.6.zip"
-            },
-            "require": {
-                "composer/installers": "^1.0 || ^2.0"
-            },
-            "type": "wordpress-plugin",
-            "homepage": "https://wordpress.org/plugins/disable-comments/"
-        },
-        {
-            "name": "wpackagist-plugin/disable-emojis",
-            "version": "1.7.6",
-            "source": {
-                "type": "svn",
-                "url": "https://plugins.svn.wordpress.org/disable-emojis/",
-                "reference": "tags/1.7.6"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://downloads.wordpress.org/plugin/disable-emojis.1.7.6.zip"
-            },
-            "require": {
-                "composer/installers": "^1.0 || ^2.0"
-            },
-            "type": "wordpress-plugin",
-            "homepage": "https://wordpress.org/plugins/disable-emojis/"
-        },
-        {
-            "name": "wpackagist-plugin/duplicate-post",
-            "version": "4.5",
-            "source": {
-                "type": "svn",
-                "url": "https://plugins.svn.wordpress.org/duplicate-post/",
-                "reference": "tags/4.5"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://downloads.wordpress.org/plugin/duplicate-post.4.5.zip"
-            },
-            "require": {
-                "composer/installers": "^1.0 || ^2.0"
-            },
-            "type": "wordpress-plugin",
-            "homepage": "https://wordpress.org/plugins/duplicate-post/"
-        },
-        {
-            "name": "wpackagist-plugin/redirection",
-            "version": "5.4.2",
-            "source": {
-                "type": "svn",
-                "url": "https://plugins.svn.wordpress.org/redirection/",
-                "reference": "tags/5.4.2"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://downloads.wordpress.org/plugin/redirection.5.4.2.zip"
-            },
-            "require": {
-                "composer/installers": "^1.0 || ^2.0"
-            },
-            "type": "wordpress-plugin",
-            "homepage": "https://wordpress.org/plugins/redirection/"
-        },
-        {
-            "name": "wpackagist-plugin/simple-custom-post-order",
-            "version": "2.5.7",
-            "source": {
-                "type": "svn",
-                "url": "https://plugins.svn.wordpress.org/simple-custom-post-order/",
-                "reference": "tags/2.5.7"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://downloads.wordpress.org/plugin/simple-custom-post-order.2.5.7.zip"
-            },
-            "require": {
-                "composer/installers": "^1.0 || ^2.0"
-            },
-            "type": "wordpress-plugin",
-            "homepage": "https://wordpress.org/plugins/simple-custom-post-order/"
-        },
-        {
-            "name": "wpackagist-plugin/svg-support",
-            "version": "2.5.5",
-            "source": {
-                "type": "svn",
-                "url": "https://plugins.svn.wordpress.org/svg-support/",
-                "reference": "tags/2.5.5"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://downloads.wordpress.org/plugin/svg-support.2.5.5.zip"
-            },
-            "require": {
-                "composer/installers": "^1.0 || ^2.0"
-            },
-            "type": "wordpress-plugin",
-            "homepage": "https://wordpress.org/plugins/svg-support/"
-        },
-        {
-            "name": "wpackagist-plugin/wordpress-seo",
-            "version": "22.5",
-            "source": {
-                "type": "svn",
-                "url": "https://plugins.svn.wordpress.org/wordpress-seo/",
-                "reference": "tags/22.5"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://downloads.wordpress.org/plugin/wordpress-seo.22.5.zip"
-            },
-            "require": {
-                "composer/installers": "^1.0 || ^2.0"
-            },
-            "type": "wordpress-plugin",
-            "homepage": "https://wordpress.org/plugins/wordpress-seo/"
-        },
-        {
-            "name": "wpackagist-plugin/wp-graphql",
-            "version": "1.24.0",
-            "source": {
-                "type": "svn",
-                "url": "https://plugins.svn.wordpress.org/wp-graphql/",
-                "reference": "tags/1.24.0"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://downloads.wordpress.org/plugin/wp-graphql.1.24.0.zip"
-            },
-            "require": {
-                "composer/installers": "^1.0 || ^2.0"
-            },
-            "type": "wordpress-plugin",
-            "homepage": "https://wordpress.org/plugins/wp-graphql/"
-        }
-    ],
-    "packages-dev": [],
-    "aliases": [],
-    "minimum-stability": "stable",
-    "stability-flags": {
-        "pristas-peter/wp-graphql-gutenberg": 20,
-        "valu/wp-graphql-offset-pagination": 20
-    },
-    "prefer-stable": false,
-    "prefer-lowest": false,
-    "platform": {
-        "php": "^8.1 || ^8.2"
-    },
-    "platform-dev": [],
-    "plugin-api-version": "2.6.0"
+	"_readme": [
+		"This file locks the dependencies of your project to a known state",
+		"Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+		"This file is @generated automatically"
+	],
+	"content-hash": "0f267c712695d2d4de31ef7186f05228",
+	"packages": [
+		{
+			"name": "ashhitch/wp-graphql-yoast-seo",
+			"version": "v4.22.5",
+			"source": {
+				"type": "git",
+				"url": "https://github.com/ashhitch/wp-graphql-yoast-seo.git",
+				"reference": "56600b12d3c2a0b73cb3b73020e23d4d9d5ad858"
+			},
+			"dist": {
+				"type": "zip",
+				"url": "https://api.github.com/repos/ashhitch/wp-graphql-yoast-seo/zipball/56600b12d3c2a0b73cb3b73020e23d4d9d5ad858",
+				"reference": "56600b12d3c2a0b73cb3b73020e23d4d9d5ad858",
+				"shasum": ""
+			},
+			"require": {
+				"phpcompatibility/phpcompatibility-wp": "^2.1"
+			},
+			"require-dev": {
+				"automattic/vipwpcs": "^2.2",
+				"dealerdirect/phpcodesniffer-composer-installer": "^0.7.0",
+				"squizlabs/php_codesniffer": "^3.5"
+			},
+			"suggest": {
+				"wp-graphql/wp-graphql": "Required to return data via GraphQl",
+				"yoast/wordpress-seo": "Required to provide SEO data to this plugin"
+			},
+			"type": "wordpress-plugin",
+			"notification-url": "https://packagist.org/downloads/",
+			"license": [
+				"GPL-3.0-or-later"
+			],
+			"authors": [
+				{
+					"name": "Ash Hitchcock",
+					"email": "hello@ashleyhitchcock.co.uk"
+				}
+			],
+			"description": "Query Yoast SEO data with wp-graphql",
+			"support": {
+				"issues": "https://github.com/ashhitch/wp-graphql-yoast-seo/issues",
+				"source": "https://github.com/ashhitch/wp-graphql-yoast-seo/tree/v4.22.5"
+			},
+			"funding": [
+				{
+					"url": "https://www.buymeacoffee.com/hafowuvo",
+					"type": "custom"
+				},
+				{
+					"url": "https://github.com/ashhitch",
+					"type": "github"
+				}
+			],
+			"time": "2023-06-30T20:18:04+00:00"
+		},
+		{
+			"name": "composer/installers",
+			"version": "v2.2.0",
+			"source": {
+				"type": "git",
+				"url": "https://github.com/composer/installers.git",
+				"reference": "c29dc4b93137acb82734f672c37e029dfbd95b35"
+			},
+			"dist": {
+				"type": "zip",
+				"url": "https://api.github.com/repos/composer/installers/zipball/c29dc4b93137acb82734f672c37e029dfbd95b35",
+				"reference": "c29dc4b93137acb82734f672c37e029dfbd95b35",
+				"shasum": ""
+			},
+			"require": {
+				"composer-plugin-api": "^1.0 || ^2.0",
+				"php": "^7.2 || ^8.0"
+			},
+			"require-dev": {
+				"composer/composer": "1.6.* || ^2.0",
+				"composer/semver": "^1 || ^3",
+				"phpstan/phpstan": "^0.12.55",
+				"phpstan/phpstan-phpunit": "^0.12.16",
+				"symfony/phpunit-bridge": "^5.3",
+				"symfony/process": "^5"
+			},
+			"type": "composer-plugin",
+			"extra": {
+				"class": "Composer\\Installers\\Plugin",
+				"branch-alias": {
+					"dev-main": "2.x-dev"
+				},
+				"plugin-modifies-install-path": true
+			},
+			"autoload": {
+				"psr-4": {
+					"Composer\\Installers\\": "src/Composer/Installers"
+				}
+			},
+			"notification-url": "https://packagist.org/downloads/",
+			"license": [
+				"MIT"
+			],
+			"authors": [
+				{
+					"name": "Kyle Robinson Young",
+					"email": "kyle@dontkry.com",
+					"homepage": "https://github.com/shama"
+				}
+			],
+			"description": "A multi-framework Composer library installer",
+			"homepage": "https://composer.github.io/installers/",
+			"keywords": [
+				"Dolibarr",
+				"Eliasis",
+				"Hurad",
+				"ImageCMS",
+				"Kanboard",
+				"Lan Management System",
+				"MODX Evo",
+				"MantisBT",
+				"Mautic",
+				"Maya",
+				"OXID",
+				"Plentymarkets",
+				"Porto",
+				"RadPHP",
+				"SMF",
+				"Starbug",
+				"Thelia",
+				"Whmcs",
+				"WolfCMS",
+				"agl",
+				"annotatecms",
+				"attogram",
+				"bitrix",
+				"cakephp",
+				"chef",
+				"cockpit",
+				"codeigniter",
+				"concrete5",
+				"croogo",
+				"dokuwiki",
+				"drupal",
+				"eZ Platform",
+				"elgg",
+				"expressionengine",
+				"fuelphp",
+				"grav",
+				"installer",
+				"itop",
+				"known",
+				"kohana",
+				"laravel",
+				"lavalite",
+				"lithium",
+				"magento",
+				"majima",
+				"mako",
+				"matomo",
+				"mediawiki",
+				"miaoxing",
+				"modulework",
+				"modx",
+				"moodle",
+				"osclass",
+				"pantheon",
+				"phpbb",
+				"piwik",
+				"ppi",
+				"processwire",
+				"puppet",
+				"pxcms",
+				"reindex",
+				"roundcube",
+				"shopware",
+				"silverstripe",
+				"sydes",
+				"sylius",
+				"tastyigniter",
+				"wordpress",
+				"yawik",
+				"zend",
+				"zikula"
+			],
+			"support": {
+				"issues": "https://github.com/composer/installers/issues",
+				"source": "https://github.com/composer/installers/tree/v2.2.0"
+			},
+			"funding": [
+				{
+					"url": "https://packagist.com",
+					"type": "custom"
+				},
+				{
+					"url": "https://github.com/composer",
+					"type": "github"
+				},
+				{
+					"url": "https://tidelift.com/funding/github/packagist/composer/composer",
+					"type": "tidelift"
+				}
+			],
+			"time": "2022-08-20T06:45:11+00:00"
+		},
+		{
+			"name": "firebase/php-jwt",
+			"version": "v6.10.0",
+			"source": {
+				"type": "git",
+				"url": "https://github.com/firebase/php-jwt.git",
+				"reference": "a49db6f0a5033aef5143295342f1c95521b075ff"
+			},
+			"dist": {
+				"type": "zip",
+				"url": "https://api.github.com/repos/firebase/php-jwt/zipball/a49db6f0a5033aef5143295342f1c95521b075ff",
+				"reference": "a49db6f0a5033aef5143295342f1c95521b075ff",
+				"shasum": ""
+			},
+			"require": {
+				"php": "^7.4||^8.0"
+			},
+			"require-dev": {
+				"guzzlehttp/guzzle": "^6.5||^7.4",
+				"phpspec/prophecy-phpunit": "^2.0",
+				"phpunit/phpunit": "^9.5",
+				"psr/cache": "^1.0||^2.0",
+				"psr/http-client": "^1.0",
+				"psr/http-factory": "^1.0"
+			},
+			"suggest": {
+				"ext-sodium": "Support EdDSA (Ed25519) signatures",
+				"paragonie/sodium_compat": "Support EdDSA (Ed25519) signatures when libsodium is not present"
+			},
+			"type": "library",
+			"autoload": {
+				"psr-4": {
+					"Firebase\\JWT\\": "src"
+				}
+			},
+			"notification-url": "https://packagist.org/downloads/",
+			"license": [
+				"BSD-3-Clause"
+			],
+			"authors": [
+				{
+					"name": "Neuman Vong",
+					"email": "neuman+pear@twilio.com",
+					"role": "Developer"
+				},
+				{
+					"name": "Anant Narayanan",
+					"email": "anant@php.net",
+					"role": "Developer"
+				}
+			],
+			"description": "A simple library to encode and decode JSON Web Tokens (JWT) in PHP. Should conform to the current spec.",
+			"homepage": "https://github.com/firebase/php-jwt",
+			"keywords": [
+				"jwt",
+				"php"
+			],
+			"support": {
+				"issues": "https://github.com/firebase/php-jwt/issues",
+				"source": "https://github.com/firebase/php-jwt/tree/v6.10.0"
+			},
+			"time": "2023-12-01T16:26:39+00:00"
+		},
+		{
+			"name": "opis/json-schema",
+			"version": "1.1.0",
+			"source": {
+				"type": "git",
+				"url": "https://github.com/opis/json-schema.git",
+				"reference": "39d8072be8657a329a284339994401066406c43b"
+			},
+			"dist": {
+				"type": "zip",
+				"url": "https://api.github.com/repos/opis/json-schema/zipball/39d8072be8657a329a284339994401066406c43b",
+				"reference": "39d8072be8657a329a284339994401066406c43b",
+				"shasum": ""
+			},
+			"require": {
+				"php": ">=7.0"
+			},
+			"require-dev": {
+				"ext-bcmath": "*",
+				"ext-intl": "*",
+				"ext-json": "*",
+				"ext-mbstring": "*",
+				"opis/string": "^1.4",
+				"phpunit/phpunit": "^6.5 || ^7.0 || ^9.4"
+			},
+			"suggest": {
+				"opis/string": "A standalone library for manipulating multibyte strings"
+			},
+			"type": "library",
+			"extra": {
+				"branch-alias": {
+					"dev-master": "1.0.x-dev"
+				}
+			},
+			"autoload": {
+				"psr-4": {
+					"Opis\\JsonSchema\\": "src/"
+				}
+			},
+			"notification-url": "https://packagist.org/downloads/",
+			"license": [
+				"Apache-2.0"
+			],
+			"authors": [
+				{
+					"name": "Sorin Sarca",
+					"email": "sarca_sorin@hotmail.com"
+				},
+				{
+					"name": "Marius Sarca",
+					"email": "marius.sarca@gmail.com"
+				}
+			],
+			"description": "Json Schema Validator",
+			"homepage": "http://www.opis.io/json-schema",
+			"keywords": [
+				"json",
+				"schema",
+				"validation",
+				"validator"
+			],
+			"support": {
+				"issues": "https://github.com/opis/json-schema/issues",
+				"source": "https://github.com/opis/json-schema/tree/1.1.0"
+			},
+			"time": "2021-04-14T20:02:50+00:00"
+		},
+		{
+			"name": "phpcompatibility/php-compatibility",
+			"version": "9.3.5",
+			"source": {
+				"type": "git",
+				"url": "https://github.com/PHPCompatibility/PHPCompatibility.git",
+				"reference": "9fb324479acf6f39452e0655d2429cc0d3914243"
+			},
+			"dist": {
+				"type": "zip",
+				"url": "https://api.github.com/repos/PHPCompatibility/PHPCompatibility/zipball/9fb324479acf6f39452e0655d2429cc0d3914243",
+				"reference": "9fb324479acf6f39452e0655d2429cc0d3914243",
+				"shasum": ""
+			},
+			"require": {
+				"php": ">=5.3",
+				"squizlabs/php_codesniffer": "^2.3 || ^3.0.2"
+			},
+			"conflict": {
+				"squizlabs/php_codesniffer": "2.6.2"
+			},
+			"require-dev": {
+				"phpunit/phpunit": "~4.5 || ^5.0 || ^6.0 || ^7.0"
+			},
+			"suggest": {
+				"dealerdirect/phpcodesniffer-composer-installer": "^0.5 || This Composer plugin will sort out the PHPCS 'installed_paths' automatically.",
+				"roave/security-advisories": "dev-master || Helps prevent installing dependencies with known security issues."
+			},
+			"type": "phpcodesniffer-standard",
+			"notification-url": "https://packagist.org/downloads/",
+			"license": [
+				"LGPL-3.0-or-later"
+			],
+			"authors": [
+				{
+					"name": "Wim Godden",
+					"homepage": "https://github.com/wimg",
+					"role": "lead"
+				},
+				{
+					"name": "Juliette Reinders Folmer",
+					"homepage": "https://github.com/jrfnl",
+					"role": "lead"
+				},
+				{
+					"name": "Contributors",
+					"homepage": "https://github.com/PHPCompatibility/PHPCompatibility/graphs/contributors"
+				}
+			],
+			"description": "A set of sniffs for PHP_CodeSniffer that checks for PHP cross-version compatibility.",
+			"homepage": "http://techblog.wimgodden.be/tag/codesniffer/",
+			"keywords": [
+				"compatibility",
+				"phpcs",
+				"standards"
+			],
+			"support": {
+				"issues": "https://github.com/PHPCompatibility/PHPCompatibility/issues",
+				"source": "https://github.com/PHPCompatibility/PHPCompatibility"
+			},
+			"time": "2019-12-27T09:44:58+00:00"
+		},
+		{
+			"name": "phpcompatibility/phpcompatibility-paragonie",
+			"version": "1.3.3",
+			"source": {
+				"type": "git",
+				"url": "https://github.com/PHPCompatibility/PHPCompatibilityParagonie.git",
+				"reference": "293975b465e0e709b571cbf0c957c6c0a7b9a2ac"
+			},
+			"dist": {
+				"type": "zip",
+				"url": "https://api.github.com/repos/PHPCompatibility/PHPCompatibilityParagonie/zipball/293975b465e0e709b571cbf0c957c6c0a7b9a2ac",
+				"reference": "293975b465e0e709b571cbf0c957c6c0a7b9a2ac",
+				"shasum": ""
+			},
+			"require": {
+				"phpcompatibility/php-compatibility": "^9.0"
+			},
+			"require-dev": {
+				"dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+				"paragonie/random_compat": "dev-master",
+				"paragonie/sodium_compat": "dev-master"
+			},
+			"suggest": {
+				"dealerdirect/phpcodesniffer-composer-installer": "^1.0 || This Composer plugin will sort out the PHP_CodeSniffer 'installed_paths' automatically.",
+				"roave/security-advisories": "dev-master || Helps prevent installing dependencies with known security issues."
+			},
+			"type": "phpcodesniffer-standard",
+			"notification-url": "https://packagist.org/downloads/",
+			"license": [
+				"LGPL-3.0-or-later"
+			],
+			"authors": [
+				{
+					"name": "Wim Godden",
+					"role": "lead"
+				},
+				{
+					"name": "Juliette Reinders Folmer",
+					"role": "lead"
+				}
+			],
+			"description": "A set of rulesets for PHP_CodeSniffer to check for PHP cross-version compatibility issues in projects, while accounting for polyfills provided by the Paragonie polyfill libraries.",
+			"homepage": "http://phpcompatibility.com/",
+			"keywords": [
+				"compatibility",
+				"paragonie",
+				"phpcs",
+				"polyfill",
+				"standards",
+				"static analysis"
+			],
+			"support": {
+				"issues": "https://github.com/PHPCompatibility/PHPCompatibilityParagonie/issues",
+				"security": "https://github.com/PHPCompatibility/PHPCompatibilityParagonie/security/policy",
+				"source": "https://github.com/PHPCompatibility/PHPCompatibilityParagonie"
+			},
+			"funding": [
+				{
+					"url": "https://github.com/PHPCompatibility",
+					"type": "github"
+				},
+				{
+					"url": "https://github.com/jrfnl",
+					"type": "github"
+				},
+				{
+					"url": "https://opencollective.com/php_codesniffer",
+					"type": "open_collective"
+				}
+			],
+			"time": "2024-04-24T21:30:46+00:00"
+		},
+		{
+			"name": "phpcompatibility/phpcompatibility-wp",
+			"version": "2.1.5",
+			"source": {
+				"type": "git",
+				"url": "https://github.com/PHPCompatibility/PHPCompatibilityWP.git",
+				"reference": "01c1ff2704a58e46f0cb1ca9d06aee07b3589082"
+			},
+			"dist": {
+				"type": "zip",
+				"url": "https://api.github.com/repos/PHPCompatibility/PHPCompatibilityWP/zipball/01c1ff2704a58e46f0cb1ca9d06aee07b3589082",
+				"reference": "01c1ff2704a58e46f0cb1ca9d06aee07b3589082",
+				"shasum": ""
+			},
+			"require": {
+				"phpcompatibility/php-compatibility": "^9.0",
+				"phpcompatibility/phpcompatibility-paragonie": "^1.0"
+			},
+			"require-dev": {
+				"dealerdirect/phpcodesniffer-composer-installer": "^1.0"
+			},
+			"suggest": {
+				"dealerdirect/phpcodesniffer-composer-installer": "^1.0 || This Composer plugin will sort out the PHP_CodeSniffer 'installed_paths' automatically.",
+				"roave/security-advisories": "dev-master || Helps prevent installing dependencies with known security issues."
+			},
+			"type": "phpcodesniffer-standard",
+			"notification-url": "https://packagist.org/downloads/",
+			"license": [
+				"LGPL-3.0-or-later"
+			],
+			"authors": [
+				{
+					"name": "Wim Godden",
+					"role": "lead"
+				},
+				{
+					"name": "Juliette Reinders Folmer",
+					"role": "lead"
+				}
+			],
+			"description": "A ruleset for PHP_CodeSniffer to check for PHP cross-version compatibility issues in projects, while accounting for polyfills provided by WordPress.",
+			"homepage": "http://phpcompatibility.com/",
+			"keywords": [
+				"compatibility",
+				"phpcs",
+				"standards",
+				"static analysis",
+				"wordpress"
+			],
+			"support": {
+				"issues": "https://github.com/PHPCompatibility/PHPCompatibilityWP/issues",
+				"security": "https://github.com/PHPCompatibility/PHPCompatibilityWP/security/policy",
+				"source": "https://github.com/PHPCompatibility/PHPCompatibilityWP"
+			},
+			"funding": [
+				{
+					"url": "https://github.com/PHPCompatibility",
+					"type": "github"
+				},
+				{
+					"url": "https://github.com/jrfnl",
+					"type": "github"
+				},
+				{
+					"url": "https://opencollective.com/php_codesniffer",
+					"type": "open_collective"
+				}
+			],
+			"time": "2024-04-24T21:37:59+00:00"
+		},
+		{
+			"name": "pristas-peter/wp-graphql-gutenberg",
+			"version": "dev-master",
+			"source": {
+				"type": "git",
+				"url": "https://github.com/superhuit-agency/wp-graphql-gutenberg.git",
+				"reference": "26311bece84745d8a3a7835a72f01bbaa776abcb"
+			},
+			"dist": {
+				"type": "zip",
+				"url": "https://api.github.com/repos/superhuit-agency/wp-graphql-gutenberg/zipball/26311bece84745d8a3a7835a72f01bbaa776abcb",
+				"reference": "26311bece84745d8a3a7835a72f01bbaa776abcb",
+				"shasum": ""
+			},
+			"require": {
+				"opis/json-schema": "^1.0",
+				"voku/simple_html_dom": "~4.7.17"
+			},
+			"require-dev": {
+				"automattic/vipwpcs": "^2.2",
+				"phpcompatibility/phpcompatibility-wp": "^2.1"
+			},
+			"type": "wordpress-plugin",
+			"autoload": {
+				"psr-4": {
+					"WPGraphqlGutenberg\\": "src/"
+				},
+				"classmap": [
+					"src/"
+				]
+			},
+			"scripts": {
+				"phpcs-i": [
+					"@php ./vendor/bin/phpcs -i"
+				],
+				"check-cs": [
+					"@php ./vendor/bin/phpcs"
+				],
+				"fix-cs": [
+					"@php ./vendor/bin/phpcbf"
+				]
+			},
+			"description": "Query gutenberg blocks with wp-graphql",
+			"support": {
+				"source": "https://github.com/superhuit-agency/wp-graphql-gutenberg/tree/master"
+			},
+			"time": "2024-07-19T09:45:32+00:00"
+		},
+		{
+			"name": "squizlabs/php_codesniffer",
+			"version": "3.9.2",
+			"source": {
+				"type": "git",
+				"url": "https://github.com/PHPCSStandards/PHP_CodeSniffer.git",
+				"reference": "aac1f6f347a5c5ac6bc98ad395007df00990f480"
+			},
+			"dist": {
+				"type": "zip",
+				"url": "https://api.github.com/repos/PHPCSStandards/PHP_CodeSniffer/zipball/aac1f6f347a5c5ac6bc98ad395007df00990f480",
+				"reference": "aac1f6f347a5c5ac6bc98ad395007df00990f480",
+				"shasum": ""
+			},
+			"require": {
+				"ext-simplexml": "*",
+				"ext-tokenizer": "*",
+				"ext-xmlwriter": "*",
+				"php": ">=5.4.0"
+			},
+			"require-dev": {
+				"phpunit/phpunit": "^4.0 || ^5.0 || ^6.0 || ^7.0 || ^8.0 || ^9.3.4"
+			},
+			"bin": [
+				"bin/phpcbf",
+				"bin/phpcs"
+			],
+			"type": "library",
+			"extra": {
+				"branch-alias": {
+					"dev-master": "3.x-dev"
+				}
+			},
+			"notification-url": "https://packagist.org/downloads/",
+			"license": [
+				"BSD-3-Clause"
+			],
+			"authors": [
+				{
+					"name": "Greg Sherwood",
+					"role": "Former lead"
+				},
+				{
+					"name": "Juliette Reinders Folmer",
+					"role": "Current lead"
+				},
+				{
+					"name": "Contributors",
+					"homepage": "https://github.com/PHPCSStandards/PHP_CodeSniffer/graphs/contributors"
+				}
+			],
+			"description": "PHP_CodeSniffer tokenizes PHP, JavaScript and CSS files and detects violations of a defined set of coding standards.",
+			"homepage": "https://github.com/PHPCSStandards/PHP_CodeSniffer",
+			"keywords": [
+				"phpcs",
+				"standards",
+				"static analysis"
+			],
+			"support": {
+				"issues": "https://github.com/PHPCSStandards/PHP_CodeSniffer/issues",
+				"security": "https://github.com/PHPCSStandards/PHP_CodeSniffer/security/policy",
+				"source": "https://github.com/PHPCSStandards/PHP_CodeSniffer",
+				"wiki": "https://github.com/PHPCSStandards/PHP_CodeSniffer/wiki"
+			},
+			"funding": [
+				{
+					"url": "https://github.com/PHPCSStandards",
+					"type": "github"
+				},
+				{
+					"url": "https://github.com/jrfnl",
+					"type": "github"
+				},
+				{
+					"url": "https://opencollective.com/php_codesniffer",
+					"type": "open_collective"
+				}
+			],
+			"time": "2024-04-23T20:25:34+00:00"
+		},
+		{
+			"name": "superhuit-agency/nextjs-revalidate",
+			"version": "1.6.4",
+			"dist": {
+				"type": "zip",
+				"url": "https://github.com/superhuit-agency/nextjs-revalidate/releases/download/v1.6.4/nextjs-revalidate-v1.6.4.zip"
+			},
+			"type": "wordpress-plugin"
+		},
+		{
+			"name": "superhuit-agency/starterpack-forms",
+			"version": "1.1.1",
+			"dist": {
+				"type": "zip",
+				"url": "https://github.com/superhuit-agency/starterpack-forms/releases/download/v1.1.1/starterpack-forms-v1.1.1.zip"
+			},
+			"type": "wordpress-plugin"
+		},
+		{
+			"name": "superhuit/wp-graphql-redirection",
+			"version": "v1.1.0",
+			"source": {
+				"type": "git",
+				"url": "https://github.com/superhuit-agency/wp-graphql-redirection.git",
+				"reference": "f74c46b839ab66819fcffbf57e4502b97405117e"
+			},
+			"dist": {
+				"type": "zip",
+				"url": "https://api.github.com/repos/superhuit-agency/wp-graphql-redirection/zipball/f74c46b839ab66819fcffbf57e4502b97405117e",
+				"reference": "f74c46b839ab66819fcffbf57e4502b97405117e",
+				"shasum": ""
+			},
+			"require": {
+				"php": "^7.4 || ^8.0"
+			},
+			"require-dev": {
+				"wp-graphql/wp-graphql": "^1.8",
+				"wpackagist-plugin/redirection": "^5.3"
+			},
+			"type": "wordpress-plugin",
+			"autoload": {
+				"psr-4": {
+					"WPGraphQLRedirection\\": "include/"
+				},
+				"classmap": [
+					"include/"
+				]
+			},
+			"notification-url": "https://packagist.org/downloads/",
+			"license": [
+				"GPL-3.0-or-later"
+			],
+			"authors": [
+				{
+					"name": "superhuit",
+					"email": "tech@superhuit.ch",
+					"homepage": "https://superhuit.ch",
+					"role": "Developer"
+				}
+			],
+			"description": "Exposes Redirection WP plugin in the WP-GraphQL schema",
+			"homepage": "https://github.com/superhuit-agency/wp-graphql-redirection",
+			"keywords": [
+				"graphql",
+				"redirection",
+				"wordpress"
+			],
+			"support": {
+				"issues": "https://github.com/superhuit-agency/wp-graphql-redirection/issues",
+				"source": "https://github.com/superhuit-agency/wp-graphql-redirection/tree/v1.1.0"
+			},
+			"time": "2023-06-05T14:09:23+00:00"
+		},
+		{
+			"name": "symfony/css-selector",
+			"version": "v6.4.8",
+			"source": {
+				"type": "git",
+				"url": "https://github.com/symfony/css-selector.git",
+				"reference": "4b61b02fe15db48e3687ce1c45ea385d1780fe08"
+			},
+			"dist": {
+				"type": "zip",
+				"url": "https://api.github.com/repos/symfony/css-selector/zipball/4b61b02fe15db48e3687ce1c45ea385d1780fe08",
+				"reference": "4b61b02fe15db48e3687ce1c45ea385d1780fe08",
+				"shasum": ""
+			},
+			"require": {
+				"php": ">=8.1"
+			},
+			"type": "library",
+			"autoload": {
+				"psr-4": {
+					"Symfony\\Component\\CssSelector\\": ""
+				},
+				"exclude-from-classmap": [
+					"/Tests/"
+				]
+			},
+			"notification-url": "https://packagist.org/downloads/",
+			"license": [
+				"MIT"
+			],
+			"authors": [
+				{
+					"name": "Fabien Potencier",
+					"email": "fabien@symfony.com"
+				},
+				{
+					"name": "Jean-François Simon",
+					"email": "jeanfrancois.simon@sensiolabs.com"
+				},
+				{
+					"name": "Symfony Community",
+					"homepage": "https://symfony.com/contributors"
+				}
+			],
+			"description": "Converts CSS selectors to XPath expressions",
+			"homepage": "https://symfony.com",
+			"support": {
+				"source": "https://github.com/symfony/css-selector/tree/v6.4.8"
+			},
+			"funding": [
+				{
+					"url": "https://symfony.com/sponsor",
+					"type": "custom"
+				},
+				{
+					"url": "https://github.com/fabpot",
+					"type": "github"
+				},
+				{
+					"url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+					"type": "tidelift"
+				}
+			],
+			"time": "2024-05-31T14:49:08+00:00"
+		},
+		{
+			"name": "valu/wp-graphql-offset-pagination",
+			"version": "dev-master",
+			"source": {
+				"type": "git",
+				"url": "https://github.com/superhuit-agency/wp-graphql-offset-pagination.git",
+				"reference": "c098996d5462f9011f0adad1236f237a8481bc18"
+			},
+			"dist": {
+				"type": "zip",
+				"url": "https://api.github.com/repos/superhuit-agency/wp-graphql-offset-pagination/zipball/c098996d5462f9011f0adad1236f237a8481bc18",
+				"reference": "c098996d5462f9011f0adad1236f237a8481bc18",
+				"shasum": ""
+			},
+			"require-dev": {
+				"codeception/module-asserts": "^1.0",
+				"codeception/module-cli": "^1.0",
+				"codeception/module-db": "^1.0",
+				"codeception/module-filesystem": "^1.0",
+				"codeception/module-phpbrowser": "^1.0",
+				"codeception/module-rest": "^1.0",
+				"codeception/module-webdriver": "^1.0",
+				"codeception/util-universalframework": "^1.0",
+				"lucatume/wp-browser": "^2.2",
+				"phpunit/phpunit": "^8.0",
+				"valu/wp-testing-tools": "^0.4.0"
+			},
+			"default-branch": true,
+			"type": "wordpress-plugin",
+			"autoload": {
+				"psr-4": {
+					"WPGraphQL\\Extensions\\OffsetPagination\\": "src/"
+				}
+			},
+			"scripts": {
+				"wp-install": [
+					"wp-install --full --env-file .env --wp-composer-file composer.wp-install.json"
+				],
+				"wpunit": [
+					"codecept run wpunit"
+				],
+				"functional": [
+					"codecept run functional"
+				],
+				"test": [
+					"@wpunit",
+					"@functional"
+				]
+			},
+			"license": [
+				"GPL-2.0-or-later"
+			],
+			"authors": [
+				{
+					"name": "Esa-Matti Suuronen",
+					"email": "esa-matti.suuronen@valu.fi",
+					"role": "developer"
+				}
+			],
+			"description": "Add offset pagination to wp-graphql",
+			"support": {
+				"issues": "https://github.com/valu-digital/wp-graphql-offset-pagination/issues",
+				"source": "https://github.com/valu-digital/wp-graphql-offset-pagination"
+			},
+			"time": "2024-03-21T13:02:51+00:00"
+		},
+		{
+			"name": "voku/simple_html_dom",
+			"version": "4.7.31",
+			"source": {
+				"type": "git",
+				"url": "https://github.com/voku/simple_html_dom.git",
+				"reference": "2bc2f89d9124bd2fd4817c73facf29a8b5be3c97"
+			},
+			"dist": {
+				"type": "zip",
+				"url": "https://api.github.com/repos/voku/simple_html_dom/zipball/2bc2f89d9124bd2fd4817c73facf29a8b5be3c97",
+				"reference": "2bc2f89d9124bd2fd4817c73facf29a8b5be3c97",
+				"shasum": ""
+			},
+			"require": {
+				"ext-dom": "*",
+				"ext-libxml": "*",
+				"ext-simplexml": "*",
+				"php": ">=7.0.0",
+				"symfony/css-selector": "~3.0 || ~4.0 || ~5.0 || ~6.0"
+			},
+			"require-dev": {
+				"phpunit/phpunit": "~6.0 || ~7.0 || ~9.0"
+			},
+			"suggest": {
+				"voku/portable-utf8": "If you need e.g. UTF-8 fixed output."
+			},
+			"type": "library",
+			"autoload": {
+				"psr-4": {
+					"voku\\helper\\": "src/voku/helper/"
+				}
+			},
+			"notification-url": "https://packagist.org/downloads/",
+			"license": [
+				"MIT"
+			],
+			"authors": [
+				{
+					"name": "dimabdc",
+					"email": "support@titor.ru",
+					"homepage": "http://github.com/dimabdc",
+					"role": "Developer"
+				},
+				{
+					"name": "Lars Moelleken",
+					"homepage": "http://www.moelleken.org/",
+					"role": "Developer"
+				}
+			],
+			"description": "Simple HTML DOM package.",
+			"homepage": "http://simplehtmldom.sourceforge.net/",
+			"keywords": [
+				"HTML Parser",
+				"dom",
+				"php dom"
+			],
+			"support": {
+				"issues": "https://github.com/voku/simple_html_dom/issues",
+				"source": "https://github.com/voku/simple_html_dom/tree/4.7.31"
+			},
+			"funding": [
+				{
+					"url": "https://www.paypal.me/moelleken",
+					"type": "custom"
+				},
+				{
+					"url": "https://github.com/voku",
+					"type": "github"
+				},
+				{
+					"url": "https://www.patreon.com/voku",
+					"type": "patreon"
+				},
+				{
+					"url": "https://tidelift.com/funding/github/packagist/voku/simple_html_dom",
+					"type": "tidelift"
+				}
+			],
+			"time": "2021-12-15T10:38:11+00:00"
+		},
+		{
+			"name": "wp-graphql/wp-graphql-jwt-authentication",
+			"version": "v0.7.0",
+			"source": {
+				"type": "git",
+				"url": "https://github.com/wp-graphql/wp-graphql-jwt-authentication.git",
+				"reference": "5de35ce97efcae2beeb9118e1ad458480ae6187b"
+			},
+			"dist": {
+				"type": "zip",
+				"url": "https://api.github.com/repos/wp-graphql/wp-graphql-jwt-authentication/zipball/5de35ce97efcae2beeb9118e1ad458480ae6187b",
+				"reference": "5de35ce97efcae2beeb9118e1ad458480ae6187b",
+				"shasum": ""
+			},
+			"require": {
+				"firebase/php-jwt": "^6.1.0"
+			},
+			"require-dev": {
+				"codeception/module-asserts": "^1.0",
+				"codeception/module-cli": "^1.0",
+				"codeception/module-db": "^1.0",
+				"codeception/module-filesystem": "^1.0",
+				"codeception/module-phpbrowser": "^1.0",
+				"codeception/module-rest": "^1.2",
+				"codeception/module-webdriver": "^1.0",
+				"codeception/util-universalframework": "^1.0",
+				"lucatume/wp-browser": "3.1.0",
+				"phpunit/phpunit": "^8.5"
+			},
+			"type": "wordpress-plugin",
+			"autoload": {
+				"psr-4": {
+					"WPGraphQL\\JWT_Authentication\\": "src/"
+				},
+				"classmap": [
+					"src/"
+				]
+			},
+			"notification-url": "https://packagist.org/downloads/",
+			"license": [
+				"GPL-3.0+"
+			],
+			"authors": [
+				{
+					"name": "jasonbahl",
+					"email": "jasonbahl@mac.com"
+				}
+			],
+			"description": "JWT Authentication for WPGraphQL",
+			"support": {
+				"issues": "https://github.com/wp-graphql/wp-graphql-jwt-authentication/issues",
+				"source": "https://github.com/wp-graphql/wp-graphql-jwt-authentication/tree/v0.7.0"
+			},
+			"time": "2023-03-31T21:57:48+00:00"
+		},
+		{
+			"name": "wpackagist-plugin/advanced-custom-fields",
+			"version": "6.3.12",
+			"source": {
+				"type": "svn",
+				"url": "https://plugins.svn.wordpress.org/advanced-custom-fields/",
+				"reference": "tags/6.3.12"
+			},
+			"dist": {
+				"type": "zip",
+				"url": "https://downloads.wordpress.org/plugin/advanced-custom-fields.6.3.12.zip"
+			},
+			"require": {
+				"composer/installers": "^1.0 || ^2.0"
+			},
+			"type": "wordpress-plugin",
+			"homepage": "https://wordpress.org/plugins/advanced-custom-fields/"
+		},
+		{
+			"name": "wpackagist-plugin/disable-comments",
+			"version": "2.4.6",
+			"source": {
+				"type": "svn",
+				"url": "https://plugins.svn.wordpress.org/disable-comments/",
+				"reference": "tags/2.4.6"
+			},
+			"dist": {
+				"type": "zip",
+				"url": "https://downloads.wordpress.org/plugin/disable-comments.2.4.6.zip"
+			},
+			"require": {
+				"composer/installers": "^1.0 || ^2.0"
+			},
+			"type": "wordpress-plugin",
+			"homepage": "https://wordpress.org/plugins/disable-comments/"
+		},
+		{
+			"name": "wpackagist-plugin/disable-emojis",
+			"version": "1.7.6",
+			"source": {
+				"type": "svn",
+				"url": "https://plugins.svn.wordpress.org/disable-emojis/",
+				"reference": "tags/1.7.6"
+			},
+			"dist": {
+				"type": "zip",
+				"url": "https://downloads.wordpress.org/plugin/disable-emojis.1.7.6.zip"
+			},
+			"require": {
+				"composer/installers": "^1.0 || ^2.0"
+			},
+			"type": "wordpress-plugin",
+			"homepage": "https://wordpress.org/plugins/disable-emojis/"
+		},
+		{
+			"name": "wpackagist-plugin/duplicate-post",
+			"version": "4.5",
+			"source": {
+				"type": "svn",
+				"url": "https://plugins.svn.wordpress.org/duplicate-post/",
+				"reference": "tags/4.5"
+			},
+			"dist": {
+				"type": "zip",
+				"url": "https://downloads.wordpress.org/plugin/duplicate-post.4.5.zip"
+			},
+			"require": {
+				"composer/installers": "^1.0 || ^2.0"
+			},
+			"type": "wordpress-plugin",
+			"homepage": "https://wordpress.org/plugins/duplicate-post/"
+		},
+		{
+			"name": "wpackagist-plugin/redirection",
+			"version": "5.4.2",
+			"source": {
+				"type": "svn",
+				"url": "https://plugins.svn.wordpress.org/redirection/",
+				"reference": "tags/5.4.2"
+			},
+			"dist": {
+				"type": "zip",
+				"url": "https://downloads.wordpress.org/plugin/redirection.5.4.2.zip"
+			},
+			"require": {
+				"composer/installers": "^1.0 || ^2.0"
+			},
+			"type": "wordpress-plugin",
+			"homepage": "https://wordpress.org/plugins/redirection/"
+		},
+		{
+			"name": "wpackagist-plugin/simple-custom-post-order",
+			"version": "2.5.7",
+			"source": {
+				"type": "svn",
+				"url": "https://plugins.svn.wordpress.org/simple-custom-post-order/",
+				"reference": "tags/2.5.7"
+			},
+			"dist": {
+				"type": "zip",
+				"url": "https://downloads.wordpress.org/plugin/simple-custom-post-order.2.5.7.zip"
+			},
+			"require": {
+				"composer/installers": "^1.0 || ^2.0"
+			},
+			"type": "wordpress-plugin",
+			"homepage": "https://wordpress.org/plugins/simple-custom-post-order/"
+		},
+		{
+			"name": "wpackagist-plugin/svg-support",
+			"version": "2.5.5",
+			"source": {
+				"type": "svn",
+				"url": "https://plugins.svn.wordpress.org/svg-support/",
+				"reference": "tags/2.5.5"
+			},
+			"dist": {
+				"type": "zip",
+				"url": "https://downloads.wordpress.org/plugin/svg-support.2.5.5.zip"
+			},
+			"require": {
+				"composer/installers": "^1.0 || ^2.0"
+			},
+			"type": "wordpress-plugin",
+			"homepage": "https://wordpress.org/plugins/svg-support/"
+		},
+		{
+			"name": "wpackagist-plugin/wordpress-seo",
+			"version": "22.5",
+			"source": {
+				"type": "svn",
+				"url": "https://plugins.svn.wordpress.org/wordpress-seo/",
+				"reference": "tags/22.5"
+			},
+			"dist": {
+				"type": "zip",
+				"url": "https://downloads.wordpress.org/plugin/wordpress-seo.22.5.zip"
+			},
+			"require": {
+				"composer/installers": "^1.0 || ^2.0"
+			},
+			"type": "wordpress-plugin",
+			"homepage": "https://wordpress.org/plugins/wordpress-seo/"
+		},
+		{
+			"name": "wpackagist-plugin/wp-graphql",
+			"version": "1.24.0",
+			"source": {
+				"type": "svn",
+				"url": "https://plugins.svn.wordpress.org/wp-graphql/",
+				"reference": "tags/1.24.0"
+			},
+			"dist": {
+				"type": "zip",
+				"url": "https://downloads.wordpress.org/plugin/wp-graphql.1.24.0.zip"
+			},
+			"require": {
+				"composer/installers": "^1.0 || ^2.0"
+			},
+			"type": "wordpress-plugin",
+			"homepage": "https://wordpress.org/plugins/wp-graphql/"
+		}
+	],
+	"packages-dev": [],
+	"aliases": [],
+	"minimum-stability": "stable",
+	"stability-flags": {
+		"pristas-peter/wp-graphql-gutenberg": 20,
+		"valu/wp-graphql-offset-pagination": 20
+	},
+	"prefer-stable": false,
+	"prefer-lowest": false,
+	"platform": {
+		"php": "^8.1 || ^8.2"
+	},
+	"platform-dev": {},
+	"plugin-api-version": "2.6.0"
 }

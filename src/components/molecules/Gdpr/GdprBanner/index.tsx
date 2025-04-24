@@ -9,8 +9,7 @@ import {
 	useCallback,
 } from 'react';
 
-import gdprConfigs from '@/gdpr-configs.json';
-import configs from '@/configs.json';
+import { useLocale } from '@/contexts/locale-context';
 
 import { Button } from '@/components/atoms';
 
@@ -19,7 +18,7 @@ import './styles.css';
 /**
  * TYPINGS
  */
-type GdprBannerProps = {
+interface GdprBannerProps {
 	bannerDismissed: boolean;
 	onPersonalizeClick: MouseEventHandler;
 	onAcceptClick: Function;
@@ -38,7 +37,7 @@ export const GdprBanner: FC<GdprBannerProps> = ({
 	const [isHidden, setIsHidden] = useState(true);
 	const [isUnmounting, setIsUnmounting] = useState(false);
 
-	const locale = configs.staticLang; // TODO :: HANDLE THIS !!!
+	const { dictionary } = useLocale();
 
 	const ref = useRef(null);
 
@@ -93,7 +92,7 @@ export const GdprBanner: FC<GdprBannerProps> = ({
 						id="cookie-law-banner:title"
 						className="supt-gdpr-banner__title"
 					>
-						{gdprConfigs.banner.texts[locale].title}
+						{dictionary.gdpr.banner.title}
 					</p>
 					<div
 						id="cookie-law-banner:desc"
@@ -101,8 +100,7 @@ export const GdprBanner: FC<GdprBannerProps> = ({
 					>
 						<p
 							dangerouslySetInnerHTML={{
-								__html: gdprConfigs.banner.texts[locale]
-									.message,
+								__html: dictionary.gdpr.banner.message,
 							}}
 						/>
 					</div>
@@ -110,14 +108,14 @@ export const GdprBanner: FC<GdprBannerProps> = ({
 
 				<div className="supt-gdpr-banner__buttons">
 					<Button
-						title={gdprConfigs.banner.texts[locale].acceptAll}
+						title={dictionary.gdpr.banner.acceptAll}
 						className="supt-gdpr-banner__accept-button"
 						onClick={handleAcceptClick}
 						variant="link"
 					/>
 
 					<Button
-						title={gdprConfigs.banner.texts[locale].personalize}
+						title={dictionary.gdpr.banner.personalize}
 						className="supt-gdpr-banner__personalize-button"
 						onClick={onPersonalizeClick}
 						variant="link"
@@ -126,7 +124,7 @@ export const GdprBanner: FC<GdprBannerProps> = ({
 					<Button
 						className="supt-gdpr-banner__reject-button"
 						onClick={handleRejectClick}
-						title={gdprConfigs.banner.texts[locale].rejectAll}
+						title={dictionary.gdpr.banner.rejectAll}
 						variant="link"
 					/>
 				</div>

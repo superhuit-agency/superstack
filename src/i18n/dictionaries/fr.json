@@ -1,0 +1,99 @@
+{
+	"archivePost": {
+		"all": "Toutes",
+		"tags": "Tags"
+	},
+	"cardNews": {
+		"read": "Lire"
+	},
+	"date": {
+		"dateFormat": "d/m/Y"
+	},
+	"footer": {
+		"madeBy": "Créé par"
+	},
+	"form": {
+		"error": {
+			"accept": "Votre fichier est invalide. Les fichiers autorisés sont %s.",
+			"email": "Veuillez entrer une adresse e-mail valide.",
+			"empty": "Veuillez remplir le formulaire pour l'envoyer.",
+			"inputEmpty": "Veuillez remplir ce champ.",
+			"filesize": "Votre fichier est trop lourd. La taille maximale est de %dMo.",
+			"message": "Une erreur est survenue et votre message n'a probablement pas été reçu, désolé. Veuillez réessayer plus tard ou nous contacter directement par e-mail"
+		},
+		"input": {
+			"optional": "Optionnel"
+		},
+		"inputFile": {
+			"accepts": "Types acceptés: %s.",
+			"fileInfos": "%(size)s – %(extension)s fichier – %(name)s",
+			"labelAdd": "Ajouter un fichier",
+			"labelInvalid": "Ajouter un autre fichier",
+			"labelInvalidMulti": "Ajouter d'autres fichiers",
+			"labelMaxFiles": "Vous ne pouvez ajouter que 5 fichiers",
+			"maxFiles": "Maximum %s fichiers.",
+			"maxFilesize": "Limite à %d Mo.",
+			"maxOneFile": "Un seul fichier.",
+			"multiMaxFilesize": "Limite à %d Mo par fichier."
+		},
+		"status": {
+			"pending": "Envoi...",
+			"success": "Message envoyé"
+		},
+		"submitLabel": "Envoyer"
+	},
+	"gdpr": {
+		"categories": {
+			"necessary": {
+				"title": "Nécessaire",
+				"description": "Les cookies définis dans cette catégorie sont absolument indispensables au fonctionnement du site web. Ces cookies ne collectent pas de données privées.",
+				"alwaysEnabled": "Toujours activé"
+			},
+			"analytics": {
+				"title": "Analytics",
+				"description": "Les cookies analytiques nous aident à comprendre comment nos visiteurs interagissent avec le site web. Ils nous aident à comprendre le nombre de visiteurs, leur provenance et les pages sur lesquelles ils naviguent. Les cookies collectent ces données et sont signalés de manière anonyme.",
+				"enable": "Activer",
+				"disable": "Désactiver",
+				"enabled": "Activé",
+				"disabled": "Désactivé"
+			}
+		},
+		"banner": {
+			"title": "Cookies",
+			"message": "Ce site utilise des cookies pour améliorer votre expérience utilisateur et vous permet de contrôler ce que vous souhaitez activer.",
+			"personalize": "Personnaliser",
+			"acceptAll": "Accepter",
+			"rejectAll": "Rejeter"
+		},
+		"modal": {
+			"title": "Cookies préférences",
+			"description": "Ce site web utilise des cookies pour améliorer votre expérience lorsque vous naviguez sur le site Web. Parmi ces cookies, les cookies classés comme nécessaires sont stockés sur votre navigateur car ils sont essentiels pour le fonctionnement des fonctionnalités de base du site Web. Nous utilisons également des cookies de tiers qui nous aident à analyser et à comprendre comment vous utilisez ce site Web. Ces cookies ne seront stockés dans votre navigateur qu'avec votre consentement. Vous avez également la possibilité de désactiver ces cookies. Toutefois, la désactivation de certains de ces cookies peut avoir un effet sur votre expérience de navigation.",
+			"save": "Accepter et sauvegarder"
+		}
+	},
+	"mainNav": {
+		"closeMenu": "Fermer le menu",
+		"openMenu": "Ouvrir le menu"
+	},
+	"page404": {
+		"title": "Page 404",
+		"description": "La page que vous cherchez n'existe pas.",
+		"buttonLabel": "Accueil"
+	},
+	"pagination": {
+		"ariaLabel": "Navigation de la pagination",
+		"goToAriaLabel": "Aller à la page",
+		"next": "Suivant",
+		"previous": "Précédent"
+	},
+	"post": {
+		"relatedNews": "Actualités liées",
+		"seeAll": "Toutes"
+	},
+	"previewToolbar": {
+		"backEditor": "Retour à l'éditeur",
+		"screenWidth": "Largeur de l'écran:",
+		"switchDraft": "Passer à la page actuelle",
+		"title": "Cette page est une prévisualisation."
+	}
+}

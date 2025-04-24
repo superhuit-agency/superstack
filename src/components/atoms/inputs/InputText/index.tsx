@@ -1,7 +1,9 @@
+'use client';
+
 import { FC, forwardRef, useId } from 'react';
 import cx from 'classnames';
 
-import { useTranslation } from '@/hooks/use-translation';
+import { useLocale } from '@/contexts/locale-context';
 
 import block from './block.json';
 
@@ -27,7 +29,7 @@ export const InputText: FC<InputTextProps> & BlockConfigs = forwardRef(
 		const defaultId = useId();
 		const id = initId ?? defaultId;
 
-		const __t = useTranslation();
+		const { dictionary } = useLocale();
 
 		return (
 			<div
@@ -43,7 +45,7 @@ export const InputText: FC<InputTextProps> & BlockConfigs = forwardRef(
 					htmlFor={id}
 					className="supt-input-text__label supt-input-field__label"
 					data-optional={
-						required ? '' : __t('form-input-optional', 'optional')
+						required ? '' : dictionary.form?.input.optional
 					}
 				>
 					{label}

@@ -37,20 +37,13 @@ export default async function getAllURIs() {
 				100
 		);
 
-		const extraWhereArgs =
-			postType === 'pages'
-				? ',template: {notIn: "template-404.php"}'
-				: '';
-
 		for (let i = 0; i < nQueries; i++) {
 			const query_name = `AllURIs_${postType}_${i + 1}_${nQueries}`;
 
 			nodesPromises.push(
 				fetchAPI(
 					`query ${query_name} {
-					${postType}(where: {offsetPagination: {offset: ${
-						i * 100
-					}, size: 100}${extraWhereArgs}}) {
+					${postType}(where: {offsetPagination: {offset: ${i * 100}, size: 100}}) {
 						nodes {
 							uri
 							isRedirected

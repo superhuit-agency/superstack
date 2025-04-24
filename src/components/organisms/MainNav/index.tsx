@@ -4,11 +4,12 @@ import cx from 'classnames';
 import { usePathname } from 'next/navigation';
 import { FC, useCallback, useEffect, useRef, useState } from 'react';
 
-import configs from '@/configs.json';
+import { useLocale } from '@/contexts/locale-context';
 import { Link } from '@/helpers/Link';
-import { useTranslation } from '@/hooks/use-translation';
+import configs from '@/configs.json';
 
-import { Image } from '../../molecules/Image';
+import { LangSwitcher } from '@/components/molecules/LangSwitcher';
+import { Image } from '@/components/molecules/Image';
 import block from './block.json';
 
 import './styles.css';
@@ -20,10 +21,7 @@ export const MainNav: FC<MainNavProps> & BlockConfigs = ({
 	siteTitle,
 	logo,
 }) => {
-	const locale = configs.staticLang; // TODO :: HANDLE THIS !!!
-
-	const __t = useTranslation();
-
+	const { dictionary, locale } = useLocale();
 	const pathname = usePathname();
 
 	// refs
@@ -166,7 +164,7 @@ export const MainNav: FC<MainNavProps> & BlockConfigs = ({
 							height={logo.height}
 							priority
 							className="supt-main-nav__logo__img"
-							alt={siteTitle}
+							alt={siteTitle || ''}
 						/>
 					) : null}
 				</Link>
@@ -205,14 +203,8 @@ export const MainNav: FC<MainNavProps> & BlockConfigs = ({
 							className="supt-main-nav__toggle"
 							aria-label={
 								isOpened
-									? __t(
-											'main-nav-close-menu-label',
-											'Fermer le menu'
-										)
-									: __t(
-											'main-nav-open-menu-label',
-											'Ouvrir le menu'
-										)
+									? dictionary.mainNav?.closeMenu
+									: dictionary.mainNav?.openMenu
 							}
 							aria-expanded={
 								isSmall && isOpened ? 'true' : 'false'
@@ -231,7 +223,10 @@ export const MainNav: FC<MainNavProps> & BlockConfigs = ({
 						</button>
 					</>
 				) : null}
+
+				{configs.isMultilang ? <LangSwitcher /> : null}
 			</div>
+
 			{menus?.header?.items?.length ? (
 				<nav
 					id="small_menu_nav"

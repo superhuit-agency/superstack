@@ -6,6 +6,7 @@ import {
 	seoTaxFragment,
 } from '@/lib/fragments';
 import { gql } from '@/utils';
+import configs from '@/configs.json';
 
 import { singlePageData, archivePostData } from '@/components/templates/data';
 
@@ -53,6 +54,7 @@ export const getData = async (fetcher: FetchApiFuncType, node: any) => {
 				where: {
 					categoryIn: $categoryIn
 					offsetPagination: { size: $size, offset: $offset }
+					${configs.isMultilang ? `language: ${node.language.code}` : ''}
 				}
 			) {
 				nodes {
@@ -64,12 +66,24 @@ export const getData = async (fetcher: FetchApiFuncType, node: any) => {
 					}
 				}
 			}
-			categories(first: 99, where: { hideEmpty: true }) {
+			categories(
+				first: 99
+				where: {
+					hideEmpty: true
+					${configs.isMultilang ? `, language: ${node.language.code}` : ''}
+				}
+			) {
 				nodes {
 					...termNodeFragment
 				}
 			}
-			tags(first: 99, where: { hideEmpty: true }) {
+			tags(
+				first: 99
+				where: {
+					hideEmpty: true
+					${configs.isMultilang ? `, language: ${node.language.code}` : ''}
+				}
+			) {
 				nodes {
 					...termNodeFragment
 				}

@@ -4,7 +4,7 @@ import debounce from 'lodash/debounce';
 import { useCallback, useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
 
-import { useTranslation } from '@/hooks/use-translation';
+import { useLocale } from '@/contexts/locale-context';
 
 import './styles.css';
 
@@ -12,7 +12,7 @@ export function PreviewToolbar({ isDraft, editLink }: PreviewToolbarProps) {
 	const [viewport, setViewport] = useState<{ w: number; h: number }>();
 	const [isDraftPreview, setIsDraftPreview] = useState(isDraft);
 
-	const __t = useTranslation();
+	const { dictionary } = useLocale();
 
 	const getViewportSizes = useCallback(
 		() => ({
@@ -50,7 +50,7 @@ export function PreviewToolbar({ isDraft, editLink }: PreviewToolbarProps) {
 
 	return (
 		<div className="supt-preview-toolbar">
-			<p>{__t('preview-toolbar-title', 'This page is a preview.')}</p>
+			<p>{dictionary.previewToolbar?.title}</p>
 
 			<label className="supt-preview-toolbar__checkbox">
 				<input
@@ -59,11 +59,11 @@ export function PreviewToolbar({ isDraft, editLink }: PreviewToolbarProps) {
 					checked={!isDraftPreview}
 					onChange={toggleIsDraftPreview}
 				/>
-				{__t('preview-toolbar-switch-draft', 'Switch to current page')}
+				{dictionary.previewToolbar?.switchDraft}
 			</label>
 
 			<p className="supt-preview-toolbar__screen">
-				{__t('preview-toolbar-screen-width', 'Screen width:')}{' '}
+				{dictionary.previewToolbar?.screenWidth}{' '}
 				<span>{`${viewport?.w ? `${viewport?.w}px` : '...'}`}</span>
 			</p>
 
@@ -72,7 +72,7 @@ export function PreviewToolbar({ isDraft, editLink }: PreviewToolbarProps) {
 					href={decodeURI(editLink).replace('&amp;', '&')}
 					className="supt-preview-toolbar__button"
 				>
-					{__t('preview-toolbar-back-editor', 'Back to editor')}
+					{dictionary.previewToolbar?.backEditor}
 				</a>
 			)}
 		</div>

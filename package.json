@@ -11,9 +11,11 @@
     "lint": "next lint",
     "storybook": "storybook dev -p 4000",
     "build-storybook": "storybook build",
-    "generate:block": "plop --plopfile ./generators/plopfile.js block"
+    "generate:block": "plop --plopfile ./generators/plopfile.js block",
+    "generate:language-migration": "plop --plopfile ./generators/plopfile.js language-migration"
   },
   "dependencies": {
+    "@formatjs/intl-localematcher": "^0.6.0",
     "@hcaptcha/react-hcaptcha": "^1.10.1",
     "@next/bundle-analyzer": "^14.2.5",
     "classnames": "^2.5.1",
@@ -21,6 +23,7 @@
     "js-cookie": "^3.0.5",
     "lodash": "^4.17.21",
     "mime": "^4.0.1",
+    "negotiator": "^1.0.0",
     "next": "^14.1.0",
     "react": "^18",
     "react-dom": "^18",
@@ -38,6 +41,7 @@
     "@storybook/test": "^8.2.6",
     "@types/js-cookie": "^3.0.6",
     "@types/lodash": "^4.14.202",
+    "@types/negotiator": "^0.6.3",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

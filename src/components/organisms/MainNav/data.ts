@@ -1,6 +1,7 @@
 import { imageData, menuItemData } from '@/components/molecules/data';
 import { fetchAPI } from '@/lib';
 import { gql } from '@/utils';
+import configs from '@/configs.json';
 
 import block from './block.json';
 
@@ -8,7 +9,6 @@ import block from './block.json';
 export const slug = block.slug;
 
 export const formatter = (data: GraphQLMainNavFields): MainNavData => ({
-	isHome: data.node?.isFrontPage ?? false,
 	logo: imageData.formatter(data.logo) ?? null,
 	menus: {
 		header: {
@@ -18,10 +18,16 @@ export const formatter = (data: GraphQLMainNavFields): MainNavData => ({
 	siteTitle: data.generalSettings?.title ?? 'superstack',
 });
 
-export const getData = async (uri: string): Promise<MainNavData> => {
+export const getData = async ({language}: {language: Locale}): Promise<MainNavData> => {
 	const query = gql`
-		query mainNavQuery($uri: String!) {
-			header: menuItems(where: { location: HEADER }, first: 9999) {
+		query mainNavQuery {
+			header: menuItems(
+				where: {
+					location: HEADER
+					${configs.isMultilang ? `, language: ${language.toUpperCase()}` : ''}
+				}
+				first: 9999
+			) {
 				nodes {
 					...menuItemFragment
 				}
@@ -33,17 +39,12 @@ export const getData = async (uri: string): Promise<MainNavData> => {
 				title
 				url
 			}
-			node: nodeByUri(uri: $uri) {
-				... on Page {
-					isFrontPage
-				}
-			}
 		}
 		${imageData.fragment}
 		${menuItemData.fragment}
 	`;
 
-	const data = await fetchAPI(query, { variables: { uri } });
+	const data = await fetchAPI(query);
 
 	return formatter(data);
 };

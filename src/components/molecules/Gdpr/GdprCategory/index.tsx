@@ -10,16 +10,22 @@ import {
 } from 'react';
 import cx from 'classnames';
 
+import { useLocale } from '@/contexts/locale-context';
 import { ChevronIcon } from '@/components/icons';
-import configs from '@/configs.json';
 
 import './styles.css';
 
 /**
  * TYPINGS
  */
-type GdprCategoryProps = {
-	cat: Record<string, any>;
+export type GdprCategoryType = {
+	id: string;
+	enabled?: boolean;
+	mandatory?: boolean;
+	services?: string[];
+};
+interface GdprCategoryProps {
+	cat: GdprCategoryType;
 	handleChange: (param: { enabled: boolean; id: string }) => void;
 };
 
@@ -29,13 +35,13 @@ type GdprCategoryProps = {
 export const GdprCategory = forwardRef(
 	({ cat, handleChange }: GdprCategoryProps, ref: Ref<{}>) => {
 		const [isCollapsed, setIsCollapsed] = useState(true);
-		const [isEnabled, setIsEnabled] = useState(cat['enabled']);
+		const [isEnabled, setIsEnabled] = useState(cat.enabled);
 
-		const locale = configs.staticLang; // TODO :: HANDLE THIS !!!
+		const { dictionary } = useLocale();
 
 		useEffect(() => {
 			handleChange({
-				enabled: isEnabled,
+				enabled: isEnabled || false,
 				id: cat.id,
 			});
 		}, [isEnabled, cat.id, handleChange]);
@@ -74,12 +80,12 @@ export const GdprCategory = forwardRef(
 		// ##############################
 
 		const getId = useCallback(() => {
-			return cat['id'];
+			return cat.id;
 		}, [cat]);
 
 		const setEnabled = useCallback(
 			(enabled = false) => {
-				if (cat['mandatory']) return;
+				if (cat.mandatory) return;
 				setIsEnabled(enabled);
 			},
 			[setIsEnabled, cat]
@@ -94,11 +100,11 @@ export const GdprCategory = forwardRef(
 				<div className="supt-gdpr-category__tab" onClick={onToggle}>
 					<button className="supt-gdpr-category__title">
 						<ChevronIcon className="supt-gdpr-category__icon" />
-						<span>{cat['title']}</span>
+						<span>{dictionary.gdpr.categories[cat.id].title}</span>
 					</button>
-					{cat['mandatory'] ? (
+					{cat.mandatory ? (
 						<span className="supt-gdpr-category__caption">
-							{cat.texts[locale].alwaysEnabled}
+							{dictionary.gdpr.categories.alwaysEnabled}
 						</span>
 					) : (
 						<div
@@ -108,23 +114,23 @@ export const GdprCategory = forwardRef(
 							<input
 								type="checkbox"
 								className="supt-gdpr-category__checkbox"
-								id={`cookie-law-category-checkbox-${cat['id']}`}
+								id={`cookie-law-category-checkbox-${cat.id}`}
 								checked={isEnabled}
 								onChange={onChange}
 							/>
 							<label
 								className="supt-gdpr-category__label"
-								htmlFor={`cookie-law-category-checkbox-${cat['id']}`}
+								htmlFor={`cookie-law-category-checkbox-${cat.id}`}
 							>
 								{
-									cat.texts[locale][
+									dictionary.gdpr.categories[cat.id][
 										isEnabled ? 'disable' : 'enable'
 									]
 								}
 							</label>
 							<span className="supt-gdpr-category__status">
 								{
-									cat.texts[locale][
+									dictionary.gdpr.categories[cat.id][
 										isEnabled ? 'enabled' : 'disabled'
 									]
 								}
@@ -137,7 +143,7 @@ export const GdprCategory = forwardRef(
 					aria-hidden={isCollapsed}
 				>
 					<div className="supt-gdpr-category__desc">
-						{cat['description']}
+						{dictionary.gdpr.categories[cat.id].description}
 					</div>
 				</div>
 			</li>

@@ -4,11 +4,12 @@ import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import Cookies from 'js-cookie';
 import Script from 'next/script';
 
+import { useLocale } from '@/contexts/locale-context';
 import gdprConfigs from '@/gdpr-configs.json';
-import configs from '@/configs.json';
 
 import { GdprBanner } from './GdprBanner';
-import { GdprModal, GdprModalProps } from './GdprModal';
+import { GdprModal, type GdprModalProps } from './GdprModal';
+import { type GdprCategoryType } from './GdprCategory';
 import block from './block.json';
 
 /**
@@ -26,12 +27,13 @@ const COOKIE_NAME = 'supt-cookie-law-consent';
  * COMPONENT
  */
 export const Gdpr: FC<GdprProps> & BlockConfigs = () => {
-	const [categories, setCategories] = useState<Record<string, any>[]>([]);
+	const [categories, setCategories] = useState<GdprCategoryType[]>([]);
 	const [bannerDismissed, setBannerDismissed] = useState(true);
 	const [gdprServices, setGdprServices] = useState<Record<string, boolean>>(
 		{}
 	);
-	const locale = configs.staticLang; // TODO :: HANDLE THIS !!!
+
+	const { locale } = useLocale();
 
 	const services = useRef({});
 

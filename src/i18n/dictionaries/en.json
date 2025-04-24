@@ -1,0 +1,99 @@
+{
+	"archivePost": {
+		"all": "All",
+		"tags": "Tags"
+	},
+	"cardNews": {
+		"read": "Read"
+	},
+	"date": {
+		"dateFormat": "m/d/Y"
+	},
+	"footer": {
+		"madeBy": "Made by"
+	},
+	"form": {
+		"error": {
+			"accept": "Your file is invalid. Allowed files are %s.",
+			"email": "Please enter a valid email address.",
+			"empty": "Please fill out the form entirely to be able to send it.",
+			"inputEmpty": "Please fill out this field.",
+			"filesize": "Your file size is larger than %dMB.",
+			"message": "There was an error and your message probably didn't get to us, sorry. Please try later or contact us directly by e-mail"
+		},
+		"input": {
+			"optional": "Optional"
+		},
+		"inputFile": {
+			"accepts": "Allowed types: %s.",
+			"fileInfos": "%(size)s – %(extension)s file – %(name)s",
+			"labelAdd": "Add file",
+			"labelInvalid": "Add another file",
+			"labelInvalidMulti": "Add other files",
+			"labelMaxFiles": "You can only add up to 5 files",
+			"maxFiles": "Maximum %s files.",
+			"maxFilesize": "Limited to %d MB.",
+			"maxOneFile": "1 file only.",
+			"multiMaxFilesize": "Limited to %d MB per file."
+		},
+		"status": {
+			"pending": "Sending...",
+			"success": "Message sent"
+		},
+		"submitLabel": "Send"
+	},
+	"gdpr": {
+		"categories": {
+			"necessary": {
+				"title": "Necessary",
+				"description": "Necessary cookies are absolutely essential for the website to function properly. This category only includes cookies that ensures basic functionalities and security features of the website. These cookies do not store any personal information.",
+				"alwaysEnabled": "Always enabled"
+			},
+			"analytics": {
+				"title": "Analytics",
+				"description": "Analytics cookies help us understand how our visitors interact with the website. It helps us understand the number of visitors, where the visitors are coming from, and the pages they navigate. The cookies collect this data and are reported anonymously.",
+				"enable": "Enable",
+				"disable": "Disable",
+				"enabled": "Enabled",
+				"disabled": "Disabled"
+			}
+		},
+		"banner": {
+			"title": "Cookies",
+			"message": "This website uses cookies to help improve your user experience and gives you control over what you want to activate.",
+			"personalize": "Personalize",
+			"acceptAll": "Accept",
+			"rejectAll": "Reject"
+		},
+		"modal": {
+			"title": "Cookies Settings",
+			"description": "This website uses cookies to improve your experience while you navigate through the website. Out of these cookies, the cookies that are categorized as necessary are stored on your browser as they are essential for the working of basic functionalities of the website. We also use third-party cookies that help us analyze and understand how you use this website. These cookies will be stored in your browser only with your consent. You also have the option to opt-out of these cookies. But opting out of some of these cookies may have an effect on your browsing experience.",
+			"save": "Accept and save"
+		}
+	},
+	"mainNav": {
+		"closeMenu": "Close menu",
+		"openMenu": "Open menu"
+	},
+	"page404": {
+		"title": "Page 404",
+		"description": "The page you are looking for does not exist.",
+		"buttonLabel": "Home"
+	},
+	"pagination": {
+		"ariaLabel": "Pagination navigation",
+		"goToAriaLabel": "Go to page",
+		"next": "Next",
+		"previous": "Previous"
+	},
+	"post": {
+		"relatedNews": "Related news",
+		"seeAll": "See all"
+	},
+	"previewToolbar": {
+		"backEditor": "Back to editor",
+		"screenWidth": "Screen width:",
+		"switchDraft": "Switch to current page",
+		"title": "This page is a preview."
+	}
+}

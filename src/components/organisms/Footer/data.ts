@@ -1,6 +1,7 @@
 import { menuItemData } from '@/components/molecules/data';
 import { fetchAPI } from '@/lib';
 import { gql } from '@/utils';
+import configs from '@/configs.json';
 
 import block from './block.json';
 
@@ -14,23 +15,40 @@ export const formatter = (data: GraphQLFooterFields): FooterData => ({
 		social: { items: menuItemData.formatter(data.social?.nodes ?? []) },
 	},
 	siteTitle: data.generalSettings?.title ?? 'Superstack',
-	isHome: data.node?.isFrontPage ?? false,
 });
 
-export const getData = async (uri: string): Promise<FooterData> => {
+export const getData = async ({language}: {language: Locale}): Promise<FooterData> => {
 	const query = gql`
-		query footerQuery($uri: String!) {
-			footer: menuItems(where: { location: FOOTER }, first: 9999) {
+		query footerQuery {
+			footer: menuItems(
+				where: {
+					location: FOOTER
+					${configs.isMultilang ? `, language: ${language.toUpperCase()}` : ''}
+				}
+				first: 9999
+			) {
 				nodes {
 					...menuItemFragment
 				}
 			}
-			legal: menuItems(where: { location: LEGAL }, first: 9999) {
+			legal: menuItems(
+				where: {
+					location: LEGAL
+					${configs.isMultilang ? `, language: ${language.toUpperCase()}` : ''}
+				}
+				first: 9999
+			) {
 				nodes {
 					...menuItemFragment
 				}
 			}
-			social: menuItems(where: { location: SOCIAL }, first: 9999) {
+			social: menuItems(
+				where: {
+					location: SOCIAL
+					${configs.isMultilang ? `, language: ${language.toUpperCase()}` : ''}
+				}
+				first: 9999
+			) {
 				nodes {
 					...menuItemFragment
 				}
@@ -38,16 +56,11 @@ export const getData = async (uri: string): Promise<FooterData> => {
 			generalSettings {
 				title
 			}
-			node: nodeByUri(uri: $uri) {
-				... on Page {
-					isFrontPage
-				}
-			}
 		}
 		${menuItemData.fragment}
 	`;
 
-	const data = await fetchAPI(query, { variables: { uri } });
+	const data = await fetchAPI(query);
 
 	return formatter(data);
 };

@@ -1,10 +1,10 @@
 import cx from 'classnames';
 import { FC, forwardRef, useId } from 'react';
-// internal imports
-import { useTranslation } from '@/hooks/use-translation';
+
+import { useLocale } from '@/contexts/locale-context';
 import { Radio } from '../Radio';
 import block from './block.json';
-// styles
+
 import './styles.css';
 
 export const InputRadio: FC<InputRadioProps> & BlockConfigs = forwardRef<
@@ -29,7 +29,7 @@ export const InputRadio: FC<InputRadioProps> & BlockConfigs = forwardRef<
 		const defaultId = useId();
 		const id = initId ?? defaultId;
 
-		const __t = useTranslation();
+		const { dictionary } = useLocale();
 
 		return (
 			<fieldset
@@ -46,9 +46,7 @@ export const InputRadio: FC<InputRadioProps> & BlockConfigs = forwardRef<
 					<legend
 						className="supt-input-field__label supt-input-radio__label"
 						data-optional={
-							required
-								? ''
-								: __t('form-input-optional', 'optional')
+							required ? '' : dictionary.form?.input.optional
 						}
 					>
 						{label}

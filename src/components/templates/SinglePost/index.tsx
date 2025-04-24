@@ -1,17 +1,16 @@
+'use client';
+
 import { useMemo } from 'react';
 
-import { useTranslation } from '@/hooks/use-translation';
+import { useLocale } from '@/contexts/locale-context';
 import { Link } from '@/helpers/Link';
 import { Blocks, Container } from '@/components/global';
 import { SectionNews, Image } from '@/components';
-import configs from '@/configs.json';
 
 import './styles.css';
 
 export default function Post({ node }: any) {
-	const locale = configs.staticLang; // TODO :: HANDLE THIS !!!
-
-	const __t = useTranslation();
+	const { dictionary, locale } = useLocale();
 
 	const postStructuredData = {
 		'@context': 'https://schema.org',
@@ -91,9 +90,9 @@ export default function Post({ node }: any) {
 				</div>
 				{node?.relatedPosts?.length ? (
 					<SectionNews
-						uptitle={__t('post-related-news', 'Related news')}
+						uptitle={dictionary.post?.relatedNews}
 						seeAllLink={{
-							title: __t('post-see-all', 'See all'),
+							title: dictionary.post?.seeAll,
 							href: node?.postsPage.uri,
 						}}
 						posts={node.relatedPosts}
