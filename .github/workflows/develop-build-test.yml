@@ -41,11 +41,11 @@ jobs:
           RELEASE_BELT_PWD: ${{ secrets.RELEASE_BELT_PWD }}
           COMPOSER_GITHUB_TOKEN: ${{ secrets.COMPOSER_GITHUB_TOKEN }}
 
-      - name: Build Backend Webpack
-        uses: ./.github/actions/build-backend-webpack
+      - name: Build Backend
+        uses: ./.github/actions/build-backend
 
-      - name: Build Frontend Typescript
-        uses: ./.github/actions/build-frontend-typescript
+      - name: Build Frontend
+        uses: ./.github/actions/build-frontend
 
       - name: Unit Tests for React Components
         shell: bash

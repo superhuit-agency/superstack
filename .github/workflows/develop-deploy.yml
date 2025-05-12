@@ -1,0 +1,88 @@
+name: Deploy develop branch
+on:
+  push:
+    branches:
+      - 'develop'
+  workflow_dispatch:
+
+jobs:
+  # Run the test procedure to validate the code being pushed.
+  # Like development tests, Start the dockers and build.
+  # Finally, run the JEST Unit test script using `npm run test`
+  build_run_test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check github environment secrets and variables
+        run: |
+          echo "Checking secrets and variables for '${{ matrix.environment }}.' environment..."
+          missing_vars=0
+          for var in COMPOSER_GITHUB_TOKEN WORDPRESS_THEME_NAME RELEASE_BELT_USER RELEASE_BELT_PWD NEXT_SSH_HOST NEXT_SSH_PATH NEXT_SSH_PORT NEXT_SSH_USER NEXT_SSH_PRIVATE_KEY NEXT_URL WORDPRESS_SSH_HOST WORDPRESS_SSH_PATH WORDPRESS_SSH_PORT WORDPRESS_SSH_USER WORDPRESS_SSH_PRIVATE_KEY WORDPRESS_URL; do
+            if [ -z "${!var}" ]; then
+              echo "$var is not set."
+              missing_vars=$((missing_vars+1))
+            else
+              echo "$var is set to '${!var}'."
+            fi
+          done
+
+          if [ $missing_vars -ne 0 ]; then
+            echo "inputs_checked=false" >> $GITHUB_OUTPUT
+            echo "Error: $missing_vars variables are missing."
+            exit 1
+          else
+            echo "inputs_checked=true" >> $GITHUB_OUTPUT
+          fi
+        env:
+          WORDPRESS_THEME_NAME: ${{ vars.WORDPRESS_THEME_NAME }}
+          RELEASE_BELT_USER: ${{ vars.RELEASE_BELT_USER }}
+          RELEASE_BELT_PWD: ${{ secrets.RELEASE_BELT_PWD }}
+          COMPOSER_GITHUB_TOKEN: ${{ secrets.COMPOSER_GITHUB_TOKEN }}
+          NEXT_SSH_HOST: ${{ vars.NEXT_SSH_HOST }}
+          NEXT_SSH_PATH: ${{ vars.NEXT_SSH_PATH }}
+          NEXT_SSH_PORT: ${{ vars.NEXT_SSH_PORT }}
+          NEXT_SSH_USER: ${{ vars.NEXT_SSH_USER }}
+          NEXT_SSH_PRIVATE_KEY: ${{ secrets.NEXT_SSH_PRIVATE_KEY }}
+          NEXT_URL: ${{ vars.NEXT_URL }}
+          WORDPRESS_SSH_HOST: ${{ vars.WORDPRESS_SSH_HOST }}
+          WORDPRESS_SSH_PATH: ${{ vars.WORDPRESS_SSH_PATH }}
+          WORDPRESS_SSH_PORT: ${{ vars.WORDPRESS_SSH_PORT }}
+          WORDPRESS_SSH_USER: ${{ vars.WORDPRESS_SSH_USER }}
+          WORDPRESS_SSH_PRIVATE_KEY: ${{ secrets.WORDPRESS_SSH_PRIVATE_KEY }}
+          WORDPRESS_URL: ${{ vars.WORDPRESS_URL }}
+
+      - name: Build Backend
+        uses: ./.github/actions/build-backend
+
+      - name: Deploy Backend
+        uses: ./.github/actions/deploy-backend
+        with:
+          REMOTE_USER: ${{ vars.WORDPRESS_SSH_USER }}
+          REMOTE_HOST: ${{ vars.WORDPRESS_SSH_HOST }}
+          REMOTE_PORT: ${{ vars.WORDPRESS_SSH_PORT }}
+          REMOTE_TARGET: ${{ vars.WORDPRESS_SSH_PATH }}
+          SSH_PRIVATE_KEY: ${{ secrets.WORDPRESS_SSH_PRIVATE_KEY }}
+          WORDPRESS_THEME_NAME: ${{ vars.WORDPRESS_THEME_NAME }}
+
+      - name: Provision WP Theme
+        uses: ./.github/actions/provision-backend
+        with:
+          REMOTE_USER: ${{ vars.WORDPRESS_SSH_USER }}
+          REMOTE_HOST: ${{ vars.WORDPRESS_SSH_HOST }}
+          REMOTE_PORT: ${{ vars.WORDPRESS_SSH_PORT }}
+          REMOTE_TARGET: ${{ vars.WORDPRESS_SSH_PATH }}
+          SSH_PRIVATE_KEY: ${{ secrets.WORDPRESS_SSH_PRIVATE_KEY }}
+          WORDPRESS_THEME_NAME: ${{ vars.WORDPRESS_THEME_NAME }}
+
+      - name: Build Frontend
+        uses: ./.github/actions/build-frontend
+
+      - name: Deploy Frontend
+        uses: ./.github/actions/deploy-frontend
+        with:
+          SSH_USER: ${{ vars.NEXT_SSH_USER }}
+          SSH_HOST: ${{ vars.NEXT_SSH_HOST }}
+          SSH_PORT: ${{ vars.NEXT_SSH_PORT }}
+          NEXT_PATH: ${{ vars.NEXT_SSH_PATH }}
+          SSH_PRIVATE_KEY: ${{ secrets.NEXT_SSH_PRIVATE_KEY }}

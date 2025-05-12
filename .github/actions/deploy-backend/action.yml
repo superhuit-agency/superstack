@@ -1,0 +1,55 @@
+name: 'Deploy WP Theme'
+inputs:
+  SSH_PRIVATE_KEY:
+    description: 'Private key of the SSH user to deploy'
+    required: true
+  REMOTE_USER:
+    description: 'Remote server SSH user'
+    required: true
+  REMOTE_HOST:
+    description: 'Remote server SSH Host (IP adress)'
+    required: true
+  REMOTE_PORT:
+    description: 'Remote server SSH Port (default: 22)'
+    required: false
+    default: 22
+  REMOTE_TARGET:
+    description: 'Path on the remote server. (default: /var/www/html)'
+    required: false
+    default: '/var/www/html'
+  WORDPRESS_THEME_NAME:
+    description: 'WordPress Theme name'
+    required: false
+    default: 'superstack'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Download artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: wp-theme-assets
+        path: wordpress/theme/static/
+
+    - name: Deploy
+      uses: easingthemes/ssh-deploy@main
+      with:
+        SSH_PRIVATE_KEY: ${{ inputs.SSH_PRIVATE_KEY }}
+        ARGS: '-raltzv --delete'
+        REMOTE_USER: ${{ inputs.REMOTE_USER }}
+        REMOTE_HOST: ${{ inputs.REMOTE_HOST }}
+        REMOTE_PORT: ${{ inputs.REMOTE_PORT }}
+        SOURCE: './wordpress/theme/'
+        TARGET: '${{ inputs.REMOTE_TARGET }}/wp-content/themes/_new'
+        EXCLUDE: '.github, .gitignore, composer.json, composer.lock, node_modules, packages.json, webpack.config.js, package-lock.json'
+
+    - name: Replace theme folder with newly uploaded
+      uses: garygrossgarten/github-action-ssh@release
+      with:
+        username: ${{ inputs.REMOTE_USER }}
+        host: ${{ inputs.REMOTE_HOST }}
+        port: ${{ inputs.REMOTE_PORT }}
+        privateKey: ${{ inputs.SSH_PRIVATE_KEY }}
+        command: |
+          [ -d "${{ inputs.REMOTE_TARGET }}/wp-content/themes/${{ inputs.WORDPRESS_THEME_NAME }}" ] && mv "${{ inputs.REMOTE_TARGET }}/wp-content/themes/${{ inputs.WORDPRESS_THEME_NAME }}" "${{ inputs.REMOTE_TARGET }}/wp-content/themes/_old"
+          mv "${{ inputs.REMOTE_TARGET }}/wp-content/themes/_new" "${{ inputs.REMOTE_TARGET }}/wp-content/themes/${{ inputs.WORDPRESS_THEME_NAME }}" && rm -rf "${{ inputs.REMOTE_TARGET }}/wp-content/themes/_old"

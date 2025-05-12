@@ -1,0 +1,58 @@
+name: 'Deploy Next.js'
+description: 'Deploy Next.js on any Server'
+inputs:
+  SSH_PRIVATE_KEY:
+    description: 'Private key of the SSH user to deploy'
+    required: true
+  SSH_USER:
+    description: 'SSH user'
+    required: true
+  SSH_HOST:
+    description: 'SSH Host (IP adress)'
+    required: true
+  SSH_PORT:
+    description: 'SSH Port (default: 22)'
+    required: false
+    default: 22
+  NEXT_PATH:
+    description: 'Next absolute path on remote server'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Install node
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+
+    - name: Install node dependencies
+      shell: bash
+      run: npm ci
+
+    - name: Pull .env file
+      uses: up9cloud/action-rsync@master
+      env:
+        MODE: PULL
+        HOST: ${{ inputs.SSH_HOST }}
+        USER: ${{ inputs.SSH_USER }}
+        PORT: ${{ inputs.SSH_PORT }}
+        KEY: ${{ inputs.SSH_PRIVATE_KEY }}
+        SOURCE: ${{ inputs.NEXT_PATH }}/.env
+        TARGET: ./
+
+    - name: Build Next
+      shell: bash
+      run: NODE_ENV=production npm run build
+
+    - name: Deploy
+      uses: easingthemes/ssh-deploy@main
+      with:
+        SSH_PRIVATE_KEY: ${{ inputs.SSH_PRIVATE_KEY }}
+        REMOTE_USER: ${{ inputs.SSH_USER }}
+        REMOTE_HOST: ${{ inputs.SSH_HOST }}
+        REMOTE_PORT: ${{ inputs.SSH_PORT }}
+        ARGS: -aulrqtvz
+        SOURCE: .
+        TARGET: ${{ inputs.NEXT_PATH }}/public
+        EXCLUDE: '.git*, .*ignore, .storybook, .vscode, docs, generators, wiki, .editorconfig, .env.github.example, .env.local.example, README.md, next-env.d.ts, vercel.json, wordpress'

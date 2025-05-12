@@ -1,0 +1,61 @@
+name: 'Deploy WP Theme'
+inputs:
+  SSH_PRIVATE_KEY:
+    description: 'Private key of the SSH user to deploy'
+    required: true
+  REMOTE_USER:
+    description: 'Remote server SSH user'
+    required: true
+  REMOTE_HOST:
+    description: 'Remote server SSH Host (IP adress)'
+    required: true
+  REMOTE_PORT:
+    description: 'Remote server SSH Port (default: 22)'
+    required: false
+    default: 22
+  REMOTE_TARGET:
+    description: 'Path on the remote server. (default: /var/www/html)'
+    required: false
+    default: '/var/www/html'
+  WORDPRESS_THEME_NAME:
+    description: 'WordPress Theme name'
+    required: false
+    default: 'superstack'
+
+runs:
+  using: 'composite'
+  steps:
+    - uses: actions/checkout@v4
+
+    - name: deploy composer
+      uses: easingthemes/ssh-deploy@main
+      with:
+        SSH_PRIVATE_KEY: ${{ inputs.SSH_PRIVATE_KEY }}
+        ARGS: '-raultzv --delete'
+        REMOTE_USER: ${{ inputs.REMOTE_USER }}
+        REMOTE_HOST: ${{ inputs.REMOTE_HOST }}
+        REMOTE_PORT: ${{ inputs.REMOTE_PORT }}
+        SOURCE: './wordpress/composer.json ./wordpress/composer.lock'
+        TARGET: ${{ inputs.REMOTE_TARGET }}
+
+    - id: ssh
+      uses: kuuak/ssh-action@main
+      with:
+        SSH_USER: ${{ inputs.REMOTE_USER }}
+        SSH_HOST: ${{ inputs.REMOTE_HOST }}
+        SSH_PORT: ${{ inputs.REMOTE_PORT }}
+        SSH_KEY: ${{ inputs.SSH_PRIVATE_KEY }}
+
+    - name: Require composer depedencies
+      shell: bash
+      run: ssh ${{ steps.ssh.outputs.SERVER }} "cd ${{ inputs.REMOTE_TARGET }}; composer install --no-dev"
+
+    - name: Execute provisiton script
+      shell: bash
+      run: |
+        ssh ${{ steps.ssh.outputs.SERVER }} \
+          "cd ${{ inputs.REMOTE_TARGET }}; \
+          env THEME_NAME=${{ inputs.WORDPRESS_THEME_NAME }} \
+          NEXT_URL=${{ inputs.NEXT_URL }} \
+          WORDPRESS_PATH=${{ inputs.REMOTE_TARGET }} \
+          /bin/bash -s " < ./wordpress/scripts/provision.sh
