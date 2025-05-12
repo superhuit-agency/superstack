@@ -13,12 +13,12 @@ jobs:
       matrix:
         environment:
           - development
+
     steps:
       - uses: actions/checkout@v4
-
       - name: Check github environment secrets and variables
         run: |
-          echo "Checking secrets and variables for '${{ matrix.environment }}.' environment..."
+          echo "Checking secrets and variables for '${{ matrix.environment }}' environment..."
           missing_vars=0
           for var in COMPOSER_GITHUB_TOKEN WORDPRESS_THEME_NAME RELEASE_BELT_USER RELEASE_BELT_PWD NEXT_SSH_HOST NEXT_SSH_PATH NEXT_SSH_PORT NEXT_SSH_USER NEXT_SSH_PRIVATE_KEY NEXT_URL WORDPRESS_SSH_HOST WORDPRESS_SSH_PATH WORDPRESS_SSH_PORT WORDPRESS_SSH_USER WORDPRESS_SSH_PRIVATE_KEY WORDPRESS_URL; do
             if [ -z "${!var}" ]; then
@@ -41,18 +41,18 @@ jobs:
           RELEASE_BELT_USER: ${{ vars.RELEASE_BELT_USER }}
           RELEASE_BELT_PWD: ${{ secrets.RELEASE_BELT_PWD }}
           COMPOSER_GITHUB_TOKEN: ${{ secrets.COMPOSER_GITHUB_TOKEN }}
-          NEXT_SSH_HOST: ${{ vars.NEXT_SSH_HOST }}
-          NEXT_SSH_PATH: ${{ vars.NEXT_SSH_PATH }}
-          NEXT_SSH_PORT: ${{ vars.NEXT_SSH_PORT }}
-          NEXT_SSH_USER: ${{ vars.NEXT_SSH_USER }}
-          NEXT_SSH_PRIVATE_KEY: ${{ secrets.NEXT_SSH_PRIVATE_KEY }}
-          NEXT_URL: ${{ vars.NEXT_URL }}
-          WORDPRESS_SSH_HOST: ${{ vars.WORDPRESS_SSH_HOST }}
-          WORDPRESS_SSH_PATH: ${{ vars.WORDPRESS_SSH_PATH }}
-          WORDPRESS_SSH_PORT: ${{ vars.WORDPRESS_SSH_PORT }}
-          WORDPRESS_SSH_USER: ${{ vars.WORDPRESS_SSH_USER }}
-          WORDPRESS_SSH_PRIVATE_KEY: ${{ secrets.WORDPRESS_SSH_PRIVATE_KEY }}
-          WORDPRESS_URL: ${{ vars.WORDPRESS_URL }}
+          NEXT_SSH_HOST: ${{ env.NEXT_SSH_HOST }}
+          NEXT_SSH_PATH: ${{ env.NEXT_SSH_PATH }}
+          NEXT_SSH_PORT: ${{ env.NEXT_SSH_PORT }}
+          NEXT_SSH_USER: ${{ env.NEXT_SSH_USER }}
+          NEXT_SSH_PRIVATE_KEY: ${{ env.NEXT_SSH_PRIVATE_KEY }}
+          NEXT_URL: ${{ env.NEXT_URL }}
+          WORDPRESS_SSH_HOST: ${{ env.WORDPRESS_SSH_HOST }}
+          WORDPRESS_SSH_PATH: ${{ env.WORDPRESS_SSH_PATH }}
+          WORDPRESS_SSH_PORT: ${{ env.WORDPRESS_SSH_PORT }}
+          WORDPRESS_SSH_USER: ${{ env.WORDPRESS_SSH_USER }}
+          WORDPRESS_SSH_PRIVATE_KEY: ${{ env.WORDPRESS_SSH_PRIVATE_KEY }}
+          WORDPRESS_URL: ${{ env.WORDPRESS_URL }}
 
       - name: Build Backend
         uses: ./.github/actions/build-backend
