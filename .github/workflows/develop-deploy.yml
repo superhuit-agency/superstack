@@ -55,6 +55,9 @@ jobs:
           WORDPRESS_SSH_PRIVATE_KEY: ${{ secrets.WORDPRESS_SSH_PRIVATE_KEY }}
           WORDPRESS_URL: ${{ vars.WORDPRESS_URL }}
 
+      - name: Build Theme
+        uses: ./.github/actions/build-theme
+
       - name: Deploy Wordpress
         uses: ./.github/actions/deploy-wordpress
         with:
@@ -64,9 +67,6 @@ jobs:
           REMOTE_TARGET: ${{ vars.WORDPRESS_SSH_PATH }}
           SSH_PRIVATE_KEY: ${{ secrets.WORDPRESS_SSH_PRIVATE_KEY }}
           WORDPRESS_THEME_NAME: ${{ vars.WORDPRESS_THEME_NAME }}
-
-      - name: Build Theme
-        uses: ./.github/actions/build-theme
 
       - name: Deploy Theme
         uses: ./.github/actions/deploy-theme
