@@ -6,7 +6,7 @@ services:
     links:
       - db
     ports:
-      - '80:80'
+      - '8090:80'
     volumes:
       - './composer.json:/var/www/html/composer.json'
       - './composer.lock:/var/www/html/composer.lock'
