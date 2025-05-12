@@ -55,11 +55,21 @@ jobs:
           WORDPRESS_SSH_PRIVATE_KEY: ${{ secrets.WORDPRESS_SSH_PRIVATE_KEY }}
           WORDPRESS_URL: ${{ vars.WORDPRESS_URL }}
 
-      - name: Build Backend
-        uses: ./.github/actions/build-backend
+      - name: Deploy Wordpress
+        uses: ./.github/actions/deploy-wordpress
+        with:
+          REMOTE_USER: ${{ vars.WORDPRESS_SSH_USER }}
+          REMOTE_HOST: ${{ vars.WORDPRESS_SSH_HOST }}
+          REMOTE_PORT: ${{ vars.WORDPRESS_SSH_PORT }}
+          REMOTE_TARGET: ${{ vars.WORDPRESS_SSH_PATH }}
+          SSH_PRIVATE_KEY: ${{ secrets.WORDPRESS_SSH_PRIVATE_KEY }}
+          WORDPRESS_THEME_NAME: ${{ vars.WORDPRESS_THEME_NAME }}
 
-      - name: Deploy Backend
-        uses: ./.github/actions/deploy-backend
+      - name: Build Theme
+        uses: ./.github/actions/build-theme
+
+      - name: Deploy Theme
+        uses: ./.github/actions/deploy-theme
         with:
           REMOTE_USER: ${{ vars.WORDPRESS_SSH_USER }}
           REMOTE_HOST: ${{ vars.WORDPRESS_SSH_HOST }}
