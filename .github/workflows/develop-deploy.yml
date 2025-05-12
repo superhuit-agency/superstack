@@ -1,16 +1,18 @@
 name: Deploy develop branch
 on:
   push:
-    branches:
-      - 'develop'
   workflow_dispatch:
 
 jobs:
   # Run the test procedure to validate the code being pushed.
   # Like development tests, Start the dockers and build.
   # Finally, run the JEST Unit test script using `npm run test`
-  build_run_test:
+  deploy_develop:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        environment:
+          - development
     steps:
       - uses: actions/checkout@v4
 
