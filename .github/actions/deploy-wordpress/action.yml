@@ -67,7 +67,7 @@ runs:
         ssh ${{ steps.ssh.outputs.SERVER }} \
         cd ${{ inputs.REMOTE_TARGET }}/wordpress; \
         docker compose down -v; \
-        npm run start;"
+        npm run start;
       env:
         THEME_NAME: ${{ inputs.WORDPRESS_THEME_NAME }}
         RELEASE_BELT_USER: ${{ inputs.RELEASE_BELT_USER }}
