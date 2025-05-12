@@ -70,7 +70,7 @@ export const getData = async (
 	`;
 
 	// construct the query variables (maybe based on the `attributes` argument)
-	const options = { variables: attrs?.queryVars } ?? {};
+	const options = { variables: attrs?.queryVars };
 
 	const data = await fetcher(query, options);
 
