@@ -21,6 +21,16 @@ inputs:
     description: 'WordPress Theme name'
     required: false
     default: 'superstack'
+  RELEASE_BELT_USER:
+    description: 'Release Belt User'
+    required: false
+    default: 'release-belt'
+  RELEASE_BELT_PWD:
+    description: 'Release Belt Password'
+    required: false
+  COMPOSER_GITHUB_TOKEN:
+    description: 'Composer GitHub Token'
+    required: false
 
 runs:
   using: 'composite'
@@ -46,10 +56,10 @@ runs:
     - id: ssh
       uses: kuuak/ssh-action@main
       with:
-        SSH_USER: ${{ secrets.SSH_USER }}
-        SSH_HOST: ${{ secrets.SSH_HOST }}
-        SSH_PORT: ${{ secrets.SSH_PORT }}
-        SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        SSH_USER: ${{ inputs.REMOTE_USER }}
+        SSH_HOST: ${{ inputs.REMOTE_HOST }}
+        SSH_PORT: ${{ inputs.REMOTE_PORT }}
+        SSH_KEY: ${{ inputs.SSH_PRIVATE_KEY }}
 
     - name: Start
       shell: bash
@@ -59,7 +69,7 @@ runs:
         docker compose down -v; \
         npm run start;"
       env:
-        THEME_NAME: ${{ vars.WORDPRESS_THEME_NAME }}
-        RELEASE_BELT_USER: ${{ vars.RELEASE_BELT_USER }}
-        RELEASE_BELT_PWD: ${{ secrets.RELEASE_BELT_PWD }}
-        COMPOSER_GITHUB_TOKEN: ${{ secrets.COMPOSER_GITHUB_TOKEN }}
+        THEME_NAME: ${{ inputs.WORDPRESS_THEME_NAME }}
+        RELEASE_BELT_USER: ${{ inputs.RELEASE_BELT_USER }}
+        RELEASE_BELT_PWD: ${{ inputs.RELEASE_BELT_PWD }}
+        COMPOSER_GITHUB_TOKEN: ${{ inputs.COMPOSER_GITHUB_TOKEN }}

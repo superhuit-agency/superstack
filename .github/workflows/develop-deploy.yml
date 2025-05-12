@@ -67,6 +67,9 @@ jobs:
           REMOTE_TARGET: ${{ vars.WORDPRESS_SSH_PATH }}
           SSH_PRIVATE_KEY: ${{ secrets.WORDPRESS_SSH_PRIVATE_KEY }}
           WORDPRESS_THEME_NAME: ${{ vars.WORDPRESS_THEME_NAME }}
+          RELEASE_BELT_USER: ${{ vars.RELEASE_BELT_USER }}
+          RELEASE_BELT_PWD: ${{ secrets.RELEASE_BELT_PWD }}
+          COMPOSER_GITHUB_TOKEN: ${{ secrets.COMPOSER_GITHUB_TOKEN }}
 
       - name: Provision WP Theme
         uses: ./.github/actions/provision-backend
