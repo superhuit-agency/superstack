@@ -66,6 +66,7 @@ runs:
       run: |
         ssh ${{ steps.ssh.outputs.SERVER }} \
         "cd ${{ inputs.REMOTE_TARGET }}/wordpress; \
+        composer install --no-dev; \
         docker compose down -v; \
         npm run start;"
       env:
