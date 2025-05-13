@@ -14,7 +14,7 @@ services:
       - './plugins:/var/www/html/wp-content/plugins'
       - './uploads:/var/www/html/wp-content/uploads'
     working_dir: /var/www/html
-    container_name: "${PROJECT_CODE:-'spck'}_wp"
+    container_name: "supestack_wp"
     environment:
       WORDPRESS_DB_HOST: db:3306
       WORDPRESS_DB_NAME: wordpress
@@ -44,7 +44,7 @@ services:
       - './.data/db:/var/lib/mysql'
     ports:
       - '3306:3306'
-    container_name: "${PROJECT_CODE:-'spck'}_db"
+    container_name: "supestack_db"
     command: --default-authentication-plugin=mysql_native_password
     environment:
       MYSQL_ROOT_PASSWORD: wordpress
