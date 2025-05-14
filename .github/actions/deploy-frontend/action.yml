@@ -35,6 +35,7 @@ runs:
       run: npm ci
 
     - name: Copy environment file
+      shell: bash
       run: cp .env.${{ inputs.NEXT_ENV }}.example .env
 
     - name: Build Next
