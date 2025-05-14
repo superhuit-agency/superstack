@@ -37,7 +37,7 @@ runs:
         REMOTE_HOST: ${{ inputs.REMOTE_HOST }}
         REMOTE_PORT: ${{ inputs.REMOTE_PORT }}
         SOURCE: 'wordpress/scripts'
-        TARGET: '${{ inputs.REMOTE_TARGET }}/wp-content/scripts'
+        TARGET: '${{ inputs.REMOTE_TARGET }}/wp-content/'
 
     - name: Deploy composer
       uses: easingthemes/ssh-deploy@main
