@@ -15,12 +15,13 @@ inputs:
     default: 22
   REMOTE_TARGET:
     description: 'Path on the remote server. (default: /var/www/html)'
-    required: false
-    default: '/var/www/html'
+    required: true
   WORDPRESS_THEME_NAME:
     description: 'WordPress Theme name'
-    required: false
-    default: 'superstack'
+    required: true
+  NEXT_URL:
+    description: 'Next.js URL'
+    required: true
 
 runs:
   using: 'composite'
@@ -57,16 +58,16 @@ runs:
         SSH_PORT: ${{ inputs.REMOTE_PORT }}
         SSH_KEY: ${{ inputs.SSH_PRIVATE_KEY }}
 
-    - name: Require composer depedencies
-      shell: bash
-      run: ssh ${{ steps.ssh.outputs.SERVER }} "cd ${{ inputs.REMOTE_TARGET }}/wp-content; composer install --no-dev"
+    # - name: Require composer depedencies
+    #   shell: bash
+    #   run: ssh ${{ steps.ssh.outputs.SERVER }} "cd ${{ inputs.REMOTE_TARGET }}/wp-content; composer install --no-dev"
 
     - name: Execute provisiton script
       shell: bash
       run: |
         ssh ${{ steps.ssh.outputs.SERVER }} \
-          "cd ${{ inputs.REMOTE_TARGET }}; \
+          "cd ${{ inputs.REMOTE_TARGET }}/wp-content; \
           env THEME_NAME=${{ inputs.WORDPRESS_THEME_NAME }} \
           NEXT_URL=${{ inputs.NEXT_URL }} \
           WORDPRESS_PATH=${{ inputs.REMOTE_TARGET }} \
-          /bin/bash -s " < ./wp-content/scripts/provision.sh
+          sh ./scripts/provision.sh"
