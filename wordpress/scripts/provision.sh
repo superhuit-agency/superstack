@@ -12,12 +12,12 @@
 #
 # USAGE:
 # * To install wordpress on a new server:
-#   Add a file $WORDPRESS_PATH/p.txt containing the
+#   Add a file $WORDPRESS_SSH_PATH/p.txt containing the
 #   MySQL password and run this script.
 #
 # * To update the theme with 0-downtime:
 #   Deploy your new theme version
-#   in $WORDPRESS_PATH/wp-content/themes/_new
+#   in $WORDPRESS_SSH_PATH/wp-content/themes/_new
 #   then run this script.
 #
 # IMPORTANT DEV NOTES:
@@ -30,25 +30,15 @@
 #===========================================
 
 IS_MULTILANG=${IS_MULTILANG:=false}
-THEME_NAME=${THEME_NAME:="superstack"}
-HTTP_HOST=${NEXT_URL}
-WORDPRESS_VERSION=${WORDPRESS_VERSION:="latest"}
-WORDPRESS_LOCALE=${WORDPRESS_LOCALE:="en_US"}
-WORDPRESS_DB_HOST=${WORDPRESS_DB_HOST:="127.0.0.1"}
-WORDPRESS_DB_NAME=${WORDPRESS_DB_NAME:="wordpress"}
-WORDPRESS_DB_USER=${WORDPRESS_DB_USER:="wordpress"}
-WORDPRESS_URL=${WORDPRESS_URL}
-WORDPRESS_TITLE=${WORDPRESS_TITLE:="superstack"}
-WORDPRESS_ADMIN_USER=${WORDPRESS_ADMIN_USER:="superstack"}
-WORDPRESS_ADMIN_EMAIL=${WORDPRESS_ADMIN_EMAIL:="tech+superstack@superhuit.ch"}
+HTTP_HOST=${WORDPRESS_URL}
 
 # #===========================================
 # # /!\ STOP to edit here /!\
 # #===========================================
 
 # vars
-if [ -z "${WORDPRESS_PATH}" ]; then
-	echo "ERROR: Please define WORDPRESS_PATH environment variable" 1>&2
+if [ -z "${WORDPRESS_SSH_PATH}" ]; then
+	echo "ERROR: Please define WORDPRESS_SSH_PATH environment variable" 1>&2
 	exit 1
 fi
 
@@ -64,10 +54,10 @@ fi
 if [ -z "${WPCLI}" ]; then
 	if [ -x "$(command -v wp)" ]; then
 		# wp-cli binary exists
-		WPCLI="wp --path=""$WORDPRESS_PATH"""
+		WPCLI="wp --path=""$WORDPRESS_SSH_PATH"""
 	else
 		# wp-cli binary not existing: download
-		WPCLI="php wp-cli.phar --path=""$WORDPRESS_PATH"""
+		WPCLI="php wp-cli.phar --path=""$WORDPRESS_SSH_PATH"""
 		[ ! -f wp-cli.phar ] && curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
 	fi
 fi
@@ -85,7 +75,7 @@ if ! $WPCLI core is-installed --quiet &> /dev/null; then
 		echo $en "- Installing WordPress $ec"
 		$WPCLI core install --url="http://localhost" --title="superstack" --admin_user="superstack" --admin_password="superstack" --admin_email="tech+superstack@superhuit.ch" --quiet &> /dev/null
 		echo "✔"
-	elif [ ! -f "$WORDPRESS_PATH/p.txt" ]; then
+	elif [ ! -f "$WORDPRESS_SSH_PATH/p.txt" ]; then
 		echo "ERROR: WordPress does not seem to be installed. Add a file 'p.txt' containing the database password if you want this script to automatically install WordPress for you." 1>&2
 		exit 1
 	else
@@ -96,23 +86,25 @@ if ! $WPCLI core is-installed --quiet &> /dev/null; then
 		[ -z "${WORDPRESS_DB_NAME}" ] && echo "ERROR: Please define WORDPRESS_DB_NAME environment variable" 1>&2 && exit 1
 		[ -z "${WORDPRESS_DB_USER}" ] && echo "ERROR: Please define WORDPRESS_DB_USER environment variable" 1>&2 && exit 1
 		[ -z "${WORDPRESS_URL}" ] && echo "ERROR: Please define WORDPRESS_URL environment variable" 1>&2 && exit 1
-		[ -z "${WORDPRESS_TITLE}" ] && echo "ERROR: Please define WORDPRESS_TITLE environment variable (with no space character)" 1>&2 && exit 1
+		[ -z "${WORDPRESS_THEME_NAME}" ] && echo "ERROR: Please define WORDPRESS_THEME_NAME environment variable (no space)" 1>&2 && exit 1
+		[ -z "${WORDPRESS_THEME_TITLE}" ] && echo "ERROR: Please define WORDPRESS_THEME_TITLE environment variable" 1>&2 && exit 1
 		[ -z "${WORDPRESS_ADMIN_USER}" ] && echo "ERROR: Please define WORDPRESS_ADMIN_USER environment variable" 1>&2 && exit 1
 		[ -z "${WORDPRESS_ADMIN_EMAIL}" ] && echo "ERROR: Please define WORDPRESS_ADMIN_EMAIL environment variable" 1>&2 && exit 1
+		[ -z "${WORDPRESS_SSH_PATH}" ] && echo "ERROR: Please define WORDPRESS_SSH_PATH environment variable" 1>&2 && exit 1
 		# install
 		echo $en "- Installing WordPress $ec"
 		$WPCLI core download --version="$WORDPRESS_VERSION" --locale="$WORDPRESS_LOCALE"  --quiet &> /dev/null
-		$WPCLI config create --dbhost="$WORDPRESS_DB_HOST" --dbname="$WORDPRESS_DB_NAME" --dbuser="$WORDPRESS_DB_USER" --prompt=dbpass < $WORDPRESS_PATH/p.txt  --quiet &> /dev/null
-		$WPCLI core install --url="$WORDPRESS_URL" --title="$WORDPRESS_TITLE" --admin_user="$WORDPRESS_ADMIN_USER" --admin_email="$WORDPRESS_ADMIN_EMAIL"  --quiet &> /dev/null
-		rm $WORDPRESS_PATH/p.txt
+		$WPCLI config create --dbhost="$WORDPRESS_DB_HOST" --dbname="$WORDPRESS_DB_NAME" --dbuser="$WORDPRESS_DB_USER" --prompt=dbpass < $WORDPRESS_SSH_PATH/p.txt  --quiet &> /dev/null
+		$WPCLI core install --url="$WORDPRESS_URL" --title="$WORDPRESS_THEME_TITLE" --admin_user="$WORDPRESS_ADMIN_USER" --admin_email="$WORDPRESS_ADMIN_EMAIL"  --quiet &> /dev/null
+		rm $WORDPRESS_SSH_PATH/p.txt
 		echo "✔"
 	fi
 fi
 
 # update theme if new version available
-if [ -d "$WORDPRESS_PATH/wp-content/themes/_new" ]; then
-	[ -d "$WORDPRESS_PATH/wp-content/themes/$THEME_NAME" ] && mv "$WORDPRESS_PATH/wp-content/themes/$THEME_NAME" "$WORDPRESS_PATH/wp-content/themes/_old"
-	mv "$WORDPRESS_PATH/wp-content/themes/_new" "$WORDPRESS_PATH/wp-content/themes/$THEME_NAME" && rm -rf "$WORDPRESS_PATH/wp-content/themes/_old"
+if [ -d "$WORDPRESS_SSH_PATH/wp-content/themes/_new" ]; then
+	[ -d "$WORDPRESS_SSH_PATH/wp-content/themes/$WORDPRESS_THEME_NAME" ] && mv "$WORDPRESS_SSH_PATH/wp-content/themes/$WORDPRESS_THEME_NAME" "$WORDPRESS_SSH_PATH/wp-content/themes/_old"
+	mv "$WORDPRESS_SSH_PATH/wp-content/themes/_new" "$WORDPRESS_SSH_PATH/wp-content/themes/$WORDPRESS_THEME_NAME" && rm -rf "$WORDPRESS_SSH_PATH/wp-content/themes/_old"
 fi
 
 echo
@@ -121,9 +113,9 @@ echo "  Theme install & configuration   "
 echo "----------------------------------"
 echo
 
-if ! $($WPCLI theme is-active $THEME_NAME --skip-plugins); then
+if ! $($WPCLI theme is-active $WORDPRESS_THEME_NAME --skip-plugins); then
 	echo $en "- Activate theme $ec"
-	$WPCLI theme activate "$THEME_NAME" --skip-plugins --quiet
+	$WPCLI theme activate "$WORDPRESS_THEME_NAME" --skip-plugins --quiet
 	echo "✔"
 else
 	echo "- Theme already active"
