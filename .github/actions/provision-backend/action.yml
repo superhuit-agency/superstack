@@ -102,18 +102,18 @@ runs:
           touch p.txt; \
           echo ${{ inputs.WORDPRESS_DB_PASSWORD }} > p.txt; \
           env \
-            WORDPRESS_VERSION="${{ inputs.WORDPRESS_VERSION }}" \
-            WORDPRESS_LOCALE="${{ inputs.WORDPRESS_LOCALE }}" \ 
-            WORDPRESS_DB_HOST="${{ inputs.WORDPRESS_DB_HOST }}" \
-            WORDPRESS_DB_NAME="${{ inputs.WORDPRESS_DB_NAME }}" \
-            WORDPRESS_DB_USER="${{ inputs.WORDPRESS_DB_USER }}" \
-            WORDPRESS_DB_PASSWORD="${{ inputs.WORDPRESS_DB_PASSWORD }}" \
-            WORDPRESS_URL="${{ inputs.WORDPRESS_URL }}" \
-            WORDPRESS_THEME_NAME="${{ inputs.WORDPRESS_THEME_NAME }}" \
-            WORDPRESS_THEME_TITLE="${{ inputs.WORDPRESS_THEME_TITLE }}" \
-            WORDPRESS_ADMIN_USER="${{ inputs.WORDPRESS_ADMIN_USER }}" \
-            WORDPRESS_ADMIN_EMAIL="${{ inputs.WORDPRESS_ADMIN_EMAIL }}" \
-            WORDPRESS_SSH_PATH="${{ inputs.WORDPRESS_SSH_PATH }}" \
-            WORDPRESS_VERSION="${{ inputs.WORDPRESS_VERSION }}" \
-            WORDPRESS_LOCALE="${{ inputs.WORDPRESS_LOCALE }}" \
+            WORDPRESS_VERSION=\"${{ inputs.WORDPRESS_VERSION }}\" \
+            WORDPRESS_LOCALE=\"${{ inputs.WORDPRESS_LOCALE }}\" \ 
+            WORDPRESS_DB_HOST=\"${{ inputs.WORDPRESS_DB_HOST }}\" \
+            WORDPRESS_DB_NAME=\"${{ inputs.WORDPRESS_DB_NAME }}\" \
+            WORDPRESS_DB_USER=\"${{ inputs.WORDPRESS_DB_USER }}\" \
+            WORDPRESS_DB_PASSWORD=\"${{ inputs.WORDPRESS_DB_PASSWORD }}\" \
+            WORDPRESS_URL=\"${{ inputs.WORDPRESS_URL }}\" \
+            WORDPRESS_THEME_NAME=\"${{ inputs.WORDPRESS_THEME_NAME }}\" \
+            WORDPRESS_THEME_TITLE=\"${{ inputs.WORDPRESS_THEME_TITLE }}\" \
+            WORDPRESS_ADMIN_USER=\"${{ inputs.WORDPRESS_ADMIN_USER }}\" \
+            WORDPRESS_ADMIN_EMAIL=\"${{ inputs.WORDPRESS_ADMIN_EMAIL }}\" \
+            WORDPRESS_SSH_PATH=\"${{ inputs.WORDPRESS_SSH_PATH }}\" \
+            WORDPRESS_VERSION=\"${{ inputs.WORDPRESS_VERSION }}\" \
+            WORDPRESS_LOCALE=\"${{ inputs.WORDPRESS_LOCALE }}\" \
           sh ./wp-content/scripts/provision.sh"
