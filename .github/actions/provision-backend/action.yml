@@ -22,6 +22,9 @@ inputs:
   NEXT_URL:
     description: 'Next.js URL'
     required: true
+  WORDPRESS_URL:
+    description: 'WordPress URL'
+    required: true
 
 runs:
   using: 'composite'
@@ -48,7 +51,7 @@ runs:
         REMOTE_HOST: ${{ inputs.REMOTE_HOST }}
         REMOTE_PORT: ${{ inputs.REMOTE_PORT }}
         SOURCE: './wordpress/composer.json ./wordpress/composer.lock'
-        TARGET: ${{ inputs.REMOTE_TARGET }}/wp-content
+        TARGET: ${{ inputs.REMOTE_TARGET }}
 
     - id: ssh
       uses: kuuak/ssh-action@main
@@ -58,9 +61,9 @@ runs:
         SSH_PORT: ${{ inputs.REMOTE_PORT }}
         SSH_KEY: ${{ inputs.SSH_PRIVATE_KEY }}
 
-    # - name: Require composer depedencies
-    #   shell: bash
-    #   run: ssh ${{ steps.ssh.outputs.SERVER }} "cd ${{ inputs.REMOTE_TARGET }}/wp-content; composer install --no-dev"
+    - name: Require composer depedencies
+      shell: bash
+      run: ssh ${{ steps.ssh.outputs.SERVER }} "cd ${{ inputs.REMOTE_TARGET }}; composer install --no-dev"
 
     - name: Execute provisiton script
       shell: bash
@@ -70,5 +73,6 @@ runs:
           env THEME_NAME=${{ inputs.WORDPRESS_THEME_NAME }} \
           HTTP_HOST=${{ inputs.NEXT_URL }} \
           NEXT_URL=${{ inputs.NEXT_URL }} \
+          WORDPRESS_URL=${{ inputs.WORDPRESS_URL }} \
           WORDPRESS_PATH=${{ inputs.REMOTE_TARGET }} \
           sh ./wp-content/scripts/provision.sh"
