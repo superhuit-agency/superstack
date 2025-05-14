@@ -31,6 +31,7 @@
 
 IS_MULTILANG=${IS_MULTILANG:=false}
 THEME_NAME=${THEME_NAME:="superstack"}
+HTTP_HOST=${NEXT_URL}
 
 # #===========================================
 # # /!\ STOP to edit here /!\
