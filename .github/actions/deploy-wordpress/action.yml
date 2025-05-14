@@ -49,7 +49,7 @@ runs:
         REMOTE_USER: ${{ inputs.REMOTE_USER }}
         REMOTE_HOST: ${{ inputs.REMOTE_HOST }}
         REMOTE_PORT: ${{ inputs.REMOTE_PORT }}
-        SOURCE: './wordpress'
+        SOURCE: '.'
         TARGET: '${{ inputs.REMOTE_TARGET }}'
         EXCLUDE: '.github, .gitignore, composer.json, composer.lock, node_modules, packages.json, webpack.config.js, package-lock.json'
 
@@ -64,11 +64,8 @@ runs:
     - name: Start
       shell: bash
       run: |
-        ssh ${{ steps.ssh.outputs.SERVER }} "cd ${{ inputs.REMOTE_TARGET }}/wordpress && \
-        docker compose down -v && \
-        docker compose -f docker-compose.yml up --build -d && \
-        docker compose exec wp composer install && \
-        docker compose exec -T wp bash < ./scripts/provision.sh"
+        ssh ${{ steps.ssh.outputs.SERVER }} "cd ${{ inputs.REMOTE_TARGET }} && \
+        sh ./scripts/provision.sh"
       env:
         THEME_NAME: ${{ inputs.WORDPRESS_THEME_NAME }}
         RELEASE_BELT_USER: ${{ inputs.RELEASE_BELT_USER }}
