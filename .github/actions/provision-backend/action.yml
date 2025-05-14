@@ -20,6 +20,12 @@ inputs:
   WORDPRESS_THEME_NAME:
     description: 'WordPress Theme name'
     required: true
+  WORDPRESS_THEME_TITLE:
+    description: 'WordPress Theme title'
+    required: true
+  WORDPRESS_ADMIN_USER:
+    description: 'WordPress Admin user'
+    required: true
   NEXT_URL:
     description: 'Next.js URL (no trailing slash)'
     required: true
@@ -31,6 +37,18 @@ inputs:
     required: true
   WORDPRESS_LOCALE:
     description: 'WordPress locale'
+    required: true
+  WORDPRESS_DB_HOST:
+    description: 'WordPress DB host'
+    required: true
+  WORDPRESS_DB_NAME:
+    description: 'WordPress DB name'
+    required: true
+  WORDPRESS_DB_USER:
+    description: 'WordPress DB user'
+    required: true
+  WORDPRESS_DB_PASSWORD:
+    description: 'WordPress DB password'
     required: true
 
 runs:
@@ -86,6 +104,7 @@ runs:
             WORDPRESS_DB_HOST=${{ inputs.WORDPRESS_DB_HOST }} \
             WORDPRESS_DB_NAME=${{ inputs.WORDPRESS_DB_NAME }} \
             WORDPRESS_DB_USER=${{ inputs.WORDPRESS_DB_USER }} \
+            WORDPRESS_DB_PASSWORD=${{ inputs.WORDPRESS_DB_PASSWORD }} \
             WORDPRESS_URL=${{ inputs.WORDPRESS_URL }} \
             WORDPRESS_THEME_NAME=${{ inputs.WORDPRESS_THEME_NAME }} \
             WORDPRESS_THEME_TITLE=${{ inputs.WORDPRESS_THEME_TITLE }} \

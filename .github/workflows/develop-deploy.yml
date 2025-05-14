@@ -105,10 +105,17 @@ jobs:
           WORDPRESS_SSH_PATH: ${{ vars.WORDPRESS_SSH_PATH }}
           WORDPRESS_SSH_PRIVATE_KEY: ${{ secrets.WORDPRESS_SSH_PRIVATE_KEY }}
           WORDPRESS_THEME_NAME: ${{ vars.WORDPRESS_THEME_NAME }}
+          WORDPRESS_THEME_TITLE: ${{ vars.WORDPRESS_THEME_TITLE }}
+          WORDPRESS_ADMIN_USER: ${{ vars.WORDPRESS_ADMIN_USER }}
+          WORDPRESS_ADMIN_EMAIL: ${{ vars.WORDPRESS_ADMIN_EMAIL }}
           WORDPRESS_URL: ${{ vars.WORDPRESS_URL }}
           NEXT_URL: ${{ vars.NEXT_URL }}
           WORDPRESS_VERSION: ${{ vars.WORDPRESS_VERSION }}
           WORDPRESS_LOCALE: ${{ vars.WORDPRESS_LOCALE }}
+          WORDPRESS_DB_HOST: ${{ vars.WORDPRESS_DB_HOST }}
+          WORDPRESS_DB_NAME: ${{ vars.WORDPRESS_DB_NAME }}
+          WORDPRESS_DB_USER: ${{ vars.WORDPRESS_DB_USER }}
+          WORDPRESS_DB_PASSWORD: ${{ vars.WORDPRESS_DB_PASSWORD }}
 
       # - name: Build Frontend
       #   uses: ./.github/actions/build-frontend
