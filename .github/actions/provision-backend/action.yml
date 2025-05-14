@@ -66,8 +66,8 @@ runs:
       shell: bash
       run: |
         ssh ${{ steps.ssh.outputs.SERVER }} \
-          "cd ${{ inputs.REMOTE_TARGET }}/wp-content; \
+          "cd ${{ inputs.REMOTE_TARGET }}; \
           env THEME_NAME=${{ inputs.WORDPRESS_THEME_NAME }} \
           NEXT_URL=${{ inputs.NEXT_URL }} \
           WORDPRESS_PATH=${{ inputs.REMOTE_TARGET }} \
-          sh ./scripts/provision.sh"
+          sh ./wp-content/scripts/provision.sh"
