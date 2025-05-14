@@ -27,7 +27,18 @@ runs:
   steps:
     - uses: actions/checkout@v4
 
-    - name: deploy composer
+    - name: Deploy Scripts
+      uses: easingthemes/ssh-deploy@main
+      with:
+        SSH_PRIVATE_KEY: ${{ inputs.SSH_PRIVATE_KEY }}
+        ARGS: '-raltzv --delete'
+        REMOTE_USER: ${{ inputs.REMOTE_USER }}
+        REMOTE_HOST: ${{ inputs.REMOTE_HOST }}
+        REMOTE_PORT: ${{ inputs.REMOTE_PORT }}
+        SOURCE: 'wordpress/scripts'
+        TARGET: '${{ inputs.REMOTE_TARGET }}/wp-content/scripts'
+
+    - name: Deploy composer
       uses: easingthemes/ssh-deploy@main
       with:
         SSH_PRIVATE_KEY: ${{ inputs.SSH_PRIVATE_KEY }}
@@ -36,7 +47,7 @@ runs:
         REMOTE_HOST: ${{ inputs.REMOTE_HOST }}
         REMOTE_PORT: ${{ inputs.REMOTE_PORT }}
         SOURCE: './wordpress/composer.json ./wordpress/composer.lock'
-        TARGET: ${{ inputs.REMOTE_TARGET }}
+        TARGET: ${{ inputs.REMOTE_TARGET }}/wp-content
 
     - id: ssh
       uses: kuuak/ssh-action@main
@@ -48,7 +59,7 @@ runs:
 
     - name: Require composer depedencies
       shell: bash
-      run: ssh ${{ steps.ssh.outputs.SERVER }} "cd ${{ inputs.REMOTE_TARGET }}; composer install --no-dev"
+      run: ssh ${{ steps.ssh.outputs.SERVER }} "cd ${{ inputs.REMOTE_TARGET }}/wp-content; composer install --no-dev"
 
     - name: Execute provisiton script
       shell: bash
@@ -58,4 +69,4 @@ runs:
           env THEME_NAME=${{ inputs.WORDPRESS_THEME_NAME }} \
           NEXT_URL=${{ inputs.NEXT_URL }} \
           WORDPRESS_PATH=${{ inputs.REMOTE_TARGET }} \
-          /bin/bash -s " < ./wordpress/scripts/provision.sh
+          /bin/bash -s " < ./wp-content/scripts/provision.sh
