@@ -26,6 +26,12 @@ inputs:
   WORDPRESS_URL:
     description: 'WordPress URL (no trailing slash)'
     required: true
+  WORDPRESS_VERSION:
+    description: 'WordPress version'
+    required: true
+  WORDPRESS_LOCALE:
+    description: 'WordPress locale'
+    required: true
 
 runs:
   using: 'composite'
@@ -86,4 +92,6 @@ runs:
             WORDPRESS_ADMIN_USER=${{ inputs.WORDPRESS_ADMIN_USER }} \
             WORDPRESS_ADMIN_EMAIL=${{ inputs.WORDPRESS_ADMIN_EMAIL }} \
             WORDPRESS_SSH_PATH=${{ inputs.WORDPRESS_SSH_PATH }} \
+            WORDPRESS_VERSION=${{ inputs.WORDPRESS_VERSION }} \
+            WORDPRESS_LOCALE=${{ inputs.WORDPRESS_LOCALE }} \
           sh ./wp-content/scripts/provision.sh"
