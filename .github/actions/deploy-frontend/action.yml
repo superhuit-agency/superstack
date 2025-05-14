@@ -54,5 +54,5 @@ runs:
         REMOTE_PORT: ${{ inputs.SSH_PORT }}
         ARGS: -aulrqtvz
         SOURCE: .
-        TARGET: ${{ inputs.NEXT_PATH }}/public
+        TARGET: ${{ inputs.NEXT_PATH }}
         EXCLUDE: '.git*, .*ignore, .storybook, .vscode, docs, generators, wiki, .editorconfig, .env.github.example, .env.local.example, README.md, next-env.d.ts, vercel.json, wordpress'
