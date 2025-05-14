@@ -1,22 +1,26 @@
 name: 'Deploy Next.js'
 description: 'Deploy Next.js on any Server'
 inputs:
-  SSH_PRIVATE_KEY:
+  NEXT_SSH_PRIVATE_KEY:
     description: 'Private key of the SSH user to deploy'
     required: true
-  SSH_USER:
+  NEXT_SSH_USER:
     description: 'SSH user'
     required: true
-  SSH_HOST:
+  NEXT_SSH_HOST:
     description: 'SSH Host (IP adress)'
     required: true
-  SSH_PORT:
+  NEXT_SSH_PORT:
     description: 'SSH Port (default: 22)'
     required: false
     default: 22
-  NEXT_PATH:
+  NEXT_SSH_PATH:
     description: 'Next absolute path on remote server'
     required: true
+  NEXT_ENV:
+    description: 'Next environment: development (default), staging or production'
+    required: false
+    default: 'development'
 
 runs:
   using: 'composite'
@@ -30,16 +34,8 @@ runs:
       shell: bash
       run: npm ci
 
-    - name: Pull .env file
-      uses: up9cloud/action-rsync@master
-      env:
-        MODE: PULL
-        HOST: ${{ inputs.SSH_HOST }}
-        USER: ${{ inputs.SSH_USER }}
-        PORT: ${{ inputs.SSH_PORT }}
-        KEY: ${{ inputs.SSH_PRIVATE_KEY }}
-        SOURCE: ${{ inputs.NEXT_PATH }}/.env
-        TARGET: ./
+    - name: Copy environment file
+      run: cp .env.${{ inputs.NEXT_ENV }}.example .env
 
     - name: Build Next
       shell: bash
@@ -48,11 +44,11 @@ runs:
     - name: Deploy
       uses: easingthemes/ssh-deploy@main
       with:
-        SSH_PRIVATE_KEY: ${{ inputs.SSH_PRIVATE_KEY }}
-        REMOTE_USER: ${{ inputs.SSH_USER }}
-        REMOTE_HOST: ${{ inputs.SSH_HOST }}
-        REMOTE_PORT: ${{ inputs.SSH_PORT }}
+        SSH_PRIVATE_KEY: ${{ inputs.NEXT_SSH_PRIVATE_KEY }}
+        REMOTE_USER: ${{ inputs.NEXT_SSH_USER }}
+        REMOTE_HOST: ${{ inputs.NEXT_SSH_HOST }}
+        REMOTE_PORT: ${{ inputs.NEXT_SSH_PORT }}
         ARGS: -aulrqtvz
         SOURCE: .
-        TARGET: ${{ inputs.NEXT_PATH }}
+        TARGET: ${{ inputs.NEXT_SSH_PATH }}
         EXCLUDE: '.git*, .*ignore, .storybook, .vscode, docs, generators, wiki, .editorconfig, .env.github.example, .env.local.example, README.md, next-env.d.ts, vercel.json, wordpress'
