@@ -62,6 +62,18 @@ runs:
         REMOTE_HOST: ${{ inputs.NEXT_SSH_HOST }}
         REMOTE_PORT: ${{ inputs.NEXT_SSH_PORT }}
         ARGS: -aulrqtvz --mkpath
-        SOURCE: ./wordpress/theme/lib/editor/
+        SOURCE: './wordpress/theme/lib/editor/'
         TARGET: ${{ inputs.NEXT_SSH_PATH }}/wordpress/theme/lib/editor/
         EXCLUDE: '*.php'
+
+    - name: Deploy WordPress files used by next
+      uses: easingthemes/ssh-deploy@main
+      with:
+        SSH_PRIVATE_KEY: ${{ inputs.NEXT_SSH_PRIVATE_KEY }}
+        REMOTE_USER: ${{ inputs.NEXT_SSH_USER }}
+        REMOTE_HOST: ${{ inputs.NEXT_SSH_HOST }}
+        REMOTE_PORT: ${{ inputs.NEXT_SSH_PORT }}
+        ARGS: -aulrqtvz
+        SOURCE: './wordpress/package.json ./wordpress/package-lock.json'
+        TARGET: ${{ inputs.NEXT_SSH_PATH }}/wordpress/
+        EXCLUDE: ''
