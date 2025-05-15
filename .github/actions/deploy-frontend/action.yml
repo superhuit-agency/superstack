@@ -62,6 +62,6 @@ runs:
         REMOTE_HOST: ${{ inputs.NEXT_SSH_HOST }}
         REMOTE_PORT: ${{ inputs.NEXT_SSH_PORT }}
         ARGS: -aulrqtvz --mkpath
-        SOURCE: ./wordpress/theme/lib/editor
-        TARGET: ${{ inputs.NEXT_SSH_PATH }}/wordpress/theme/lib/editor
+        SOURCE: ./wordpress/theme/lib/editor/
+        TARGET: ${{ inputs.NEXT_SSH_PATH }}/wordpress/theme/lib/editor/
         EXCLUDE: '*.php'
