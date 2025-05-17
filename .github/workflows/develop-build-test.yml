@@ -41,8 +41,8 @@ jobs:
           RELEASE_BELT_PWD: ${{ secrets.RELEASE_BELT_PWD }}
           COMPOSER_GITHUB_TOKEN: ${{ secrets.COMPOSER_GITHUB_TOKEN }}
 
-      - name: Build Backend
-        uses: ./.github/actions/build-backend
+      - name: Build Theme
+        uses: ./.github/actions/build-theme
 
       - name: Build Frontend
         uses: ./.github/actions/build-frontend

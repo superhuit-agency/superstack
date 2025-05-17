@@ -21,6 +21,16 @@ inputs:
     description: 'WordPress Theme name'
     required: false
     default: 'superstack'
+  RELEASE_BELT_USER:
+    description: 'Release Belt User'
+    required: false
+    default: 'release-belt'
+  RELEASE_BELT_PWD:
+    description: 'Release Belt Password'
+    required: false
+  COMPOSER_GITHUB_TOKEN:
+    description: 'Composer GitHub Token'
+    required: false
 
 runs:
   using: 'composite'
@@ -28,8 +38,8 @@ runs:
     - name: Download artifacts
       uses: actions/download-artifact@v4
       with:
-        name: wp-theme-assets
-        path: wordpress/theme/static/
+        name: wp-assets
+        path: wordpress/
 
     - name: Deploy
       uses: easingthemes/ssh-deploy@main
@@ -39,17 +49,25 @@ runs:
         REMOTE_USER: ${{ inputs.REMOTE_USER }}
         REMOTE_HOST: ${{ inputs.REMOTE_HOST }}
         REMOTE_PORT: ${{ inputs.REMOTE_PORT }}
-        SOURCE: './wordpress/theme/'
-        TARGET: '${{ inputs.REMOTE_TARGET }}/wp-content/themes/_new'
+        SOURCE: '.'
+        TARGET: '${{ inputs.REMOTE_TARGET }}'
         EXCLUDE: '.github, .gitignore, composer.json, composer.lock, node_modules, packages.json, webpack.config.js, package-lock.json'
 
-    - name: Replace theme folder with newly uploaded
-      uses: garygrossgarten/github-action-ssh@release
+    - id: ssh
+      uses: kuuak/ssh-action@main
       with:
-        username: ${{ inputs.REMOTE_USER }}
-        host: ${{ inputs.REMOTE_HOST }}
-        port: ${{ inputs.REMOTE_PORT }}
-        privateKey: ${{ inputs.SSH_PRIVATE_KEY }}
-        command: |
-          [ -d "${{ inputs.REMOTE_TARGET }}/wp-content/themes/${{ inputs.WORDPRESS_THEME_NAME }}" ] && mv "${{ inputs.REMOTE_TARGET }}/wp-content/themes/${{ inputs.WORDPRESS_THEME_NAME }}" "${{ inputs.REMOTE_TARGET }}/wp-content/themes/_old"
-          mv "${{ inputs.REMOTE_TARGET }}/wp-content/themes/_new" "${{ inputs.REMOTE_TARGET }}/wp-content/themes/${{ inputs.WORDPRESS_THEME_NAME }}" && rm -rf "${{ inputs.REMOTE_TARGET }}/wp-content/themes/_old"
+        SSH_USER: ${{ inputs.REMOTE_USER }}
+        SSH_HOST: ${{ inputs.REMOTE_HOST }}
+        SSH_PORT: ${{ inputs.REMOTE_PORT }}
+        SSH_KEY: ${{ inputs.SSH_PRIVATE_KEY }}
+
+    - name: Start
+      shell: bash
+      run: |
+        ssh ${{ steps.ssh.outputs.SERVER }} "cd ${{ inputs.REMOTE_TARGET }} && \
+        sh ./scripts/provision.sh"
+      env:
+        THEME_NAME: ${{ inputs.WORDPRESS_THEME_NAME }}
+        RELEASE_BELT_USER: ${{ inputs.RELEASE_BELT_USER }}
+        RELEASE_BELT_PWD: ${{ inputs.RELEASE_BELT_PWD }}
+        COMPOSER_GITHUB_TOKEN: ${{ inputs.COMPOSER_GITHUB_TOKEN }}
