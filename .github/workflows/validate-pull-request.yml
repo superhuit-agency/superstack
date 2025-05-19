@@ -1,0 +1,118 @@
+name: Test and Validate Pull Request
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+    branches:
+      - '*' # Trigger on pull requests targeting any branch
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  # Pull requests made on the MAIN branch must contain a changelog description.
+  # The version and description written will be used to trigger new tags & releases.
+  check_changelog:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.base.ref == 'main'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Getting version from Next NPM
+        run: echo "CURRENT_VERSION=$(./.github/actions/automated/increment-semver.sh ./package.json self --out)" >> $GITHUB_ENV
+
+      - name: Check if changelog contains description
+        run: bash ./.github/actions/automated/check-changelog.sh "./CHANGELOG.md" ${{ env.CURRENT_VERSION }}
+
+  # Run the test procedure to validate the code being pushed.
+  # Like development tests, Start the dockers and build.
+  # Finally, run the JEST Unit test script using `npm run test`
+  build_run_test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check github environment secrets and variables
+        run: |
+          echo "Checking secrets and variables for the current environment... (${{ matrix.environment }})"
+          missing_vars=0
+          for var in COMPOSER_GITHUB_TOKEN WORDPRESS_THEME_NAME RELEASE_BELT_USER RELEASE_BELT_PWD; do
+            if [ -z "${!var}" ]; then
+              echo "$var is not set."
+              missing_vars=$((missing_vars+1))
+            else
+              echo "$var is set to '${!var}'."
+            fi
+          done
+
+          if [ $missing_vars -ne 0 ]; then
+            echo "inputs_checked=false" >> $GITHUB_OUTPUT
+            echo "Error: $missing_vars variables are missing."
+            exit 1
+          else
+            echo "inputs_checked=true" >> $GITHUB_OUTPUT
+          fi
+        env:
+          WORDPRESS_THEME_NAME: ${{ vars.WORDPRESS_THEME_NAME }}
+          RELEASE_BELT_USER: ${{ vars.RELEASE_BELT_USER }}
+          RELEASE_BELT_PWD: ${{ secrets.RELEASE_BELT_PWD }}
+          COMPOSER_GITHUB_TOKEN: ${{ secrets.COMPOSER_GITHUB_TOKEN }}
+
+      - name: Build WP Theme
+        uses: ./.github/actions/build-theme
+
+      - name: Start WP
+        shell: bash
+        run: |
+          cd wordpress
+          docker compose down -v
+          npm run start
+        env:
+          THEME_NAME: ${{ vars.WORDPRESS_THEME_NAME }}
+          RELEASE_BELT_USER: ${{ vars.RELEASE_BELT_USER }}
+          RELEASE_BELT_PWD: ${{ secrets.RELEASE_BELT_PWD }}
+          COMPOSER_GITHUB_TOKEN: ${{ secrets.COMPOSER_GITHUB_TOKEN }}
+
+      - name: Wait for WordPress
+        shell: bash
+        run: |
+          echo "Waiting for WordPress to be ready..."
+          timeout=300
+          while ! curl -s http://localhost/wp-admin/ > /dev/null; do
+            if [ $timeout -le 0 ]; then
+              echo "Timeout waiting for WordPress"
+              exit 1
+            fi
+            echo "Waiting... ($timeout seconds remaining)"
+            sleep 5
+            timeout=$((timeout-5))
+          done
+
+      - name: Copy environment file
+        run: cp .env.local.example .env.local
+
+      - name: Build Next Frontend
+        uses: ./.github/actions/build-frontend
+
+      - name: Start Next as a thread
+        shell: bash
+        run: |
+          nohup npm run start -- -p 3000 > next.log 2>&1 &
+          echo "Waiting for Next.js to be ready..."
+          timeout=60
+          while ! curl -s http://localhost:3000/ > /dev/null; do
+            if [ $timeout -le 0 ]; then
+              echo "Timeout waiting for Next.js. Log content:"
+              cat next.log
+              exit 0
+            fi
+            echo "Waiting... ($timeout seconds remaining)"
+            sleep 10
+            timeout=$((timeout-10))
+          done
+
+      - name: Simple HTTP Test
+        shell: bash
+        run: sh ./.github/actions/tests/simple-http-test.sh
+
+      - name: Jest Unit Tests
+        shell: bash
+        run: npm run test:all -u

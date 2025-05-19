@@ -1,26 +1,25 @@
 name: 'Deploy WP Theme'
 inputs:
-  SSH_PRIVATE_KEY:
+  WORDPRESS_SSH_PRIVATE_KEY:
     description: 'Private key of the SSH user to deploy'
     required: true
-  REMOTE_USER:
+  WORDPRESS_SSH_USER:
     description: 'Remote server SSH user'
     required: true
-  REMOTE_HOST:
+  WORDPRESS_SSH_HOST:
     description: 'Remote server SSH Host (IP adress)'
     required: true
-  REMOTE_PORT:
+  WORDPRESS_SSH_PORT:
     description: 'Remote server SSH Port (default: 22)'
     required: false
     default: 22
-  REMOTE_TARGET:
+  WORDPRESS_PATH:
     description: 'Path on the remote server. (default: /var/www/html)'
     required: false
     default: '/var/www/html'
   WORDPRESS_THEME_NAME:
     description: 'WordPress Theme name'
-    required: false
-    default: 'superstack'
+    required: true
 
 runs:
   using: 'composite'
@@ -34,22 +33,22 @@ runs:
     - name: Deploy
       uses: easingthemes/ssh-deploy@main
       with:
-        SSH_PRIVATE_KEY: ${{ inputs.SSH_PRIVATE_KEY }}
+        SSH_PRIVATE_KEY: ${{ inputs.WORDPRESS_SSH_PRIVATE_KEY }}
         ARGS: '-raltzv --delete'
-        REMOTE_USER: ${{ inputs.REMOTE_USER }}
-        REMOTE_HOST: ${{ inputs.REMOTE_HOST }}
-        REMOTE_PORT: ${{ inputs.REMOTE_PORT }}
+        REMOTE_USER: ${{ inputs.WORDPRESS_SSH_USER }}
+        REMOTE_HOST: ${{ inputs.WORDPRESS_SSH_HOST }}
+        REMOTE_PORT: ${{ inputs.WORDPRESS_SSH_PORT }}
         SOURCE: './wordpress/theme/'
-        TARGET: '${{ inputs.REMOTE_TARGET }}/wp-content/themes/_new'
+        TARGET: '${{ inputs.WORDPRESS_PATH }}/wp-content/themes/_new'
         EXCLUDE: '.github, .gitignore, composer.json, composer.lock, node_modules, packages.json, webpack.config.js, package-lock.json'
 
     - name: Replace theme folder with newly uploaded
       uses: garygrossgarten/github-action-ssh@release
       with:
-        username: ${{ inputs.REMOTE_USER }}
-        host: ${{ inputs.REMOTE_HOST }}
-        port: ${{ inputs.REMOTE_PORT }}
-        privateKey: ${{ inputs.SSH_PRIVATE_KEY }}
+        username: ${{ inputs.WORDPRESS_SSH_USER }}
+        host: ${{ inputs.WORDPRESS_SSH_HOST }}
+        port: ${{ inputs.WORDPRESS_SSH_PORT }}
+        privateKey: ${{ inputs.WORDPRESS_SSH_PRIVATE_KEY }}
         command: |
-          [ -d "${{ inputs.REMOTE_TARGET }}/wp-content/themes/${{ inputs.WORDPRESS_THEME_NAME }}" ] && mv "${{ inputs.REMOTE_TARGET }}/wp-content/themes/${{ inputs.WORDPRESS_THEME_NAME }}" "${{ inputs.REMOTE_TARGET }}/wp-content/themes/_old"
-          mv "${{ inputs.REMOTE_TARGET }}/wp-content/themes/_new" "${{ inputs.REMOTE_TARGET }}/wp-content/themes/${{ inputs.WORDPRESS_THEME_NAME }}" && rm -rf "${{ inputs.REMOTE_TARGET }}/wp-content/themes/_old"
+          [ -d "${{ inputs.WORDPRESS_PATH }}/wp-content/themes/${{ inputs.WORDPRESS_THEME_NAME }}" ] && mv "${{ inputs.WORDPRESS_PATH }}/wp-content/themes/${{ inputs.WORDPRESS_THEME_NAME }}" "${{ inputs.WORDPRESS_PATH }}/wp-content/themes/_old"
+          mv "${{ inputs.WORDPRESS_PATH }}/wp-content/themes/_new" "${{ inputs.WORDPRESS_PATH }}/wp-content/themes/${{ inputs.WORDPRESS_THEME_NAME }}" && rm -rf "${{ inputs.WORDPRESS_PATH }}/wp-content/themes/_old"
