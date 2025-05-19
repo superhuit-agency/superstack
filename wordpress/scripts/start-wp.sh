@@ -20,4 +20,4 @@ echo ""
 echo "Provisioning WordPress..."
 echo "-------"
 sleep 1
-WORDPRESS_SSH_PATH="$(pwd)" THEME_NAME=${THEME_NAME} $COMPOSE exec -T wp bash < ./scripts/provision.sh
+THEME_NAME=${THEME_NAME} $COMPOSE exec -T wp bash < ./scripts/provision.sh

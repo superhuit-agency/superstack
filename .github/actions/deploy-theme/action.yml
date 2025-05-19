@@ -13,7 +13,7 @@ inputs:
     description: 'Remote server SSH Port (default: 22)'
     required: false
     default: 22
-  WORDPRESS_SSH_PATH:
+  WORDPRESS_PATH:
     description: 'Path on the remote server. (default: /var/www/html)'
     required: false
     default: '/var/www/html'
@@ -39,7 +39,7 @@ runs:
         REMOTE_HOST: ${{ inputs.WORDPRESS_SSH_HOST }}
         REMOTE_PORT: ${{ inputs.WORDPRESS_SSH_PORT }}
         SOURCE: './wordpress/theme/'
-        TARGET: '${{ inputs.WORDPRESS_SSH_PATH }}/wp-content/themes/_new'
+        TARGET: '${{ inputs.WORDPRESS_PATH }}/wp-content/themes/_new'
         EXCLUDE: '.github, .gitignore, composer.json, composer.lock, node_modules, packages.json, webpack.config.js, package-lock.json'
 
     - name: Replace theme folder with newly uploaded
@@ -50,5 +50,5 @@ runs:
         port: ${{ inputs.WORDPRESS_SSH_PORT }}
         privateKey: ${{ inputs.WORDPRESS_SSH_PRIVATE_KEY }}
         command: |
-          [ -d "${{ inputs.WORDPRESS_SSH_PATH }}/wp-content/themes/${{ inputs.WORDPRESS_THEME_NAME }}" ] && mv "${{ inputs.WORDPRESS_SSH_PATH }}/wp-content/themes/${{ inputs.WORDPRESS_THEME_NAME }}" "${{ inputs.WORDPRESS_SSH_PATH }}/wp-content/themes/_old"
-          mv "${{ inputs.WORDPRESS_SSH_PATH }}/wp-content/themes/_new" "${{ inputs.WORDPRESS_SSH_PATH }}/wp-content/themes/${{ inputs.WORDPRESS_THEME_NAME }}" && rm -rf "${{ inputs.WORDPRESS_SSH_PATH }}/wp-content/themes/_old"
+          [ -d "${{ inputs.WORDPRESS_PATH }}/wp-content/themes/${{ inputs.WORDPRESS_THEME_NAME }}" ] && mv "${{ inputs.WORDPRESS_PATH }}/wp-content/themes/${{ inputs.WORDPRESS_THEME_NAME }}" "${{ inputs.WORDPRESS_PATH }}/wp-content/themes/_old"
+          mv "${{ inputs.WORDPRESS_PATH }}/wp-content/themes/_new" "${{ inputs.WORDPRESS_PATH }}/wp-content/themes/${{ inputs.WORDPRESS_THEME_NAME }}" && rm -rf "${{ inputs.WORDPRESS_PATH }}/wp-content/themes/_old"

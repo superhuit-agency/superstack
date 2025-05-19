@@ -63,7 +63,6 @@ jobs:
         shell: bash
         run: |
           cd wordpress
-          env WORDPRESS_SSH_PATH="$(pwd)"
           docker compose down -v
           npm run start
         env:
