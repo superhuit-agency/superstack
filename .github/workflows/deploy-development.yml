@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - 'development'
+      - 'develop'
   workflow_dispatch:
 
 jobs:
