@@ -93,7 +93,7 @@ if ! $WPCLI core is-installed --quiet &> /dev/null; then
 		[ -z "${WORDPRESS_VERSION}" ] && echo "ERROR: Please define WORDPRESS_VERSION environment variable" 1>&2 && exit 1
 		# install
 
-		if $WPCLI core is-installed --quiet; then
+		if ! $WPCLI core is-installed --quiet; then
 			echo $en "- Installing WordPress $ec"
 			$WPCLI core download --version="$WORDPRESS_VERSION" --locale="$WORDPRESS_LOCALE"  --quiet &> /dev/null
 			$WPCLI config create --dbhost="$WORDPRESS_DB_HOST" --dbname="$WORDPRESS_DB_NAME" --dbuser="$WORDPRESS_DB_USER" --prompt=dbpass < $WORDPRESS_PATH/p.txt  --quiet &> /dev/null
@@ -101,7 +101,7 @@ if ! $WPCLI core is-installed --quiet &> /dev/null; then
 			rm $WORDPRESS_PATH/p.txt
 			echo "✔"
 		else
-			# Check if current WordPress version matches requested version
+			echo "Already installed"
 			CURRENT_VERSION=$($WPCLI core version --quiet)
 			if [ "$CURRENT_VERSION" != "$WORDPRESS_VERSION" ]; then
 				echo $en "- Updating WordPress from $CURRENT_VERSION to $WORDPRESS_VERSION $ec"
@@ -111,6 +111,7 @@ if ! $WPCLI core is-installed --quiet &> /dev/null; then
 				echo "- WordPress version $WORDPRESS_VERSION already installed"
 			fi
 		fi
+
 	fi
 fi
 
