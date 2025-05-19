@@ -2,7 +2,7 @@
 
 Follow these steps to install the stack for the 1st time:
 
--   `cp .env.local.example .env.local` - make default environment variables available to Next.js, Storybook and WordPress
+-   `cp .env.next.local.example .env.local` - make default environment variables available to Next.js, Storybook and WordPress
 -   `nvm use`
 -   `npm install` - install packages
 

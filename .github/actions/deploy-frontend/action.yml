@@ -18,7 +18,7 @@ inputs:
     description: 'Next absolute path on remote server'
     required: true
   NEXT_ENV:
-    description: 'Next environment: development (default), staging or production'
+    description: 'Next environment: local, development (default), staging or production'
     required: false
     default: 'development'
 
@@ -36,7 +36,7 @@ runs:
 
     - name: Copy environment file
       shell: bash
-      run: cp .env.${{ inputs.NEXT_ENV }}.example .env
+      run: cp .env.next.${{ inputs.NEXT_ENV }}.example .env
 
     - name: Build Next
       shell: bash
@@ -52,7 +52,7 @@ runs:
         ARGS: -aulrqtvz
         SOURCE: .
         TARGET: ${{ inputs.NEXT_SSH_PATH }}
-        EXCLUDE: '.git*, .*ignore, .storybook, .vscode, docs, generators, wiki, .editorconfig, .env.github.example, .env.local.example, README.md, next-env.d.ts, vercel.json, wordpress'
+        EXCLUDE: '.git*, .*ignore, .storybook, .vscode, docs, generators, wiki, .editorconfig, .env.*.example, README.md, next-env.d.ts, vercel.json, wordpress'
 
     - name: Deploy WordPress files used by next
       uses: easingthemes/ssh-deploy@main

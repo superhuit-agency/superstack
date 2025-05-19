@@ -87,7 +87,7 @@ jobs:
           done
 
       - name: Copy environment file
-        run: cp .env.local.example .env.local
+        run: cp .env.next.local.example .env.local
 
       - name: Build Next Frontend
         uses: ./.github/actions/build-frontend
