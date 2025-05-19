@@ -99,6 +99,17 @@ if ! $WPCLI core is-installed --quiet &> /dev/null; then
 		rm $WORDPRESS_PATH/p.txt
 		echo "✔"
 	fi
+else
+	echo "- WordPress already installed"
+	# Check if current WordPress version matches requested version
+	CURRENT_VERSION=$($WPCLI core version --quiet)
+	if [ "$CURRENT_VERSION" != "$WORDPRESS_VERSION" ]; then
+		echo $en "- Updating WordPress from $CURRENT_VERSION to $WORDPRESS_VERSION $ec"
+		$WPCLI core update --version="$WORDPRESS_VERSION" --force --quiet &> /dev/null
+		echo "✔"
+	else
+		echo "- WordPress version $WORDPRESS_VERSION already installed"
+	fi
 fi
 
 # update theme if new version available
