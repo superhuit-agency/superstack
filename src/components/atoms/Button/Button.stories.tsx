@@ -29,3 +29,34 @@ export const Secondary: Story = {
 		variant: 'secondary',
 	},
 };
+
+export const Submit: Story = {
+	args: {
+		type: 'submit',
+		title: 'Submit Form',
+	},
+};
+
+export const Download: Story = {
+	args: {
+		download: true,
+		title: 'Download file',
+		href: '/file.pdf',
+	},
+};
+
+export const External: Story = {
+	args: {
+		title: 'Made by Superhuit',
+		href: 'https://superhuit.ch',
+		target: '_blank',
+	},
+};
+
+export const Empty: Story = {
+	args: {
+		title: undefined,
+		href: 'https://superhuit.ch',
+		target: '_blank',
+	},
+};

@@ -1,0 +1,119 @@
+name: Deploy development branch
+on:
+  push:
+    branches:
+      - 'development'
+      - 'develop'
+  workflow_dispatch:
+
+jobs:
+  # Run the test procedure to validate the code being pushed.
+  # Like development tests, Start the dockers and build.
+  # Finally, run the JEST Unit test script using `npm run test`
+  deploy_development:
+    name: Deploy in development environment
+    runs-on: ubuntu-latest
+    environment: development
+    strategy:
+      matrix:
+        environment:
+          - development
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check github environment secrets and variables
+        run: |
+          echo "Checking secrets and variables for '${{ matrix.environment }}' environment..."
+          missing_vars=0
+          for var in COMPOSER_GITHUB_TOKEN RELEASE_BELT_USER RELEASE_BELT_PWD WORDPRESS_SSH_HOST WORDPRESS_PATH WORDPRESS_SSH_PORT WORDPRESS_SSH_USER WORDPRESS_SSH_PRIVATE_KEY WORDPRESS_URL WORDPRESS_VERSION WORDPRESS_LOCALE WORDPRESS_THEME_NAME WORDPRESS_THEME_TITLE WORDPRESS_ADMIN_USER WORDPRESS_ADMIN_EMAIL WORDPRESS_DB_HOST WORDPRESS_DB_NAME WORDPRESS_DB_USER WORDPRESS_DB_PASSWORD NEXT_SSH_HOST NEXT_SSH_PATH NEXT_SSH_PORT NEXT_SSH_USER NEXT_SSH_PRIVATE_KEY NEXT_URL; do
+            if [ -z "${!var}" ]; then
+              echo "$var is not set."
+              missing_vars=$((missing_vars+1))
+            else
+              echo "$var is set to '${!var}'."
+            fi
+          done
+
+          if [ $missing_vars -ne 0 ]; then
+            echo "inputs_checked=false" >> $GITHUB_OUTPUT
+            echo "Error: $missing_vars variables are missing."
+            exit 1
+          else
+            echo "inputs_checked=true" >> $GITHUB_OUTPUT
+          fi
+        env:
+          COMPOSER_GITHUB_TOKEN: ${{ secrets.COMPOSER_GITHUB_TOKEN }}
+          RELEASE_BELT_USER: ${{ vars.RELEASE_BELT_USER }}
+          RELEASE_BELT_PWD: ${{ secrets.RELEASE_BELT_PWD }}
+
+          WORDPRESS_SSH_HOST: ${{ vars.WORDPRESS_SSH_HOST }}
+          WORDPRESS_SSH_PORT: ${{ vars.WORDPRESS_SSH_PORT }}
+          WORDPRESS_SSH_USER: ${{ vars.WORDPRESS_SSH_USER }}
+          WORDPRESS_SSH_PRIVATE_KEY: ${{ secrets.WORDPRESS_SSH_PRIVATE_KEY }}
+
+          WORDPRESS_PATH: ${{ vars.WORDPRESS_PATH }}
+          WORDPRESS_URL: ${{ vars.WORDPRESS_URL }}
+          WORDPRESS_VERSION: ${{ vars.WORDPRESS_VERSION }}
+          WORDPRESS_LOCALE: ${{ vars.WORDPRESS_LOCALE }}
+          WORDPRESS_THEME_NAME: ${{ vars.WORDPRESS_THEME_NAME }}
+          WORDPRESS_THEME_TITLE: ${{ vars.WORDPRESS_THEME_TITLE }}
+
+          WORDPRESS_ADMIN_USER: ${{ vars.WORDPRESS_ADMIN_USER }}
+          WORDPRESS_ADMIN_EMAIL: ${{ vars.WORDPRESS_ADMIN_EMAIL }}
+          WORDPRESS_DB_HOST: ${{ vars.WORDPRESS_DB_HOST }}
+          WORDPRESS_DB_NAME: ${{ vars.WORDPRESS_DB_NAME }}
+          WORDPRESS_DB_USER: ${{ vars.WORDPRESS_DB_USER }}
+          WORDPRESS_DB_PASSWORD: ${{ secrets.WORDPRESS_DB_PASSWORD }}
+
+          NEXT_URL: ${{ vars.NEXT_URL }}
+
+          NEXT_SSH_HOST: ${{ vars.NEXT_SSH_HOST }}
+          NEXT_SSH_PATH: ${{ vars.NEXT_SSH_PATH }}
+          NEXT_SSH_PORT: ${{ vars.NEXT_SSH_PORT }}
+          NEXT_SSH_USER: ${{ vars.NEXT_SSH_USER }}
+          NEXT_SSH_PRIVATE_KEY: ${{ secrets.NEXT_SSH_PRIVATE_KEY }}
+
+      - name: Build Theme
+        uses: ./.github/actions/build-theme
+
+      - name: Deploy Theme
+        uses: ./.github/actions/deploy-theme
+        with:
+          WORDPRESS_SSH_USER: ${{ vars.WORDPRESS_SSH_USER }}
+          WORDPRESS_SSH_HOST: ${{ vars.WORDPRESS_SSH_HOST }}
+          WORDPRESS_SSH_PORT: ${{ vars.WORDPRESS_SSH_PORT }}
+          WORDPRESS_SSH_PRIVATE_KEY: ${{ secrets.WORDPRESS_SSH_PRIVATE_KEY }}
+          WORDPRESS_PATH: ${{ vars.WORDPRESS_PATH }}
+          WORDPRESS_THEME_NAME: ${{ vars.WORDPRESS_THEME_NAME }}
+
+      - name: Provision WordPress
+        uses: ./.github/actions/provision-backend
+        with:
+          WORDPRESS_SSH_USER: ${{ vars.WORDPRESS_SSH_USER }}
+          WORDPRESS_SSH_HOST: ${{ vars.WORDPRESS_SSH_HOST }}
+          WORDPRESS_SSH_PORT: ${{ vars.WORDPRESS_SSH_PORT }}
+          WORDPRESS_SSH_PRIVATE_KEY: ${{ secrets.WORDPRESS_SSH_PRIVATE_KEY }}
+          WORDPRESS_PATH: ${{ vars.WORDPRESS_PATH }}
+          WORDPRESS_THEME_NAME: ${{ vars.WORDPRESS_THEME_NAME }}
+          WORDPRESS_THEME_TITLE: ${{ vars.WORDPRESS_THEME_TITLE }}
+          WORDPRESS_ADMIN_USER: ${{ vars.WORDPRESS_ADMIN_USER }}
+          WORDPRESS_ADMIN_EMAIL: ${{ vars.WORDPRESS_ADMIN_EMAIL }}
+          WORDPRESS_URL: ${{ vars.WORDPRESS_URL }}
+          NEXT_URL: ${{ vars.NEXT_URL }}
+          WORDPRESS_VERSION: ${{ vars.WORDPRESS_VERSION }}
+          WORDPRESS_LOCALE: ${{ vars.WORDPRESS_LOCALE }}
+          WORDPRESS_DB_HOST: ${{ vars.WORDPRESS_DB_HOST }}
+          WORDPRESS_DB_NAME: ${{ vars.WORDPRESS_DB_NAME }}
+          WORDPRESS_DB_USER: ${{ vars.WORDPRESS_DB_USER }}
+          WORDPRESS_DB_PASSWORD: ${{ secrets.WORDPRESS_DB_PASSWORD }}
+
+      - name: Deploy Frontend
+        uses: ./.github/actions/deploy-frontend
+        with:
+          NEXT_ENV: development
+          WORDPRESS_URL: ${{ vars.WORDPRESS_URL }}
+          NEXT_SSH_USER: ${{ vars.NEXT_SSH_USER }}
+          NEXT_SSH_HOST: ${{ vars.NEXT_SSH_HOST }}
+          NEXT_SSH_PORT: ${{ vars.NEXT_SSH_PORT }}
+          NEXT_SSH_PATH: ${{ vars.NEXT_SSH_PATH }}
+          NEXT_SSH_PRIVATE_KEY: ${{ secrets.NEXT_SSH_PRIVATE_KEY }}

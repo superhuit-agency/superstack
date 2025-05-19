@@ -30,7 +30,7 @@
 #===========================================
 
 IS_MULTILANG=${IS_MULTILANG:=false}
-THEME_NAME=${THEME_NAME:="superstack"}
+HTTP_HOST=${WORDPRESS_URL}
 
 # #===========================================
 # # /!\ STOP to edit here /!\
@@ -80,20 +80,22 @@ if ! $WPCLI core is-installed --quiet &> /dev/null; then
 		exit 1
 	else
 		# bail early if missing env vars
-		[ -z "${WORDPRESS_VERSION}" ] && echo "ERROR: Please define WORDPRESS_VERSION environment variable" 1>&2 && exit 1
-		[ -z "${WORDPRESS_LOCALE}" ] && echo "ERROR: Please define WORDPRESS_LOCALE environment variable" 1>&2 && exit 1
+		[ -z "${WORDPRESS_ADMIN_USER}" ] && echo "ERROR: Please define WORDPRESS_ADMIN_USER environment variable" 1>&2 && exit 1
+		[ -z "${WORDPRESS_ADMIN_EMAIL}" ] && echo "ERROR: Please define WORDPRESS_ADMIN_EMAIL environment variable" 1>&2 && exit 1
 		[ -z "${WORDPRESS_DB_HOST}" ] && echo "ERROR: Please define WORDPRESS_DB_HOST environment variable" 1>&2 && exit 1
 		[ -z "${WORDPRESS_DB_NAME}" ] && echo "ERROR: Please define WORDPRESS_DB_NAME environment variable" 1>&2 && exit 1
 		[ -z "${WORDPRESS_DB_USER}" ] && echo "ERROR: Please define WORDPRESS_DB_USER environment variable" 1>&2 && exit 1
+		[ -z "${WORDPRESS_LOCALE}" ] && echo "ERROR: Please define WORDPRESS_LOCALE environment variable" 1>&2 && exit 1
+		[ -z "${WORDPRESS_PATH}" ] && echo "ERROR: Please define WORDPRESS_PATH environment variable" 1>&2 && exit 1
+		[ -z "${WORDPRESS_THEME_NAME}" ] && echo "ERROR: Please define WORDPRESS_THEME_NAME environment variable (no space)" 1>&2 && exit 1
+		[ -z "${WORDPRESS_THEME_TITLE}" ] && echo "ERROR: Please define WORDPRESS_THEME_TITLE environment variable" 1>&2 && exit 1
 		[ -z "${WORDPRESS_URL}" ] && echo "ERROR: Please define WORDPRESS_URL environment variable" 1>&2 && exit 1
-		[ -z "${WORDPRESS_TITLE}" ] && echo "ERROR: Please define WORDPRESS_TITLE environment variable (with no space character)" 1>&2 && exit 1
-		[ -z "${WORDPRESS_ADMIN_USER}" ] && echo "ERROR: Please define WORDPRESS_ADMIN_USER environment variable" 1>&2 && exit 1
-		[ -z "${WORDPRESS_ADMIN_EMAIL}" ] && echo "ERROR: Please define WORDPRESS_ADMIN_EMAIL environment variable" 1>&2 && exit 1
+		[ -z "${WORDPRESS_VERSION}" ] && echo "ERROR: Please define WORDPRESS_VERSION environment variable" 1>&2 && exit 1
 		# install
 		echo $en "- Installing WordPress $ec"
 		$WPCLI core download --version="$WORDPRESS_VERSION" --locale="$WORDPRESS_LOCALE"  --quiet &> /dev/null
 		$WPCLI config create --dbhost="$WORDPRESS_DB_HOST" --dbname="$WORDPRESS_DB_NAME" --dbuser="$WORDPRESS_DB_USER" --prompt=dbpass < $WORDPRESS_PATH/p.txt  --quiet &> /dev/null
-		$WPCLI core install --url="$WORDPRESS_URL" --title="$WORDPRESS_TITLE" --admin_user="$WORDPRESS_ADMIN_USER" --admin_email="$WORDPRESS_ADMIN_EMAIL"  --quiet &> /dev/null
+		$WPCLI core install --url="$WORDPRESS_URL" --title="$WORDPRESS_THEME_TITLE" --admin_user="$WORDPRESS_ADMIN_USER" --admin_email="$WORDPRESS_ADMIN_EMAIL"  --quiet &> /dev/null
 		rm $WORDPRESS_PATH/p.txt
 		echo "✔"
 	fi
@@ -101,8 +103,8 @@ fi
 
 # update theme if new version available
 if [ -d "$WORDPRESS_PATH/wp-content/themes/_new" ]; then
-	[ -d "$WORDPRESS_PATH/wp-content/themes/$THEME_NAME" ] && mv "$WORDPRESS_PATH/wp-content/themes/$THEME_NAME" "$WORDPRESS_PATH/wp-content/themes/_old"
-	mv "$WORDPRESS_PATH/wp-content/themes/_new" "$WORDPRESS_PATH/wp-content/themes/$THEME_NAME" && rm -rf "$WORDPRESS_PATH/wp-content/themes/_old"
+	[ -d "$WORDPRESS_PATH/wp-content/themes/$WORDPRESS_THEME_NAME" ] && mv "$WORDPRESS_PATH/wp-content/themes/$WORDPRESS_THEME_NAME" "$WORDPRESS_PATH/wp-content/themes/_old"
+	mv "$WORDPRESS_PATH/wp-content/themes/_new" "$WORDPRESS_PATH/wp-content/themes/$WORDPRESS_THEME_NAME" && rm -rf "$WORDPRESS_PATH/wp-content/themes/_old"
 fi
 
 echo
@@ -111,9 +113,9 @@ echo "  Theme install & configuration   "
 echo "----------------------------------"
 echo
 
-if ! $($WPCLI theme is-active $THEME_NAME --skip-plugins); then
+if ! $($WPCLI theme is-active $WORDPRESS_THEME_NAME --skip-plugins); then
 	echo $en "- Activate theme $ec"
-	$WPCLI theme activate "$THEME_NAME" --skip-plugins --quiet
+	$WPCLI theme activate "$WORDPRESS_THEME_NAME" --skip-plugins --quiet
 	echo "✔"
 else
 	echo "- Theme already active"
