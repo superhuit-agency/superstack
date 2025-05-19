@@ -95,7 +95,7 @@ if ! $WPCLI core is-installed --quiet &> /dev/null; then
 		echo $en "- Installing WordPress $ec"
 		$WPCLI core download --version="$WORDPRESS_VERSION" --locale="$WORDPRESS_LOCALE"  --quiet &> /dev/null
 		$WPCLI config create --dbhost="$WORDPRESS_DB_HOST" --dbname="$WORDPRESS_DB_NAME" --dbuser="$WORDPRESS_DB_USER" --prompt=dbpass < $WORDPRESS_PATH/p.txt  --quiet &> /dev/null
-		$WPCLI core install --url="$WORDPRESS_URL" --title="$WORDPRESS_THEME_TITLE" --admin_user="$WORDPRESS_ADMIN_USER" --admin_email="$WORDPRESS_ADMIN_EMAIL"  --quiet &> /dev/null
+		$WPCLI core install --version="$WORDPRESS_VERSION" --locale="$WORDPRESS_LOCALE" --url="$WORDPRESS_URL" --title="$WORDPRESS_THEME_TITLE" --admin_user="$WORDPRESS_ADMIN_USER" --admin_email="$WORDPRESS_ADMIN_EMAIL"  --quiet &> /dev/null
 		rm $WORDPRESS_PATH/p.txt
 		echo "✔"
 	fi
