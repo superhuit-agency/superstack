@@ -115,4 +115,4 @@ jobs:
 
       - name: Jest Unit Tests
         shell: bash
-        run: npm run test -u
+        run: npm run test:all -u
