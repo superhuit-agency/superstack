@@ -1,8 +1,8 @@
 import '@testing-library/jest-dom';
 import { render } from '@testing-library/react';
-import { Primary, Secondary } from './Button.stories';
-import { Button } from './index';
 
+import { Primary, Secondary, Submit, Download, External, Empty } from './Button.stories';
+import { Button } from './index';
 
 /**
  * Button Unit tests.
@@ -16,7 +16,9 @@ describe('React Component Unit Tests: ' + Button.name, () => {
 
 		expect(component).toBeInTheDocument();
 		expect(component).toHaveClass(['supt-button', '-primary'], {exact: true});
-		expect(component).toHaveTextContent('Button Primary');
+
+		expect(component).toHaveTextContent(Primary.args.title);
+
 		expect(component).toHaveRole('link');
 		expect(component).toBeEnabled();
 		expect(component).toBeVisible();
@@ -29,7 +31,8 @@ describe('React Component Unit Tests: ' + Button.name, () => {
 
 		expect(component).toBeInTheDocument();
 		expect(component).toHaveClass(['supt-button', '-secondary'], {exact: true});
-		expect(component).toHaveTextContent('Button Secondary');
+
+		expect(component).toHaveTextContent(Secondary.args.title);
 		expect(component).toHaveRole('link');
 		expect(component).toBeEnabled();
 		expect(component).toBeVisible();
@@ -37,12 +40,12 @@ describe('React Component Unit Tests: ' + Button.name, () => {
 
 	it('Submit button', () => {
 		const id = 'button_submit';
-		const { container } = render(<Button type='submit' title='Submit Form' id={id} />);
+		const { container } = render(<Button {...Submit.args} id={id} />);
 		const component = container.querySelector(`#${id}`);
 
 		expect(component).toBeInTheDocument();
 		expect(component).toHaveClass(['supt-button', '-primary'], {exact: true});
-		expect(component).toHaveTextContent('Submit Form');
+		expect(component).toHaveTextContent(Submit.args.title);
 		expect(component).toHaveRole('button');
 		expect(component).toBeEnabled();
 		expect(component).toBeVisible();
@@ -50,7 +53,7 @@ describe('React Component Unit Tests: ' + Button.name, () => {
 
 	it('Download button', () => {
 		const id = 'button_download';
-		const { container } = render(<Button download={true} title='Download file' href="/file.pdf" id={id} />);
+		const { container } = render(<Button {...Download.args} id={id} />);
 		const component = container.querySelector(`#${id}`);
 
 		expect(component).toBeInTheDocument();
@@ -63,7 +66,7 @@ describe('React Component Unit Tests: ' + Button.name, () => {
 
 	it('External link button', () => {
 		const id = 'button_external';
-		const { container } = render(<Button title='Made by Superhuit' href="https://superhuit.ch" target='_blank' id={id} />);
+		const { container } = render(<Button {...External.args} id={id} />);
 		const component = container.querySelector(`#${id}`);
 
 		expect(component).toBeInTheDocument();
@@ -73,6 +76,13 @@ describe('React Component Unit Tests: ' + Button.name, () => {
 		expect(component).toHaveAttribute('target', '_blank');
 		expect(component).toBeEnabled();
 		expect(component).toBeVisible();
+	});
+
+	it('Empty button', () => {
+		const id = 'button_external';
+		const { container } = render(<Button {...Empty.args} id={id} />);
+		const component = container.querySelector(`#${id}`);
+		expect(component).toBeNull();
 	});
 });
 
