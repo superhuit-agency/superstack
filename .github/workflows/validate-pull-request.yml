@@ -100,7 +100,9 @@ jobs:
           timeout=60
           while ! curl -s http://localhost:3000/ > /dev/null; do
             if [ $timeout -le 0 ]; then
-              echo "Timeout waiting for Next.js. Running tests anyway..."
+              echo "Timeout waiting for Next.js. Log content:"
+              cat next.log
+              exit 0
             fi
             echo "Waiting... ($timeout seconds remaining)"
             sleep 10
