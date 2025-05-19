@@ -1,5 +1,6 @@
 import '@testing-library/jest-dom';
 import { render } from '@testing-library/react';
+
 import { Primary, Secondary, Submit, Download, External, Empty } from './Button.stories';
 import { Button } from './index';
 
@@ -15,7 +16,9 @@ describe('React Component Unit Tests: ' + Button.name, () => {
 
 		expect(component).toBeInTheDocument();
 		expect(component).toHaveClass(['supt-button', '-primary'], {exact: true});
+
 		expect(component).toHaveTextContent(Primary.args.title);
+
 		expect(component).toHaveRole('link');
 		expect(component).toBeEnabled();
 		expect(component).toBeVisible();
@@ -28,6 +31,7 @@ describe('React Component Unit Tests: ' + Button.name, () => {
 
 		expect(component).toBeInTheDocument();
 		expect(component).toHaveClass(['supt-button', '-secondary'], {exact: true});
+
 		expect(component).toHaveTextContent(Secondary.args.title);
 		expect(component).toHaveRole('link');
 		expect(component).toBeEnabled();
