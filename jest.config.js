@@ -59,6 +59,9 @@ const config = {
 	//   "enableGlobally": false
 	// },
 
+	// Configure for ES modules support
+	extensionsToTreatAsEsm: ['.ts', '.tsx'],
+
 	// Force coverage collection from ignored files using an array of glob patterns
 	// forceCoverageMatch: [],
 
@@ -109,7 +112,7 @@ const config = {
 	// notifyMode: "failure-change",
 
 	// A preset that is used as a base for Jest's configuration
-	// preset: undefined,
+	preset: 'ts-jest',
 
 	// Run tests from one or more projects
 	// projects: undefined,
@@ -144,7 +147,7 @@ const config = {
 	// setupFiles: [],
 
 	// A list of paths to modules that run some code to configure or set up the testing framework before each test
-	// setupFilesAfterEnv: [],
+	setupFilesAfterEnv: [],
 
 	// The number of seconds after which a test is considered as slow and reported as such in the results.
 	// slowTestThreshold: 5,
@@ -184,13 +187,24 @@ const config = {
 	testTimeout: 30000,
 
 	// A map from regular expressions to paths to transformers
-	// transform: undefined,
+	transform: {
+		// Use ts-jest for TypeScript files
+		'^.+\\.(ts|tsx)$': [
+			'ts-jest',
+			{
+				useESM: true,
+				tsconfig: {
+					module: 'esnext',
+					target: 'es2020',
+				},
+			},
+		],
+	},
 
 	// An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
-	// transformIgnorePatterns: [
-	//   "/node_modules/",
-	//   "\\.pnp\\.[^\\/]+$"
-	// ],
+	transformIgnorePatterns: [
+		'/node_modules/(?!(mime|filesize|@formatjs|@hcaptcha)/)',
+	],
 
 	// An array of regexp pattern strings that are matched against all modules before the module loader will automatically return a mock for them
 	// unmockedModulePathPatterns: undefined,
@@ -209,4 +223,29 @@ const createJestConfig = nextJest({
 	// Provide the path to your Next.js app to load next.config.js and .env files in your test environment
 	dir: './',
 });
-module.exports = createJestConfig(config);
+
+// Create the Next.js config but override specific settings for TypeScript and ES modules
+module.exports = async () => {
+	const nextConfig = await createJestConfig(config)();
+
+	return {
+		...nextConfig,
+		extensionsToTreatAsEsm: ['.ts', '.tsx'],
+		transform: {
+			...nextConfig.transform,
+			'^.+\\.(ts|tsx)$': [
+				'ts-jest',
+				{
+					useESM: true,
+					tsconfig: {
+						module: 'esnext',
+						target: 'es2020',
+					},
+				},
+			],
+		},
+		transformIgnorePatterns: [
+			'/node_modules/(?!(mime|filesize|@formatjs|@hcaptcha)/)',
+		],
+	};
+};
