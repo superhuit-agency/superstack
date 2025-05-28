@@ -3,4 +3,6 @@ interface HeadingAttributes extends BlockAttributes {
 	level: number;
 }
 
-interface HeadingProps extends HeadingAttributes {}
+interface HeadingProps extends HeadingAttributes {
+	className?: string;
+}

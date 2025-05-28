@@ -1,4 +1,4 @@
-interface ButtonAttributes extends BlockAttributes, LinkAttributes {
+interface ButtonAttributes extends BlockAttributes, LinkProps {
 	variant?: 'primary' | 'secondary' | 'link';
 }
 

@@ -39,7 +39,7 @@
 		"**/*.ts",
 		"**/*.tsx",
 		".next/types/**/*.ts",
-		"src/__tests__/*.[jt]s(x)"
+		"src/__tests__/*.[jt]s(x)?"
 	],
 	"exclude": ["node_modules"],
 	"ts-node": {

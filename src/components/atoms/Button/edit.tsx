@@ -38,7 +38,7 @@ export const ButtonBlock: WpBlockType<ButtonAttributes> = {
 		description: _x('', 'Block description', 'supt'),
 		icon: 'button',
 		category: 'text',
-		postTypes: ['post'],
+		postTypes: ['post', 'page'],
 		attributes: {
 			href: {
 				type: 'string',

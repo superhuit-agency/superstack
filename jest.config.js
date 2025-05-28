@@ -165,10 +165,7 @@ const config = {
 	// testLocationInResults: false,
 
 	// The glob patterns Jest uses to detect test files
-	testMatch: [
-		'**/__tests__/**/*.[jt]s?(x)',
-		'**/?(*.)+(spec|test).[tj]s?(x)',
-	],
+	testMatch: ['**/__tests__/**/*.[jt]s?(x)'],
 
 	// An array of regexp pattern strings that are matched against all test paths, matched tests are skipped
 	// testPathIgnorePatterns: [
@@ -226,26 +223,5 @@ const createJestConfig = nextJest({
 
 // Create the Next.js config but override specific settings for TypeScript and ES modules
 module.exports = async () => {
-	const nextConfig = await createJestConfig(config)();
-
-	return {
-		...nextConfig,
-		extensionsToTreatAsEsm: ['.ts', '.tsx'],
-		transform: {
-			...nextConfig.transform,
-			'^.+\\.(ts|tsx)$': [
-				'ts-jest',
-				{
-					useESM: true,
-					tsconfig: {
-						module: 'esnext',
-						target: 'es2020',
-					},
-				},
-			],
-		},
-		transformIgnorePatterns: [
-			'/node_modules/(?!(mime|filesize|@formatjs|@hcaptcha)/)',
-		],
-	};
+	return await createJestConfig(config)();
 };
