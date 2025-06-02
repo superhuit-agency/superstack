@@ -1,22 +1,26 @@
-import { Meta, StoryObj } from '@storybook/react';
-
+import ListBlock from './block.json';
 import { List } from './index';
 import { ListItem } from '..';
+import { expect } from '@storybook/test';
 
-const meta = {
+export default {
 	title: 'Components/Atoms/List',
 	component: List,
 	parameters: {
 		layout: 'centered',
 	},
 	args: {},
-} satisfies Meta<typeof List>;
+	blockConfig: ListBlock,
+	getTestableStories: () => [
+		Default,
+		Ordered,
+		OrderedWithCounter,
+		WithEmptyItems,
+	],
+} as TestableComponentMeta<typeof List>;
 
-export default meta;
-
-type Story = StoryObj<typeof meta>;
-
-export const Default: Story = {
+export const Default: TestableStory<typeof List> = {
+	name: 'List Unordered',
 	args: {
 		ordered: false,
 		children: (
@@ -37,11 +41,99 @@ export const Default: Story = {
 			</>
 		),
 	},
+	unitTest: (component: Element | null) => {
+		// General
+		expect(component).toBeInTheDocument();
+		// Display
+		expect(component).toBeVisible();
+		expect(component).toHaveClass('supt-list');
+		// HTML structure - should be ul for unordered
+		expect(component?.tagName.toLowerCase()).toBe('ul');
+		// Content - should contain list items
+		const listItems = component?.querySelectorAll('li');
+		expect(listItems?.length).toBeGreaterThan(0);
+	},
 };
 
-export const Ordered: Story = {
+export const Ordered: TestableStory<typeof List> = {
+	name: 'List Ordered',
 	args: {
-		...Default.args,
 		ordered: true,
+		children: (
+			<>
+				<ListItem content="First item" />
+				<ListItem content="Second item" />
+				<ListItem content="Third item" />
+			</>
+		),
+	},
+	unitTest: (component: Element | null) => {
+		// General
+		expect(component).toBeInTheDocument();
+		// Display
+		expect(component).toBeVisible();
+		expect(component).toHaveClass('supt-list');
+		// HTML structure - should be ol for ordered
+		expect(component?.tagName.toLowerCase()).toBe('ol');
+		// Content
+		expect(component).toHaveTextContent('First item');
+		expect(component).toHaveTextContent('Second item');
+		expect(component).toHaveTextContent('Third item');
+	},
+};
+
+export const OrderedWithCounter: TestableStory<typeof List> = {
+	name: 'List Ordered with counter',
+	args: {
+		ordered: true,
+		start: 1,
+		children: (
+			<>
+				<ListItem content="Second item" />
+				<ListItem content="Third item" />
+				<ListItem content="Fourth item" />
+			</>
+		),
+	},
+	unitTest: (component: Element | null) => {
+		// General
+		expect(component).toBeInTheDocument();
+		// Display
+		expect(component).toBeVisible();
+		expect(component).toHaveClass('supt-list');
+		// HTML structure - should be ol for ordered
+		expect(component?.tagName.toLowerCase()).toBe('ol');
+		// Counter
+		expect(component).toHaveAttribute('style', 'counter-set: li 2;');
+		// Content
+		expect(component).toHaveTextContent('Second item');
+		expect(component).toHaveTextContent('Third item');
+		expect(component).toHaveTextContent('Fourth item');
+	},
+};
+
+export const WithEmptyItems: TestableStory<typeof List> = {
+	name: 'List Ordered with counter',
+	args: {
+		children: (
+			<>
+				<ListItem content="First item" />
+				<ListItem content="" id="empty-item" />
+				<ListItem content="Third item" />
+			</>
+		),
+	},
+	unitTest: (component: Element | null) => {
+		// General
+		expect(component).toBeInTheDocument();
+		// Display
+		expect(component).toBeVisible();
+		expect(component).toHaveClass('supt-list');
+		// Content
+		expect(component).toHaveTextContent('First item');
+		expect(component).toHaveTextContent('Third item');
+		// Empty item
+		const emptyItem = component?.querySelector('#empty-item');
+		expect(emptyItem).toBeNull();
 	},
 };

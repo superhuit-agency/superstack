@@ -44,6 +44,7 @@ export const Checkbox: FC<CheckboxProps> & BlockConfigs = forwardRef<
 				<input
 					id={finalId}
 					className="supt-checkbox__input"
+					aria-checked={finalValue}
 					type="checkbox"
 					name={name}
 					value={finalValue}

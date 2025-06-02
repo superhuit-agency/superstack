@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { FC, useCallback, useEffect, useRef, useState } from 'react';
 
 import { useLocale } from '@/contexts/locale-context';
-import { Link } from '@/helpers/Link';
+import { Link } from '@/components/atoms/Link';
 import configs from '@/configs.json';
 
 import { LangSwitcher } from '@/components/molecules/LangSwitcher';
