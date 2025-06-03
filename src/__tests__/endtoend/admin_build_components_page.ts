@@ -9,8 +9,10 @@ import { Stories as AllTestableComponents } from '@/components/stories';
 
 const puppeteer = require('puppeteer');
 
-const WORDPRESS_ADMIN_USER = 'superstack';
-const WORDPRESS_ADMIN_PASSWORD = 'stacksuper';
+const WORDPRESS_ADMIN_USER = process.env.WORDPRESS_ADMIN_USER || 'superstack';
+const WORDPRESS_ADMIN_PASSWORD =
+	process.env.WORDPRESS_ADMIN_PASSWORD || 'stacksuper';
+const WORDPRESS_URL = process.env.WORDPRESS_URL || 'http://localhost';
 
 describe('Admin: Create a page to test all the blocks', () => {
 	let browser: Browser;
@@ -20,7 +22,19 @@ describe('Admin: Create a page to test all the blocks', () => {
 
 	beforeAll(async () => {
 		browser = await puppeteer.launch({
-			headless: false,
+			headless: process.env.CI ? true : false,
+			args: process.env.CI
+				? [
+						'--no-sandbox',
+						'--disable-setuid-sandbox',
+						'--disable-dev-shm-usage',
+						'--disable-accelerated-2d-canvas',
+						'--no-first-run',
+						'--no-zygote',
+						'--single-process',
+						'--disable-gpu',
+					]
+				: [],
 		});
 		page = await browser.newPage();
 
@@ -30,7 +44,7 @@ describe('Admin: Create a page to test all the blocks', () => {
 
 	it('should open the admin and login', async () => {
 		// Go to the admin page
-		await page.goto('http://localhost/wp-admin/');
+		await page.goto(`${WORDPRESS_URL}/wp-admin/`);
 		// Find out if we need to login (url changed to wp-login.php)
 		const url = await page.url();
 		if (url.includes('wp-login.php')) {
@@ -50,7 +64,7 @@ describe('Admin: Create a page to test all the blocks', () => {
 	it('should open the admin to create a new page', async () => {
 		// Go to the admin page to create a new page
 		await page.goto(
-			'http://localhost/wp-admin/post-new.php?post_type=page'
+			`${WORDPRESS_URL}/wp-admin/post-new.php?post_type=page`
 		);
 	});
 

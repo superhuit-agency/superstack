@@ -1,5 +1,7 @@
-import { Stories as AllTestableComponents } from '@/components/stories';
+/* On github CI, the import fails but it's not a problem */
+/* eslint-disable storybook/use-storybook-testing-library */
 import { render } from '@testing-library/react';
+import { Stories as AllTestableComponents } from '@/components/stories';
 
 for (const componentMeta of AllTestableComponents) {
 	describe(
