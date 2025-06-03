@@ -1,3 +1,4 @@
+import { act } from '@testing-library/react';
 import InputSelectBlock from './block.json';
 import { InputSelect } from './index';
 import { expect } from '@storybook/test';
@@ -10,7 +11,7 @@ export default {
 	},
 	args: {},
 	blockConfig: InputSelectBlock,
-	getTestableStories: () => [Default, Filled, WithError],
+	getUnitTests: () => [Default, Filled, Disabled, WithError],
 } as TestableComponentMeta<typeof InputSelect>;
 
 export const Default: TestableStory<typeof InputSelect> = {
@@ -21,7 +22,7 @@ export const Default: TestableStory<typeof InputSelect> = {
 		placeholder: 'Select color',
 		options: 'red: Red; blue: Blue; orange: Orange;',
 	},
-	unitTest: (component: Element | null) => {
+	unitTest: async (component: Element | null, container: Element | null) => {
 		// General
 		expect(component).toBeInTheDocument();
 		// Display
@@ -44,7 +45,7 @@ export const Filled: TestableStory<typeof InputSelect> = {
 		options: 'red: Red; blue: Blue; orange: Orange;',
 		value: 'orange',
 	},
-	unitTest: (component: Element | null) => {
+	unitTest: async (component: Element | null, container: Element | null) => {
 		// General
 		expect(component).toBeInTheDocument();
 		// Display
@@ -58,6 +59,56 @@ export const Filled: TestableStory<typeof InputSelect> = {
 		const label = component?.querySelector('label');
 		expect(label).toBeInTheDocument();
 		expect(label).toHaveTextContent('Color');
+
+		// Test dropdown interaction
+		const combobox = component?.querySelector('input[role="combobox"]');
+		expect(combobox).toBeInTheDocument();
+		// Click to open dropdown
+		// act(() => {
+		// 	(combobox as HTMLElement).click();
+		// });
+		// // Check dropdown menu does not appear
+		// const menu = component?.querySelector('.supt-input-select__menu-list');
+		// expect(menu).toBeInTheDocument();
+		// expect(menu).toBeVisible();
+
+		// // Check options are displayed
+		// const options = component?.querySelectorAll(
+		// 	'.supt-input-select__option'
+		// );
+		// expect(options).toHaveLength(3);
+	},
+};
+
+export const Disabled: TestableStory<typeof InputSelect> = {
+	name: 'InputSelect Disabled',
+	args: {
+		label: 'This is a disabled select',
+		name: 'disabled',
+		placeholder: 'Select a country',
+		options: 'France: France; Switzerland: Switzerland; Germany: Germany;',
+		disabled: true,
+	},
+	unitTest: async (component: Element | null, container: Element | null) => {
+		// General
+		expect(component).toBeInTheDocument();
+		// Display
+		expect(component).toBeVisible();
+		expect(component).toHaveClass('supt-input-select');
+		// Accessibility
+		const label = component?.querySelector('label');
+		expect(label).toBeInTheDocument();
+		expect(label).toHaveTextContent('This is a disabled select');
+		// Disabled
+		const select = component?.querySelector('input[role="combobox"]');
+		expect(select).toHaveAttribute('disabled');
+		// Click to open dropdown
+		// act(() => {
+		// 	(select as any).click();
+		// });
+		// // Check dropdown menu does not appear
+		// const menu = component?.querySelector('.supt-input-select__menu-list');
+		// expect(menu).toBeNull();
 	},
 };
 
@@ -70,7 +121,7 @@ export const WithError: TestableStory<typeof InputSelect> = {
 		options: 'red: Red; blue: Blue; orange: Orange;',
 		invalid: 'Error message',
 	},
-	unitTest: (component: Element | null) => {
+	unitTest: async (component: Element | null, container: Element | null) => {
 		// General
 		expect(component).toBeInTheDocument();
 		// Error state

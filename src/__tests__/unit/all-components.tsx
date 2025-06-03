@@ -5,12 +5,12 @@ for (const componentMeta of AllTestableComponents) {
 	describe(
 		'Unit Tests: Run all the unit tests for ' + componentMeta.title,
 		() => {
-			componentMeta.getTestableStories().forEach((story) => {
+			componentMeta.getUnitTests().forEach((story) => {
 				it('Story: ' + story.name, () => {
 					const id =
 						'test-' + Math.random().toString(36).substring(2, 10);
 					if (!componentMeta.component) {
-						story.unitTest(null, story.args);
+						story.unitTest(null, null, story.args);
 						return;
 					}
 					/**
@@ -26,11 +26,11 @@ for (const componentMeta of AllTestableComponents) {
 						container.children.length === 0 ||
 						container.children[0] === undefined
 					) {
-						story.unitTest(null, story.args);
+						story.unitTest(null, container, story.args);
 						return;
 					}
 					const component = container.children[0];
-					story.unitTest(component, story.args);
+					story.unitTest(component, container, story.args);
 				});
 			});
 		}

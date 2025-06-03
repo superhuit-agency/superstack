@@ -10,7 +10,7 @@ export default {
 	},
 	args: {},
 	blockConfig: InputEmailBlock,
-	getTestableStories: () => [Default, Filled, WithError],
+	getUnitTests: () => [Default, Filled, WithError],
 } as TestableComponentMeta<typeof InputEmail>;
 
 export const Default: TestableStory<typeof InputEmail> = {
@@ -20,7 +20,7 @@ export const Default: TestableStory<typeof InputEmail> = {
 		name: 'email',
 		placeholder: 'john@example.com',
 	},
-	unitTest: (component: Element | null) => {
+	unitTest: async (component: Element | null, container: Element | null) => {
 		// General
 		expect(component).toBeInTheDocument();
 		// Display
@@ -51,7 +51,7 @@ export const Filled: TestableStory<typeof InputEmail> = {
 			value: 'jane@example.com',
 		},
 	},
-	unitTest: (component: Element | null) => {
+	unitTest: async (component: Element | null, container: Element | null) => {
 		// General
 		expect(component).toBeInTheDocument();
 		// Input value
@@ -69,7 +69,7 @@ export const WithError: TestableStory<typeof InputEmail> = {
 		placeholder: 'john@example.com',
 		invalid: 'Please enter a valid email address',
 	},
-	unitTest: (component: Element | null) => {
+	unitTest: async (component: Element | null, container: Element | null) => {
 		// General
 		expect(component).toBeInTheDocument();
 		// Error state

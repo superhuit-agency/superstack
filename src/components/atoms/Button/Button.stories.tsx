@@ -11,14 +11,7 @@ export default {
 	},
 	args: {},
 	blockConfig: ButtonBlock,
-	getTestableStories: () => [
-		Primary,
-		Secondary,
-		Submit,
-		Download,
-		External,
-		Empty,
-	],
+	getUnitTests: () => [Primary, Secondary, Submit, Download, External, Empty],
 } as TestableComponentMeta<typeof Button>;
 
 export const Primary: TestableStory<typeof Button> = {
@@ -27,7 +20,7 @@ export const Primary: TestableStory<typeof Button> = {
 		title: 'Button Primary',
 		href: '#',
 	},
-	unitTest: (component: Element | null) => {
+	unitTest: async (component: Element | null, container: Element | null) => {
 		// General
 		expect(component).toBeInTheDocument();
 		// Content
@@ -50,7 +43,7 @@ export const Secondary: TestableStory<typeof Button> = {
 		href: '#',
 		variant: 'secondary',
 	},
-	unitTest: (component: Element | null) => {
+	unitTest: async (component: Element | null, container: Element | null) => {
 		// General
 		expect(component).toBeInTheDocument();
 		// Content
@@ -72,7 +65,7 @@ export const Submit: TestableStory<typeof Button> = {
 		type: 'submit',
 		title: 'Submit Form',
 	},
-	unitTest: (component: Element | null) => {
+	unitTest: async (component: Element | null, container: Element | null) => {
 		// General
 		expect(component).toBeInTheDocument();
 		// Content
@@ -95,7 +88,7 @@ export const Download: TestableStory<typeof Button> = {
 		title: 'Download file',
 		href: '/file.pdf',
 	},
-	unitTest: (component: Element | null) => {
+	unitTest: async (component: Element | null, container: Element | null) => {
 		// General
 		expect(component).toBeInTheDocument();
 		// Content
@@ -118,7 +111,7 @@ export const External: TestableStory<typeof Button> = {
 		href: 'https://superhuit.ch',
 		target: '_blank',
 	},
-	unitTest: (component: Element | null) => {
+	unitTest: async (component: Element | null, container: Element | null) => {
 		// General
 		expect(component).toBeInTheDocument();
 		// Content
@@ -142,7 +135,7 @@ export const Empty: TestableStory<typeof Button> = {
 		href: 'https://superhuit.ch',
 		target: '_blank',
 	},
-	unitTest: (component: Element | null) => {
+	unitTest: async (component: Element | null, container: Element | null) => {
 		// General
 		expect(component).toBeNull();
 	},

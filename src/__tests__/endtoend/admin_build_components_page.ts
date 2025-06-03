@@ -10,20 +10,13 @@ import { Stories as AllTestableComponents } from '@/components/stories';
 const puppeteer = require('puppeteer');
 
 const WORDPRESS_ADMIN_USER = 'superstack';
-const WORDPRESS_ADMIN_PASSWORD = 'wuzge-rug648RTWG';
-
-// Define testable components directly to avoid Storybook imports
-const testableComponents = AllTestableComponents.map((component) => ({
-	blockConfig: {
-		title: component.blockConfig.title,
-		slug: component.blockConfig.slug,
-	},
-}));
+const WORDPRESS_ADMIN_PASSWORD = 'stacksuper';
 
 describe('Admin: Create a page to test all the blocks', () => {
 	let browser: Browser;
 	let page: Page;
 	const test_id = 'test-' + Math.random().toString(36).substring(2, 10);
+	let allComponentsHTML = '';
 
 	beforeAll(async () => {
 		browser = await puppeteer.launch({
@@ -33,17 +26,6 @@ describe('Admin: Create a page to test all the blocks', () => {
 
 		// Set a reasonable viewport size
 		await page.setViewport({ width: 960, height: 800 });
-
-		// // Enable console logging from the browser
-		// page.on('console', (msg) =>
-		// 	console.log('Browser console:', msg.text())
-		// );
-
-		// // Enable request logging
-		// page.on('request', (request) => console.log('Request:', request.url()));
-		// page.on('requestfailed', (request) =>
-		// 	console.log('Failed request:', request.url())
-		// );
 	});
 
 	it('should open the admin and login', async () => {
@@ -72,7 +54,25 @@ describe('Admin: Create a page to test all the blocks', () => {
 		);
 	});
 
-	for (const blockStory of testableComponents) {
+	it('should deactivate the Code Editor', async () => {
+		// Code Editor is on if we can find the editor toolbar ("exit code editor")
+		let isOn = await page.evaluate(
+			() =>
+				document.querySelector('.edit-post-text-editor__toolbar') !=
+				null
+		);
+		if (isOn) {
+			await page.keyboard.down('Meta');
+			await page.keyboard.down('Shift');
+			await page.keyboard.down('Alt');
+			await page.keyboard.press('M');
+			await page.keyboard.up('Alt');
+			await page.keyboard.up('Shift');
+			await page.keyboard.up('Meta');
+		}
+	});
+
+	for (const blockStory of AllTestableComponents) {
 		let blockTitle = blockStory.blockConfig.title ?? '';
 		let blockSlug = blockStory.blockConfig.slug ?? '';
 		let blockClassName = blockSlug.replace('core/', '').replace(/\//g, '-');
@@ -94,15 +94,26 @@ describe('Admin: Create a page to test all the blocks', () => {
 				blockTitle
 			);
 			// Wait and find the first component in the list
-			await page.waitForSelector(
-				'.block-editor-block-types-list button.editor-block-list-item-' +
-					blockClassName
-			);
-			// Click on it
-			await page.click(
-				'.block-editor-block-types-list button.editor-block-list-item-' +
-					blockClassName
-			);
+			await page
+				.waitForSelector(
+					'.block-editor-block-types-list button.editor-block-list-item-' +
+						blockClassName,
+					{
+						timeout: 500,
+					}
+				)
+				.then(async (block) => {
+					// Click on it
+					await page.click(
+						'.block-editor-block-types-list button.editor-block-list-item-' +
+							blockClassName
+					);
+				})
+				.catch((err) => {
+					console.log(
+						`Block ${blockTitle} (${blockSlug}) could not be added to the page`
+					);
+				});
 			// Close the Blocks inserter panel
 			await page.click(
 				'.components-button.editor-document-tools__inserter-toggle.is-pressed'

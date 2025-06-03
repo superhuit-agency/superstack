@@ -10,7 +10,7 @@ export default {
 	},
 	args: {},
 	blockConfig: ParagraphBlock,
-	getTestableStories: () => [Default, Empty],
+	getUnitTests: () => [Default, Empty],
 } as TestableComponentMeta<typeof Paragraph>;
 
 export const Default: TestableStory<typeof Paragraph> = {
@@ -19,7 +19,7 @@ export const Default: TestableStory<typeof Paragraph> = {
 		content:
 			'Excepteur quis aute cupidatat consequat fugiat. Ipsum consectetur laborum reprehenderit Lorem. Sint excepteur aute tempor magna ex culpa dolor do.',
 	},
-	unitTest: (component: Element | null) => {
+	unitTest: async (component: Element | null, container: Element | null) => {
 		// General
 		expect(component).toBeInTheDocument();
 		// Content
@@ -39,7 +39,7 @@ export const Empty: TestableStory<typeof Paragraph> = {
 	args: {
 		content: '',
 	},
-	unitTest: (component: Element | null) => {
+	unitTest: async (component: Element | null, container: Element | null) => {
 		// Should not render when content is empty
 		expect(component).toBeNull();
 	},

@@ -10,7 +10,7 @@ export default {
 	},
 	args: {},
 	blockConfig: InputFileBlock,
-	getTestableStories: () => [Default, WithError],
+	getUnitTests: () => [Default, WithError],
 } as TestableComponentMeta<typeof InputFile>;
 
 export const Default: TestableStory<typeof InputFile> = {
@@ -22,7 +22,7 @@ export const Default: TestableStory<typeof InputFile> = {
 			'1 seul fichier. Limité à 5 Mo. <br> Types autorisés: pdf, doc, docx, zip.',
 		label: 'Ajouter un fichier',
 	},
-	unitTest: (component: Element | null) => {
+	unitTest: async (component: Element | null, container: Element | null) => {
 		// General
 		expect(component).toBeInTheDocument();
 		// Display
@@ -48,7 +48,7 @@ export const WithError: TestableStory<typeof InputFile> = {
 		label: 'Ajouter un fichier',
 		invalid: 'Error message',
 	},
-	unitTest: (component: Element | null) => {
+	unitTest: async (component: Element | null, container: Element | null) => {
 		// General
 		expect(component).toBeInTheDocument();
 		// Error state

@@ -11,12 +11,7 @@ export default {
 	},
 	args: {},
 	blockConfig: ListBlock,
-	getTestableStories: () => [
-		Default,
-		Ordered,
-		OrderedWithCounter,
-		WithEmptyItems,
-	],
+	getUnitTests: () => [Default, Ordered, OrderedWithCounter, WithEmptyItems],
 } as TestableComponentMeta<typeof List>;
 
 export const Default: TestableStory<typeof List> = {
@@ -41,7 +36,7 @@ export const Default: TestableStory<typeof List> = {
 			</>
 		),
 	},
-	unitTest: (component: Element | null) => {
+	unitTest: async (component: Element | null, container: Element | null) => {
 		// General
 		expect(component).toBeInTheDocument();
 		// Display
@@ -67,7 +62,7 @@ export const Ordered: TestableStory<typeof List> = {
 			</>
 		),
 	},
-	unitTest: (component: Element | null) => {
+	unitTest: async (component: Element | null, container: Element | null) => {
 		// General
 		expect(component).toBeInTheDocument();
 		// Display
@@ -95,7 +90,7 @@ export const OrderedWithCounter: TestableStory<typeof List> = {
 			</>
 		),
 	},
-	unitTest: (component: Element | null) => {
+	unitTest: async (component: Element | null, container: Element | null) => {
 		// General
 		expect(component).toBeInTheDocument();
 		// Display
@@ -123,7 +118,7 @@ export const WithEmptyItems: TestableStory<typeof List> = {
 			</>
 		),
 	},
-	unitTest: (component: Element | null) => {
+	unitTest: async (component: Element | null, container: Element | null) => {
 		// General
 		expect(component).toBeInTheDocument();
 		// Display

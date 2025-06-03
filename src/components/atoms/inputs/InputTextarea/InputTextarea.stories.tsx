@@ -10,7 +10,7 @@ export default {
 	},
 	args: {},
 	blockConfig: InputTextareaBlock,
-	getTestableStories: () => [Default, Filled, WithError],
+	getUnitTests: () => [Default, Filled, WithError],
 } as TestableComponentMeta<typeof InputTextarea>;
 
 export const Default: TestableStory<typeof InputTextarea> = {
@@ -20,7 +20,7 @@ export const Default: TestableStory<typeof InputTextarea> = {
 		name: 'message',
 		placeholder: 'Lorem ipsum',
 	},
-	unitTest: (component: Element | null) => {
+	unitTest: async (component: Element | null, container: Element | null) => {
 		// General
 		expect(component).toBeInTheDocument();
 		// Display
@@ -50,7 +50,7 @@ export const Filled: TestableStory<typeof InputTextarea> = {
 			value: 'Anim dolor ea culpa reprehenderit minim adipisicing.',
 		},
 	},
-	unitTest: (component: Element | null) => {
+	unitTest: async (component: Element | null, container: Element | null) => {
 		// General
 		expect(component).toBeInTheDocument();
 		// Textarea value
@@ -70,7 +70,7 @@ export const WithError: TestableStory<typeof InputTextarea> = {
 		placeholder: 'Lorem ipsum',
 		invalid: 'Error message',
 	},
-	unitTest: (component: Element | null) => {
+	unitTest: async (component: Element | null, container: Element | null) => {
 		// General
 		expect(component).toBeInTheDocument();
 		// Error state

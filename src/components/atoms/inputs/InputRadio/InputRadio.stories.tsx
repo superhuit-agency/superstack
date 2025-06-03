@@ -10,7 +10,7 @@ export default {
 	},
 	args: {},
 	blockConfig: InputRadioBlock,
-	getTestableStories: () => [Default, WithError],
+	getUnitTests: () => [Default, WithError],
 } as TestableComponentMeta<typeof InputRadio>;
 
 export const Default: TestableStory<typeof InputRadio> = {
@@ -36,7 +36,7 @@ export const Default: TestableStory<typeof InputRadio> = {
 			},
 		],
 	},
-	unitTest: (component: Element | null) => {
+	unitTest: async (component: Element | null, container: Element | null) => {
 		// General
 		expect(component).toBeInTheDocument();
 		// Display
@@ -84,7 +84,7 @@ export const WithError: TestableStory<typeof InputRadio> = {
 		],
 		invalid: 'Error message',
 	},
-	unitTest: (component: Element | null) => {
+	unitTest: async (component: Element | null, container: Element | null) => {
 		// General
 		expect(component).toBeInTheDocument();
 		// Error state

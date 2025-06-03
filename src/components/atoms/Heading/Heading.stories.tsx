@@ -10,16 +10,16 @@ export default {
 	},
 	args: {},
 	blockConfig: HeadingBlock,
-	getTestableStories: () => [H1, H2, H3, H4, H5, H6, Empty],
+	getUnitTests: () => [H1, H2, H3, H4, H5, H6, Empty],
 } as TestableComponentMeta<typeof Heading>;
 
 export const H1: TestableStory<typeof Heading> = {
 	name: 'H1',
 	args: {
-		content: 'Title',
+		content: '<h1>Title</h1>',
 		level: 1,
 	},
-	unitTest: (component: Element | null) => {
+	unitTest: async (component: Element | null, container: Element | null) => {
 		// General
 		expect(component).toBeInTheDocument();
 		// Content
@@ -36,10 +36,10 @@ export const H1: TestableStory<typeof Heading> = {
 export const H2: TestableStory<typeof Heading> = {
 	name: 'H2',
 	args: {
-		content: 'Subtitle 2',
+		content: '<h2>Subtitle 2</h2>',
 		level: 2,
 	},
-	unitTest: (component: Element | null) => {
+	unitTest: async (component: Element | null, container: Element | null) => {
 		// General
 		expect(component).toBeInTheDocument();
 		// Content
@@ -59,7 +59,7 @@ export const H3: TestableStory<typeof Heading> = {
 		content: 'Subtitle 3',
 		level: 3,
 	},
-	unitTest: (component: Element | null) => {
+	unitTest: async (component: Element | null, container: Element | null) => {
 		// General
 		expect(component).toBeInTheDocument();
 		// Content
@@ -76,10 +76,10 @@ export const H3: TestableStory<typeof Heading> = {
 export const H4: TestableStory<typeof Heading> = {
 	name: 'H4',
 	args: {
-		content: 'Subtitle 4',
+		content: '<h4>Subtitle 4</h4>',
 		level: 4,
 	},
-	unitTest: (component: Element | null) => {
+	unitTest: async (component: Element | null, container: Element | null) => {
 		// General
 		expect(component).toBeInTheDocument();
 		// Content
@@ -96,10 +96,10 @@ export const H4: TestableStory<typeof Heading> = {
 export const H5: TestableStory<typeof Heading> = {
 	name: 'H5',
 	args: {
-		content: 'Subtitle 5',
+		content: '<h5>Subtitle 5</h5>',
 		level: 5,
 	},
-	unitTest: (component: Element | null) => {
+	unitTest: async (component: Element | null, container: Element | null) => {
 		// General
 		expect(component).toBeInTheDocument();
 		// Content
@@ -116,10 +116,10 @@ export const H5: TestableStory<typeof Heading> = {
 export const H6: TestableStory<typeof Heading> = {
 	name: 'H6',
 	args: {
-		content: 'Subtitle 6',
+		content: '<h6>Subtitle 6</h6>',
 		level: 6,
 	},
-	unitTest: (component: Element | null) => {
+	unitTest: async (component: Element | null, container: Element | null) => {
 		// General
 		expect(component).toBeInTheDocument();
 		// Content
@@ -139,7 +139,7 @@ export const Empty: TestableStory<typeof Heading> = {
 		content: '',
 		level: 0,
 	},
-	unitTest: (component: Element | null) => {
+	unitTest: async (component: Element | null, container: Element | null) => {
 		// General
 		expect(component).toBeNull();
 	},

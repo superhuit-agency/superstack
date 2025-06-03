@@ -10,7 +10,7 @@ export default {
 	},
 	args: {},
 	blockConfig: InputTextBlock,
-	getTestableStories: () => [Default, Filled, WithError],
+	getUnitTests: () => [Default, Filled, WithError],
 } as TestableComponentMeta<typeof InputText>;
 
 export const Default: TestableStory<typeof InputText> = {
@@ -20,7 +20,7 @@ export const Default: TestableStory<typeof InputText> = {
 		name: 'name',
 		placeholder: 'John Doe',
 	},
-	unitTest: (component: Element | null) => {
+	unitTest: async (component: Element | null, container: Element | null) => {
 		// General
 		expect(component).toBeInTheDocument();
 		// Display
@@ -51,7 +51,7 @@ export const Filled: TestableStory<typeof InputText> = {
 			value: 'Jane Doe',
 		},
 	},
-	unitTest: (component: Element | null) => {
+	unitTest: async (component: Element | null, container: Element | null) => {
 		// General
 		expect(component).toBeInTheDocument();
 		// Input value
@@ -69,7 +69,7 @@ export const WithError: TestableStory<typeof InputText> = {
 		placeholder: 'John Doe',
 		invalid: 'Error message',
 	},
-	unitTest: (component: Element | null) => {
+	unitTest: async (component: Element | null, container: Element | null) => {
 		// General
 		expect(component).toBeInTheDocument();
 		// Error state

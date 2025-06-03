@@ -10,7 +10,7 @@ export default {
 	},
 	args: {},
 	blockConfig: FormSectionBreakerBlock,
-	getTestableStories: () => [Default, Empty],
+	getUnitTests: () => [Default, Empty],
 } as TestableComponentMeta<typeof FormSectionBreaker>;
 
 export const Default: TestableStory<typeof FormSectionBreaker> = {
@@ -18,7 +18,7 @@ export const Default: TestableStory<typeof FormSectionBreaker> = {
 	args: {
 		title: 'Documents',
 	},
-	unitTest: (component: Element | null) => {
+	unitTest: async (component: Element | null, container: Element | null) => {
 		// General
 		expect(component).toBeInTheDocument();
 		// Display
@@ -40,7 +40,7 @@ export const Empty: TestableStory<typeof FormSectionBreaker> = {
 	args: {
 		title: '',
 	},
-	unitTest: (component: Element | null) => {
+	unitTest: async (component: Element | null, container: Element | null) => {
 		// General
 		expect(component).toBeInTheDocument();
 		// Display

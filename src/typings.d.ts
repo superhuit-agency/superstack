@@ -113,12 +113,16 @@ declare global {
 
 	type TestableComponentMeta<T> = Meta<T> & {
 		blockConfig: BlockConfigs;
-		getTestableStories: () => TestableStory<T>[];
+		getUnitTests: () => TestableStory<T>[];
 	};
 
 	type TestableStory<T> = StoryObj<T> & {
 		name: string;
-		unitTest: (component: Element | null, args?: any) => void;
+		unitTest: (
+			component: Element | null,
+			container: Element | null,
+			args?: any
+		) => Promise<void>;
 	};
 }
 

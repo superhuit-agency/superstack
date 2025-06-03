@@ -10,7 +10,7 @@ export default {
 	},
 	args: {},
 	blockConfig: InputCheckboxBlock,
-	getTestableStories: () => [Default, WithError],
+	getUnitTests: () => [Default, WithError],
 } as TestableComponentMeta<typeof InputCheckbox>;
 
 export const Default: TestableStory<typeof InputCheckbox> = {
@@ -36,7 +36,7 @@ export const Default: TestableStory<typeof InputCheckbox> = {
 			},
 		],
 	},
-	unitTest: (component: Element | null) => {
+	unitTest: async (component: Element | null, container: Element | null) => {
 		// General
 		expect(component).toBeInTheDocument();
 		// Display
@@ -94,7 +94,7 @@ export const WithError: TestableStory<typeof InputCheckbox> = {
 		],
 		invalid: 'Error message',
 	},
-	unitTest: (component: Element | null) => {
+	unitTest: async (component: Element | null, container: Element | null) => {
 		// General
 		expect(component).toBeInTheDocument();
 		// Error state

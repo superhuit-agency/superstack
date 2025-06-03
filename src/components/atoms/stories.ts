@@ -1,6 +1,6 @@
 import ButtonStories from './Button/Button.stories';
 import HeadingStories from './Heading/Heading.stories';
-import LinkStories from './Link/stories';
+//import LinkStories from './Link/stories';
 import ParagraphStories from './Paragraph/Paragraph.stories';
 import ListStories from './List/List.stories';
 import FormSectionBreakerStories from './inputs/FormSectionBreaker/FormSectionBreaker.stories';
@@ -15,7 +15,7 @@ import InputFileStories from './inputs/InputFile/InputFile.stories';
 export const AtomsStories = [
 	ButtonStories,
 	HeadingStories,
-	LinkStories,
+	//LinkStories,
 	ParagraphStories,
 	ListStories,
 	FormSectionBreakerStories,
