@@ -73,6 +73,11 @@ jobs:
           NEXT_SSH_USER: ${{ vars.NEXT_SSH_USER }}
           NEXT_SSH_PRIVATE_KEY: ${{ secrets.NEXT_SSH_PRIVATE_KEY }}
 
+      - name: Build Typescript
+        shell: bash
+        run: |
+          tsc
+
       - name: Build Theme
         uses: ./.github/actions/build-theme
 

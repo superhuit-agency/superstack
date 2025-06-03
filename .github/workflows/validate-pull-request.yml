@@ -59,7 +59,7 @@ jobs:
       - name: Build Typescript
         shell: bash
         run: |
-          tsc --noEmit
+          tsc
 
       - name: Build WP Theme
         uses: ./.github/actions/build-theme
