@@ -56,11 +56,6 @@ jobs:
           RELEASE_BELT_PASSWORD: ${{ secrets.RELEASE_BELT_PASSWORD }}
           COMPOSER_GITHUB_TOKEN: ${{ secrets.COMPOSER_GITHUB_TOKEN }}
 
-      - name: Build Typescript
-        shell: bash
-        run: |
-          tsc
-
       - name: Build WP Theme
         uses: ./.github/actions/build-theme
 
