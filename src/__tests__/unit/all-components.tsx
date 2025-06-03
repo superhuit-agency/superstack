@@ -17,6 +17,7 @@ for (const componentMeta of AllTestableComponents) {
 					 * Render the React Node rendered from Component's index.tsx
 					 */
 					const { container } = render(
+						// @ts-ignore - Of course this is a mess to make compile, so we ignore the type error
 						<componentMeta.component {...story.args} id={id} />
 					);
 					// Sometimes the component is not rendered but it could be expected,
