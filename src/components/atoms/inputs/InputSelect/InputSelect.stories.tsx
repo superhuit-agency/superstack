@@ -1,4 +1,3 @@
-import { act } from '@testing-library/react';
 import InputSelectBlock from './block.json';
 import { InputSelect } from './index';
 import { expect } from '@storybook/test';
