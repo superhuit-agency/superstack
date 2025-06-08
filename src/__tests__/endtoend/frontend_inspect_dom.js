@@ -12,7 +12,34 @@ describe('Frontend: Inspect the DOM', () => {
 	// Setup before all tests
 	beforeAll(async () => {
 		browser = await puppeteer.launch({
-			headless: 'new', // Use new headless mode
+			headless: process.env.CI ? 'new' : false,
+			args: process.env.CI
+				? [
+						'--no-sandbox',
+						'--disable-setuid-sandbox',
+						'--disable-dev-shm-usage',
+						'--disable-accelerated-2d-canvas',
+						'--no-first-run',
+						'--no-zygote',
+						'--single-process',
+						'--disable-gpu',
+						'--disable-background-timer-throttling',
+						'--disable-backgrounding-occluded-windows',
+						'--disable-renderer-backgrounding',
+						'--disable-features=TranslateUI',
+						'--disable-extensions',
+						'--disable-default-apps',
+						'--disable-component-extensions-with-background-pages',
+						'--no-default-browser-check',
+						'--mute-audio',
+						'--disable-web-security',
+						'--allow-running-insecure-content',
+						'--disable-features=VizDisplayCompositor',
+					]
+				: [],
+			executablePath: process.env.CI
+				? '/usr/bin/google-chrome'
+				: undefined,
 		});
 	});
 

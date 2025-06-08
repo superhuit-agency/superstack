@@ -66,7 +66,7 @@ describe('Admin: Create a page to test all the blocks', () => {
 
 	beforeAll(async () => {
 		browser = await puppeteer.launch({
-			headless: process.env.CI ? true : false,
+			headless: process.env.CI ? 'new' : false,
 			args: process.env.CI
 				? [
 						'--no-sandbox',
@@ -77,8 +77,23 @@ describe('Admin: Create a page to test all the blocks', () => {
 						'--no-zygote',
 						'--single-process',
 						'--disable-gpu',
+						'--disable-background-timer-throttling',
+						'--disable-backgrounding-occluded-windows',
+						'--disable-renderer-backgrounding',
+						'--disable-features=TranslateUI',
+						'--disable-extensions',
+						'--disable-default-apps',
+						'--disable-component-extensions-with-background-pages',
+						'--no-default-browser-check',
+						'--mute-audio',
+						'--disable-web-security',
+						'--allow-running-insecure-content',
+						'--disable-features=VizDisplayCompositor',
 					]
 				: [],
+			executablePath: process.env.CI
+				? '/usr/bin/google-chrome'
+				: undefined,
 		});
 		page = await browser.newPage();
 
