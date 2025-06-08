@@ -7,7 +7,8 @@ jobs:
   test:
     runs-on: ubuntu-latest
     environment: development
-
+    # Only run this workflow on the develop branch
+    if: github.ref == 'refs/heads/develop'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -33,44 +34,12 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y \
-          ca-certificates \
-          fonts-liberation \
-          libasound2 \
-          libasound2-dev \
-          libatk-bridge2.0-0 \
-          libatk-bridge2.0-dev \
-          libatk1.0-0 \
-          libatspi2.0-0 \
-          libcups2 \
-          libdbus-1-3 \
-          libdrm2 \
-          libdrm-dev \
-          libgbm1 \
-          libgbm-dev \
-          libgtk-3-0 \
-          libnspr4 \
-          libnss3 \
-          libnss3-dev \
-          libwayland-client0 \
-          libx11-6 \
-          libx11-xcb1 \
-          libxcb1 \
-          libxcb-dri3-0 \
-          libxcomposite1 \
-          libxcursor1 \
-          libxdamage1 \
-          libxext6 \
-          libxfixes3 \
-          libxi6 \
-          libxkbcommon0 \
-          libxkbcommon-dev \
-          libxrandr2 \
-          libxrender1 \
-          libxss1 \
-          libxtst6 \
-          lsb-release \
-          wget \
-          xdg-utils
+            libnss3-dev \
+            libatk-bridge2.0-dev \
+            libdrm-dev \
+            libxkbcommon-dev \
+            libgbm-dev \
+            libasound2-dev
 
       - name: Run all tests
         run: npm run test:all
