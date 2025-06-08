@@ -1,0 +1,92 @@
+name: Test development environment
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    environment: development
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build project
+        run: NODE_ENV=production npm run build
+        env:
+          WORDPRESS_URL: ${{ vars.WORDPRESS_URL }}
+          NEXT_URL: ${{ vars.NEXT_URL }}
+          WORDPRESS_ADMIN_USER: ${{ vars.WORDPRESS_ADMIN_USER }}
+          WORDPRESS_ADMIN_PASSWORD: ${{ secrets.WORDPRESS_ADMIN_PASSWORD }}
+
+      - name: Install Puppeteer dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+          ca-certificates \
+          fonts-liberation \
+          libasound2 \
+          libasound2-dev \
+          libatk-bridge2.0-0 \
+          libatk-bridge2.0-dev \
+          libatk1.0-0 \
+          libatspi2.0-0 \
+          libcups2 \
+          libdbus-1-3 \
+          libdrm2 \
+          libdrm-dev \
+          libgbm1 \
+          libgbm-dev \
+          libgtk-3-0 \
+          libnspr4 \
+          libnss3 \
+          libnss3-dev \
+          libwayland-client0 \
+          libx11-6 \
+          libx11-xcb1 \
+          libxcb1 \
+          libxcb-dri3-0 \
+          libxcomposite1 \
+          libxcursor1 \
+          libxdamage1 \
+          libxext6 \
+          libxfixes3 \
+          libxi6 \
+          libxkbcommon0 \
+          libxkbcommon-dev \
+          libxrandr2 \
+          libxrender1 \
+          libxss1 \
+          libxtst6 \
+          lsb-release \
+          wget \
+          xdg-utils
+
+      - name: Run all tests
+        run: npm run test:all
+        env:
+          CI: true
+          WORDPRESS_URL: ${{ vars.WORDPRESS_URL }}
+          NEXT_URL: ${{ vars.NEXT_URL }}
+          WORDPRESS_ADMIN_USER: ${{ vars.WORDPRESS_ADMIN_USER }}
+          WORDPRESS_ADMIN_PASSWORD: ${{ secrets.WORDPRESS_ADMIN_PASSWORD }}
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: |
+            coverage/
+            test-results/
+          retention-days: 30
