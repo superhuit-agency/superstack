@@ -252,7 +252,7 @@ describe('Admin: Create a page to test all the blocks', () => {
 
 	it('should visit the page and be a HTTP 200', async () => {
 		// Go to the page
-		const response = await page.goto(`${FRONTEND_URL}/${test_id}/`);
+		const response = await page.goto(`${NEXT_URL}/${test_id}/`);
 		// Wait for the page to load
 		await page.waitForNavigation();
 		// Check the response status
