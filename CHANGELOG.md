@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.2 - 2025-06-08
+
+Added some unit tests
+
 ## 1.1.1 - 2025-05-19
 
 Dummy version number
