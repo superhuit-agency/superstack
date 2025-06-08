@@ -5,6 +5,8 @@
 
 const puppeteer = require('puppeteer');
 
+const NEXT_URL = process.env.NEXT_URL || 'http://localhost:3000';
+
 describe('Frontend: Inspect the DOM', () => {
 	let browser;
 	let page;
@@ -60,7 +62,7 @@ describe('Frontend: Inspect the DOM', () => {
 
 	it('should load the page and check content', async () => {
 		// Navigate to your page
-		await page.goto('http://localhost:3000/blog/hello-world/');
+		await page.goto(`${NEXT_URL}/blog/hello-world/`);
 
 		// Wait for specific element to be present
 		await page.waitForSelector('h1');
