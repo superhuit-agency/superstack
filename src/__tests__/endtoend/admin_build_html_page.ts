@@ -19,7 +19,6 @@ describe('Admin: Create a page to test all the blocks', () => {
 	let browser: Browser;
 	let page: Page;
 	const test_id = 'test-' + Math.random().toString(36).substring(2, 10);
-	let allComponentsHTML = '';
 
 	const setCodeEditor = async (activate: boolean) => {
 		// Code Editor is on if we can find the editor toolbar ("exit code editor")
@@ -117,7 +116,7 @@ describe('Admin: Create a page to test all the blocks', () => {
 			// Find the login button and click it
 			await page.click('#wp-submit');
 			// Wait for the page to load
-			await page.waitForNavigation();
+			await page.waitForNavigation({ timeout: 5000 });
 		}
 	});
 
@@ -135,11 +134,8 @@ describe('Admin: Create a page to test all the blocks', () => {
 	it('should add the HTML to the page', async () => {
 		// Find the main HTML TextArea
 		await page.waitForSelector('textarea.editor-post-text-editor');
-		let k = 99;
 		for (const blockStory of AllTestableComponents) {
-			let blockTitle = blockStory.blockConfig.title ?? '';
-			let blockSlug = blockStory.blockConfig.slug ?? '';
-			let blockClassName = blockSlug.replace('core/', '');
+			let blockClassName = blockStory.blockConfig.slug ?? '';
 
 			for (const testableStory of blockStory.getUnitTests() as TestableStory<any>[]) {
 				await page.type(

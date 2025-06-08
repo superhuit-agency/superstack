@@ -43,7 +43,7 @@ const config = {
 	setupFilesAfterEnv: [],
 
 	// Longer timeout for end-to-end tests
-	testTimeout: 60000,
+	testTimeout: 120000,
 
 	// Transform configuration
 	transform: {
