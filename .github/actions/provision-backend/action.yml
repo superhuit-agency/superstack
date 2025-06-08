@@ -1,0 +1,119 @@
+name: 'Deploy WP Theme'
+inputs:
+  WORDPRESS_SSH_PRIVATE_KEY:
+    description: 'Private key of the SSH user to deploy'
+    required: true
+  WORDPRESS_SSH_USER:
+    description: 'Remote server SSH user name'
+    required: true
+  WORDPRESS_SSH_HOST:
+    description: 'Remote server SSH Host IP address'
+    required: true
+  WORDPRESS_SSH_PORT:
+    description: 'Remote server SSH Port (default: 22)'
+    required: false
+    default: 22
+  WORDPRESS_PATH:
+    description: 'Path on the remote server (default: ~/admin)'
+    required: false
+    default: '~/admin'
+  WORDPRESS_THEME_NAME:
+    description: 'WordPress Theme name'
+    required: true
+  WORDPRESS_THEME_TITLE:
+    description: 'WordPress Theme title'
+    required: true
+  WORDPRESS_ADMIN_USER:
+    description: 'WordPress Admin user'
+    required: true
+  WORDPRESS_ADMIN_EMAIL:
+    description: 'WordPress Admin email'
+    required: true
+  NEXT_URL:
+    description: 'Next.js URL (no trailing slash)'
+    required: true
+  WORDPRESS_URL:
+    description: 'WordPress URL (no trailing slash)'
+    required: true
+  WORDPRESS_VERSION:
+    description: 'WordPress version'
+    required: true
+  WORDPRESS_LOCALE:
+    description: 'WordPress locale'
+    required: true
+  WORDPRESS_DB_HOST:
+    description: 'WordPress DB host'
+    required: true
+  WORDPRESS_DB_NAME:
+    description: 'WordPress DB name'
+    required: true
+  WORDPRESS_DB_USER:
+    description: 'WordPress DB user'
+    required: true
+  WORDPRESS_DB_PASSWORD:
+    description: 'WordPress DB password'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - uses: actions/checkout@v4
+
+    - name: Deploy composer
+      uses: easingthemes/ssh-deploy@main
+      with:
+        SSH_PRIVATE_KEY: ${{ inputs.WORDPRESS_SSH_PRIVATE_KEY }}
+        ARGS: '-raultzv --delete'
+        REMOTE_USER: ${{ inputs.WORDPRESS_SSH_USER }}
+        REMOTE_HOST: ${{ inputs.WORDPRESS_SSH_HOST }}
+        REMOTE_PORT: ${{ inputs.WORDPRESS_SSH_PORT }}
+        SOURCE: './wordpress/composer.json ./wordpress/composer.lock'
+        TARGET: '${{ inputs.WORDPRESS_PATH }}/'
+
+    - name: Deploy Scripts
+      uses: easingthemes/ssh-deploy@main
+      with:
+        SSH_PRIVATE_KEY: ${{ inputs.WORDPRESS_SSH_PRIVATE_KEY }}
+        ARGS: '-raltzv --delete'
+        REMOTE_USER: ${{ inputs.WORDPRESS_SSH_USER }}
+        REMOTE_HOST: ${{ inputs.WORDPRESS_SSH_HOST }}
+        REMOTE_PORT: ${{ inputs.WORDPRESS_SSH_PORT }}
+        SOURCE: './wordpress/scripts'
+        TARGET: '${{ inputs.WORDPRESS_PATH }}/wp-content/'
+
+    - id: ssh
+      name: 'SSH Connection setup'
+      uses: kuuak/ssh-action@main
+      with:
+        SSH_USER: ${{ inputs.WORDPRESS_SSH_USER }}
+        SSH_HOST: ${{ inputs.WORDPRESS_SSH_HOST }}
+        SSH_PORT: ${{ inputs.WORDPRESS_SSH_PORT }}
+        SSH_KEY: ${{ inputs.WORDPRESS_SSH_PRIVATE_KEY }}
+
+    - name: Require composer depedencies
+      shell: bash
+      run: ssh ${{ steps.ssh.outputs.SERVER }} "cd ${{ inputs.WORDPRESS_PATH }}; composer install --no-dev"
+
+    - name: Execute provisiton script
+      shell: bash
+      run: |
+        ssh ${{ steps.ssh.outputs.SERVER }} \
+          "cd ${{ inputs.WORDPRESS_PATH }}; \
+          touch p.txt; \
+          echo ${{ inputs.WORDPRESS_DB_PASSWORD }} > p.txt; \
+          env \
+            WORDPRESS_VERSION=\"${{ inputs.WORDPRESS_VERSION }}\" \
+            WORDPRESS_LOCALE=\"${{ inputs.WORDPRESS_LOCALE }}\" \ 
+            WORDPRESS_DB_HOST=\"${{ inputs.WORDPRESS_DB_HOST }}\" \
+            WORDPRESS_DB_NAME=\"${{ inputs.WORDPRESS_DB_NAME }}\" \
+            WORDPRESS_DB_USER=\"${{ inputs.WORDPRESS_DB_USER }}\" \
+            WORDPRESS_DB_PASSWORD=\"${{ inputs.WORDPRESS_DB_PASSWORD }}\" \
+            WORDPRESS_URL=\"${{ inputs.WORDPRESS_URL }}\" \
+            WORDPRESS_THEME_NAME=\"${{ inputs.WORDPRESS_THEME_NAME }}\" \
+            WORDPRESS_THEME_TITLE=\"${{ inputs.WORDPRESS_THEME_TITLE }}\" \
+            WORDPRESS_ADMIN_USER=\"${{ inputs.WORDPRESS_ADMIN_USER }}\" \
+            WORDPRESS_ADMIN_EMAIL=\"${{ inputs.WORDPRESS_ADMIN_EMAIL }}\" \
+            WORDPRESS_PATH=\"${{ inputs.WORDPRESS_PATH }}\" \
+            WORDPRESS_VERSION=\"${{ inputs.WORDPRESS_VERSION }}\" \
+            WORDPRESS_LOCALE=\"${{ inputs.WORDPRESS_LOCALE }}\" \
+          sh ./wp-content/scripts/provision.sh"
