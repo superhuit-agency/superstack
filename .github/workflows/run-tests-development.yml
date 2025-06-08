@@ -1,4 +1,4 @@
-name: Run Tests (Manual)
+name: Test development environment
 
 on:
   workflow_dispatch:
