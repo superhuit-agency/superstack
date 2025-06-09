@@ -35,7 +35,9 @@ export const setCodeEditor = async (page: Page, activate: boolean) => {
 	);
 	if (isOn && !activate) {
 		// click on the editor toolbar
-		await page.click('.edit-post-text-editor__toolbar', { delay: 100 });
+		await page.click('.edit-post-text-editor__toolbar .components-button', {
+			delay: 100,
+		});
 	} else if (!isOn && activate) {
 		await setOptionsPanel(page, true);
 		// Find the option command that says "Code Editor" using XPATH
