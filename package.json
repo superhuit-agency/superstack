@@ -13,8 +13,8 @@
     "storybook": "storybook dev -p 4000",
     "test:all": "npm run test:unit && npm run test:endtoend",
     "test:all:debug": "VIDEO_RECORD=true node --inspect-brk=9229 ./node_modules/.bin/jest --runInBand --no-cache",
-    "test:unit": "jest --config jest.config.js --testPathPattern __tests__/unit",
-    "test:endtoend": "jest --config jest.config.endtoend.js --testPathPattern __tests__/endtoend",
+    "test:unit": "jest --config jest.config.js --testPathPattern __tests__/unit --maxWorkers=1",
+    "test:endtoend": "jest --config jest.config.endtoend.js --testPathPattern __tests__/endtoend --bail=1 --maxWorkers=1",
     "build-storybook": "storybook build",
     "generate:block": "plop --plopfile ./generators/plopfile.js block",
     "generate:language-migration": "plop --plopfile ./generators/plopfile.js language-migration"

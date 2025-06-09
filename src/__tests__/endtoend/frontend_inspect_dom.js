@@ -84,7 +84,7 @@ describe('Frontend: Inspect the DOM', () => {
 		await page.goto(`${NEXT_URL}/blog/hello-world/`);
 
 		// Wait for specific element to be present
-		await page.waitForSelector('h1');
+		await page.waitForSelector('h1', { timeout: 5000 });
 
 		// Get text content
 		const h1Text = await page.$eval('h1', (el) => el.textContent);

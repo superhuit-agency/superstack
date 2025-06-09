@@ -102,7 +102,7 @@ describe('Admin: Create a page to test all the blocks', () => {
 		await page.setViewport({ width: 960, height: 800 });
 
 		// Initialize video recorder for the entire suite
-		videoRecorder = new VideoRecorder('Admin_Full_Page_Cycle');
+		videoRecorder = new VideoRecorder('admin_full_page_cycle');
 		await videoRecorder.startRecording(page);
 	});
 
@@ -118,15 +118,15 @@ describe('Admin: Create a page to test all the blocks', () => {
 		if (url.includes('wp-login.php')) {
 			await new Promise((resolve) => setTimeout(resolve, 250));
 			// Find the username input and type the username
-			await page.waitForSelector('#user_login');
+			await page.waitForSelector('#user_login', { timeout: 5000 });
 			await page.type('#user_login', WORDPRESS_ADMIN_USER);
 			// Find the password input and type the password
-			await page.waitForSelector('#user_pass');
+			await page.waitForSelector('#user_pass', { timeout: 5000 });
 			await page.type('#user_pass', WORDPRESS_ADMIN_PASSWORD);
 			// Find the login button and click it
 			await page.click('#wp-submit');
 			// Wait for the page to load
-			await page.waitForNavigation({ timeout: 5000 });
+			await page.waitForNavigation({ timeout: 10000 });
 		}
 	});
 
@@ -143,7 +143,9 @@ describe('Admin: Create a page to test all the blocks', () => {
 
 	it('should add the HTML to the page', async () => {
 		// Find the main HTML TextArea
-		await page.waitForSelector('textarea.editor-post-text-editor');
+		await page.waitForSelector('textarea.editor-post-text-editor', {
+			timeout: 5000,
+		});
 		for (const blockStory of AllTestableComponents) {
 			let blockClassName = blockStory.blockConfig.slug ?? '';
 
@@ -171,7 +173,10 @@ describe('Admin: Create a page to test all the blocks', () => {
 
 	it('should save the page as draft', async () => {
 		// Find the "Save Draft" button
-		await page.waitForSelector('.components-button.editor-post-save-draft');
+		await page.waitForSelector(
+			'.components-button.editor-post-save-draft',
+			{ timeout: 5000 }
+		);
 		// Click on it
 		await page.click('.components-button.editor-post-save-draft');
 	});
@@ -179,7 +184,8 @@ describe('Admin: Create a page to test all the blocks', () => {
 	it('should display a success message in the snackbar', async () => {
 		// Find the success message
 		await page.waitForSelector(
-			'.components-snackbar-list.components-editor-notices__snackbar .components-snackbar__content'
+			'.components-snackbar-list.components-editor-notices__snackbar .components-snackbar__content',
+			{ timeout: 10000 }
 		);
 		// The message should say "Draft saved"
 		const message = await page.evaluate(
@@ -211,7 +217,8 @@ describe('Admin: Create a page to test all the blocks', () => {
 		) {
 			// Find the "Settings" button
 			await page.waitForSelector(
-				'button[aria-label="Settings"][aria-controls="edit-post:document"]'
+				'button[aria-label="Settings"][aria-controls="edit-post:document"]',
+				{ timeout: 5000 }
 			);
 			// Click on it
 			await page.click(
@@ -223,14 +230,16 @@ describe('Admin: Create a page to test all the blocks', () => {
 	it('should define a slug for the page', async () => {
 		// Find the "Slug" input
 		await page.waitForSelector(
-			'.components-button.editor-post-url__panel-toggle'
+			'.components-button.editor-post-url__panel-toggle',
+			{ timeout: 5000 }
 		);
 		// Click on it
 		await page.click('.components-button.editor-post-url__panel-toggle');
 
 		// Find the "Slug" input
 		await page.waitForSelector(
-			'.components-popover__content input[type="text"]'
+			'.components-popover__content input[type="text"]',
+			{ timeout: 5000 }
 		);
 		// Clear the field and type the slug (the slug is the page name)
 		await page.evaluate(() => {
@@ -251,7 +260,8 @@ describe('Admin: Create a page to test all the blocks', () => {
 	it('should save the page as published', async () => {
 		// Find the "Publish" button
 		await page.waitForSelector(
-			'.components-button.editor-post-publish-button__button'
+			'.components-button.editor-post-publish-button__button',
+			{ timeout: 5000 }
 		);
 		// Click on it
 		await page.click(
@@ -268,14 +278,14 @@ describe('Admin: Create a page to test all the blocks', () => {
 	it('should see the success message in the snackbar', async () => {
 		// Find the success message
 		// <div class="components-snackbar" tabindex="0" role="button" aria-label="Dismiss this notice"><div class="components-snackbar__content">Page updated.<a href="/347-2/" class="components-button components-snackbar__action is-tertiary">View Page</a></div></div>
-		await page.waitForSelector('.components-snackbar');
+		await page.waitForSelector('.components-snackbar', { timeout: 10000 });
 	});
 
 	it('should visit the page and be a HTTP 200', async () => {
 		// Go to the page
 		const response = await page.goto(`${NEXT_URL}/${test_id}/`);
 		// Wait for the page to load
-		await page.waitForNavigation();
+		await page.waitForNavigation({ timeout: 10000 });
 		// Check the response status
 		expect(response?.status()).toBe(200);
 		// Give a second to any human eye looking at this test execution.
@@ -287,7 +297,7 @@ describe('Admin: Create a page to test all the blocks', () => {
 		if (videoRecorder) {
 			const videoPath = await videoRecorder.stopRecording();
 			if (videoPath) {
-				console.log(`📹 Complete test suite video saved: ${videoPath}`);
+				console.log(`Video log saved: ${videoPath}`);
 			}
 			videoRecorder.cleanup();
 		}

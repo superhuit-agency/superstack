@@ -19,6 +19,9 @@ const config = {
 	// Automatically clear mock calls, instances, contexts and results before every test
 	clearMocks: true,
 
+	// Stop running tests after first failure (fail fast)
+	bail: 1,
+
 	// Indicates whether the coverage information should be collected while executing the test
 	collectCoverage: false,
 

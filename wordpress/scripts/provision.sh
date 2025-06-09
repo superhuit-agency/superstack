@@ -73,7 +73,7 @@ if ! $WPCLI core is-installed --quiet &> /dev/null; then
 	echo
 	if [ ! -z "${WORDPRESS_ENV}" ] && [ "${WORDPRESS_ENV}" = "dev" ]; then # we are on local dev environment (in docker)
 		echo $en "- Installing WordPress as localhost $ec"
-		$WPCLI core install --url="http://localhost" --title="superstack" --admin_user="superstack" --admin_password="superstack" --admin_email="tech+superstack@superhuit.ch" --quiet &> /dev/null
+		$WPCLI core install --url="http://localhost" --title="superstack" --admin_user="superstack" --admin_password="stacksuper" --admin_email="tech+superstack@superhuit.ch" --quiet &> /dev/null
 		echo "✔"
 	elif [ ! -f "$WORDPRESS_PATH/p.txt" ]; then
 		echo "ERROR: WordPress does not seem to be installed. Add a file 'p.txt' containing the database password if you want this script to automatically install WordPress for you." 1>&2

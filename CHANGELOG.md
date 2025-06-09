@@ -1,31 +1,35 @@
 # Changelog
 
+## 1.1.4 - 2025-06-09
+
+-   Added video logs and artifacts for failed tests.
+
 ## 1.1.3 - 2025-06-08
 
-- Merge branch 'main' of github.com:superhuit-agency/superstack_test geck1942
-- ci: new workflow geck1942
-- ship: 🚀 upgrade to version 1.1.2 superhuit
-- Merge branch 'main' of github.com:superhuit-agency/superstack_test geck1942
-- ci: new workflow geck1942
-- ship: 🚀 upgrade to version 1.1.1 superhuit
-- guthub develop PR workflow + actions
+-   Merge branch 'main' of github.com:superhuit-agency/superstack_test geck1942
+-   ci: new workflow geck1942
+-   ship: 🚀 upgrade to version 1.1.2 superhuit
+-   Merge branch 'main' of github.com:superhuit-agency/superstack_test geck1942
+-   ci: new workflow geck1942
+-   ship: 🚀 upgrade to version 1.1.1 superhuit
+-   guthub develop PR workflow + actions
 
-* test: ✅ JEST integration
-- guthub develop PR workflow + actions
+*   test: ✅ JEST integration
 
+-   guthub develop PR workflow + actions
 
 ## 1.1.2 - 2025-06-08
 
-- Merge branch 'main' of github.com:superhuit-agency/superstack_test geck1942
-- ci: new workflow geck1942
-- ship: 🚀 upgrade to version 1.1.1 superhuit
-- guthub develop PR workflow + actions
+-   Merge branch 'main' of github.com:superhuit-agency/superstack_test geck1942
+-   ci: new workflow geck1942
+-   ship: 🚀 upgrade to version 1.1.1 superhuit
+-   guthub develop PR workflow + actions
 
-* test: ✅ JEST integration
-- guthub develop PR workflow + actions
+*   test: ✅ JEST integration
 
-* CI: 🧑‍🔧 testing CI deployment
+-   guthub develop PR workflow + actions
 
+*   CI: 🧑‍🔧 testing CI deployment
 
 ## 1.1.1 - 2025-05-19
 

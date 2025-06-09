@@ -59,7 +59,7 @@ describe('Admin: Create a page to test all the blocks', () => {
 		await page.setViewport({ width: 960, height: 800 });
 
 		// Initialize video recorder for the entire suite
-		videoRecorder = new VideoRecorder('Admin_Create_Empty_Components');
+		videoRecorder = new VideoRecorder('admin_create_empty_components');
 		await videoRecorder.startRecording(page);
 	});
 
@@ -74,15 +74,15 @@ describe('Admin: Create a page to test all the blocks', () => {
 		const url = await page.url();
 		if (url.includes('wp-login.php')) {
 			// Find the username input and type the username
-			await page.waitForSelector('#user_login');
+			await page.waitForSelector('#user_login', { timeout: 5000 });
 			await page.type('#user_login', WORDPRESS_ADMIN_USER);
 			// Find the password input and type the password
-			await page.waitForSelector('#user_pass');
+			await page.waitForSelector('#user_pass', { timeout: 5000 });
 			await page.type('#user_pass', WORDPRESS_ADMIN_PASSWORD);
 			// Find the login button and click it
 			await page.click('#wp-submit');
 			// Wait for the page to load
-			await page.waitForNavigation();
+			await page.waitForNavigation({ timeout: 10000 });
 		}
 	});
 
@@ -119,14 +119,18 @@ describe('Admin: Create a page to test all the blocks', () => {
 		it('should add the ' + blockTitle + ' block to the page', async () => {
 			// Find the "+" button on the top left of the page
 			await page.waitForSelector(
-				'button.components-button.editor-document-tools__inserter-toggle'
+				'button.components-button.editor-document-tools__inserter-toggle',
+				{ timeout: 5000 }
 			);
 			// Click on the "+" button
 			await page.click(
 				'button.components-button.editor-document-tools__inserter-toggle'
 			);
 			// Find the "Search input" in the inserter
-			await page.waitForSelector('input.components-input-control__input');
+			await page.waitForSelector(
+				'input.components-input-control__input',
+				{ timeout: 5000 }
+			);
 			// Type the block name in the search input
 			await page.type(
 				'input.components-input-control__input',
@@ -138,7 +142,7 @@ describe('Admin: Create a page to test all the blocks', () => {
 					'.block-editor-block-types-list button.editor-block-list-item-' +
 						blockClassName,
 					{
-						timeout: 500,
+						timeout: 5000,
 					}
 				)
 				.then(async (block) => {
@@ -152,6 +156,10 @@ describe('Admin: Create a page to test all the blocks', () => {
 					console.log(
 						`Block ${blockTitle} (${blockSlug}) could not be added to the page`
 					);
+					// Fail fast: throw error to stop the suite
+					throw new Error(
+						`Failed to add block ${blockTitle}: ${err.message}`
+					);
 				});
 			// Close the Blocks inserter panel
 			await page.click(
@@ -162,7 +170,10 @@ describe('Admin: Create a page to test all the blocks', () => {
 
 	it('should save the page as draft', async () => {
 		// Find the "Save Draft" button
-		await page.waitForSelector('.components-button.editor-post-save-draft');
+		await page.waitForSelector(
+			'.components-button.editor-post-save-draft',
+			{ timeout: 5000 }
+		);
 		// Click on it
 		await page.click('.components-button.editor-post-save-draft');
 	});
@@ -170,7 +181,8 @@ describe('Admin: Create a page to test all the blocks', () => {
 	it('should display a success message in the snackbar', async () => {
 		// Find the success message
 		await page.waitForSelector(
-			'.components-snackbar-list.components-editor-notices__snackbar .components-snackbar__content'
+			'.components-snackbar-list.components-editor-notices__snackbar .components-snackbar__content',
+			{ timeout: 10000 }
 		);
 		// The message should say "Draft saved"
 		const message = await page.evaluate(
@@ -187,7 +199,7 @@ describe('Admin: Create a page to test all the blocks', () => {
 		if (videoRecorder) {
 			const videoPath = await videoRecorder.stopRecording();
 			if (videoPath) {
-				console.log(`📹 Complete test suite video saved: ${videoPath}`);
+				console.log(`Video log saved: ${videoPath}`);
 			}
 			videoRecorder.cleanup();
 		}
