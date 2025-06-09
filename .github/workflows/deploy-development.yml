@@ -128,7 +128,8 @@ jobs:
     environment: development
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
       - name: Run tests in development environment
         uses: ./.github/actions/run-tests
