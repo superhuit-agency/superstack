@@ -76,10 +76,14 @@ describe('Admin: Create a page to test all the blocks', () => {
 		if (url.includes('wp-login.php')) {
 			// Find the username input and type the username
 			await page.waitForSelector('#user_login', { timeout: 5000 });
-			await page.type('#user_login', WORDPRESS_ADMIN_USER);
+			await page.type('#user_login', WORDPRESS_ADMIN_USER, {
+				delay: 100,
+			});
 			// Find the password input and type the password
 			await page.waitForSelector('#user_pass', { timeout: 5000 });
-			await page.type('#user_pass', WORDPRESS_ADMIN_PASSWORD);
+			await page.type('#user_pass', WORDPRESS_ADMIN_PASSWORD, {
+				delay: 100,
+			});
 			// Find the login button and click it
 			await page.click('#wp-submit');
 			// Wait for the page to load

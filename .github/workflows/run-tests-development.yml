@@ -19,16 +19,8 @@ jobs:
           node-version: 20
           cache: 'npm'
 
-      - name: Install dependencies
+      - name: Install dependencies for jest + puppeteer
         run: npm ci --legacy-peer-deps
-
-      - name: Build project
-        run: NODE_ENV=production npm run build
-        env:
-          WORDPRESS_URL: ${{ vars.WORDPRESS_URL }}
-          NEXT_URL: ${{ vars.NEXT_URL }}
-          WORDPRESS_ADMIN_USER: ${{ vars.WORDPRESS_ADMIN_USER }}
-          WORDPRESS_ADMIN_PASSWORD: ${{ secrets.WORDPRESS_ADMIN_PASSWORD }}
 
       - name: Install Puppeteer dependencies
         run: |
