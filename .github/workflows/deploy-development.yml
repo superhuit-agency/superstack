@@ -124,13 +124,14 @@ jobs:
   test_development:
     name: Test development environment
     needs: deploy_development
-    environment: development
     runs-on: ubuntu-latest
+    environment: development
 
     steps:
-      - uses: ./.github/workflows/run-tests-development.yml
+      - name: Run tests in development environment
+        uses: ./.github/actions/run-tests
         with:
           WORDPRESS_URL: ${{ vars.WORDPRESS_URL }}
           NEXT_URL: ${{ vars.NEXT_URL }}
           WORDPRESS_ADMIN_USER: ${{ vars.WORDPRESS_ADMIN_USER }}
-          WORDPRESS_ADMIN_PASSWORD: ${{ secrets.NEXT_SSH_PRIVATE_KEY }}
+          WORDPRESS_ADMIN_PASSWORD: ${{ secrets.WORDPRESS_ADMIN_PASSWORD }}

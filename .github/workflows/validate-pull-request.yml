@@ -113,54 +113,12 @@ jobs:
         shell: bash
         run: sh ./.github/actions/tests/simple-http-test.sh
 
-      - name: Jest Unit Tests
-        shell: bash
-        run: npm run test:all -u
-        env:
-          VIDEO_RECORD: true
+      - name: Run tests in local environment
+        uses: ./.github/actions/run-tests
+        with:
           CI: true
+          VIDEO_RECORD: true
           WORDPRESS_URL: http://localhost
           NEXT_URL: http://localhost:3000
           WORDPRESS_ADMIN_USER: 'superstack'
           WORDPRESS_ADMIN_PASSWORD: 'stacksuper'
-
-      - name: Upload test videos on failure
-        uses: actions/upload-artifact@v4
-        if: failure()
-        with:
-          name: test-failure-videos
-          path: |
-            src/__tests__/video-logs/
-          retention-days: 7
-
-      - name: Comment on failure with video info
-        if: failure() && github.event_name == 'pull_request'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `❌ **E2E Tests Failed**
-
-              To view the video recordings:
-              1. Go to the "Summary" tab of this workflow run
-              2. Download and extract the "test-failure-videos" artifact to see what went wrong.`
-            })
-
-      - name: List generated videos
-        if: always()
-        run: |
-          echo "Generated test videos:"
-          ls -la src/__tests__/video-logs/ || echo "No video-logs directory found"
-
-      - name: Upload test results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: test-results
-          path: |
-            coverage/
-            src/__tests__/video-logs/
-          retention-days: 30
