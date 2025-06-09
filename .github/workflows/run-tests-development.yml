@@ -13,10 +13,9 @@ on:
       WORDPRESS_ADMIN_USER:
         required: true
         type: string
-    secrets:
       WORDPRESS_ADMIN_PASSWORD:
         required: true
-
+        type: string
 jobs:
   test:
     runs-on: ubuntu-latest
