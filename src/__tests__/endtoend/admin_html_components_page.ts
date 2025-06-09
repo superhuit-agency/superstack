@@ -7,6 +7,11 @@ import { Browser } from 'puppeteer';
 import { Page } from 'puppeteer';
 import { Stories as AllTestableComponents } from '@/components/stories';
 import { VideoRecorder } from '../utils/video-recorder';
+import {
+	setCodeEditor,
+	setRightPanel,
+	writeBlockHTML,
+} from '../utils/admin-manipulation';
 
 const puppeteer = require('puppeteer');
 
@@ -21,49 +26,6 @@ describe('Admin: Create a page to test all the blocks', () => {
 	let page: Page;
 	let videoRecorder: VideoRecorder;
 	const test_id = 'test-' + Math.random().toString(36).substring(2, 10);
-
-	const setCodeEditor = async (activate: boolean) => {
-		// Code Editor is on if we can find the editor toolbar ("exit code editor")
-		let isOn = await page.evaluate(
-			() =>
-				document.querySelector('.edit-post-text-editor__toolbar') !=
-				null
-		);
-		if ((activate && !isOn) || (!activate && isOn)) {
-			await page.keyboard.down('Meta');
-			await page.keyboard.down('Shift');
-			await page.keyboard.down('Alt');
-			await page.keyboard.press('M');
-			await page.keyboard.up('Alt');
-			await page.keyboard.up('Shift');
-			await page.keyboard.up('Meta');
-		}
-	};
-	const writeBlockHTML = async (blockSlug: string, blockArgs: any) => {
-		let content = (blockArgs as any).content ?? null;
-		let children = (blockArgs as any).children ?? null;
-		let args = { ...blockArgs, children: undefined, content: undefined };
-		let html = '';
-
-		if (content) {
-			html += `<!-- wp:${blockSlug} ${JSON.stringify(args)} -->\n`;
-			html += content;
-			html += `\n<!-- /wp:${blockSlug} -->\n`;
-		} else if (children && Array.isArray(children) && children.length > 0) {
-			html += `<!-- wp:${blockSlug} ${JSON.stringify(args)} -->\n`;
-			for (const child of children) {
-				await writeBlockHTML(child.blockName, child.attributes);
-			}
-			html += `\n<!-- /wp:${blockSlug} -->\n`;
-			// } else if (children && children instanceof HTMLElement) {
-			// 	allComponentsHTML += `<!-- wp:${blockSlug} ${JSON.stringify(args)} -->\n`;
-			// 	allComponentsHTML += children.outerHTML;
-			// 	allComponentsHTML += `\n<!-- /wp:${blockSlug} -->\n`;
-		} else {
-			html += `<!-- wp:${blockSlug} ${JSON.stringify(args)} /-->\n`;
-		}
-		return html;
-	};
 
 	beforeAll(async () => {
 		browser = await puppeteer.launch({
@@ -138,11 +100,20 @@ describe('Admin: Create a page to test all the blocks', () => {
 	});
 
 	it('should activate the HTML editor', async () => {
-		await setCodeEditor(true);
+		await setCodeEditor(page, true);
+	});
+
+	it('should type a page title', async () => {
+		await page.type(
+			'.wp-block-post-title .components-textarea-control__input',
+			`Test Page ${test_id}`,
+			{ delay: 100 }
+		);
 	});
 
 	it('should add the HTML to the page', async () => {
 		// Find the main HTML TextArea
+		let allComponentsHTML = '';
 		await page.waitForSelector('textarea.editor-post-text-editor', {
 			timeout: 5000,
 		});
@@ -150,25 +121,31 @@ describe('Admin: Create a page to test all the blocks', () => {
 			let blockClassName = blockStory.blockConfig.slug ?? '';
 
 			for (const testableStory of blockStory.getUnitTests() as TestableStory<any>[]) {
-				await page.type(
-					'textarea.editor-post-text-editor',
-					await writeBlockHTML(blockClassName, testableStory.args),
-					{
-						delay: 1,
-					}
+				allComponentsHTML += writeBlockHTML(
+					blockClassName,
+					testableStory.args
 				);
+				// await page.type(
+				// 	'textarea.editor-post-text-editor',
+				// 	await writeBlockHTML(blockClassName, testableStory.args),
+				// 	{
+				// 		delay: 0,
+				// 	}
+				// );
 			}
 		}
 		// Change the HTML in the textarea
-		// await page.evaluate(() => {
-		// 	const textarea = document.querySelector(
-		// 		'textarea.editor-post-text-editor'
-		// 	);
-		// 	if (textarea) {
-		// 		(textarea as HTMLTextAreaElement).value = allComponentsHTML;
-		// 	}
-		// });
-		await new Promise((resolve) => setTimeout(resolve, 1000));
+		await page.evaluate((html) => {
+			const textarea = document.querySelector(
+				'textarea.editor-post-text-editor'
+			);
+			if (textarea) {
+				(textarea as HTMLTextAreaElement).innerHTML = html;
+			}
+		}, allComponentsHTML);
+		await new Promise((resolve) => setTimeout(resolve, 500));
+		await page.focus('textarea.editor-post-text-editor');
+		await page.keyboard.press('Enter');
 	});
 
 	it('should save the page as draft', async () => {
@@ -199,32 +176,12 @@ describe('Admin: Create a page to test all the blocks', () => {
 
 	it('should switch back to the visual editor', async () => {
 		// Type Meta+Shift+Alt+M to deactivate the Code Editor.
-		await page.keyboard.down('Meta');
-		await page.keyboard.down('Shift');
-		await page.keyboard.down('Alt');
-		await page.keyboard.press('M');
-		await page.keyboard.up('Alt');
-		await page.keyboard.up('Shift');
-		await page.keyboard.up('Meta');
+		await setCodeEditor(page, false);
 	});
 
 	it('should open the Settings panel', async () => {
 		// If the settings panel is still closed, open it
-		if (
-			await page.evaluate(
-				() => document.querySelector('div#edit-post\\:document') == null
-			)
-		) {
-			// Find the "Settings" button
-			await page.waitForSelector(
-				'button[aria-label="Settings"][aria-controls="edit-post:document"]',
-				{ timeout: 5000 }
-			);
-			// Click on it
-			await page.click(
-				'button[aria-label="Settings"][aria-controls="edit-post:document"]'
-			);
-		}
+		await setRightPanel(page, true);
 	});
 
 	it('should define a slug for the page', async () => {

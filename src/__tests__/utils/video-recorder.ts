@@ -32,7 +32,6 @@ export class VideoRecorder {
 	async startRecording(page: Page): Promise<void> {
 		// Only record in CI environment or when VIDEO_RECORD env var is set
 		if (!process.env.CI && !process.env.VIDEO_RECORD) {
-			console.log('🎥 Video recording skipped');
 			return;
 		}
 

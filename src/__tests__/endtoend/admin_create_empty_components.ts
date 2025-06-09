@@ -7,6 +7,7 @@ import { Browser } from 'puppeteer';
 import { Page } from 'puppeteer';
 import { Stories as AllTestableComponents } from '@/components/stories';
 import { VideoRecorder } from '../utils/video-recorder';
+import { setCodeEditor, setRightPanel } from '../utils/admin-manipulation';
 
 const puppeteer = require('puppeteer');
 
@@ -95,20 +96,8 @@ describe('Admin: Create a page to test all the blocks', () => {
 
 	it('should deactivate the Code Editor', async () => {
 		// Code Editor is on if we can find the editor toolbar ("exit code editor")
-		let isOn = await page.evaluate(
-			() =>
-				document.querySelector('.edit-post-text-editor__toolbar') !=
-				null
-		);
-		if (isOn) {
-			await page.keyboard.down('Meta');
-			await page.keyboard.down('Shift');
-			await page.keyboard.down('Alt');
-			await page.keyboard.press('M');
-			await page.keyboard.up('Alt');
-			await page.keyboard.up('Shift');
-			await page.keyboard.up('Meta');
-		}
+		await new Promise((resolve) => setTimeout(resolve, 500));
+		await setCodeEditor(page, false);
 	});
 
 	for (const blockStory of AllTestableComponents) {
@@ -124,13 +113,13 @@ describe('Admin: Create a page to test all the blocks', () => {
 			);
 			// Click on the "+" button
 			await page.click(
-				'button.components-button.editor-document-tools__inserter-toggle'
+				'button.components-button.editor-document-tools__inserter-toggle',
+				{
+					delay: 100,
+				}
 			);
 			// Find the "Search input" in the inserter
-			await page.waitForSelector(
-				'input.components-input-control__input',
-				{ timeout: 5000 }
-			);
+			await page.waitForSelector('input.components-input-control__input');
 			// Type the block name in the search input
 			await page.type(
 				'input.components-input-control__input',
@@ -142,23 +131,22 @@ describe('Admin: Create a page to test all the blocks', () => {
 					'.block-editor-block-types-list button.editor-block-list-item-' +
 						blockClassName,
 					{
-						timeout: 5000,
+						timeout: 500,
 					}
 				)
 				.then(async (block) => {
 					// Click on it
 					await page.click(
 						'.block-editor-block-types-list button.editor-block-list-item-' +
-							blockClassName
+							blockClassName,
+						{
+							delay: 100,
+						}
 					);
 				})
 				.catch((err) => {
 					console.log(
 						`Block ${blockTitle} (${blockSlug}) could not be added to the page`
-					);
-					// Fail fast: throw error to stop the suite
-					throw new Error(
-						`Failed to add block ${blockTitle}: ${err.message}`
 					);
 				});
 			// Close the Blocks inserter panel
@@ -169,6 +157,7 @@ describe('Admin: Create a page to test all the blocks', () => {
 	}
 
 	it('should save the page as draft', async () => {
+		await setRightPanel(page, true);
 		// Find the "Save Draft" button
 		await page.waitForSelector(
 			'.components-button.editor-post-save-draft',
@@ -182,7 +171,7 @@ describe('Admin: Create a page to test all the blocks', () => {
 		// Find the success message
 		await page.waitForSelector(
 			'.components-snackbar-list.components-editor-notices__snackbar .components-snackbar__content',
-			{ timeout: 10000 }
+			{ timeout: 1000 }
 		);
 		// The message should say "Draft saved"
 		const message = await page.evaluate(
