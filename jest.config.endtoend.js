@@ -72,5 +72,10 @@ const createJestConfig = nextJest({
 
 // Create the Next.js config but override specific settings for end-to-end tests
 module.exports = async () => {
+	// Set video recording environment variable if passed via command line
+	if (process.env.VIDEO_RECORD) {
+		process.env.VIDEO_RECORD = 'true';
+	}
+
 	return await createJestConfig(config)();
 };

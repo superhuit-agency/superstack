@@ -6,6 +6,7 @@
 import { Browser } from 'puppeteer';
 import { Page } from 'puppeteer';
 import { Stories as AllTestableComponents } from '@/components/stories';
+import { VideoRecorder } from '../utils/video-recorder';
 
 const puppeteer = require('puppeteer');
 
@@ -17,6 +18,7 @@ const WORDPRESS_URL = process.env.WORDPRESS_URL || 'http://localhost';
 describe('Admin: Create a page to test all the blocks', () => {
 	let browser: Browser;
 	let page: Page;
+	let videoRecorder: VideoRecorder;
 	const test_id = 'test-' + Math.random().toString(36).substring(2, 10);
 	let allComponentsHTML = '';
 
@@ -55,6 +57,14 @@ describe('Admin: Create a page to test all the blocks', () => {
 
 		// Set a reasonable viewport size
 		await page.setViewport({ width: 960, height: 800 });
+
+		// Initialize video recorder for the entire suite
+		videoRecorder = new VideoRecorder('Admin_Create_Empty_Components');
+		await videoRecorder.startRecording(page);
+	});
+
+	beforeEach(async () => {
+		// No per-test setup needed anymore
 	});
 
 	it('should open the admin and login', async () => {
@@ -173,6 +183,19 @@ describe('Admin: Create a page to test all the blocks', () => {
 	});
 
 	afterAll(async () => {
+		// Stop video recording
+		if (videoRecorder) {
+			const videoPath = await videoRecorder.stopRecording();
+			if (videoPath) {
+				console.log(`📹 Complete test suite video saved: ${videoPath}`);
+			}
+			videoRecorder.cleanup();
+		}
+
 		await browser.close();
+	});
+
+	afterEach(async () => {
+		// No per-test cleanup needed anymore
 	});
 });

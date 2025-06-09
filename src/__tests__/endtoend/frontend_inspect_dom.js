@@ -4,12 +4,14 @@
  */
 
 const puppeteer = require('puppeteer');
+const { VideoRecorder } = require('../utils/video-recorder');
 
 const NEXT_URL = process.env.NEXT_URL || 'http://localhost:3000';
 
 describe('Frontend: Inspect the DOM', () => {
 	let browser;
 	let page;
+	let videoRecorder;
 
 	// Setup before all tests
 	beforeAll(async () => {
@@ -43,11 +45,19 @@ describe('Frontend: Inspect the DOM', () => {
 				? '/usr/bin/google-chrome'
 				: undefined,
 		});
+
+		// Initialize video recorder for the entire suite
+		videoRecorder = new VideoRecorder('Frontend_Inspect_DOM');
 	});
 
 	// Setup before each test
 	beforeEach(async () => {
 		page = await browser.newPage();
+
+		// Start recording only for the first test
+		if (!videoRecorder.recording) {
+			await videoRecorder.startRecording(page);
+		}
 	});
 
 	// Cleanup after each test
@@ -57,6 +67,15 @@ describe('Frontend: Inspect the DOM', () => {
 
 	// Cleanup after all tests
 	afterAll(async () => {
+		// Stop video recording
+		if (videoRecorder) {
+			const videoPath = await videoRecorder.stopRecording();
+			if (videoPath) {
+				console.log(`📹 Complete test suite video saved: ${videoPath}`);
+			}
+			videoRecorder.cleanup();
+		}
+
 		await browser.close();
 	});
 

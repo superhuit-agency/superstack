@@ -39,16 +39,61 @@ jobs:
             libdrm-dev \
             libxkbcommon-dev \
             libgbm-dev \
-            libasound2-dev
+            libasound2-dev \
+            ffmpeg
+
+      - name: Install Google Chrome
+        run: |
+          wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+          sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable
+
+      - name: Check Chrome installation
+        run: |
+          google-chrome --version
+          which google-chrome
 
       - name: Run all tests
         run: npm run test:all
         env:
           CI: true
+          VIDEO_RECORD: true
           WORDPRESS_URL: ${{ vars.WORDPRESS_URL }}
           NEXT_URL: ${{ vars.NEXT_URL }}
           WORDPRESS_ADMIN_USER: ${{ vars.WORDPRESS_ADMIN_USER }}
           WORDPRESS_ADMIN_PASSWORD: ${{ secrets.WORDPRESS_ADMIN_PASSWORD }}
+
+      - name: Upload test videos on failure
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: test-failure-videos
+          path: |
+            src/__tests__/video-logs/
+          retention-days: 7
+
+      - name: Comment on failure with video info
+        if: failure() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `❌ **End to end Tests Failed**
+              
+              To view the video recordings:
+              1. Go to the "Summary" tab of this workflow run
+              2. Download and extract the "test-failure-videos" artifact to see what went wrong.`
+            })
+
+      - name: List generated videos
+        if: always()
+        run: |
+          echo "Generated test videos:"
+          ls -la src/__tests__/video-logs/ || echo "No video-logs directory found"
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
@@ -57,5 +102,5 @@ jobs:
           name: test-results
           path: |
             coverage/
-            test-results/
+            src/__tests__/video-logs/
           retention-days: 30

@@ -12,9 +12,9 @@
     "lint": "next lint",
     "storybook": "storybook dev -p 4000",
     "test:all": "npm run test:unit && npm run test:endtoend",
+    "test:all:debug": "VIDEO_RECORD=true node --inspect-brk=9229 ./node_modules/.bin/jest --runInBand --no-cache",
     "test:unit": "jest --config jest.config.js --testPathPattern __tests__/unit",
     "test:endtoend": "jest --config jest.config.endtoend.js --testPathPattern __tests__/endtoend",
-    "test:debugall": "node --inspect-brk=9229 ./node_modules/.bin/jest --runInBand --no-cache",
     "build-storybook": "storybook build",
     "generate:block": "plop --plopfile ./generators/plopfile.js block",
     "generate:language-migration": "plop --plopfile ./generators/plopfile.js language-migration"
@@ -82,6 +82,7 @@
     "postcss-simple-vars": "^7.0.1",
     "prettier": "^3.2.5",
     "puppeteer": "^24.8.1",
+    "puppeteer-screen-recorder": "^3.0.6",
     "react-test-renderer": "^18.3.1",
     "resolve-url-loader": "^5.0.0",
     "storybook": "^8.2.6",

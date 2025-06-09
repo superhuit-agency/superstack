@@ -8,7 +8,8 @@ node_modules/
 
 # testing
 /coverage
-.artifacts
+src/__tests__/video-logs/
+.artifacts/
 
 # next.js
 /.next/
@@ -27,13 +28,11 @@ yarn-debug.log*
 yarn-error.log*
 
 # local env files
-.env
-.env.*
-!.env.*.example
+.env*.local
 
 # vercel
 .vercel
 
 # typescript
 *.tsbuildinfo
-# next-env.d.ts
+next-env.d.ts
