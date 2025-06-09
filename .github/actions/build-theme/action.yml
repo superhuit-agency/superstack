@@ -11,7 +11,7 @@ runs:
       shell: bash
       run: |
         npm install --frozen-lockfile --legacy-peer-deps
-        npm --prefix ./wordpress install --frozen-lockfile
+        npm --prefix ./wordpress install --frozen-lockfile --legacy-peer-deps
 
     - name: Build assets
       shell: bash
