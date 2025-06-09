@@ -117,3 +117,14 @@ jobs:
           NEXT_SSH_PORT: ${{ vars.NEXT_SSH_PORT }}
           NEXT_SSH_PATH: ${{ vars.NEXT_SSH_PATH }}
           NEXT_SSH_PRIVATE_KEY: ${{ secrets.NEXT_SSH_PRIVATE_KEY }}
+
+  # RUN THE run-tests-development.yml workflow
+  test_development:
+    name: Test development environment
+    needs: deploy_development
+    uses: ./.github/workflows/run-tests-development.yml
+    with:
+      WORDPRESS_URL: ${{ vars.WORDPRESS_URL }}
+      NEXT_URL: ${{ vars.NEXT_URL }}
+      WORDPRESS_ADMIN_USER: ${{ vars.WORDPRESS_ADMIN_USER }}
+      WORDPRESS_ADMIN_PASSWORD: ${{ secrets.WORDPRESS_ADMIN_PASSWORD }}

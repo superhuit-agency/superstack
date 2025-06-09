@@ -8,6 +8,7 @@ import { Page } from 'puppeteer';
 import { Stories as AllTestableComponents } from '@/components/stories';
 import { VideoRecorder } from '../utils/video-recorder';
 import {
+	doLoginIfNeeded,
 	setCodeEditor,
 	setRightPanel,
 	writeBlockHTML,
@@ -75,21 +76,11 @@ describe('Admin: Create a page to test all the blocks', () => {
 	it('should open the admin and login', async () => {
 		// Go to the admin page
 		await page.goto(`${WORDPRESS_URL}/wp-admin/`);
-		// Find out if we need to login (url changed to wp-login.php)
-		const url = await page.url();
-		if (url.includes('wp-login.php')) {
-			await new Promise((resolve) => setTimeout(resolve, 250));
-			// Find the username input and type the username
-			await page.waitForSelector('#user_login', { timeout: 5000 });
-			await page.type('#user_login', WORDPRESS_ADMIN_USER);
-			// Find the password input and type the password
-			await page.waitForSelector('#user_pass', { timeout: 5000 });
-			await page.type('#user_pass', WORDPRESS_ADMIN_PASSWORD);
-			// Find the login button and click it
-			await page.click('#wp-submit');
-			// Wait for the page to load
-			await page.waitForNavigation({ timeout: 10000 });
-		}
+		await doLoginIfNeeded(
+			page,
+			WORDPRESS_ADMIN_USER,
+			WORDPRESS_ADMIN_PASSWORD
+		);
 	});
 
 	it('should open the admin to create a new page', async () => {

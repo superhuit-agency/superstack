@@ -12,6 +12,10 @@ export const setOptionsPanel = async (page: Page, activate: boolean) => {
 	if ((await isOptionsPanelOpen(page)) === activate) {
 		return;
 	}
+	await page.waitForSelector(
+		'.interface-more-menu-dropdown .components-button.components-dropdown-menu__toggle',
+		{ timeout: 1000 }
+	);
 	await page.click(
 		'.interface-more-menu-dropdown .components-button.components-dropdown-menu__toggle'
 	);
@@ -65,6 +69,29 @@ export const setRightPanel = async (page: Page, activate: boolean) => {
 	await page.click(
 		'button[aria-label="Settings"][aria-controls="edit-post:document"]'
 	);
+};
+
+export const doLoginIfNeeded = async (
+	page: Page,
+	username: string,
+	password: string
+) => {
+	// Find out if we need to login (url changed to wp-login.php)
+	const url = await page.url();
+	if (url.includes('wp-login.php')) {
+		// Find the username input and type the username
+		await page.waitForSelector('#user_login', { timeout: 5000 });
+		// Needed to avoid race condition
+		await new Promise((resolve) => setTimeout(resolve, 250));
+		await page.type('#user_login', username);
+		// Find the password input and type the password
+		await page.waitForSelector('#user_pass', { timeout: 5000 });
+		await page.type('#user_pass', password);
+		// Find the login button and click it
+		await page.click('#wp-submit');
+		// Wait for the page to load
+		await page.waitForNavigation({ timeout: 10000 });
+	}
 };
 
 /**
