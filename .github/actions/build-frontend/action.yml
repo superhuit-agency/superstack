@@ -9,7 +9,7 @@ runs:
 
     - name: Install node dependencies
       shell: bash
-      run: npm install --frozen-lockfile
+      run: npm install --frozen-lockfile --legacy-peer-deps
 
     - name: Frontend ESLint
       shell: bash

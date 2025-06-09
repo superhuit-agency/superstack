@@ -113,11 +113,12 @@ jobs:
         shell: bash
         run: sh ./.github/actions/tests/simple-http-test.sh
 
-      - name: Jest Unit Tests
-        shell: bash
-        run: npm run test:all -u
-        env:
-          WORDPRESS_URL: ${{ vars.WORDPRESS_URL }}
-          NEXT_URL: ${{ vars.NEXT_URL }}
-          WORDPRESS_ADMIN_USER: ${{ vars.WORDPRESS_ADMIN_USER }}
-          WORDPRESS_ADMIN_PASSWORD: ${{ vars.WORDPRESS_ADMIN_PASSWORD }}
+      - name: Run tests in local environment
+        uses: ./.github/actions/run-tests
+        with:
+          CI: true
+          VIDEO_RECORD: true
+          WORDPRESS_URL: http://localhost
+          NEXT_URL: http://localhost:3000
+          WORDPRESS_ADMIN_USER: 'superstack'
+          WORDPRESS_ADMIN_PASSWORD: 'stacksuper'

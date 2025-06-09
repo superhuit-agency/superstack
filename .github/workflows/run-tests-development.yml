@@ -4,58 +4,18 @@ on:
   workflow_dispatch:
 
 jobs:
-  test:
+  test-development:
     runs-on: ubuntu-latest
     environment: development
     # Only run this workflow on the develop branch
     if: github.ref == 'refs/heads/develop'
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Run tests un the development environment
+        uses: ./.github/actions/run-tests
         with:
-          node-version: 20
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build project
-        run: NODE_ENV=production npm run build
-        env:
-          WORDPRESS_URL: ${{ vars.WORDPRESS_URL }}
-          NEXT_URL: ${{ vars.NEXT_URL }}
-          WORDPRESS_ADMIN_USER: ${{ vars.WORDPRESS_ADMIN_USER }}
-          WORDPRESS_ADMIN_PASSWORD: ${{ secrets.WORDPRESS_ADMIN_PASSWORD }}
-
-      - name: Install Puppeteer dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            libnss3-dev \
-            libatk-bridge2.0-dev \
-            libdrm-dev \
-            libxkbcommon-dev \
-            libgbm-dev \
-            libasound2-dev
-
-      - name: Run all tests
-        run: npm run test:all
-        env:
           CI: true
+          VIDEO_RECORD: true
           WORDPRESS_URL: ${{ vars.WORDPRESS_URL }}
           NEXT_URL: ${{ vars.NEXT_URL }}
           WORDPRESS_ADMIN_USER: ${{ vars.WORDPRESS_ADMIN_USER }}
           WORDPRESS_ADMIN_PASSWORD: ${{ secrets.WORDPRESS_ADMIN_PASSWORD }}
-
-      - name: Upload test results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: test-results
-          path: |
-            coverage/
-            test-results/
-          retention-days: 30
