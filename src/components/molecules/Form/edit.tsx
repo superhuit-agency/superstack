@@ -154,9 +154,25 @@ export const FormBlock: WpBlockType<FormProps> = {
 				type: 'number',
 				default: undefined,
 			},
+			name: {
+				type: 'string',
+				default: '',
+			},
+			optIns: {
+				type: 'object',
+				default: {},
+			},
 			isPreview: {
 				type: 'boolean',
 				default: false,
+			},
+			fields: {
+				type: 'array',
+				default: [],
+			},
+			version: {
+				type: 'number',
+				default: 0,
 			},
 		},
 		keywords: [],

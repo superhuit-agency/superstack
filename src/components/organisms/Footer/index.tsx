@@ -4,7 +4,7 @@ import cx from 'classnames';
 import { FC, useMemo } from 'react';
 
 import { useLocale } from '@/contexts/locale-context';
-import { Link } from '@/helpers/Link';
+import { Link } from '@/components/atoms/Link';
 
 import block from './block.json';
 

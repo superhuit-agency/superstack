@@ -1,3 +1,5 @@
+'use client';
+
 import cx from 'classnames';
 import { FC, forwardRef, useId } from 'react';
 
@@ -38,7 +40,7 @@ export const InputRadio: FC<InputRadioProps> & BlockConfigs = forwardRef<
 					{
 						'-error': invalid && typeof invalid === 'string',
 						'-disabled': disabled,
-						'-single': options.length === 1,
+						'-single': options?.length === 1,
 					}
 				)}
 			>

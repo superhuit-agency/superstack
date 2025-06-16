@@ -32,9 +32,11 @@ runs:
         cache: 'npm'
 
     - name: Install dependencies for jest + puppeteer
+      shell: bash
       run: npm ci --legacy-peer-deps
 
     - name: Install Puppeteer dependencies
+      shell: bash
       run: |
         sudo apt-get update
         sudo apt-get install -y \
@@ -47,6 +49,7 @@ runs:
           ffmpeg
 
     - name: Install Google Chrome
+      shell: bash
       run: |
         wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
         sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
@@ -54,11 +57,13 @@ runs:
         sudo apt-get install -y google-chrome-stable
 
     - name: Check Chrome installation
+      shell: bash
       run: |
         google-chrome --version
         which google-chrome
 
     - name: Run all tests
+      shell: bash
       run: npm run test:all
       env:
         CI: ${{ inputs.CI }}
@@ -95,6 +100,7 @@ runs:
 
     - name: List generated videos
       if: always()
+      shell: bash
       run: |
         echo "Generated test videos:"
         ls -la src/__tests__/video-logs/ || echo "No video-logs directory found"

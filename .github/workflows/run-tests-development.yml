@@ -10,6 +10,9 @@ jobs:
     # Only run this workflow on the develop branch
     if: github.ref == 'refs/heads/develop'
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
       - name: Run tests un the development environment
         uses: ./.github/actions/run-tests
         with:
