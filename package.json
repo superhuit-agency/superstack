@@ -1,6 +1,6 @@
 {
   "name": "superstack",
-  "version": "1.1.5",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "postinstall": "npm --prefix ./wordpress install",
@@ -61,7 +61,6 @@
     "@types/wordpress__block-editor": "^11.5.15",
     "@types/wordpress__blocks": "^12.5.13",
     "@wordpress/api-fetch": "^7.4.0",
-    "babel-jest": "^29.7.0",
     "eslint": "^8",
     "eslint-config-next": "14.0.4",
     "eslint-plugin-storybook": "^0.8.0",
@@ -81,7 +80,7 @@
     "postcss-preset-env": "^9.3.0",
     "postcss-simple-vars": "^7.0.1",
     "prettier": "^3.2.5",
-    "puppeteer": "^24.8.1",
+    "puppeteer": "^24.10.1",
     "puppeteer-screen-recorder": "^3.0.6",
     "react-test-renderer": "^18.3.1",
     "resolve-url-loader": "^5.0.0",
