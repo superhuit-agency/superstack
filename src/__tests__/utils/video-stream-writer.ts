@@ -3,7 +3,7 @@ import os from 'os';
 import { extname } from 'path';
 import { PassThrough, Writable } from 'stream';
 
-import ffmpeg, { setFfmpegPath } from 'fluent-ffmpeg';
+import ffmpeg, { FfmpegCommand, setFfmpegPath } from 'fluent-ffmpeg';
 
 import {
 	pageScreenFrame,
@@ -27,7 +27,7 @@ const SUPPORTED_FILE_FORMATS = [
  */
 export default class videoStreamWriter extends EventEmitter {
 	private readonly screenLimit = 10;
-	private screenCastFrames = [];
+	private screenCastFrames: Array<pageScreenFrame> = [];
 	public duration = '00:00:00:00';
 	public frameGain = 0;
 	public frameLoss = 0;
@@ -35,7 +35,7 @@ export default class videoStreamWriter extends EventEmitter {
 	private status = VIDEO_WRITE_STATUS.NOT_STARTED;
 
 	private videoMediatorStream: PassThrough = new PassThrough();
-	private writerPromise: Promise<boolean>;
+	private writerPromise: Promise<boolean> | null = null;
 
 	constructor(
 		destinationSource: string | Writable,
@@ -57,11 +57,13 @@ export default class videoStreamWriter extends EventEmitter {
 	}
 
 	private get videoFrameSize(): string {
-		const { width, height } = this.options.videoFrame;
-
-		return width !== null && height !== null
-			? `${width}x${height}`
-			: '100%';
+		if (this.options.videoFrame !== undefined) {
+			const { width, height } = this.options.videoFrame;
+			if (width !== null && height !== null) {
+				return `${width}x${height}`;
+			}
+		}
+		return '100%';
 	}
 
 	private get autopad(): { activation: boolean; color?: string } {
@@ -78,7 +80,6 @@ export default class videoStreamWriter extends EventEmitter {
 		}
 
 		try {
-			// eslint-disable-next-line @typescript-eslint/no-var-requires
 			const ffmpeg = require('@ffmpeg-installer/ffmpeg');
 			if (ffmpeg.path) {
 				return ffmpeg.path;
@@ -89,7 +90,9 @@ export default class videoStreamWriter extends EventEmitter {
 		}
 	}
 
-	private getDestinationPathExtension(destinationFile): SupportedFileFormats {
+	private getDestinationPathExtension(
+		destinationFile: string
+	): SupportedFileFormats {
 		const fileExtension = extname(destinationFile);
 		return fileExtension.includes('.')
 			? (fileExtension.replace('.', '') as SupportedFileFormats)
@@ -133,11 +136,11 @@ export default class videoStreamWriter extends EventEmitter {
 			const outputStream = this.getDestinationStream();
 
 			outputStream
-				.on('error', (e) => {
+				.on('error', (e: Error) => {
 					this.handleWriteStreamError(e.message);
 					resolve(false);
 				})
-				.on('stderr', (e) => {
+				.on('stderr', (e: string) => {
 					this.handleWriteStreamError(e);
 					resolve(false);
 				})
@@ -158,11 +161,11 @@ export default class videoStreamWriter extends EventEmitter {
 			const outputStream = this.getDestinationStream();
 
 			outputStream
-				.on('error', (e) => {
+				.on('error', (e: Error) => {
 					writableStream.emit('error', e);
 					resolve(false);
 				})
-				.on('stderr', (e) => {
+				.on('stderr', (e: string) => {
 					writableStream.emit('error', { message: e });
 					resolve(false);
 				})
@@ -212,7 +215,7 @@ export default class videoStreamWriter extends EventEmitter {
 		}
 	}
 
-	private getDestinationStream(): ffmpeg {
+	private getDestinationStream(): FfmpegCommand {
 		const outputStream = ffmpeg({
 			source: this.videoMediatorStream,
 			priority: 20,
@@ -237,7 +240,7 @@ export default class videoStreamWriter extends EventEmitter {
 		return outputStream;
 	}
 
-	private handleWriteStreamError(errorMessage): void {
+	private handleWriteStreamError(errorMessage: string): void {
 		this.emit('videoStreamWriterError', errorMessage);
 
 		if (
@@ -355,6 +358,10 @@ export default class videoStreamWriter extends EventEmitter {
 	}
 
 	public stop(stoppedTime = Date.now() / 1000): Promise<boolean> {
+		if (!this.writerPromise) {
+			return Promise.resolve(false);
+		}
+
 		if (this.status === VIDEO_WRITE_STATUS.COMPLETED) {
 			return this.writerPromise;
 		}

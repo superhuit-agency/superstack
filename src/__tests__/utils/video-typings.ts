@@ -34,7 +34,7 @@ export type PuppeteerScreenRecorderOptions = {
 	 * @description Numeric value which denotes no.of Frames per second in which the video should be recorded. default value is 25.
 	 * @default 25
 	 */
-	readonly fps?: number;
+	readonly fps: number;
 
 	/**
 	 * @name quality
