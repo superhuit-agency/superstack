@@ -33,7 +33,7 @@ runs:
 
     - name: Install dependencies for jest + puppeteer
       shell: bash
-      run: npm ci --legacy-peer-deps
+      run: npm ci
 
     - name: Install Puppeteer dependencies
       shell: bash

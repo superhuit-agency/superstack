@@ -32,7 +32,7 @@ runs:
 
     - name: Install node dependencies
       shell: bash
-      run: npm ci --legacy-peer-deps
+      run: npm ci
 
     - name: Copy environment file
       shell: bash

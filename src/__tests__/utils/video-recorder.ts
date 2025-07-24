@@ -1,64 +1,88 @@
 import { Page } from 'puppeteer';
-import { PuppeteerScreenRecorder } from 'puppeteer-screen-recorder';
 import * as path from 'path';
 import * as fs from 'fs';
+import { dirname } from 'path';
+
+import videoStreamReader from './video-stream-reader';
+import videoStreamWriter from './video-stream-writer';
+import { PuppeteerScreenRecorderOptions } from './video-typings';
+
+export const options: PuppeteerScreenRecorderOptions = {
+	followNewTab: true,
+	fps: 25,
+	ffmpeg_Path: null, // Use system ffmpeg
+	videoFrame: {
+		width: 1280,
+		height: 720,
+	},
+	videoCrf: 18,
+	videoCodec: 'libx264',
+	videoPreset: 'ultrafast',
+	videoBitrate: 1000,
+	autopad: {
+		color: 'black',
+	},
+	quality: 100,
+};
 
 export class VideoRecorder {
-	private recorder: PuppeteerScreenRecorder | null = null;
 	private outputPath: string;
 	private isRecording: boolean = false;
+	private streamReader?: videoStreamReader;
+	private streamWriter?: videoStreamWriter;
+	private isScreenCaptureEnded: boolean | null = null;
 
-	constructor(private suiteName: string) {
-		// Create video-logs directory if it doesn't exist
-		const videosDir = path.join(
+	/**
+	 * @param testName - The name of the test to record.
+	 * @param page - The page to record.
+	 */
+	constructor(
+		testName: string,
+		private page: Page
+	) {
+		// Generate unique filename with timestamp
+		const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+		const sanitizedTestName = testName.replace(/[^a-zA-Z0-9]/g, '_');
+		this.outputPath = path.join(
 			process.cwd(),
 			'src',
 			'__tests__',
-			'video-logs'
+			'video-logs',
+			`${sanitizedTestName}_${timestamp}.mp4`
 		);
-		if (!fs.existsSync(videosDir)) {
-			fs.mkdirSync(videosDir, { recursive: true });
-		}
-
-		// Generate unique filename with timestamp
-		const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-		const sanitizedSuiteName = suiteName.replace(/[^a-zA-Z0-9]/g, '_');
-		this.outputPath = path.join(
-			videosDir,
-			`${sanitizedSuiteName}_${timestamp}.mp4`
-		);
+		// Create the directory if it doesn't exist
+		fs.mkdirSync(dirname(this.outputPath), { recursive: true });
 	}
 
-	async startRecording(page: Page): Promise<void> {
+	/**
+	 * Start the video recording.
+	 * @returns A promise that resolves when the recording is started.
+	 */
+	public async start(): Promise<void> {
 		// Only record in CI environment or when VIDEO_RECORD env var is set
 		if (!process.env.CI && !process.env.VIDEO_RECORD) {
-			return;
+			return Promise.resolve();
 		}
 
-		console.log('🎥 Starting video recording...');
-
 		try {
-			this.recorder = new PuppeteerScreenRecorder(page, {
-				followNewTab: true,
-				fps: 25,
-				ffmpeg_Path: null, // Use system ffmpeg
-				videoFrame: {
-					width: 1280,
-					height: 720,
-				},
-				videoCrf: 18,
-				videoCodec: 'libx264',
-				videoPreset: 'ultrafast',
-				videoBitrate: 1000,
-				autopad: {
-					color: 'black',
-				},
-			});
+			this.streamReader = new videoStreamReader(this.page, options);
+			this.streamWriter = new videoStreamWriter(this.outputPath, options);
 
-			await this.recorder.start(this.outputPath);
-			this.isRecording = true;
-			console.log(`🎥 Video recording started: ${this.outputPath}`);
-		} catch (error) {
+			// Stop the streams when the page is closed
+			this.page.once('close', async () => await this.stopStreams());
+			// Bind the stream reader to the writer
+			this.streamReader.on('pageScreenFrame', (pageScreenFrame) => {
+				this.streamWriter?.insert(pageScreenFrame);
+			});
+			// Stop the streams when the writer encounters an error
+			this.streamWriter.once('videoStreamWriterError', () =>
+				this.stopStreams()
+			);
+			// Start the recording
+			this.isRecording = await this.streamReader?.start();
+			console.log(`🎥 Video recording started => ${this.outputPath}`);
+			//
+		} catch (error: any) {
 			console.warn(
 				'❌ Failed to start video recording:',
 				(error as Error).message
@@ -66,21 +90,31 @@ export class VideoRecorder {
 		}
 	}
 
-	async stopRecording(): Promise<string | null> {
-		if (!this.isRecording || !this.recorder) {
+	/**
+	 * Stop the video recording.
+	 * @returns A promise that resolves when the recording is stopped and
+	 * returns the the file path and size if the file was created and has content
+	 */
+	public async stop(): Promise<{
+		filePath: string;
+		fileSize: number;
+	} | null> {
+		if (!this.isRecording) {
 			return null;
 		}
 
 		try {
-			await this.recorder.stop();
-			this.isRecording = false;
-			console.log(`🎬 Video recording stopped: ${this.outputPath}`);
+			this.isRecording = !(await this.stopStreams());
+			console.log(`🎬 Video recording stopped => ${this.outputPath}`);
 
 			// Check if file was created and has content
 			if (fs.existsSync(this.outputPath)) {
 				const stats = fs.statSync(this.outputPath);
 				if (stats.size > 0) {
-					return this.outputPath;
+					return {
+						filePath: this.outputPath,
+						fileSize: stats.size,
+					};
 				}
 			}
 			return null;
@@ -93,17 +127,17 @@ export class VideoRecorder {
 		}
 	}
 
-	getOutputPath(): string {
-		return this.outputPath;
-	}
+	private async stopStreams(): Promise<boolean> {
+		if (
+			this.isScreenCaptureEnded !== null ||
+			!this.streamReader ||
+			!this.streamWriter
+		) {
+			return this.isScreenCaptureEnded!;
+		}
 
-	get recording(): boolean {
-		return this.isRecording;
-	}
-
-	cleanup(): void {
-		// Clean up recorder instance
-		this.recorder = null;
-		this.isRecording = false;
+		await this.streamReader.stop();
+		this.isScreenCaptureEnded = await this.streamWriter.stop();
+		return this.isScreenCaptureEnded;
 	}
 }

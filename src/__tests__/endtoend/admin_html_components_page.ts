@@ -65,8 +65,8 @@ describe('Admin: Create a page to test all the blocks', () => {
 		await page.setViewport({ width: 960, height: 800 });
 
 		// Initialize video recorder for the entire suite
-		videoRecorder = new VideoRecorder('admin_full_page_cycle');
-		await videoRecorder.startRecording(page);
+		videoRecorder = new VideoRecorder('admin_full_page_cycle', page);
+		await videoRecorder.start();
 	});
 
 	beforeEach(async () => {
@@ -242,12 +242,11 @@ describe('Admin: Create a page to test all the blocks', () => {
 
 	afterAll(async () => {
 		// Stop video recording
-		if (videoRecorder) {
-			const videoPath = await videoRecorder.stopRecording();
-			if (videoPath) {
-				console.log(`Video log saved: ${videoPath}`);
-			}
-			videoRecorder.cleanup();
+		const videoFile = await videoRecorder?.stop();
+		if (videoFile) {
+			console.log(
+				`📹 Complete test suite video saved: ${videoFile.filePath} (${videoFile.fileSize} bytes)`
+			);
 		}
 
 		await browser.close();

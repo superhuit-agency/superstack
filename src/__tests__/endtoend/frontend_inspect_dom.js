@@ -46,36 +46,28 @@ describe('Frontend: Inspect the DOM', () => {
 				: undefined,
 		});
 
-		// Initialize video recorder for the entire suite
-		videoRecorder = new VideoRecorder('Frontend_Inspect_DOM');
-	});
-
-	// Setup before each test
-	beforeEach(async () => {
+		// Create a single page for the entire test suite
 		page = await browser.newPage();
 
-		// Start recording only for the first test
-		if (!videoRecorder.recording) {
-			await videoRecorder.startRecording(page);
-		}
-	});
-
-	// Cleanup after each test
-	afterEach(async () => {
-		await page.close();
+		// Initialize video recorder for the entire suite
+		videoRecorder = new VideoRecorder('Frontend_Inspect_DOM', page);
+		await videoRecorder.start();
 	});
 
 	// Cleanup after all tests
 	afterAll(async () => {
-		// Stop video recording
-		if (videoRecorder) {
-			const videoPath = await videoRecorder.stopRecording();
-			if (videoPath) {
-				console.log(`📹 Complete test suite video saved: ${videoPath}`);
-			}
-			videoRecorder.cleanup();
+		// Stop video recording BEFORE closing the browser
+		const videoFile = await videoRecorder?.stop();
+		if (videoFile) {
+			console.log(
+				`📹 Complete test suite video saved: ${videoFile.filePath} (${videoFile.fileSize} bytes)`
+			);
 		}
 
+		// Close the page and browser
+		if (page) {
+			await page.close();
+		}
 		await browser.close();
 	});
 
