@@ -92,7 +92,7 @@ else
 		COMMITS=$(curl -H "Authorization: token $TOKEN" \
 		               -H "Accept: application/vnd.github.v3+json" \
 		               "https://api.github.com/repos/$REPO/commits?sha=main&since=$LAST_TAG_DATE" \
-		               -s | jq -r '.[] | select(.sha != "'$LAST_TAG_SHA'") | "- \(.commit.message) (\(.commit.author.name))"')
+		               -s | jq -r '.[] | select(.sha != "'$LAST_TAG_SHA'") | "- [\(.sha | .[:7])](https://github.com/'$REPO'/commit/\(.sha)) \(.commit.message) (\(.commit.author.name))"')
 	else
 		echo "Getting last 10 commits (could not find release tag v$log_version)"
 		COMMITS=$(curl -H "Authorization: token $TOKEN" \
