@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.0.3 - 2025-07-28
+
+- Merge branch 'main' of github.com:superhuit-agency/superstack_test geck1942
+- tests: config update
+- fixed paragraph test geck1942
+- ship: 🚀 upgrade to version 1.0.2 superhuit
+- tests: Changed the architecture of tests + stories geck1942
+- fix: 🐛 typescript + build fixes geck1942
+- Merge branch 'main' of github.com:superhuit-agency/superstack_test geck1942
+- fix: 🐛 replaced pupeteer by ffmpeg
+- removed problematic dependency
+- adjusted code for video testing
+
+
 ## 1.0.2 - 2025-07-28
 
 - tests: Changed the architecture of tests + stories geck1942
