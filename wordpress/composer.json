@@ -1,6 +1,6 @@
 {
 	"name": "superhuit/superstack",
-	"version": "1.0.3",
+	"version": "1.0.4",
 	"type": "project",
 	"authors": [
 		{
@@ -68,7 +68,7 @@
 			"type": "package",
 			"package": {
 				"name": "superhuit-agency/starterpack-i18n",
-				"version": "1.0.3",
+				"version": "1.0.4",
 				"type": "wordpress-plugin",
 				"dist": {
 					"url": "https://github.com/superhuit-agency/starterpack-i18n/releases/download/v1.0.1/starterpack-i18n.zip",
