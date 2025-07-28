@@ -56,11 +56,35 @@ else
 	DATE=$(date "+%Y-%m-%d")
 	description="## $new_version - $DATE\n\n"
 
+	# Get the commit SHA of the last release tag
+	LAST_TAG_SHA=$(curl -H "Authorization: token $TOKEN" \
+	                    -H "Accept: application/vnd.github.v3+json" \
+	                    "https://api.github.com/repos/$REPO/git/refs/tags/v$log_version" \
+	                    -s | jq -r '.object.sha // empty')
+
 	# Get commits since last release
-	COMMITS=$(curl -H "Authorization: token $TOKEN" \
-									-H "Accept: application/vnd.github.v3+json" \
-									"https://api.github.com/repos/$REPO/commits?sha=main" \
-									-s | jq -r '.[] | "- \(.commit.message) \(.commit.author.name)"' | head -n 10)
+	if [ -n "$LAST_TAG_SHA" ]; then
+
+		# Get the date of the last release commit
+		LAST_TAG_DATE=$(curl -H "Authorization: token $TOKEN" \
+		                     -H "Accept: application/vnd.github.v3+json" \
+		                     "https://api.github.com/repos/$REPO/git/commits/$LAST_TAG_SHA" \
+		                     -s | jq -r '.author.date')
+	fi
+
+	if [ -n "$LAST_TAG_DATE" ] && [ "$LAST_TAG_DATE" != "null" ]; then
+		echo "Getting commits since last version $log_version (after $LAST_TAG_DATE)"
+		COMMITS=$(curl -H "Authorization: token $TOKEN" \
+										-H "Accept: application/vnd.github.v3+json" \
+										"https://api.github.com/repos/$REPO/commits?sha=main&since=$LAST_TAG_DATE" \
+										-s | jq -r '.[] | select(.sha != "'$LAST_TAG_SHA'") | "- \(.commit.message) (\(.commit.author.name))"')
+	else
+		echo "Getting last 10 commits"
+		COMMITS=$(curl -H "Authorization: token $TOKEN" \
+										-H "Accept: application/vnd.github.v3+json" \
+										"https://api.github.com/repos/$REPO/commits?sha=main" \
+										-s | jq -r '.[] | "- \(.commit.message) (\(.commit.author.name))"' | head -n 10)
+	fi
 
 	if [[ $COMMITS =~ [^[:space:]] ]]; then
 		echo "Updating Changelog for $new_version with list of commits:"
