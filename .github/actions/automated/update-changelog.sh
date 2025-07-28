@@ -62,28 +62,38 @@ else
 	                    "https://api.github.com/repos/$REPO/git/refs/tags/v$log_version" \
 	                    -s | jq -r '.object.sha // empty')
 
-	# Get commits since last release
-	if [ -n "$LAST_TAG_SHA" ]; then
+	# If we can't find the tag with 'v' prefix, try without it
+	if [ -z "$LAST_TAG_SHA" ]; then
+		LAST_TAG_SHA=$(curl -H "Authorization: token $TOKEN" \
+		                    -H "Accept: application/vnd.github.v3+json" \
+		                    "https://api.github.com/repos/$REPO/git/refs/tags/$log_version" \
+		                    -s | jq -r '.object.sha // empty')
+	fi
 
-		# Get the date of the last release commit
+	# Initialize LAST_TAG_DATE
+	LAST_TAG_DATE=""
+
+	# Get the date of the last release commit if we found the tag
+	if [ -n "$LAST_TAG_SHA" ]; then
 		LAST_TAG_DATE=$(curl -H "Authorization: token $TOKEN" \
 		                     -H "Accept: application/vnd.github.v3+json" \
 		                     "https://api.github.com/repos/$REPO/git/commits/$LAST_TAG_SHA" \
 		                     -s | jq -r '.author.date')
 	fi
 
+	# Get commits since last release or fallback to last 10
 	if [ -n "$LAST_TAG_DATE" ] && [ "$LAST_TAG_DATE" != "null" ]; then
 		echo "Getting commits since last version $log_version (after $LAST_TAG_DATE)"
 		COMMITS=$(curl -H "Authorization: token $TOKEN" \
-										-H "Accept: application/vnd.github.v3+json" \
-										"https://api.github.com/repos/$REPO/commits?sha=main&since=$LAST_TAG_DATE" \
-										-s | jq -r '.[] | select(.sha != "'$LAST_TAG_SHA'") | "- \(.commit.message) (\(.commit.author.name))"')
+		               -H "Accept: application/vnd.github.v3+json" \
+		               "https://api.github.com/repos/$REPO/commits?sha=main&since=$LAST_TAG_DATE" \
+		               -s | jq -r '.[] | select(.sha != "'$LAST_TAG_SHA'") | "- \(.commit.message) (\(.commit.author.name))"')
 	else
-		echo "Getting last 10 commits"
+		echo "Getting last 10 commits (could not find release tag v$log_version or $log_version)"
 		COMMITS=$(curl -H "Authorization: token $TOKEN" \
-										-H "Accept: application/vnd.github.v3+json" \
-										"https://api.github.com/repos/$REPO/commits?sha=main" \
-										-s | jq -r '.[] | "- \(.commit.message) (\(.commit.author.name))"' | head -n 10)
+		               -H "Accept: application/vnd.github.v3+json" \
+		               "https://api.github.com/repos/$REPO/commits?sha=main" \
+		               -s | jq -r '.[] | "- \(.commit.message) (\(.commit.author.name))"' | head -n 10)
 	fi
 
 	if [[ $COMMITS =~ [^[:space:]] ]]; then
