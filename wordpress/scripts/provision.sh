@@ -74,9 +74,9 @@ fi
 # /!\ dev note: don't write anything in the folder before this or it will fail, saying 'the folder is not empty'
 if ! $WPCLI core is-installed --quiet &> /dev/null; then
 	echo
-	echo "----------------------------------"
-	echo "     WordPress installation       "
-	echo "----------------------------------"
+	echo "-------------------------------------------------------------------"
+	echo "                   WordPress installation                          "
+	echo "-------------------------------------------------------------------"
 	echo
 	if [ ! -z "${WORDPRESS_ENV}" ] && [ "${WORDPRESS_ENV}" = "dev" ]; then # we are on local dev environment (in docker)
 		echo $en "- Installing WordPress as localhost $ec"
@@ -131,9 +131,9 @@ if [ -d "$WORDPRESS_PATH/wp-content/themes/_new" ]; then
 fi
 
 echo
-echo "----------------------------------"
-echo "  Theme install & configuration   "
-echo "----------------------------------"
+echo "-------------------------------------------------------------------"
+echo "                   Theme install & configuration                   "
+echo "-------------------------------------------------------------------"
 echo
 
 if ! $($WPCLI theme is-active $WORDPRESS_THEME_NAME --skip-plugins); then
@@ -153,9 +153,9 @@ $WPCLI theme uninstall twentytwentyfour --quiet &> /dev/null
 echo "✔"
 
 echo
-echo "----------------------------------"
-echo "            Plugins               "
-echo "----------------------------------"
+echo "-------------------------------------------------------------------"
+echo "                   Plugins install & configuration                 "
+echo "-------------------------------------------------------------------"
 echo
 
 echo $en "- Uninstalling default plugins $ec"
@@ -187,9 +187,9 @@ fi
 
 if [ "$FIRSTTIME_INSTALL" = true ]; then
 	echo
-	echo "----------------------------------"
-	echo "        First time install        "
-	echo "----------------------------------"
+	echo "-------------------------------------------------------------------"
+	echo "                      First time install                           "
+	echo "-------------------------------------------------------------------"
 	echo
 
 	# Update Sample Page to be the Home
@@ -214,9 +214,9 @@ if [ "$FIRSTTIME_INSTALL" = true ]; then
 fi
 
 echo
-echo "----------------------------------"
-echo "          Other configs           "
-echo "----------------------------------"
+echo "-------------------------------------------------------------------"
+echo "                       Other configs                               "
+echo "-------------------------------------------------------------------"
 echo
 
 # Setup redirection tables
@@ -269,6 +269,6 @@ $WPCLI rewrite flush --hard --quiet
 echo "✔"
 
 echo
-echo "----------------------------------"
-echo "       Installation complete      "
-echo "----------------------------------"
+echo "-------------------------------------------------------------------"
+echo "                   Installation complete                           "
+echo "-------------------------------------------------------------------"
