@@ -7,7 +7,7 @@ node_modules/
 .yarn/install-state.gz
 
 # testing
-/coverage
+src/__tests__/coverage/
 src/__tests__/video-logs/
 .artifacts/
 

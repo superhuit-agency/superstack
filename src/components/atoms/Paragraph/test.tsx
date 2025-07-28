@@ -18,7 +18,7 @@ export const ParagraphTests: ComponentTests = {
 				expect(component).toBeInTheDocument();
 				// Content
 				expect(component).toHaveTextContent(
-					'Excepteur quis aute cupidatat consequat fugiat' + 'xxx'
+					'Excepteur quis aute cupidatat consequat fugiat'
 				);
 				// Display
 				expect(component).toBeVisible();
