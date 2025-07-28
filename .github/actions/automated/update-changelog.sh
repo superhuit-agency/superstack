@@ -29,19 +29,24 @@ description=""
 while IFS= read -r line || [[ -n "$line" ]]; do
   if [[ $line =~ ^##\ ([0-9]+\.[0-9]+\.[0-9]+) ]]; then
     # When a version header is found
+    version_number="${BASH_REMATCH[1]}"
+
     if $new_version_found; then
       # If we found the new version in the previous iteration, stop reading further
       break
     fi
 
-    version_number="${BASH_REMATCH[1]}"
     if [[ "$version_number" == "$new_version" ]]; then
       # Start capturing the description for the next version found
       new_version_found=true
     else
+			if [[ $log_version == "patch" ]]; then
+				log_version=$version_number;
+			fi
       # Stop capturing if this version is less than or equal to the last known version
       break
     fi
+
   elif $new_version_found; then
     # Capture the description lines
     description+="$line"$'\n'
@@ -89,7 +94,7 @@ else
 		               "https://api.github.com/repos/$REPO/commits?sha=main&since=$LAST_TAG_DATE" \
 		               -s | jq -r '.[] | select(.sha != "'$LAST_TAG_SHA'") | "- \(.commit.message) (\(.commit.author.name))"')
 	else
-		echo "Getting last 10 commits (could not find release tag v$log_version or $log_version)"
+		echo "Getting last 10 commits (could not find release tag v$log_version)"
 		COMMITS=$(curl -H "Authorization: token $TOKEN" \
 		               -H "Accept: application/vnd.github.v3+json" \
 		               "https://api.github.com/repos/$REPO/commits?sha=main" \
