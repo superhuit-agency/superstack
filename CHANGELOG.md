@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.0.5 - 2025-07-28
+
+- ci: updated changelog workflow (geck1942)
+- ship: 🚀 upgrade to version 1.0.4 (superhuit)
+- ci: updated changelog workflow (geck1942)
+- ship: 🚀 upgrade to version 1.0.3 (superhuit)
+- Merge branch 'main' of github.com:superhuit-agency/superstack_test (geck1942)
+- tests: config update
+- fixed paragraph test (geck1942)
+- ship: 🚀 upgrade to version 1.0.2 (superhuit)
+- tests: Changed the architecture of tests + stories (geck1942)
+- fix: 🐛 typescript + build fixes (geck1942)
+
+
 ## 1.0.4 - 2025-07-28
 
 - ci: updated changelog workflow (geck1942)
