@@ -124,6 +124,22 @@ declare global {
 			args?: any
 		) => Promise<void>;
 	};
+
+	type ComponentTests = {
+		block: BlockConfigs;
+		component: ReactNode | null;
+		tests: Record<
+			string,
+			{
+				args: any;
+				unitTest: (
+					component: Element | null,
+					container: Element | null,
+					args?: any
+				) => Promise<void>;
+			}
+		>;
+	};
 }
 
 // This empty export makes this file a module

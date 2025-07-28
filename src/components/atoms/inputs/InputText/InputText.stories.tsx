@@ -1,48 +1,29 @@
-import InputTextBlock from './block.json';
-import { InputText } from './index';
-import { expect } from '@storybook/test';
+import { Meta, StoryObj } from '@storybook/react';
 
-export default {
+import { InputText } from './index';
+
+const meta = {
 	title: 'Components/Atoms/Inputs/Input Text',
 	component: InputText,
 	parameters: {
 		layout: 'centered',
 	},
 	args: {},
-	blockConfig: InputTextBlock,
-	getUnitTests: () => [Default, Filled, WithError],
-} as TestableComponentMeta<typeof InputText>;
+} satisfies Meta<typeof InputText>;
 
-export const Default: TestableStory<typeof InputText> = {
-	name: 'InputText Default',
+export default meta;
+
+type Story = StoryObj<typeof meta>;
+
+export const Default: Story = {
 	args: {
 		label: 'Name',
 		name: 'name',
 		placeholder: 'John Doe',
 	},
-	unitTest: async (component: Element | null, container: Element | null) => {
-		// General
-		expect(component).toBeInTheDocument();
-		// Display
-		expect(component).toBeVisible();
-		expect(component).toHaveClass('supt-input-text');
-		// Label
-		const label = component?.querySelector('label');
-		expect(label).toBeInTheDocument();
-		expect(label).toHaveTextContent('Name');
-		// Input
-		const input = component?.querySelector('input');
-		expect(input).toBeInTheDocument();
-		expect(input).toHaveAttribute('placeholder', 'John Doe');
-		expect(input).toHaveAttribute('name', 'name');
-		expect(input).toHaveAttribute('type', 'text');
-		// No error state
-		expect(component).not.toHaveClass('-error');
-	},
 };
 
-export const Filled: TestableStory<typeof InputText> = {
-	name: 'InputText Filled',
+export const Filled: Story = {
 	args: {
 		label: 'Name',
 		name: 'name',
@@ -51,35 +32,13 @@ export const Filled: TestableStory<typeof InputText> = {
 			value: 'Jane Doe',
 		},
 	},
-	unitTest: async (component: Element | null, container: Element | null) => {
-		// General
-		expect(component).toBeInTheDocument();
-		// Input value
-		const input = component?.querySelector('input');
-		expect(input).toBeInTheDocument();
-		expect(input).toHaveValue('Jane Doe');
-	},
 };
 
-export const WithError: TestableStory<typeof InputText> = {
-	name: 'InputText WithError',
+export const WithError: Story = {
 	args: {
 		label: 'Name',
 		name: 'name',
 		placeholder: 'John Doe',
 		invalid: 'Error message',
-	},
-	unitTest: async (component: Element | null, container: Element | null) => {
-		// General
-		expect(component).toBeInTheDocument();
-		// Error state
-		expect(component).toHaveClass('-error');
-		// Error message
-		const errorElement = component?.querySelector('[role="alert"]');
-		expect(errorElement).toBeInTheDocument();
-		expect(errorElement).toHaveTextContent('Error message');
-		// Input aria-invalid
-		const input = component?.querySelector('input');
-		expect(input).toHaveAttribute('aria-invalid', 'true');
 	},
 };

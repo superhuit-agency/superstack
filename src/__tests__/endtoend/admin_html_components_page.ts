@@ -13,6 +13,7 @@ import {
 	setRightPanel,
 	writeBlockHTML,
 } from '../utils/admin-manipulation';
+import * as AllComponentsTests from '@/components/test';
 
 const puppeteer = require('puppeteer');
 
@@ -108,22 +109,15 @@ describe('Admin: Create a page to test all the blocks', () => {
 		await page.waitForSelector('textarea.editor-post-text-editor', {
 			timeout: 5000,
 		});
-		for (const blockStory of AllTestableComponents) {
-			let blockClassName = blockStory.blockConfig.slug ?? '';
+		for (const componentTests of Object.values(AllComponentsTests)) {
+			let blockClassName = componentTests.block.slug ?? '';
 
-			for (const testableStory of blockStory.getUnitTests() as TestableStory<any>[]) {
+			Object.values(componentTests.tests).forEach((testableStory) => {
 				allComponentsHTML += writeBlockHTML(
 					blockClassName,
 					testableStory.args
 				);
-				// await page.type(
-				// 	'textarea.editor-post-text-editor',
-				// 	await writeBlockHTML(blockClassName, testableStory.args),
-				// 	{
-				// 		delay: 0,
-				// 	}
-				// );
-			}
+			});
 		}
 		// Change the HTML in the textarea
 		await page.evaluate((html) => {

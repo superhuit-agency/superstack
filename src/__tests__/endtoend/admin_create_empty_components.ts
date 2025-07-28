@@ -5,7 +5,7 @@
 
 import { Browser } from 'puppeteer';
 import { Page } from 'puppeteer';
-import { Stories as AllTestableComponents } from '@/components/stories';
+import * as AllComponentsTests from '@/components/test';
 import { VideoRecorder } from '../utils/video-recorder';
 import {
 	doLoginIfNeeded,
@@ -98,9 +98,9 @@ describe('Admin: Create a page to test all the blocks', () => {
 		await setCodeEditor(page, false);
 	});
 
-	for (const blockStory of AllTestableComponents) {
-		let blockTitle = blockStory.blockConfig.title ?? '';
-		let blockSlug = blockStory.blockConfig.slug ?? '';
+	Object.values(AllComponentsTests).forEach((componentTests) => {
+		let blockTitle = componentTests.block.title ?? '';
+		let blockSlug = componentTests.block.slug ?? '';
 		let blockClassName = blockSlug.replace('core/', '').replace(/\//g, '-');
 
 		it('should add the ' + blockTitle + ' block to the page', async () => {
@@ -152,7 +152,7 @@ describe('Admin: Create a page to test all the blocks', () => {
 				'.components-button.editor-document-tools__inserter-toggle.is-pressed'
 			);
 		});
-	}
+	});
 
 	it('should save the page as draft', async () => {
 		await setRightPanel(page, true);

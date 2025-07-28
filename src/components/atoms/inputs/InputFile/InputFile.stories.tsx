@@ -1,61 +1,33 @@
-import InputFileBlock from './block.json';
-import { InputFile } from './index';
-import { expect } from '@storybook/test';
+import { Meta, StoryObj } from '@storybook/react';
 
-export default {
+import { InputFile } from './index';
+
+const meta = {
 	title: 'Components/Atoms/Inputs/Input File',
 	component: InputFile,
 	parameters: {
 		layout: 'centered',
 	},
 	args: {},
-	blockConfig: InputFileBlock,
-	getUnitTests: () => [Default, WithError],
-} as TestableComponentMeta<typeof InputFile>;
+} satisfies Meta<typeof InputFile>;
 
-export const Default: TestableStory<typeof InputFile> = {
-	name: 'InputFile Default',
+export default meta;
+
+type Story = StoryObj<typeof meta>;
+
+export const Default: Story = {
 	args: {
 		title: 'CV',
 		name: 'cv',
 		description:
 			'1 seul fichier. Limité à 5 Mo. <br> Types autorisés: pdf, doc, docx, zip.',
 		label: 'Ajouter un fichier',
-	},
-	unitTest: async (component: Element | null, container: Element | null) => {
-		// General
-		expect(component).toBeInTheDocument();
-		// Display
-		expect(component).toBeVisible();
-		expect(component).toHaveClass('supt-input-file');
-		expect(component).toHaveTextContent('Ajouter un fichier');
-		// File input
-		const fileInput = component?.querySelector('input[type="file"]');
-		expect(fileInput).toBeInTheDocument();
-		expect(fileInput).toHaveAttribute('name', 'cv');
-		// No error state
-		expect(component).not.toHaveClass('-error');
 	},
 };
 
-export const WithError: TestableStory<typeof InputFile> = {
-	name: 'InputFile WithError',
+export const WithError: Story = {
 	args: {
-		title: 'CV',
-		name: 'cv',
-		description:
-			'1 seul fichier. Limité à 5 Mo. <br> Types autorisés: pdf, doc, docx, zip.',
-		label: 'Ajouter un fichier',
+		...Default.args,
 		invalid: 'Error message',
-	},
-	unitTest: async (component: Element | null, container: Element | null) => {
-		// General
-		expect(component).toBeInTheDocument();
-		// Error state
-		expect(component).toHaveClass('-error');
-		// Error message
-		const errorElement = component?.querySelector('[role="alert"]');
-		expect(errorElement).toBeInTheDocument();
-		expect(errorElement).toHaveTextContent('Error message');
 	},
 };
