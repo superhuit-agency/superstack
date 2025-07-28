@@ -17,42 +17,42 @@ type Story = StoryObj<typeof meta>;
 
 export const H1: Story = {
 	args: {
-		content: '<h1>Title</h1>',
+		content: 'Main Title',
 		level: 1,
 	},
 };
 
 export const H2: Story = {
 	args: {
-		content: '<h2>Subtitle 2</h2>',
+		content: 'Subtitle 2',
 		level: 2,
 	},
 };
 
 export const H3: Story = {
 	args: {
-		content: '<h3>Subtitle 3</h3>',
+		content: 'Subtitle 3',
 		level: 3,
 	},
 };
 
 export const H4: Story = {
 	args: {
-		content: '<h4>Subtitle 4</h4>',
+		content: 'Subtitle 4',
 		level: 4,
 	},
 };
 
 export const H5: Story = {
 	args: {
-		content: '<h5>Subtitle 5</h5>',
+		content: 'Subtitle 5',
 		level: 5,
 	},
 };
 
 export const H6: Story = {
 	args: {
-		content: '<h6>Subtitle 6</h6>',
+		content: 'Subtitle 6',
 		level: 6,
 	},
 };

@@ -15,7 +15,6 @@ export const Heading: FC<HeadingProps> = ({
 
 	return (
 		<HTag
-			aria-level={level}
 			className={cx('supt-heading', className)}
 			dangerouslySetInnerHTML={{ __html: content }}
 		/>

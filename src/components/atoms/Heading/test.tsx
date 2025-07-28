@@ -17,13 +17,12 @@ export const HeadingTests: ComponentTests = {
 				// General
 				expect(component).toBeInTheDocument();
 				// Content
-				expect(component).toHaveTextContent('Title');
+				expect(component).toHaveTextContent('Main Title');
 				// Display
 				expect(component).toBeVisible();
 				expect(component).toHaveClass('supt-heading', { exact: true });
 				// Accessibility
 				expect(component).toHaveRole('heading');
-				expect(component).toHaveAttribute('aria-level', '1');
 			},
 		},
 		H2: {
@@ -38,7 +37,6 @@ export const HeadingTests: ComponentTests = {
 				expect(component).toHaveClass('supt-heading', { exact: true });
 				// Accessibility
 				expect(component).toHaveRole('heading');
-				expect(component).toHaveAttribute('aria-level', '2');
 			},
 		},
 		H3: {
@@ -53,7 +51,6 @@ export const HeadingTests: ComponentTests = {
 				expect(component).toHaveClass('supt-heading', { exact: true });
 				// Accessibility
 				expect(component).toHaveRole('heading');
-				expect(component).toHaveAttribute('aria-level', '3');
 			},
 		},
 		H4: {
@@ -68,7 +65,6 @@ export const HeadingTests: ComponentTests = {
 				expect(component).toHaveClass('supt-heading', { exact: true });
 				// Accessibility
 				expect(component).toHaveRole('heading');
-				expect(component).toHaveAttribute('aria-level', '4');
 			},
 		},
 		H5: {
@@ -83,7 +79,6 @@ export const HeadingTests: ComponentTests = {
 				expect(component).toHaveClass('supt-heading', { exact: true });
 				// Accessibility
 				expect(component).toHaveRole('heading');
-				expect(component).toHaveAttribute('aria-level', '5');
 			},
 		},
 		H6: {
@@ -98,7 +93,6 @@ export const HeadingTests: ComponentTests = {
 				expect(component).toHaveClass('supt-heading', { exact: true });
 				// Accessibility
 				expect(component).toHaveRole('heading');
-				expect(component).toHaveAttribute('aria-level', '6');
 			},
 		},
 		Invalid: {
