@@ -85,10 +85,10 @@ describe('Admin: Create a page to test all the blocks', () => {
 		);
 	});
 
-	it('should open the admin to create a new page', async () => {
-		// Go to the admin page to create a new page
+	it('should open the admin to create a new post', async () => {
+		// Go to the admin page to create a new post
 		await page.goto(
-			`${WORDPRESS_URL}/wp-admin/post-new.php?post_type=page`
+			`${WORDPRESS_URL}/wp-admin/post-new.php?post_type=post`
 		);
 	});
 
@@ -103,7 +103,7 @@ describe('Admin: Create a page to test all the blocks', () => {
 		let blockSlug = componentTests.block.slug ?? '';
 		let blockClassName = blockSlug.replace('core/', '').replace(/\//g, '-');
 
-		it('should add the ' + blockTitle + ' block to the page', async () => {
+		it('should add the ' + blockTitle + ' block to the post', async () => {
 			// Find the "+" button on the top left of the page
 			await page.waitForSelector(
 				'button.components-button.editor-document-tools__inserter-toggle',
@@ -144,7 +144,7 @@ describe('Admin: Create a page to test all the blocks', () => {
 				})
 				.catch((err) => {
 					console.log(
-						`Block ${blockTitle} (${blockSlug}) could not be added to the page`
+						`Block ${blockTitle} (${blockSlug}) could not be added to the post`
 					);
 				});
 			// Close the Blocks inserter panel
@@ -154,7 +154,7 @@ describe('Admin: Create a page to test all the blocks', () => {
 		});
 	});
 
-	it('should save the page as draft', async () => {
+	it('should save the post as draft', async () => {
 		await setRightPanel(page, true);
 		// Find the "Save Draft" button
 		await page.waitForSelector(

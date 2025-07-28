@@ -29,6 +29,9 @@ inputs:
   WORDPRESS_ADMIN_EMAIL:
     description: 'WordPress Admin email'
     required: true
+  WORDPRESS_ADMIN_PASSWORD:
+    description: 'WordPress Admin password'
+    required: true
   NEXT_URL:
     description: 'Next.js URL (no trailing slash)'
     required: true
@@ -113,6 +116,7 @@ runs:
             WORDPRESS_THEME_TITLE=\"${{ inputs.WORDPRESS_THEME_TITLE }}\" \
             WORDPRESS_ADMIN_USER=\"${{ inputs.WORDPRESS_ADMIN_USER }}\" \
             WORDPRESS_ADMIN_EMAIL=\"${{ inputs.WORDPRESS_ADMIN_EMAIL }}\" \
+            WORDPRESS_ADMIN_PASSWORD=\"${{ inputs.WORDPRESS_ADMIN_PASSWORD }}\" \
             WORDPRESS_PATH=\"${{ inputs.WORDPRESS_PATH }}\" \
             WORDPRESS_VERSION=\"${{ inputs.WORDPRESS_VERSION }}\" \
             WORDPRESS_LOCALE=\"${{ inputs.WORDPRESS_LOCALE }}\" \

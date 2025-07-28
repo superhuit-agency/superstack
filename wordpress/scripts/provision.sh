@@ -31,12 +31,19 @@
 
 IS_MULTILANG=${IS_MULTILANG:=false}
 HTTP_HOST=${WORDPRESS_URL}
+WORDPRESS_ADMIN_PASSWORD=${WORDPRESS_ADMIN_PASSWORD:="stacksuper"}
+WORDPRESS_ADMIN_EMAIL=${WORDPRESS_ADMIN_EMAIL:="tech+superstack@superhuit.ch"}
+WORDPRESS_ADMIN_USER=${WORDPRESS_ADMIN_USER:="superstack"}
+WORDPRESS_THEME_NAME=${WORDPRESS_THEME_NAME:="superstack"}
+
 
 # #===========================================
 # # /!\ STOP to edit here /!\
 # #===========================================
 
 # vars
+FIRSTTIME_INSTALL=false
+
 if [ -z "${WORDPRESS_PATH}" ]; then
 	echo "ERROR: Please define WORDPRESS_PATH environment variable" 1>&2
 	exit 1
@@ -73,8 +80,10 @@ if ! $WPCLI core is-installed --quiet &> /dev/null; then
 	echo
 	if [ ! -z "${WORDPRESS_ENV}" ] && [ "${WORDPRESS_ENV}" = "dev" ]; then # we are on local dev environment (in docker)
 		echo $en "- Installing WordPress as localhost $ec"
-		$WPCLI core install --url="http://localhost" --title="superstack" --admin_user="superstack" --admin_password="stacksuper" --admin_email="tech+superstack@superhuit.ch" --quiet &> /dev/null
+		$WPCLI core install --url="http://localhost" --title="$WORDPRESS_THEME_NAME" --admin_user="$WORDPRESS_ADMIN_USER" --admin_password="$WORDPRESS_ADMIN_PASSWORD" --admin_email="$WORDPRESS_ADMIN_EMAIL" --quiet &> /dev/null
 		echo "✔"
+		FIRSTTIME_INSTALL=true
+
 	elif [ ! -f "$WORDPRESS_PATH/p.txt" ]; then
 		echo "ERROR: WordPress does not seem to be installed. Add a file 'p.txt' containing the database password if you want this script to automatically install WordPress for you." 1>&2
 		exit 1
@@ -176,6 +185,34 @@ else
 	echo "✔"
 fi
 
+if [ "$FIRSTTIME_INSTALL" = true ]; then
+	echo
+	echo "----------------------------------"
+	echo "        First time install        "
+	echo "----------------------------------"
+	echo
+
+	# Update Sample Page to be the Home
+	echo $en "- Updating Sample Page to be the Home $ec"
+	$WPCLI post update 2 --post_title="Home"
+	$WPCLI option update show_on_front page
+	$WPCLI option update page_on_front 2
+	echo "✔"
+
+	# Add WP Graphql Gutenberg Registry if not yet registered in the db (=> avoids Vercel first deployment to fail)
+	$WPCLI option get wp_graphql_gutenberg_block_types &> /dev/null
+	if [ $? -ne 0 ]; then
+		echo $en "- Adding Graphql Gutenberg Registry"
+		$WPCLI option add wp_graphql_gutenberg_block_types --format=json '{"core/paragraph":{"name":"core/paragraph","keywords":["text"],"attributes":{"align":{"type":"string"},"content":{"type":"string","source":"html","selector":"p","default":"","__experimentalRole":"content"},"dropCap":{"type":"boolean","default":false},"placeholder":{"type":"string","default":"Start writing"},"direction":{"type":"string","enum":["ltr","rtl"]},"lock":{"type":"object"},"style":{"type":"object"},"backgroundColor":{"type":"string"},"textColor":{"type":"string"},"gradient":{"type":"string"},"className":{"type":"string"},"fontSize":{"type":"string"},"fontFamily":{"type":"string"},"anchor":{"type":"string","source":"attribute","attribute":"id","selector":"*"},"isPreview":{"type":"boolean","default":false}},"providesContext":[],"usesContext":[],"supports":{"anchor":true,"className":false,"color":{"gradients":true,"link":true,"__experimentalDefaultControls":{"background":true,"text":true}},"spacing":{"margin":true,"padding":true},"typography":{"fontSize":true,"lineHeight":true,"__experimentalFontFamily":true,"__experimentalTextDecoration":true,"__experimentalFontStyle":true,"__experimentalFontWeight":true,"__experimentalLetterSpacing":true,"__experimentalTextTransform":true,"__experimentalDefaultControls":{"fontSize":true}},"__experimentalSelector":"p","__unstablePasteTextInline":true},"styles":[],"variations":[],"apiVersion":2,"title":"Paragraph","description":"Start with the basic building block of all narrative.","category":"text","example":{"name":"core/paragraph","attributes":{"isPreview":true}},"deprecated":[{"supports":{"className":false},"attributes":{"align":{"type":"string"},"content":{"type":"string","source":"html","selector":"p","default":""},"dropCap":{"type":"boolean","default":false},"placeholder":{"type":"string","default":"Start writing"},"textColor":{"type":"string"},"backgroundColor":{"type":"string"},"fontSize":{"type":"string"},"direction":{"type":"string","enum":["ltr","rtl"]},"customTextColor":{"type":"string"},"customBackgroundColor":{"type":"string"},"customFontSize":{"type":"number"},"lock":{"type":"object"},"className":{"type":"string"},"isPreview":{"type":"boolean","default":false}}},{"supports":{"className":false},"attributes":{"align":{"type":"string"},"content":{"type":"string","source":"html","selector":"p","default":""},"dropCap":{"type":"boolean","default":false},"placeholder":{"type":"string","default":"Start writing"},"textColor":{"type":"string"},"backgroundColor":{"type":"string"},"fontSize":{"type":"string"},"direction":{"type":"string","enum":["ltr","rtl"]},"customTextColor":{"type":"string"},"customBackgroundColor":{"type":"string"},"customFontSize":{"type":"number"},"lock":{"type":"object"},"className":{"type":"string"},"isPreview":{"type":"boolean","default":false}}},{"supports":{"className":false},"attributes":{"align":{"type":"string"},"content":{"type":"string","source":"html","selector":"p","default":""},"dropCap":{"type":"boolean","default":false},"placeholder":{"type":"string","default":"Start writing"},"textColor":{"type":"string"},"backgroundColor":{"type":"string"},"fontSize":{"type":"string"},"direction":{"type":"string","enum":["ltr","rtl"]},"customTextColor":{"type":"string"},"customBackgroundColor":{"type":"string"},"customFontSize":{"type":"number"},"lock":{"type":"object"},"className":{"type":"string"},"isPreview":{"type":"boolean","default":false}}},{"supports":{"className":false},"attributes":{"align":{"type":"string"},"content":{"type":"string","source":"html","selector":"p","default":""},"dropCap":{"type":"boolean","default":false},"placeholder":{"type":"string","default":"Start writing"},"textColor":{"type":"string"},"backgroundColor":{"type":"string"},"fontSize":{"type":"string"},"direction":{"type":"string","enum":["ltr","rtl"]},"customTextColor":{"type":"string"},"customBackgroundColor":{"type":"string"},"customFontSize":{"type":"number"},"width":{"type":"string"},"lock":{"type":"object"},"className":{"type":"string"},"isPreview":{"type":"boolean","default":false}}},{"supports":{"className":false},"attributes":{"align":{"type":"string"},"content":{"type":"string","source":"html","selector":"p","default":""},"dropCap":{"type":"boolean","default":false},"placeholder":{"type":"string","default":"Start writing"},"textColor":{"type":"string"},"backgroundColor":{"type":"string"},"fontSize":{"type":"number"},"direction":{"type":"string","enum":["ltr","rtl"]},"lock":{"type":"object"},"className":{"type":"string"},"isPreview":{"type":"boolean","default":false}}},{"supports":{"className":false},"attributes":{"align":{"type":"string"},"content":{"type":"string","source":"html","default":""},"dropCap":{"type":"boolean","default":false},"placeholder":{"type":"string","default":"Start writing"},"textColor":{"type":"string"},"backgroundColor":{"type":"string"},"fontSize":{"type":"string"},"direction":{"type":"string","enum":["ltr","rtl"]},"style":{"type":"object"},"lock":{"type":"object"},"className":{"type":"string"},"isPreview":{"type":"boolean","default":false}}}]}}'
+		echo "✔"
+	fi
+
+	echo $en "- Setting rewrite structure $ec"
+	$WPCLI rewrite structure '/blog/%postname%/'
+	echo "✔"
+
+fi
+
 echo
 echo "----------------------------------"
 echo "          Other configs           "
@@ -227,19 +264,9 @@ if [ -z $($WPCLI config get "WP_AUTO_UPDATE_CORE") ]; then
 	$WPCLI config set "WP_AUTO_UPDATE_CORE" "minor"
 fi
 
-# Update Sample Page to be the Home
-# $WPCLI post update 2 --post_title="Home" --post_content='<!-- wp:heading {"level":1} --><h1 class="wp-block-heading">Home</h1><!-- /wp:heading -->'
-# $WPCLI option update show_on_front page
-# $WPCLI option update page_on_front 2
-
-# Add WP Graphql Gutenberg Registry if not yet registered in the db (=> avoids Vercel first deployment to fail)
-$WPCLI option get wp_graphql_gutenberg_block_types &> /dev/null
-if [ $? -ne 0 ]; then
-	$WPCLI option add wp_graphql_gutenberg_block_types --format=json '{"core/paragraph":{"name":"core/paragraph","keywords":["text"],"attributes":{"align":{"type":"string"},"content":{"type":"string","source":"html","selector":"p","default":"","__experimentalRole":"content"},"dropCap":{"type":"boolean","default":false},"placeholder":{"type":"string","default":"Start writing"},"direction":{"type":"string","enum":["ltr","rtl"]},"lock":{"type":"object"},"style":{"type":"object"},"backgroundColor":{"type":"string"},"textColor":{"type":"string"},"gradient":{"type":"string"},"className":{"type":"string"},"fontSize":{"type":"string"},"fontFamily":{"type":"string"},"anchor":{"type":"string","source":"attribute","attribute":"id","selector":"*"},"isPreview":{"type":"boolean","default":false}},"providesContext":[],"usesContext":[],"supports":{"anchor":true,"className":false,"color":{"gradients":true,"link":true,"__experimentalDefaultControls":{"background":true,"text":true}},"spacing":{"margin":true,"padding":true},"typography":{"fontSize":true,"lineHeight":true,"__experimentalFontFamily":true,"__experimentalTextDecoration":true,"__experimentalFontStyle":true,"__experimentalFontWeight":true,"__experimentalLetterSpacing":true,"__experimentalTextTransform":true,"__experimentalDefaultControls":{"fontSize":true}},"__experimentalSelector":"p","__unstablePasteTextInline":true},"styles":[],"variations":[],"apiVersion":2,"title":"Paragraph","description":"Start with the basic building block of all narrative.","category":"text","example":{"name":"core/paragraph","attributes":{"isPreview":true}},"deprecated":[{"supports":{"className":false},"attributes":{"align":{"type":"string"},"content":{"type":"string","source":"html","selector":"p","default":""},"dropCap":{"type":"boolean","default":false},"placeholder":{"type":"string","default":"Start writing"},"textColor":{"type":"string"},"backgroundColor":{"type":"string"},"fontSize":{"type":"string"},"direction":{"type":"string","enum":["ltr","rtl"]},"customTextColor":{"type":"string"},"customBackgroundColor":{"type":"string"},"customFontSize":{"type":"number"},"lock":{"type":"object"},"className":{"type":"string"},"isPreview":{"type":"boolean","default":false}}},{"supports":{"className":false},"attributes":{"align":{"type":"string"},"content":{"type":"string","source":"html","selector":"p","default":""},"dropCap":{"type":"boolean","default":false},"placeholder":{"type":"string","default":"Start writing"},"textColor":{"type":"string"},"backgroundColor":{"type":"string"},"fontSize":{"type":"string"},"direction":{"type":"string","enum":["ltr","rtl"]},"customTextColor":{"type":"string"},"customBackgroundColor":{"type":"string"},"customFontSize":{"type":"number"},"lock":{"type":"object"},"className":{"type":"string"},"isPreview":{"type":"boolean","default":false}}},{"supports":{"className":false},"attributes":{"align":{"type":"string"},"content":{"type":"string","source":"html","selector":"p","default":""},"dropCap":{"type":"boolean","default":false},"placeholder":{"type":"string","default":"Start writing"},"textColor":{"type":"string"},"backgroundColor":{"type":"string"},"fontSize":{"type":"string"},"direction":{"type":"string","enum":["ltr","rtl"]},"customTextColor":{"type":"string"},"customBackgroundColor":{"type":"string"},"customFontSize":{"type":"number"},"lock":{"type":"object"},"className":{"type":"string"},"isPreview":{"type":"boolean","default":false}}},{"supports":{"className":false},"attributes":{"align":{"type":"string"},"content":{"type":"string","source":"html","selector":"p","default":""},"dropCap":{"type":"boolean","default":false},"placeholder":{"type":"string","default":"Start writing"},"textColor":{"type":"string"},"backgroundColor":{"type":"string"},"fontSize":{"type":"string"},"direction":{"type":"string","enum":["ltr","rtl"]},"customTextColor":{"type":"string"},"customBackgroundColor":{"type":"string"},"customFontSize":{"type":"number"},"width":{"type":"string"},"lock":{"type":"object"},"className":{"type":"string"},"isPreview":{"type":"boolean","default":false}}},{"supports":{"className":false},"attributes":{"align":{"type":"string"},"content":{"type":"string","source":"html","selector":"p","default":""},"dropCap":{"type":"boolean","default":false},"placeholder":{"type":"string","default":"Start writing"},"textColor":{"type":"string"},"backgroundColor":{"type":"string"},"fontSize":{"type":"number"},"direction":{"type":"string","enum":["ltr","rtl"]},"lock":{"type":"object"},"className":{"type":"string"},"isPreview":{"type":"boolean","default":false}}},{"supports":{"className":false},"attributes":{"align":{"type":"string"},"content":{"type":"string","source":"html","default":""},"dropCap":{"type":"boolean","default":false},"placeholder":{"type":"string","default":"Start writing"},"textColor":{"type":"string"},"backgroundColor":{"type":"string"},"fontSize":{"type":"string"},"direction":{"type":"string","enum":["ltr","rtl"]},"style":{"type":"object"},"lock":{"type":"object"},"className":{"type":"string"},"isPreview":{"type":"boolean","default":false}}}]}}'
-fi
-
-$WPCLI rewrite structure '/blog/%postname%/'
+echo $en "- Flushing rewrite rules $ec"
 $WPCLI rewrite flush --hard --quiet
+echo "✔"
 
 echo
 echo "----------------------------------"

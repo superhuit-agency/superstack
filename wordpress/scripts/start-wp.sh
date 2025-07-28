@@ -2,13 +2,15 @@
 
 COMPOSE="docker compose"
 THEME_NAME=${THEME_NAME:="superstack"}
-PROJECT_CODE=${PROJECT_CODE:="spck"}
+WORDPRESS_ADMIN_EMAIL=${WORDPRESS_ADMIN_EMAIL:="tech+superstack@superhuit.ch"}
+WORDPRESS_ADMIN_USER=${WORDPRESS_ADMIN_USER:="superstack"}
+WORDPRESS_ADMIN_PASSWORD=${WORDPRESS_ADMIN_PASSWORD:="stacksuper"}
 
 echo ""
 echo "Starting WordPress..."
 echo "-------"
 sleep 1
-THEME_NAME=${THEME_NAME} PROJECT_CODE=${PROJECT_CODE} $COMPOSE -f docker-compose.yml up "$@" --build -d
+THEME_NAME=${THEME_NAME} $COMPOSE -f docker-compose.yml up "$@" --build -d
 
 echo ""
 echo "Installing Composer dependencies..."
