@@ -168,4 +168,9 @@
 	display: block !important;
 }
 
+.editor-post-featured-image__preview,
+.editor-post-featured-image__toggle {
+	max-height: none;
+}
+
 /* CUSTOM EDIT STYLE */

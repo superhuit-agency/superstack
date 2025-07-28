@@ -3,7 +3,7 @@
 # This file is for dev purpose only!
 #====================================
 
-FROM wordpress:6.5-php8.2-apache
+FROM wordpress:6.8-php8.2-apache
 
 # Add sudo in order to run wp-cli as the www-data user
 RUN apt-get -qq update && apt-get -qq install -y \
@@ -17,7 +17,11 @@ RUN apt-get -qq update && apt-get -qq install -y \
 
 ## Enable Xdebug
 RUN pecl install xdebug && docker-php-ext-enable xdebug
-RUN echo "xdebug.mode=develop,debug\nxdebug.start_with_request=yes\nxdebug.client_port=9003\nxdebug.client_host=host.docker.internal\nxdebug.log_level=0" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+RUN echo 'xdebug.mode=develop,debug\n\
+xdebug.start_with_request=yes\n\
+xdebug.client_port=9003\n\
+xdebug.client_host=host.docker.internal\n\
+xdebug.log_level=0' >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
 # PHP extensions -> uncomment if needed
 # RUN apt-get -qq install -y libxml2-dev
@@ -25,12 +29,17 @@ RUN echo "xdebug.mode=develop,debug\nxdebug.start_with_request=yes\nxdebug.clien
 # RUN docker-php-ext-install pdo_mysql
 
 # PHP config
-## Copy custom php config
-COPY ./php.ini $PHP_INI_DIR/php.ini
 ## Show php logs in stderr
 RUN touch /usr/local/etc/php/conf.d/php_error.ini
 RUN echo "log_errors = on" >> /usr/local/etc/php/conf.d/php_error.ini
 RUN echo "error_log = /dev/stderr" >> /usr/local/etc/php/conf.d/php_error.ini
+
+## Add custom PHP configurations
+RUN echo 'file_uploads = On\n\
+memory_limit = 1024M\n\
+upload_max_filesize = 512M\n\
+post_max_size = 512M\n\
+max_execution_time = 6000' > /usr/local/etc/php/conf.d/custom.ini
 
 #-------------
 # Add WP-CLI

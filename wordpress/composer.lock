@@ -4,20 +4,20 @@
 		"Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
 		"This file is @generated automatically"
 	],
-	"content-hash": "0f267c712695d2d4de31ef7186f05228",
+	"content-hash": "747816e7628b821115d146fa4373f0b7",
 	"packages": [
 		{
 			"name": "ashhitch/wp-graphql-yoast-seo",
-			"version": "v4.22.5",
+			"version": "v4.23.2",
 			"source": {
 				"type": "git",
 				"url": "https://github.com/ashhitch/wp-graphql-yoast-seo.git",
-				"reference": "56600b12d3c2a0b73cb3b73020e23d4d9d5ad858"
+				"reference": "9bdf344626a788c9bd9e2d1a1e2d1655c2394393"
 			},
 			"dist": {
 				"type": "zip",
-				"url": "https://api.github.com/repos/ashhitch/wp-graphql-yoast-seo/zipball/56600b12d3c2a0b73cb3b73020e23d4d9d5ad858",
-				"reference": "56600b12d3c2a0b73cb3b73020e23d4d9d5ad858",
+				"url": "https://api.github.com/repos/ashhitch/wp-graphql-yoast-seo/zipball/9bdf344626a788c9bd9e2d1a1e2d1655c2394393",
+				"reference": "9bdf344626a788c9bd9e2d1a1e2d1655c2394393",
 				"shasum": ""
 			},
 			"require": {
@@ -46,7 +46,7 @@
 			"description": "Query Yoast SEO data with wp-graphql",
 			"support": {
 				"issues": "https://github.com/ashhitch/wp-graphql-yoast-seo/issues",
-				"source": "https://github.com/ashhitch/wp-graphql-yoast-seo/tree/v4.22.5"
+				"source": "https://github.com/ashhitch/wp-graphql-yoast-seo/tree/v4.23.2"
 			},
 			"funding": [
 				{
@@ -58,20 +58,20 @@
 					"type": "github"
 				}
 			],
-			"time": "2023-06-30T20:18:04+00:00"
+			"time": "2024-12-18T12:58:47+00:00"
 		},
 		{
 			"name": "composer/installers",
-			"version": "v2.2.0",
+			"version": "v2.3.0",
 			"source": {
 				"type": "git",
 				"url": "https://github.com/composer/installers.git",
-				"reference": "c29dc4b93137acb82734f672c37e029dfbd95b35"
+				"reference": "12fb2dfe5e16183de69e784a7b84046c43d97e8e"
 			},
 			"dist": {
 				"type": "zip",
-				"url": "https://api.github.com/repos/composer/installers/zipball/c29dc4b93137acb82734f672c37e029dfbd95b35",
-				"reference": "c29dc4b93137acb82734f672c37e029dfbd95b35",
+				"url": "https://api.github.com/repos/composer/installers/zipball/12fb2dfe5e16183de69e784a7b84046c43d97e8e",
+				"reference": "12fb2dfe5e16183de69e784a7b84046c43d97e8e",
 				"shasum": ""
 			},
 			"require": {
@@ -79,12 +79,12 @@
 				"php": "^7.2 || ^8.0"
 			},
 			"require-dev": {
-				"composer/composer": "1.6.* || ^2.0",
-				"composer/semver": "^1 || ^3",
-				"phpstan/phpstan": "^0.12.55",
-				"phpstan/phpstan-phpunit": "^0.12.16",
-				"symfony/phpunit-bridge": "^5.3",
-				"symfony/process": "^5"
+				"composer/composer": "^1.10.27 || ^2.7",
+				"composer/semver": "^1.7.2 || ^3.4.0",
+				"phpstan/phpstan": "^1.11",
+				"phpstan/phpstan-phpunit": "^1",
+				"symfony/phpunit-bridge": "^7.1.1",
+				"symfony/process": "^5 || ^6 || ^7"
 			},
 			"type": "composer-plugin",
 			"extra": {
@@ -141,6 +141,7 @@
 				"cockpit",
 				"codeigniter",
 				"concrete5",
+				"concreteCMS",
 				"croogo",
 				"dokuwiki",
 				"drupal",
@@ -187,7 +188,7 @@
 			],
 			"support": {
 				"issues": "https://github.com/composer/installers/issues",
-				"source": "https://github.com/composer/installers/tree/v2.2.0"
+				"source": "https://github.com/composer/installers/tree/v2.3.0"
 			},
 			"funding": [
 				{
@@ -203,30 +204,30 @@
 					"type": "tidelift"
 				}
 			],
-			"time": "2022-08-20T06:45:11+00:00"
+			"time": "2024-06-24T20:46:46+00:00"
 		},
 		{
 			"name": "firebase/php-jwt",
-			"version": "v6.10.0",
+			"version": "v6.11.1",
 			"source": {
 				"type": "git",
 				"url": "https://github.com/firebase/php-jwt.git",
-				"reference": "a49db6f0a5033aef5143295342f1c95521b075ff"
+				"reference": "d1e91ecf8c598d073d0995afa8cd5c75c6e19e66"
 			},
 			"dist": {
 				"type": "zip",
-				"url": "https://api.github.com/repos/firebase/php-jwt/zipball/a49db6f0a5033aef5143295342f1c95521b075ff",
-				"reference": "a49db6f0a5033aef5143295342f1c95521b075ff",
+				"url": "https://api.github.com/repos/firebase/php-jwt/zipball/d1e91ecf8c598d073d0995afa8cd5c75c6e19e66",
+				"reference": "d1e91ecf8c598d073d0995afa8cd5c75c6e19e66",
 				"shasum": ""
 			},
 			"require": {
-				"php": "^7.4||^8.0"
+				"php": "^8.0"
 			},
 			"require-dev": {
-				"guzzlehttp/guzzle": "^6.5||^7.4",
+				"guzzlehttp/guzzle": "^7.4",
 				"phpspec/prophecy-phpunit": "^2.0",
 				"phpunit/phpunit": "^9.5",
-				"psr/cache": "^1.0||^2.0",
+				"psr/cache": "^2.0||^3.0",
 				"psr/http-client": "^1.0",
 				"psr/http-factory": "^1.0"
 			},
@@ -264,44 +265,39 @@
 			],
 			"support": {
 				"issues": "https://github.com/firebase/php-jwt/issues",
-				"source": "https://github.com/firebase/php-jwt/tree/v6.10.0"
+				"source": "https://github.com/firebase/php-jwt/tree/v6.11.1"
 			},
-			"time": "2023-12-01T16:26:39+00:00"
+			"time": "2025-04-09T20:32:01+00:00"
 		},
 		{
 			"name": "opis/json-schema",
-			"version": "1.1.0",
+			"version": "1.2.0",
 			"source": {
 				"type": "git",
 				"url": "https://github.com/opis/json-schema.git",
-				"reference": "39d8072be8657a329a284339994401066406c43b"
+				"reference": "2b6a820a69e2e01870b25eec7d8ed61ebd7ad5a3"
 			},
 			"dist": {
 				"type": "zip",
-				"url": "https://api.github.com/repos/opis/json-schema/zipball/39d8072be8657a329a284339994401066406c43b",
-				"reference": "39d8072be8657a329a284339994401066406c43b",
+				"url": "https://api.github.com/repos/opis/json-schema/zipball/2b6a820a69e2e01870b25eec7d8ed61ebd7ad5a3",
+				"reference": "2b6a820a69e2e01870b25eec7d8ed61ebd7ad5a3",
 				"shasum": ""
 			},
 			"require": {
-				"php": ">=7.0"
+				"php": ">=7.4"
 			},
 			"require-dev": {
 				"ext-bcmath": "*",
 				"ext-intl": "*",
 				"ext-json": "*",
 				"ext-mbstring": "*",
-				"opis/string": "^1.4",
+				"opis/string": "^2.0",
 				"phpunit/phpunit": "^6.5 || ^7.0 || ^9.4"
 			},
 			"suggest": {
 				"opis/string": "A standalone library for manipulating multibyte strings"
 			},
 			"type": "library",
-			"extra": {
-				"branch-alias": {
-					"dev-master": "1.0.x-dev"
-				}
-			},
 			"autoload": {
 				"psr-4": {
 					"Opis\\JsonSchema\\": "src/"
@@ -331,9 +327,9 @@
 			],
 			"support": {
 				"issues": "https://github.com/opis/json-schema/issues",
-				"source": "https://github.com/opis/json-schema/tree/1.1.0"
+				"source": "https://github.com/opis/json-schema/tree/1.2.0"
 			},
-			"time": "2021-04-14T20:02:50+00:00"
+			"time": "2025-03-05T20:03:36+00:00"
 		},
 		{
 			"name": "phpcompatibility/php-compatibility",
@@ -471,21 +467,22 @@
 		},
 		{
 			"name": "phpcompatibility/phpcompatibility-wp",
-			"version": "2.1.5",
+			"version": "2.1.7",
 			"source": {
 				"type": "git",
 				"url": "https://github.com/PHPCompatibility/PHPCompatibilityWP.git",
-				"reference": "01c1ff2704a58e46f0cb1ca9d06aee07b3589082"
+				"reference": "5bfbbfbabb3df2b9a83e601de9153e4a7111962c"
 			},
 			"dist": {
 				"type": "zip",
-				"url": "https://api.github.com/repos/PHPCompatibility/PHPCompatibilityWP/zipball/01c1ff2704a58e46f0cb1ca9d06aee07b3589082",
-				"reference": "01c1ff2704a58e46f0cb1ca9d06aee07b3589082",
+				"url": "https://api.github.com/repos/PHPCompatibility/PHPCompatibilityWP/zipball/5bfbbfbabb3df2b9a83e601de9153e4a7111962c",
+				"reference": "5bfbbfbabb3df2b9a83e601de9153e4a7111962c",
 				"shasum": ""
 			},
 			"require": {
 				"phpcompatibility/php-compatibility": "^9.0",
-				"phpcompatibility/phpcompatibility-paragonie": "^1.0"
+				"phpcompatibility/phpcompatibility-paragonie": "^1.0",
+				"squizlabs/php_codesniffer": "^3.3"
 			},
 			"require-dev": {
 				"dealerdirect/phpcodesniffer-composer-installer": "^1.0"
@@ -535,9 +532,13 @@
 				{
 					"url": "https://opencollective.com/php_codesniffer",
 					"type": "open_collective"
+				},
+				{
+					"url": "https://thanks.dev/u/gh/phpcompatibility",
+					"type": "thanks_dev"
 				}
 			],
-			"time": "2024-04-24T21:37:59+00:00"
+			"time": "2025-05-12T16:38:37+00:00"
 		},
 		{
 			"name": "pristas-peter/wp-graphql-gutenberg",
@@ -545,12 +546,12 @@
 			"source": {
 				"type": "git",
 				"url": "https://github.com/superhuit-agency/wp-graphql-gutenberg.git",
-				"reference": "26311bece84745d8a3a7835a72f01bbaa776abcb"
+				"reference": "15d4dbd6f3c231a0e0b2fbcdb1fe196767ca0c98"
 			},
 			"dist": {
 				"type": "zip",
-				"url": "https://api.github.com/repos/superhuit-agency/wp-graphql-gutenberg/zipball/26311bece84745d8a3a7835a72f01bbaa776abcb",
-				"reference": "26311bece84745d8a3a7835a72f01bbaa776abcb",
+				"url": "https://api.github.com/repos/superhuit-agency/wp-graphql-gutenberg/zipball/15d4dbd6f3c231a0e0b2fbcdb1fe196767ca0c98",
+				"reference": "15d4dbd6f3c231a0e0b2fbcdb1fe196767ca0c98",
 				"shasum": ""
 			},
 			"require": {
@@ -585,20 +586,20 @@
 			"support": {
 				"source": "https://github.com/superhuit-agency/wp-graphql-gutenberg/tree/master"
 			},
-			"time": "2024-07-19T09:45:32+00:00"
+			"time": "2024-09-27T19:21:10+00:00"
 		},
 		{
 			"name": "squizlabs/php_codesniffer",
-			"version": "3.9.2",
+			"version": "3.13.2",
 			"source": {
 				"type": "git",
 				"url": "https://github.com/PHPCSStandards/PHP_CodeSniffer.git",
-				"reference": "aac1f6f347a5c5ac6bc98ad395007df00990f480"
+				"reference": "5b5e3821314f947dd040c70f7992a64eac89025c"
 			},
 			"dist": {
 				"type": "zip",
-				"url": "https://api.github.com/repos/PHPCSStandards/PHP_CodeSniffer/zipball/aac1f6f347a5c5ac6bc98ad395007df00990f480",
-				"reference": "aac1f6f347a5c5ac6bc98ad395007df00990f480",
+				"url": "https://api.github.com/repos/PHPCSStandards/PHP_CodeSniffer/zipball/5b5e3821314f947dd040c70f7992a64eac89025c",
+				"reference": "5b5e3821314f947dd040c70f7992a64eac89025c",
 				"shasum": ""
 			},
 			"require": {
@@ -663,9 +664,13 @@
 				{
 					"url": "https://opencollective.com/php_codesniffer",
 					"type": "open_collective"
+				},
+				{
+					"url": "https://thanks.dev/u/gh/phpcsstandards",
+					"type": "thanks_dev"
 				}
 			],
-			"time": "2024-04-23T20:25:34+00:00"
+			"time": "2025-06-17T22:17:01+00:00"
 		},
 		{
 			"name": "superhuit-agency/nextjs-revalidate",
@@ -687,16 +692,16 @@
 		},
 		{
 			"name": "superhuit/wp-graphql-redirection",
-			"version": "v1.1.0",
+			"version": "v1.1.1",
 			"source": {
 				"type": "git",
 				"url": "https://github.com/superhuit-agency/wp-graphql-redirection.git",
-				"reference": "f74c46b839ab66819fcffbf57e4502b97405117e"
+				"reference": "726c67e9133966df0df833be26693a8bfaafcbd1"
 			},
 			"dist": {
 				"type": "zip",
-				"url": "https://api.github.com/repos/superhuit-agency/wp-graphql-redirection/zipball/f74c46b839ab66819fcffbf57e4502b97405117e",
-				"reference": "f74c46b839ab66819fcffbf57e4502b97405117e",
+				"url": "https://api.github.com/repos/superhuit-agency/wp-graphql-redirection/zipball/726c67e9133966df0df833be26693a8bfaafcbd1",
+				"reference": "726c67e9133966df0df833be26693a8bfaafcbd1",
 				"shasum": ""
 			},
 			"require": {
@@ -736,22 +741,22 @@
 			],
 			"support": {
 				"issues": "https://github.com/superhuit-agency/wp-graphql-redirection/issues",
-				"source": "https://github.com/superhuit-agency/wp-graphql-redirection/tree/v1.1.0"
+				"source": "https://github.com/superhuit-agency/wp-graphql-redirection/tree/v1.1.1"
 			},
-			"time": "2023-06-05T14:09:23+00:00"
+			"time": "2024-09-19T15:23:36+00:00"
 		},
 		{
 			"name": "symfony/css-selector",
-			"version": "v6.4.8",
+			"version": "v6.4.13",
 			"source": {
 				"type": "git",
 				"url": "https://github.com/symfony/css-selector.git",
-				"reference": "4b61b02fe15db48e3687ce1c45ea385d1780fe08"
+				"reference": "cb23e97813c5837a041b73a6d63a9ddff0778f5e"
 			},
 			"dist": {
 				"type": "zip",
-				"url": "https://api.github.com/repos/symfony/css-selector/zipball/4b61b02fe15db48e3687ce1c45ea385d1780fe08",
-				"reference": "4b61b02fe15db48e3687ce1c45ea385d1780fe08",
+				"url": "https://api.github.com/repos/symfony/css-selector/zipball/cb23e97813c5837a041b73a6d63a9ddff0778f5e",
+				"reference": "cb23e97813c5837a041b73a6d63a9ddff0778f5e",
 				"shasum": ""
 			},
 			"require": {
@@ -787,7 +792,7 @@
 			"description": "Converts CSS selectors to XPath expressions",
 			"homepage": "https://symfony.com",
 			"support": {
-				"source": "https://github.com/symfony/css-selector/tree/v6.4.8"
+				"source": "https://github.com/symfony/css-selector/tree/v6.4.13"
 			},
 			"funding": [
 				{
@@ -803,20 +808,20 @@
 					"type": "tidelift"
 				}
 			],
-			"time": "2024-05-31T14:49:08+00:00"
+			"time": "2024-09-25T14:18:03+00:00"
 		},
 		{
 			"name": "valu/wp-graphql-offset-pagination",
 			"version": "dev-master",
 			"source": {
 				"type": "git",
-				"url": "https://github.com/superhuit-agency/wp-graphql-offset-pagination.git",
-				"reference": "c098996d5462f9011f0adad1236f237a8481bc18"
+				"url": "https://github.com/valu-digital/wp-graphql-offset-pagination.git",
+				"reference": "db85d9b676377f4ddda96859f56e14c1e32dd0ce"
 			},
 			"dist": {
 				"type": "zip",
-				"url": "https://api.github.com/repos/superhuit-agency/wp-graphql-offset-pagination/zipball/c098996d5462f9011f0adad1236f237a8481bc18",
-				"reference": "c098996d5462f9011f0adad1236f237a8481bc18",
+				"url": "https://api.github.com/repos/valu-digital/wp-graphql-offset-pagination/zipball/db85d9b676377f4ddda96859f56e14c1e32dd0ce",
+				"reference": "db85d9b676377f4ddda96859f56e14c1e32dd0ce",
 				"shasum": ""
 			},
 			"require-dev": {
@@ -839,21 +844,7 @@
 					"WPGraphQL\\Extensions\\OffsetPagination\\": "src/"
 				}
 			},
-			"scripts": {
-				"wp-install": [
-					"wp-install --full --env-file .env --wp-composer-file composer.wp-install.json"
-				],
-				"wpunit": [
-					"codecept run wpunit"
-				],
-				"functional": [
-					"codecept run functional"
-				],
-				"test": [
-					"@wpunit",
-					"@functional"
-				]
-			},
+			"notification-url": "https://packagist.org/downloads/",
 			"license": [
 				"GPL-2.0-or-later"
 			],
@@ -869,7 +860,7 @@
 				"issues": "https://github.com/valu-digital/wp-graphql-offset-pagination/issues",
 				"source": "https://github.com/valu-digital/wp-graphql-offset-pagination"
 			},
-			"time": "2024-03-21T13:02:51+00:00"
+			"time": "2025-03-21T10:53:11+00:00"
 		},
 		{
 			"name": "voku/simple_html_dom",
@@ -1009,15 +1000,15 @@
 		},
 		{
 			"name": "wpackagist-plugin/advanced-custom-fields",
-			"version": "6.3.12",
+			"version": "6.4.3",
 			"source": {
 				"type": "svn",
 				"url": "https://plugins.svn.wordpress.org/advanced-custom-fields/",
-				"reference": "tags/6.3.12"
+				"reference": "tags/6.4.3"
 			},
 			"dist": {
 				"type": "zip",
-				"url": "https://downloads.wordpress.org/plugin/advanced-custom-fields.6.3.12.zip"
+				"url": "https://downloads.wordpress.org/plugin/advanced-custom-fields.6.4.3.zip"
 			},
 			"require": {
 				"composer/installers": "^1.0 || ^2.0"
@@ -1027,15 +1018,15 @@
 		},
 		{
 			"name": "wpackagist-plugin/disable-comments",
-			"version": "2.4.6",
+			"version": "2.5.2",
 			"source": {
 				"type": "svn",
 				"url": "https://plugins.svn.wordpress.org/disable-comments/",
-				"reference": "tags/2.4.6"
+				"reference": "tags/2.5.2"
 			},
 			"dist": {
 				"type": "zip",
-				"url": "https://downloads.wordpress.org/plugin/disable-comments.2.4.6.zip"
+				"url": "https://downloads.wordpress.org/plugin/disable-comments.2.5.2.zip"
 			},
 			"require": {
 				"composer/installers": "^1.0 || ^2.0"
@@ -1045,15 +1036,15 @@
 		},
 		{
 			"name": "wpackagist-plugin/disable-emojis",
-			"version": "1.7.6",
+			"version": "1.7.7",
 			"source": {
 				"type": "svn",
 				"url": "https://plugins.svn.wordpress.org/disable-emojis/",
-				"reference": "tags/1.7.6"
+				"reference": "tags/1.7.7"
 			},
 			"dist": {
 				"type": "zip",
-				"url": "https://downloads.wordpress.org/plugin/disable-emojis.1.7.6.zip"
+				"url": "https://downloads.wordpress.org/plugin/disable-emojis.1.7.7.zip"
 			},
 			"require": {
 				"composer/installers": "^1.0 || ^2.0"
@@ -1081,15 +1072,15 @@
 		},
 		{
 			"name": "wpackagist-plugin/redirection",
-			"version": "5.4.2",
+			"version": "5.5.2",
 			"source": {
 				"type": "svn",
 				"url": "https://plugins.svn.wordpress.org/redirection/",
-				"reference": "tags/5.4.2"
+				"reference": "tags/5.5.2"
 			},
 			"dist": {
 				"type": "zip",
-				"url": "https://downloads.wordpress.org/plugin/redirection.5.4.2.zip"
+				"url": "https://downloads.wordpress.org/plugin/redirection.5.5.2.zip"
 			},
 			"require": {
 				"composer/installers": "^1.0 || ^2.0"
@@ -1099,15 +1090,15 @@
 		},
 		{
 			"name": "wpackagist-plugin/simple-custom-post-order",
-			"version": "2.5.7",
+			"version": "2.5.11",
 			"source": {
 				"type": "svn",
 				"url": "https://plugins.svn.wordpress.org/simple-custom-post-order/",
-				"reference": "tags/2.5.7"
+				"reference": "tags/2.5.11"
 			},
 			"dist": {
 				"type": "zip",
-				"url": "https://downloads.wordpress.org/plugin/simple-custom-post-order.2.5.7.zip"
+				"url": "https://downloads.wordpress.org/plugin/simple-custom-post-order.2.5.11.zip"
 			},
 			"require": {
 				"composer/installers": "^1.0 || ^2.0"
@@ -1117,15 +1108,15 @@
 		},
 		{
 			"name": "wpackagist-plugin/svg-support",
-			"version": "2.5.5",
+			"version": "2.5.14",
 			"source": {
 				"type": "svn",
 				"url": "https://plugins.svn.wordpress.org/svg-support/",
-				"reference": "tags/2.5.5"
+				"reference": "tags/2.5.14"
 			},
 			"dist": {
 				"type": "zip",
-				"url": "https://downloads.wordpress.org/plugin/svg-support.2.5.5.zip"
+				"url": "https://downloads.wordpress.org/plugin/svg-support.2.5.14.zip"
 			},
 			"require": {
 				"composer/installers": "^1.0 || ^2.0"
@@ -1135,15 +1126,15 @@
 		},
 		{
 			"name": "wpackagist-plugin/wordpress-seo",
-			"version": "22.5",
+			"version": "25.5",
 			"source": {
 				"type": "svn",
 				"url": "https://plugins.svn.wordpress.org/wordpress-seo/",
-				"reference": "tags/22.5"
+				"reference": "tags/25.5"
 			},
 			"dist": {
 				"type": "zip",
-				"url": "https://downloads.wordpress.org/plugin/wordpress-seo.22.5.zip"
+				"url": "https://downloads.wordpress.org/plugin/wordpress-seo.25.5.zip"
 			},
 			"require": {
 				"composer/installers": "^1.0 || ^2.0"
@@ -1153,15 +1144,15 @@
 		},
 		{
 			"name": "wpackagist-plugin/wp-graphql",
-			"version": "1.24.0",
+			"version": "2.3.3",
 			"source": {
 				"type": "svn",
 				"url": "https://plugins.svn.wordpress.org/wp-graphql/",
-				"reference": "tags/1.24.0"
+				"reference": "tags/2.3.3"
 			},
 			"dist": {
 				"type": "zip",
-				"url": "https://downloads.wordpress.org/plugin/wp-graphql.1.24.0.zip"
+				"url": "https://downloads.wordpress.org/plugin/wp-graphql.2.3.3.zip"
 			},
 			"require": {
 				"composer/installers": "^1.0 || ^2.0"
