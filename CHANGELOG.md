@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.6 - 2025-07-28
+
+- ci: updated changelog workflow (geck1942)
+
+
 ## 1.0.5 - 2025-07-28
 
 - ci: updated changelog workflow (geck1942)
