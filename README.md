@@ -37,7 +37,7 @@ An opinionated boilerplate for decoupled (headless) websites that are both perfo
 | Name           | Version | Download                                                |
 | -------------- | ------- | ------------------------------------------------------- |
 | Nvm            | >= 0.38 | [nvm](https://github.com/creationix/nvm)                |
-| Node           | >= 20.x | [node](https://nodejs.org/)                             |
+| Node           | >= 22.x | [node](https://nodejs.org/)                             |
 | Docker         | >= 23   | [docker](https://www.docker.com/products/docker-engine) |
 | Docker Compose | >= 1.29 | [docker-compose](https://docs.docker.com/compose/)      |
 
