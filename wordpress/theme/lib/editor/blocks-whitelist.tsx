@@ -32,7 +32,9 @@ const BlocksWhitelist = (): JSX.Element | null => {
 				const block = unregisterBlockType(blockType.name);
 				if (block) {
 					//@ts-ignore // .parent is readOnly but we ignore it anyway
-					block.parent = [];
+					block.parent = [
+						'supt/fake-parent-to-hide-block-from-inserter',
+					];
 					registerBlockType(blockType.name, block);
 				}
 			}
@@ -40,6 +42,8 @@ const BlocksWhitelist = (): JSX.Element | null => {
 	}, []);
 
 	useEffect(() => {
+		if (!postType || postType === 'wp_block') return; // Skip wp_block post type as it's used for patterns
+
 		whiteListBlocks(postType);
 	}, [whiteListBlocks, postType]);
 
