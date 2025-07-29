@@ -1,8 +1,17 @@
+'use client';
+
 import cx from 'classnames';
-import Img from 'next/image';
 import { FC, forwardRef } from 'react';
+// import NextImage from 'next/image';
+import dynamic from 'next/dynamic';
+
+import { useIsEditor } from '@/hooks/use-is-editor';
 
 import block from './block.json';
+
+const NextImage = dynamic(() => import('next/image'), {
+	loading: () => <div>Loading...</div>,
+});
 
 // styles
 import './styles.css';
@@ -32,7 +41,27 @@ export const Image: FC<ImageProps> & BlockConfigs = forwardRef<
 		},
 		ref
 	) => {
+		const isEditor = useIsEditor();
+
 		if (!src) return null;
+
+		// WP Editor doesn't support next/image, so we need to return a regular anchor tag
+		if (isEditor) {
+			return (
+				<figure
+					ref={ref}
+					className={cx('supt-figure', className)}
+					style={style}
+				>
+					<img
+						src={src}
+						alt={alt}
+						className="supt-figure__image"
+						{...props}
+					/>
+				</figure>
+			);
+		}
 
 		return (
 			<figure
@@ -40,15 +69,7 @@ export const Image: FC<ImageProps> & BlockConfigs = forwardRef<
 				className={cx('supt-figure', className)}
 				style={style}
 			>
-				{/* {!width && !height && !fill ? (
-					// no need to optimise (we are either rendering an svg or outside of Next.js context)
-					<img
-						src={src}
-						alt={alt}
-						className="supt-figure__image"
-					/>
-				) : ( */}
-				<Img
+				<NextImage
 					src={src}
 					alt={alt}
 					className="supt-figure__image"
@@ -64,7 +85,6 @@ export const Image: FC<ImageProps> & BlockConfigs = forwardRef<
 					id={id?.toString()}
 					{...props}
 				/>
-				{/* )} */}
 				{caption && (
 					<figcaption className="supt-figure__figcaption">
 						{caption}
