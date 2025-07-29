@@ -2,7 +2,6 @@ import { BlockEditProps } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { ComponentType } from 'react';
 
-
 import block from './block.json';
 
 // styles
@@ -17,17 +16,7 @@ const withCustomClassName = createHigherOrderComponent(
 			if ((props as any).name !== block.slug)
 				return <BlockListBlock {...props} />;
 
-			return (
-				<BlockListBlock
-					{...props}
-					className="supt-list"
-					style={{
-						counterSet: props.attributes.start
-							? `li ${props.attributes.start + 1}`
-							: null,
-					}}
-				/>
-			);
+			return <BlockListBlock {...props} className="supt-list" />;
 		};
 
 		return EnhancedComponent;
@@ -37,8 +26,30 @@ const withCustomClassName = createHigherOrderComponent(
 
 export const ListEditBlockClassName: WpFilterType = {
 	hook: 'editor.BlockListBlock',
-	namespace: 'supt/list',
+	namespace: 'supt/list-edit-classname',
 	callback: withCustomClassName,
+};
+
+/**
+ * Add custom `postTypes` and `parent` to core/list block
+ */
+const withCustomPostTypesSetting = (
+	settings: WpBlockType<any>['settings'],
+	name: string
+) => {
+	if (name !== block.slug) {
+		return settings;
+	}
+
+	settings['postTypes'] = ['post'];
+	settings['parent'] = [];
+
+	return settings;
+};
+export const ListEditBlockSettings: WpFilterType = {
+	hook: 'blocks.registerBlockType',
+	namespace: 'supt/list-edit-setting',
+	callback: withCustomPostTypesSetting,
 };
 
 export const ListBlock = {

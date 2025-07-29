@@ -3,40 +3,31 @@
 .supt-list {
 	@extend %t-paragraph;
 
-	list-style: none;
-	padding: 0px;
-
-	li {
-		position: relative;
-		padding-left: 1em;
-
-		&::before {
-			content: '';
-			position: absolute;
-			left: 0;
-		}
-	}
-
 	ul&,
 	ul {
-		> li::before {
-			top: 0.5em;
-			width: 5px;
-			height: 5px;
-			border-radius: 50%;
-			background-color: $color-brand-1-base;
+		list-style: none;
+		> li {
+			position: relative;
+			padding-left: 1em;
+
+			&::before {
+				content: '';
+				position: absolute;
+				left: 0;
+				top: 0.5em;
+				width: 5px;
+				height: 5px;
+				border-radius: 50%;
+				background-color: $color-brand-1-base;
+			}
 		}
 	}
 
 	ol&,
 	ol {
-		counter-reset: li;
-
+		list-style-position: inside;
 		> li {
-			counter-increment: li;
-
-			&::before {
-				top: 0;
+			&::marker {
 				font-weight: bold;
 			}
 		}
@@ -44,11 +35,7 @@
 
 	ol& {
 		> li {
-			padding-left: 1.3em;
-
-			&::before {
-				content: counter(li) '.';
-
+			&::marker {
 				color: $color-brand-1-base;
 			}
 		}
@@ -57,33 +44,21 @@
 	/* Child Lists */
 	ul,
 	ol {
-		list-style: none;
-		padding: 0px;
+		padding-left: 1em;
 	}
 
 	/* Child Ordered List - letter bullet */
 	ol {
-		> li::before {
-			content: counter(li, lower-alpha) '.';
+		> li::marker {
 			color: $color-brand-1-lighter;
 		}
 	}
 
 	/* Child Unordered List - gray triangle */
 	ul {
+		list-style: none;
 		> li::before {
 			background-color: $color-brand-1-lighter;
-		}
-	}
-
-	/* MODIFIERS */
-	&[reversed] {
-		ol& {
-			> li {
-				&::before {
-					counter-increment: li -1;
-				}
-			}
 		}
 	}
 }

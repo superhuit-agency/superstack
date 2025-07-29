@@ -26,3 +26,8 @@ This is a known issue and can be fixed by visiting the permalinks in the WordPre
 ### 2. Error: Unexpected token '<' (<div id='e'... is not valid JSON) in getRedirection
 
 This issue is because of the redirection table not existing in the Database. To fix it, you need to setup the Redirection plugin in Wordpress (In Tools > Redirection, then click on the Start Setup and follow the steps).
+
+### 3. WP Core blocks don't display in the front
+
+This might be because of the WP GraphQL Gutenberg block registry. It may not be up to date with the correct blocks attributes.
+On the WordPress Admin go to `GraphQL` > `GraphQL Gutenberg` and then click on the `update` button.

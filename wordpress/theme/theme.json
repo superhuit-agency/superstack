@@ -13,8 +13,10 @@
 			"defaultGradients": false
 		},
 		"typography": {
+			"customFontSize": false,
 			"dropCap": false,
 			"fontWeight": false,
+			"fontSizes": [],
 			"fontStyle": false,
 			"textDecoration": false,
 			"textTransform": false,
