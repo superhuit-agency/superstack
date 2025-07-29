@@ -18,7 +18,7 @@ const isValidData = (data: GraphQlFormFields) =>
 export const formatter = (
 	data: GraphQlFormFields,
 	isEditor = false
-): FormComponentData => {
+): FormProps => {
 	if (!isValidData(data)) throw new Error('Invalid form data');
 
 	return {

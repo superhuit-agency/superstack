@@ -17,7 +17,10 @@ import './styles.edit.css';
 /**
  * COMPONENT EDIT
  */
-const Edit = ({ attributes, setAttributes }: BlockEditProps<FormProps>) => {
+const Edit = ({
+	attributes,
+	setAttributes,
+}: BlockEditProps<FormComponentData>) => {
 	const { isLoading: isLoadingFormsList, data: formsList } =
 		useGraphQlApi(getFormsList);
 
@@ -128,7 +131,7 @@ const Edit = ({ attributes, setAttributes }: BlockEditProps<FormProps>) => {
 /**
  * WORDPRESS BLOCK
  */
-export const FormBlock: WpBlockType<FormProps> = {
+export const FormBlock: WpBlockType<FormComponentData> = {
 	slug: block.slug,
 	settings: {
 		title: block.title,
@@ -154,25 +157,9 @@ export const FormBlock: WpBlockType<FormProps> = {
 				type: 'number',
 				default: undefined,
 			},
-			name: {
-				type: 'string',
-				default: '',
-			},
-			optIns: {
-				type: 'object',
-				default: {},
-			},
 			isPreview: {
 				type: 'boolean',
 				default: false,
-			},
-			fields: {
-				type: 'array',
-				default: [],
-			},
-			version: {
-				type: 'number',
-				default: 0,
 			},
 		},
 		keywords: [],
