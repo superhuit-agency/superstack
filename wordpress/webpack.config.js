@@ -172,12 +172,6 @@ module.exports = {
 							},
 						},
 					},
-					// {
-					// 	loader: 'resolve-url-loader',
-					// 	options: {
-					// 		root: path.join(__dirname, '../src'),
-					// 	},
-					// },
 				],
 			},
 			// images

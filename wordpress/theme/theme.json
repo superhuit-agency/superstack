@@ -8,7 +8,9 @@
 			"custom": false,
 			"duotone": [],
 			"gradients": [],
-			"palette": []
+			"palette": [],
+			"defaultPalette": false,
+			"defaultGradients": false
 		},
 		"typography": {
 			"dropCap": false,
