@@ -46,7 +46,9 @@ export const Video: FC<VideoProps> & BlockConfigs = ({
 			});
 		} else if (source === 'vimeo') {
 			// Vimeo
-			fetch(`https://vimeo.com/api/v2/video/${id}.json`)
+			fetch(`https://vimeo.com/api/v2/video/${id}.json`, {
+				cache: 'force-cache',
+			})
 				.then((res) => res.json())
 				.then(
 					([

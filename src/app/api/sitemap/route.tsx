@@ -1,6 +1,8 @@
 import { getSitemapData } from '@/lib';
 import { type NextRequest } from 'next/server';
 
+export const dynamic = 'force-static';
+
 type ContentTypeSitemapDataType = {
 	name: string;
 	total: number;
