@@ -26,14 +26,30 @@ export const Default: Story = {
 
 export const Filled: Story = {
 	args: {
-		...Default.args,
+		label: 'Color',
+		name: 'color',
+		placeholder: 'Select color',
+		options: 'red: Red; blue: Blue; orange: Orange;',
 		value: 'orange',
+	},
+};
+
+export const Disabled: Story = {
+	args: {
+		label: 'This is a disabled select',
+		name: 'disabled',
+		placeholder: 'Select a country',
+		options: 'France: France; Switzerland: Switzerland; Germany: Germany;',
+		disabled: true,
 	},
 };
 
 export const WithError: Story = {
 	args: {
-		...Default.args,
+		label: 'Color',
+		name: 'color',
+		placeholder: 'Select color',
+		options: 'red: Red; blue: Blue; orange: Orange;',
 		invalid: 'Error message',
 	},
 };

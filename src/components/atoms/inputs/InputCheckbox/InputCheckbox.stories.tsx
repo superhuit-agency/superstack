@@ -36,6 +36,57 @@ export const Default: Story = {
 				},
 			},
 		],
+		value: ['choice-1'],
+	},
+};
+
+export const WithNoValue: Story = {
+	args: {
+		label: 'Label',
+		name: 'name',
+		options: [
+			{
+				attrs: {
+					name: 'name',
+					label: 'The Fellowship of the Ring',
+				},
+			},
+			{
+				attrs: {
+					name: 'name',
+					label: 'The Two Towers',
+				},
+			},
+			{
+				attrs: {
+					name: 'name',
+					label: 'The Return of the King',
+				},
+			},
+		],
+	},
+};
+
+export const WithIdAndNoLabel: Story = {
+	args: {
+		label: 'Label',
+		name: 'name',
+		options: [
+			{
+				attrs: {
+					name: 'name',
+					id: undefined,
+					value: 'choice-1',
+				},
+			},
+			{
+				attrs: {
+					name: 'name',
+					id: undefined,
+					value: 'choice-2',
+				},
+			},
+		],
 	},
 };
 

@@ -1,0 +1,61 @@
+name: Release a new version
+on:
+  push:
+    branches:
+      - 'main'
+    paths-ignore:
+      - 'composer.json'
+      - 'package.json'
+      - '*.md'
+
+jobs:
+  release_new_version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Getting last version from Next NPM
+        run: echo "LAST_VERSION=$(./.github/actions/automated/increment-semver.sh ./package.json self --out)" >> $GITHUB_ENV
+
+      - name: Getting new version from Changelog
+        run: echo "LOG_VERSION=$(./.github/actions/automated/check-changelog.sh ./CHANGELOG.md ${{ env.LAST_VERSION }} --version)" >> $GITHUB_ENV
+
+      - name: Getting potential version from Next NPM
+        run: echo "NEW_VERSION=$(./.github/actions/automated/increment-semver.sh ./package.json ${{ env.LOG_VERSION }} --out)" >> $GITHUB_ENV
+
+      - name: Update project version in Next NPM
+        run: bash ./.github/actions/automated/increment-semver.sh "./package.json" ${{ env.NEW_VERSION }}
+
+      - name: Update project version in WP Composer
+        run: bash ./.github/actions/automated/increment-semver.sh "./wordpress/composer.json" ${{ env.NEW_VERSION }}
+
+      - name: Update project version in WP NPM
+        run: bash ./.github/actions/automated/increment-semver.sh "./wordpress/package.json" ${{ env.NEW_VERSION }}
+
+      - name: Append Changelog if missing
+        run: bash ./.github/actions/automated/update-changelog.sh "${{ github.repository }}" "${{ secrets.GITHUB_TOKEN }}" ./CHANGELOG.md ${{ env.LOG_VERSION }} ${{ env.NEW_VERSION }}
+
+      - name: Set up Git
+        run: |
+          git config --global user.email "tech@superhuit.ch"
+          git config --global user.name "superhuit"
+
+      - name: Commit changes
+        shell: bash
+        run: |
+          git add ./package.json
+          git add ./wordpress/composer.json
+          git add ./wordpress/package.json
+          git add ./CHANGELOG.md
+          git commit -m "ship: 🚀 upgrade to version ${{ env.NEW_VERSION }}"
+          git push origin main
+
+      # - name: Write Draft release
+      #   run: bash ./.github/actions/automated/git-release.sh "${{ github.repository }}" "${{ secrets.GITHUB_TOKEN }}" "${{ env.NEW_VERSION }}" "./CHANGELOG.md" --draft
+
+      - name: Write production release
+        run: bash ./.github/actions/automated/git-release.sh "${{ github.repository }}" "${{ secrets.GITHUB_TOKEN }}" "${{ env.NEW_VERSION }}" "./CHANGELOG.md"
+
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -19,7 +19,7 @@
 			"name": "Next.js: debug server-side",
 			"type": "node-terminal",
 			"request": "launch",
-			"command": "npm run dev"
+			"command": "nvm use && npm run dev"
 		},
 		{
 			"name": "Next.js: debug client-side",
@@ -28,20 +28,24 @@
 			"url": "http://localhost:3000"
 		},
 		{
-			"name": "Storybook: debug",
-			"type": "chrome",
-			"request": "launch",
-			"url": "http://localhost:4000"
-		},
-		{
 			"name": "Next.js: debug full stack",
 			"type": "node-terminal",
 			"request": "launch",
-			"command": "npm run dev",
+			"command": "nvm use && npm run dev",
 			"serverReadyAction": {
 				"pattern": "started server on .+, url: (https?://.+)",
 				"uriFormat": "%s",
 				"action": "debugWithChrome"
+			}
+		},
+		{
+			"name": "Debug All Jest Tests",
+			"type": "node-terminal",
+			"request": "launch",
+			"command": "nvm use && node --inspect-brk ./node_modules/.bin/jest --runInBand --no-cache --no-coverage",
+			"cwd": "${workspaceFolder}",
+			"env": {
+				"NODE_ENV": "test"
 			}
 		}
 	]

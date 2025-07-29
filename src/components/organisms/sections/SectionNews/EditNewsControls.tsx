@@ -23,7 +23,7 @@ const EditNewsControls: FC<EditNewsControls> = ({
 	children,
 }) => {
 	const [manual, setManual] = useState(
-		!!(vars?.postIn && vars.postIn.length) ?? false
+		!!(vars?.postIn && vars.postIn.length)
 	);
 
 	return (

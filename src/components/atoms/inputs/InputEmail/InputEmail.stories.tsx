@@ -35,6 +35,6 @@ export const Filled: Story = {
 export const WithError: Story = {
 	args: {
 		...Default.args,
-		invalid: 'Error message',
+		invalid: 'Please enter a valid email address',
 	},
 };

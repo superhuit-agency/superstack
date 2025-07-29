@@ -4,7 +4,7 @@ import cx from 'classnames';
 import { useMemo } from 'react';
 
 import { useLocale } from '@/contexts/locale-context';
-import { Link } from '@/helpers/Link';
+import { Link } from '@/components/atoms/Link';
 import { Blocks, Container } from '@/components/global';
 import { Pagination, Button, CardNews } from '@/components';
 

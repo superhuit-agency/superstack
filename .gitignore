@@ -7,7 +7,9 @@ node_modules/
 .yarn/install-state.gz
 
 # testing
-/coverage
+src/__tests__/coverage/
+src/__tests__/video-logs/
+.artifacts/
 
 # next.js
 /.next/
@@ -35,4 +37,4 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
-# next-env.d.ts
+next-env.d.ts

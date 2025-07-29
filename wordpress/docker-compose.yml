@@ -14,17 +14,15 @@ services:
       - './plugins:/var/www/html/wp-content/plugins'
       - './uploads:/var/www/html/wp-content/uploads'
     working_dir: /var/www/html
-    container_name: "${PROJECT_CODE:-'spck'}_wp"
+    container_name: "${THEME_NAME:-'superstack'}_wp"
     environment:
       WORDPRESS_DB_HOST: db:3306
       WORDPRESS_DB_NAME: wordpress
       WORDPRESS_DB_USER: wordpress
       WORDPRESS_DB_PASSWORD: wordpress
-      # TODO: clean provision script which requires these vars
       THEME_NAME: ${THEME_NAME:-superstack}
       WORDPRESS_PATH: /var/www/html
       WORDPRESS_ENV: dev
-      # END TODO
       WORDPRESS_DEBUG: 1
       WORDPRESS_CONFIG_EXTRA: |
         define('WP_DEBUG_LOG', '/dev/stderr');        // write logs to stderr
@@ -44,7 +42,7 @@ services:
       - './.data/db:/var/lib/mysql'
     ports:
       - '3306:3306'
-    container_name: "${PROJECT_CODE:-'spck'}_db"
+    container_name: "${THEME_NAME:-'superstack'}_db"
     command: --default-authentication-plugin=mysql_native_password
     environment:
       MYSQL_ROOT_PASSWORD: wordpress

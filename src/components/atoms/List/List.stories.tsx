@@ -41,7 +41,40 @@ export const Default: Story = {
 
 export const Ordered: Story = {
 	args: {
-		...Default.args,
 		ordered: true,
+		children: (
+			<>
+				<ListItem content="First item" />
+				<ListItem content="Second item" />
+				<ListItem content="Third item" />
+			</>
+		),
+	},
+};
+
+export const OrderedWithCounter: Story = {
+	args: {
+		ordered: true,
+		start: 1,
+		children: (
+			<>
+				<ListItem content="Second item" />
+				<ListItem content="Third item" />
+				<ListItem content="Fourth item" />
+			</>
+		),
+	},
+};
+
+export const WithEmptyItems: Story = {
+	args: {
+		ordered: false,
+		children: (
+			<>
+				<ListItem content="First item" />
+				<ListItem content="" id="empty-item" />
+				<ListItem content="Third item" />
+			</>
+		),
 	},
 };

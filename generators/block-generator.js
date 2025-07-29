@@ -76,6 +76,11 @@ module.exports = async function (plop) {
 						value: 'supportsData',
 						checked: true,
 					},
+					{
+						name: 'Unit Tests',
+						value: 'supportsTests',
+						checked: true,
+					},
 				],
 			},
 			{
@@ -147,7 +152,7 @@ module.exports = async function (plop) {
 			delete data.blockOptionals;
 			delete data.blockAttributesTypes;
 
-			const { supportsStory, supportsData } = data;
+			const { supportsStory, supportsData, supportsTests } = data;
 
 			data.unprefixedBlockName = data.blockName.replace(
 				`${CONFIG.blockPrefix}/`,
@@ -164,6 +169,7 @@ module.exports = async function (plop) {
 					ignore: [
 						...(!supportsStory ? ['**/*.stories.tsx.hbs'] : []),
 						...(!supportsData ? ['**/data.ts.hbs'] : []),
+						...(!supportsTests ? ['**/test.tsx.hbs'] : []),
 					],
 				},
 			});
@@ -191,6 +197,16 @@ module.exports = async function (plop) {
 					path: `${CONFIG.paths.relativePath}/{{blockType}}/data.ts`,
 					pattern: /(\/\/ -- GENERATOR EXPORT SLOT --)/gi,
 					template: `export * as {{ camelCase blockTitle }}Data from './{{ pascalCase blockTitle }}/data';\r\n$1`,
+				});
+			}
+
+			// Export component in packages/blocks/components/{{blockType}}/test.ts
+			if (supportsTests) {
+				actions.push({
+					type: 'modify',
+					path: `${CONFIG.paths.relativePath}/{{blockType}}/test.ts`,
+					pattern: /(\/\/ -- GENERATOR EXPORT SLOT --)/gi,
+					template: `export * from './{{ pascalCase blockTitle }}/test';\r\n$1`,
 				});
 			}
 

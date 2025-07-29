@@ -3,7 +3,7 @@
 import { useMemo } from 'react';
 
 import { useLocale } from '@/contexts/locale-context';
-import { Link } from '@/helpers/Link';
+import { Link } from '@/components/atoms/Link';
 import { Blocks, Container } from '@/components/global';
 import { SectionNews, Image } from '@/components';
 

@@ -18,6 +18,12 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
 	args: {
 		content:
-			"Excepteur quis aute cupidatat consequat fugiat. Ipsum consectetur laborum reprehenderit Lorem. Sint excepteur aute tempor magna ex culpa dolor do.",
+			'Excepteur quis aute cupidatat consequat fugiat. Ipsum consectetur laborum reprehenderit Lorem. Sint excepteur aute tempor magna ex culpa dolor do.',
+	},
+};
+
+export const Empty: Story = {
+	args: {
+		content: '',
 	},
 };

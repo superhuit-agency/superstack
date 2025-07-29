@@ -42,13 +42,14 @@ interface FormStrings {
 	[id: string]: string;
 }
 
-interface FormComponentData {
-	fields: Array<FormField>;
+interface FormComponentData extends BlockAttributes {
 	id: number;
-	name: string;
-	optIns: Array<FormOptIn>;
 	strings?: FormStrings;
-	version: number;
 }
 
-interface FormProps extends FormComponentData, FormAttributes, BlockProps {}
+interface FormProps extends FormComponentData, BlockProps {
+	name: string;
+	optIns: Array<FormOptIn>;
+	fields: Array<FormField>;
+	version: number;
+}

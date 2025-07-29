@@ -71,6 +71,7 @@ Open [http://localhost:4000](http://localhost:4000) with your browser to access 
 ### Additional commands
 
 -   `npm run generate:block` - create a new block (interactive prompt)
+-   `npm run test:all` - run all unit and end-to-end tests
 
 ## 🏗 Project setup
 
@@ -98,6 +99,7 @@ Open [http://localhost:4000](http://localhost:4000) with your browser to access 
 -   [Blocks Whitelisting](./docs/features/blocks-whitelisting.md)
 -   [Forms](./docs/features/forms.md)
 -   [Multilang](./docs/features/multilang.md)
+-   [Testing](./docs/tests/readme.md)
 
 ## 📚 Resources
 

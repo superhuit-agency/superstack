@@ -20,6 +20,7 @@ Every custom block you create will typically include the following components:
 -   **`data.ts`**: [Optional] The data fetching logic for the block. (📚 [Read more about this file](fetch-data.md))
 -   **`edit.tsx`**: The WordPress editor component for block settings and attributes. (📚 [Read more about this file](#dive-into-edittsx))
 -   **`index.tsx`**: The React component rendered on the front end.
+-   **`test.tsx`**: The Unit test scripts.
 -   **`typings.d.ts`**: The typescript typings for the block.
 -   **CSS Files**: `styles.css` for front-end styling and `styles.edit.css` for editor-specific styling (if needed).
 -   **Storybook Story File** - `**.stories.tsx`: Optional but recommended for testing the block's UI.
@@ -44,6 +45,7 @@ Navigate to the newly created directory in your blocks folder and begin shaping 
 -   **`edit.tsx`**: Craft the Gutenberg editor experience for your block.
 -   **`index.tsx`**: Implement the React component for front-end display.
 -   **`typings.d.ts`**: Review and increment the typings for the block attributes and props.
+-   **`test.tsx`**: Add relevant tests to your block and its different stories.
 -   <strong>`**.stories.tsx`</strong>: Optionally develop a story to prototype your block's UI on Storybook.
 
 ### Step 3: (Optional) Fetch datas
@@ -91,6 +93,10 @@ export const ButtonBlock: WpBlockType<ButtonAttributes> = {
 ```
 
 > We've added a custom property `postTypes` for the blocks' settings to define on which WP Post Type it can be available.<br /> 📚 [Learn more on how we've handled blocks whitelisting in here.](../features/blocks-whitelisting.md)
+
+### Unit tests
+
+Follow [this documentation](../tests/readme.md) to implement the best way some unit tests to your components and ensure a good code coverage.
 
 ## 🏷️ Typing `typings.d.ts`
 

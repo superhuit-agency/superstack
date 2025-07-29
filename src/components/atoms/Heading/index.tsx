@@ -10,6 +10,7 @@ export const Heading: FC<HeadingProps> = ({
 }) => {
 	const HTag = `h${level}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
 
+	// If there is no content, do not display anything
 	if (!content) return null;
 
 	return (

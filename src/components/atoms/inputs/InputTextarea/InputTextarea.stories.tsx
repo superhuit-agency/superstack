@@ -25,7 +25,9 @@ export const Default: Story = {
 
 export const Filled: Story = {
 	args: {
-		...Default.args,
+		label: 'Message',
+		name: 'message',
+		placeholder: 'Lorem ipsum',
 		inputAttributes: {
 			value: 'Anim dolor ea culpa reprehenderit minim adipisicing.',
 		},
@@ -34,7 +36,9 @@ export const Filled: Story = {
 
 export const WithError: Story = {
 	args: {
-		...Default.args,
+		label: 'Message',
+		name: 'message',
+		placeholder: 'Lorem ipsum',
 		invalid: 'Error message',
 	},
 };

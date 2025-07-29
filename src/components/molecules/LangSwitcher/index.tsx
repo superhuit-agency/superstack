@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { FC, useEffect, useState } from 'react';
 
 import { useLocale } from '@/contexts/locale-context';
-import { Link } from '@/helpers/Link';
+import { Link } from '@/components/atoms/Link';
 
 import './styles.css';
 

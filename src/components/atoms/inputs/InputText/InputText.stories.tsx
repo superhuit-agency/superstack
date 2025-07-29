@@ -25,7 +25,9 @@ export const Default: Story = {
 
 export const Filled: Story = {
 	args: {
-		...Default.args,
+		label: 'Name',
+		name: 'name',
+		placeholder: 'John Doe',
 		inputAttributes: {
 			value: 'Jane Doe',
 		},
@@ -34,7 +36,9 @@ export const Filled: Story = {
 
 export const WithError: Story = {
 	args: {
-		...Default.args,
+		label: 'Name',
+		name: 'name',
+		placeholder: 'John Doe',
 		invalid: 'Error message',
 	},
 };

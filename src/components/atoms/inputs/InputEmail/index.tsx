@@ -60,6 +60,13 @@ export const InputEmail: FC<InputEmailProps> & BlockConfigs = forwardRef(
 					{...inputAttributes}
 					onChange={onChange}
 					onBlur={onBlur}
+					// This is here to avoid an error when 'value' is set from inputAttributes
+					// TODO: remove inputAttributes and use regular props instead (defaultValue)
+					readOnly={
+						inputAttributes?.readOnly ||
+						!!inputAttributes?.value ||
+						undefined
+					}
 				/>
 				{invalid && typeof invalid === 'string' ? (
 					<span

@@ -2,7 +2,6 @@ import { BlockEditProps } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { ComponentType } from 'react';
 
-
 import block from './block.json';
 
 // styles
@@ -35,10 +34,32 @@ const withCustomClassName = createHigherOrderComponent(
 	'withCustomClassName'
 );
 
+/**
+ * Add custom `postTypes` to core/paragraph block
+ */
+const withCustomPostTypesSetting = (
+	settings: WpBlockType<any>['settings'],
+	name: string
+) => {
+	if (name !== block.slug) {
+		return settings;
+	}
+
+	settings['postTypes'] = ['post', 'page'];
+
+	return settings;
+};
+
 export const ListEditBlockClassName: WpFilterType = {
 	hook: 'editor.BlockListBlock',
 	namespace: 'supt/list',
 	callback: withCustomClassName,
+};
+
+export const ListEditBlockSettings: WpFilterType = {
+	hook: 'editor.BlockListBlock',
+	namespace: 'supt/list',
+	callback: withCustomPostTypesSetting,
 };
 
 export const ListBlock = {

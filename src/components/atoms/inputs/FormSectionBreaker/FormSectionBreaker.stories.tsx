@@ -20,3 +20,9 @@ export const Default: Story = {
 		title: 'Documents',
 	},
 };
+
+export const Empty: Story = {
+	args: {
+		title: '',
+	},
+};

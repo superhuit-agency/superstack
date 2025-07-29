@@ -1,0 +1,39 @@
+import { expect } from '@storybook/test';
+
+import block from './block.json';
+import { {{ pascalCase blockTitle }} } from './index';
+{{#if supportsStory}}
+import * as stories from './{{ pascalCase blockTitle }}.stories';
+{{/if}}
+
+/**
+ * Unique name for the component tests.
+ * Returns an object from each storybook story with for each a unit test to run.
+ */
+export const {{ pascalCase blockTitle }}Tests: ComponentTests = {
+	block: block,
+	component: {{ pascalCase blockTitle }},
+	tests: {
+		Default: {
+			{{#if supportsStory}}
+			args: stories.Default.args,
+			{{/if}}
+			{{#ifNot supportsStory}}
+			args: {
+				{{#each blockAttributes as |attribute|}}
+				{{attribute.name}}: '',
+				{{/each}}
+			},
+			{{/ifNot}}
+			unitTest: async (component, container) => {
+				// General
+				expect(component).toBeInTheDocument();
+				// Content
+				// Display
+				expect(component).toBeVisible();
+				// Accessibility
+				expect(component).toBeEnabled();
+			},
+		},
+	},
+};
