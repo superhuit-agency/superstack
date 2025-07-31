@@ -9,6 +9,7 @@ export const List: FC<ListProps> & BlockConfigs = ({
 	ordered,
 	reversed,
 	start,
+	type,
 	children,
 }) => {
 	return (
@@ -16,10 +17,11 @@ export const List: FC<ListProps> & BlockConfigs = ({
 			{ordered ? (
 				<ol
 					className="supt-list"
-					style={{
-						counterSet: start ? `li ${start + 1}` : undefined,
-					}}
 					reversed={reversed}
+					start={start}
+					style={{
+						listStyleType: type,
+					}}
 				>
 					{children}
 				</ol>

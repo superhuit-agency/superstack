@@ -81,20 +81,27 @@
 }
 
 /* Reset styles of core blocks */
-.wp-block[data-type='core/list'] ul,
-.wp-block[data-type='core/list'] ol {
-	margin-right: 0px;
-	margin-left: 0px;
-	margin-bottom: 0px;
-	padding-left: 0px;
+ul.wp-block[data-type='core/list'] {
+	> .wp-block[data-type='core/list-item'] {
+		padding: 0 0 0 1em;
+	}
+}
+
+ol.wp-block[data-type='core/list'] {
+	> .wp-block[data-type='core/list-item'] {
+		padding: 0;
+		> div {
+			display: inline-block;
+		}
+	}
 }
 
 /* Reset styles of inner blocks wrapper */
 .block-editor-inner-blocks,
 .block-editor-block-list__layout:not(
-		.block-library-block__reusable-block-container,
-		.block-editor-block-list__block
-	) {
+	.block-library-block__reusable-block-container,
+	.block-editor-block-list__block
+) {
 	display: contents;
 }
 
@@ -102,10 +109,6 @@
 .post-type-page .edit-post-visual-editor__post-title-wrapper {
 	display: none;
 }
-
-/* .editor-styles-wrapper.edit-post-visual-editor p {
-	margin: 0;
-} */
 
 /* Overrides .card WP styles */
 .card {
@@ -171,6 +174,11 @@
 .editor-post-featured-image__preview,
 .editor-post-featured-image__toggle {
 	max-height: none;
+}
+
+/* Hide disabled blocks from block inserter (we only want to display the Insertable blocks) */
+.block-editor-inserter__all-blocks {
+	display: none;
 }
 
 /* CUSTOM EDIT STYLE */

@@ -53,8 +53,8 @@ export const CardNews: FC<CardNewsProps> & BlockConfigs = ({
 					alt={image.alt || title}
 					className="supt-card-news__image"
 					sizes="(max-width: 768px) 100vw,
-              		 (max-width: 1200px) 50vw,
-              		 33vw"
+              	 (max-width: 1200px) 50vw,
+              	 33vw"
 					fill
 				/>
 			) : null}

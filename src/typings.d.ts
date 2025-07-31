@@ -7,7 +7,7 @@ interface WpBlockType<T> {
 		};
 }
 
-type PostType = 'page' | 'post' | 'form';
+type PostType = 'page' | 'post' | 'form' | 'wp_block';
 
 interface WpBlockEditProps<T> extends Omit<BlockEditProps<T>, 'attributes'> {
 	name?: string;
@@ -92,7 +92,7 @@ interface SectionAttributes extends BlockAttributes {
 
 interface SectionProps extends SectionAttributes, BlockProps {}
 
-type NextLayoutParams = {
+type NextParams = Promise<{
 	uri: string[];
 	lang: Locale;
-};
+}>;

@@ -5,10 +5,10 @@ import { redirect } from 'next/navigation';
 export async function GET(request: NextRequest) {
 	const path = request.nextUrl.searchParams.get('redirect') ?? '/';
 
-	draftMode().disable();
+	(await draftMode()).disable();
 
 	// Delete preview-draft + token cookies
-	const cookieStore = cookies();
+	const cookieStore = await cookies();
 	cookieStore.delete('token');
 	cookieStore.delete('preview-draft');
 

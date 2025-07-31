@@ -40,6 +40,8 @@ const BlocksWhitelist = (): JSX.Element | null => {
 	}, []);
 
 	useEffect(() => {
+		if (!postType || postType === 'wp_block') return; // Skip wp_block post type as it's used for patterns
+
 		whiteListBlocks(postType);
 	}, [whiteListBlocks, postType]);
 

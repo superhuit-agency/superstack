@@ -1,6 +1,6 @@
-import { FC, forwardRef } from 'react';
-import NextLink from 'next/link';
+import { forwardRef } from 'react';
 
+import NextLink from 'next/link';
 
 export const Link = forwardRef<HTMLAnchorElement, LinkProps>(
 	(

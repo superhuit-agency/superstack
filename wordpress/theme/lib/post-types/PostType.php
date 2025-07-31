@@ -6,7 +6,6 @@ use WPGraphQL\Model\Post as GraphQlPost;
 
 use const Supt\Taxonomies\Tag\TAXONOMY_NAME as TAG_TAXONOMY_NAME;
 use const Supt\Taxonomies\Category\TAXONOMY_NAME as CATEGORY_TAXONOMY_NAME;
-use const SUPT\Types\Page\GRAPHQL_TYPE_NAME;
 
 class Post extends TypeWithArchive {
 

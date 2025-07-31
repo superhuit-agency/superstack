@@ -38,6 +38,7 @@ const fetchAPI: FetchApiFuncType = async (query, options) => {
 				query: dedupedQuery,
 				variables,
 			}),
+			cache: 'force-cache',
 		});
 
 		let resText;
@@ -63,7 +64,10 @@ const fetchAPI: FetchApiFuncType = async (query, options) => {
 
 		if (errors) {
 			const errs = errors
-				.map((e: any) => `\t- ${e.message} [${e.extensions.category}]`)
+				.map(
+					(e: any) =>
+						`\t- ${e.message} ${e.extensions?.category ? '[' + e.extensions?.category + ']' : ''}`
+				)
 				.join('\n');
 
 			throw new Error(errs);
@@ -77,19 +81,19 @@ const fetchAPI: FetchApiFuncType = async (query, options) => {
 
 		(Array.isArray(errors) ? errors : [errors]).map((err) =>
 			console.error(`
-${limit}
-GraphQl API error
-${sep}
-== date:\t  ${new Date().toISOString()}
-== endpoint: ${endpoint}
-== query:
-	- name:       ${name}
-	- variables:  ${vars ?? '-'}
-	- full query: "${dedupedQuery.replace(/[\n\t\s]+/g, ' ')}"
-== error:
-${err.message}
-${limit}
-`)
+				${limit}
+				GraphQl API error
+				${sep}
+				== date:\t  ${new Date().toISOString()}
+				== endpoint: ${endpoint}
+				== query:
+					- name:       ${name}
+					- variables:  ${vars ?? '-'}
+					- full query: "${dedupedQuery.replace(/[\n\t\s]+/g, ' ')}"
+				== error:
+				${err.message}
+				${limit}
+			`)
 		);
 	}
 

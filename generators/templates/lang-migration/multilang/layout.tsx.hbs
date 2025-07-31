@@ -13,13 +13,15 @@ export default async function Layout({
 	children,
 }: {
 	children: React.ReactNode;
-	params: { lang: Locale };
+	params: NextParams;
 }) {
-	const dictionary = await getDictionary(params.lang);
+	const { lang } = await params;
+
+	const dictionary = await getDictionary(lang);
 
 	const [navPromise, footerPromise] = await Promise.allSettled([
-		mainNavData.getData({language: params.lang}),
-		footerData.getData({language: params.lang}),
+		mainNavData.getData({language: lang}),
+		footerData.getData({language: lang}),
 	]);
 
 	const mainNavProps =
@@ -28,7 +30,7 @@ export default async function Layout({
 		footerPromise.status === 'fulfilled' ? footerPromise.value : null;
 
 	return (
-		<LocaleProvider locale={params.lang} dictionary={dictionary}>
+		<LocaleProvider locale={lang} dictionary={dictionary}>
 			{mainNavProps ? <MainNav {...mainNavProps} /> : null}
 			<div className="main">{children}</div>
 			{footerProps ? <Footer {...footerProps} /> : null}

@@ -2,7 +2,7 @@ interface CardNewsProps {
 	category?: LinkProps;
 	date: string;
 	excerpt?: string;
-	image?: ImageProps | null;
+	image?: ImageProps | undefined;
 	linkLabel?: string;
 	title: string;
 	uri: string;

@@ -281,6 +281,7 @@ export const MediaBlock: WpBlockType<MediaAttributes> = {
 		category: 'media',
 		icon: 'admin-media',
 		postTypes: ['page'],
+		parent: [],
 		attributes: {
 			image: {
 				type: 'object',

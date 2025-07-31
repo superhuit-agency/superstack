@@ -1,6 +1,6 @@
 import cx from 'classnames';
-import Img from 'next/image';
 import { FC, forwardRef } from 'react';
+import NextImage from 'next/image';
 
 import block from './block.json';
 
@@ -40,15 +40,7 @@ export const Image: FC<ImageProps> & BlockConfigs = forwardRef<
 				className={cx('supt-figure', className)}
 				style={style}
 			>
-				{/* {!width && !height && !fill ? (
-					// no need to optimise (we are either rendering an svg or outside of Next.js context)
-					<img
-						src={src}
-						alt={alt}
-						className="supt-figure__image"
-					/>
-				) : ( */}
-				<Img
+				<NextImage
 					src={src}
 					alt={alt}
 					className="supt-figure__image"
@@ -64,7 +56,6 @@ export const Image: FC<ImageProps> & BlockConfigs = forwardRef<
 					id={id?.toString()}
 					{...props}
 				/>
-				{/* )} */}
 				{caption && (
 					<figcaption className="supt-figure__figcaption">
 						{caption}

@@ -84,6 +84,18 @@ module.exports = {
 			'@resources': path.resolve(__dirname, '../src/css/resources'),
 			'@': path.resolve(__dirname, '../src/'),
 			'#': path.resolve(__dirname, './theme/lib/editor/'),
+			// TODO :: TEMPORARY FIX
+			// WP Editor doesn't support next/image and next/link due to React versions incompatibility
+			// so we need to return a regular img tag and anchor tag instead
+			// TODO :: REMOVE THIS AFTER WP PACKAGES UPGRADED TO REACT 19
+			'next/image': path.resolve(
+				__dirname,
+				'./theme/lib/editor/wp-mocks/MockedImage.tsx'
+			),
+			'next/link': path.resolve(
+				__dirname,
+				'./theme/lib/editor/wp-mocks/MockedLink.tsx'
+			),
 		},
 		extensions: ['.tsx', '.ts', '.js', '.jsx', '.css'],
 		fallback: {
@@ -172,12 +184,6 @@ module.exports = {
 							},
 						},
 					},
-					// {
-					// 	loader: 'resolve-url-loader',
-					// 	options: {
-					// 		root: path.join(__dirname, '../src'),
-					// 	},
-					// },
 				],
 			},
 			// images

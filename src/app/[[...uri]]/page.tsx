@@ -28,11 +28,11 @@ export async function generateStaticParams() {
 }
 
 // Generate page metadata
-export async function generateMetadata({
-	params,
-}: {
-	params: { uri: string[]; lang: Locale };
+export async function generateMetadata(props: {
+	params: NextParams;
 }): Promise<Metadata> {
+	const params = await props.params;
+
 	const uri = getWpUriFromNextPath(params.uri ?? []);
 
 	let auth = {};
@@ -131,12 +131,10 @@ export async function generateMetadata({
 	};
 }
 
-export default async function Page({
-	params,
-}: {
-	params: { uri: string[]; lang: Locale };
-}) {
-	const { isEnabled: isDraftModeEnable } = draftMode();
+export default async function Page(props: { params: NextParams }) {
+	const params = await props.params;
+
+	const { isEnabled: isDraftModeEnable } = await draftMode();
 
 	let isDraft = false,
 		token = '';
@@ -153,7 +151,7 @@ export default async function Page({
 	if (isDraftModeEnable) {
 		// We are now in dynamic rendering
 
-		const cookieStore = cookies();
+		const cookieStore = await cookies();
 
 		token = cookieStore.get('token')?.value ?? '';
 		isDraft = cookieStore.get('preview-draft')?.value === 'true';

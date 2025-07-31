@@ -8,11 +8,15 @@
 			"custom": false,
 			"duotone": [],
 			"gradients": [],
-			"palette": []
+			"palette": [],
+			"defaultPalette": false,
+			"defaultGradients": false
 		},
 		"typography": {
+			"customFontSize": false,
 			"dropCap": false,
 			"fontWeight": false,
+			"fontSizes": [],
 			"fontStyle": false,
 			"textDecoration": false,
 			"textTransform": false,

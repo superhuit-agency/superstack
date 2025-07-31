@@ -53,19 +53,6 @@ export const ParagraphEditBlockSettings: WpFilterType = {
 	callback: withCustomPostTypesSetting,
 };
 
-/**
- * Disable unwanted text formats
- *
- * @see https://developer.wordpress.org/block-editor/how-to-guides/format-api/
- * @see https://github.com/WordPress/gutenberg/tree/trunk/packages/format-library/src
- */
-domReady(() => {
-	unregisterFormatType('core/text-color'); // Highlight text
-	unregisterFormatType('core/image'); // Inline image
-	unregisterFormatType('core/keyboard');
-	unregisterFormatType('core/code');
-});
-
 export const ParagraphBlock = {
 	slug: block.slug,
 };
