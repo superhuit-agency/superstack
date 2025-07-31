@@ -1,11 +1,6 @@
-import { useIsEditor } from '@/hooks/use-is-editor';
-import dynamic from 'next/dynamic';
-import { FC, forwardRef } from 'react';
+import { forwardRef } from 'react';
 
-// import NextLink from 'next/link';
-const NextLink = dynamic(() => import('next/link'), {
-	loading: () => <div>Loading...</div>,
-});
+import NextLink from 'next/link';
 
 export const Link = forwardRef<HTMLAnchorElement, LinkProps>(
 	(
@@ -23,8 +18,6 @@ export const Link = forwardRef<HTMLAnchorElement, LinkProps>(
 			...props,
 			ref,
 		};
-
-		const isEditor = useIsEditor();
 
 		// Return a button if there is no href
 		if (!href) {
@@ -66,15 +59,6 @@ export const Link = forwardRef<HTMLAnchorElement, LinkProps>(
 					target="_blank"
 					rel="noopener noreferrer"
 				>
-					{children}
-				</a>
-			);
-		}
-
-		// WP Editor doesn't support next/link, so we need to return a regular anchor tag
-		if (isEditor) {
-			return (
-				<a href={href} {...linkProps}>
 					{children}
 				</a>
 			);

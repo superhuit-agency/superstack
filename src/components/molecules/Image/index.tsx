@@ -1,17 +1,8 @@
-'use client';
-
 import cx from 'classnames';
 import { FC, forwardRef } from 'react';
-// import NextImage from 'next/image';
-import dynamic from 'next/dynamic';
-
-import { useIsEditor } from '@/hooks/use-is-editor';
+import NextImage from 'next/image';
 
 import block from './block.json';
-
-const NextImage = dynamic(() => import('next/image'), {
-	loading: () => <div>Loading...</div>,
-});
 
 // styles
 import './styles.css';
@@ -41,27 +32,7 @@ export const Image: FC<ImageProps> & BlockConfigs = forwardRef<
 		},
 		ref
 	) => {
-		const isEditor = useIsEditor();
-
 		if (!src) return null;
-
-		// WP Editor doesn't support next/image, so we need to return a regular anchor tag
-		if (isEditor) {
-			return (
-				<figure
-					ref={ref}
-					className={cx('supt-figure', className)}
-					style={style}
-				>
-					<img
-						src={src}
-						alt={alt}
-						className="supt-figure__image"
-						{...props}
-					/>
-				</figure>
-			);
-		}
 
 		return (
 			<figure
