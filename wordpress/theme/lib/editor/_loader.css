@@ -176,4 +176,9 @@ ol.wp-block[data-type='core/list'] {
 	max-height: none;
 }
 
+/* Hide disabled blocks from block inserter (we only want to display the Insertable blocks) */
+.block-editor-inserter__all-blocks {
+	display: none;
+}
+
 /* CUSTOM EDIT STYLE */

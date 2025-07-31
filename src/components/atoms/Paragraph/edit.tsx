@@ -33,7 +33,7 @@ export const ParagraphEditBlockClassName: WpFilterType = {
 };
 
 /**
- * Add custom `postTypes` and `parent` to core/paragraph block
+ * Add custom `postTypes` to core/paragraph block
  */
 const withCustomPostTypesSetting = (
 	settings: WpBlockType<any>['settings'],
@@ -44,7 +44,6 @@ const withCustomPostTypesSetting = (
 	}
 
 	settings['postTypes'] = ['post'];
-	settings['parent'] = [];
 
 	return settings;
 };

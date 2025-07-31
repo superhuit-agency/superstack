@@ -31,7 +31,7 @@ export const ListEditBlockClassName: WpFilterType = {
 };
 
 /**
- * Add custom `postTypes` and `parent` to core/list block
+ * Add custom `postTypes` to core/list block
  */
 const withCustomPostTypesSetting = (
 	settings: WpBlockType<any>['settings'],
@@ -42,7 +42,6 @@ const withCustomPostTypesSetting = (
 	}
 
 	settings['postTypes'] = ['post'];
-	settings['parent'] = [];
 
 	return settings;
 };

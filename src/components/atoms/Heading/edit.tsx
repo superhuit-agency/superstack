@@ -59,7 +59,6 @@ const withCustomPostTypesSetting = (
 	}
 
 	settings['postTypes'] = ['post'];
-	settings['parent'] = [];
 
 	return settings;
 };

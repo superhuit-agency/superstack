@@ -17,7 +17,9 @@ import block from './block.json';
 
 import './styles.css';
 
-const Select = dynamic(() => import('react-select'));
+const Select = dynamic(() => import('react-select'), {
+	ssr: false,
+});
 
 const isOptionProps = (value: unknown): value is InputSelectOptionProps => {
 	return (

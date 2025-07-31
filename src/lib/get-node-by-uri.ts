@@ -88,8 +88,8 @@ export default async function getNodeByURI(
 		const { blocksJSON, templateData } = await Promise.allSettled([
 			formatBlocksJSON(
 				previewDraft
-					? node.preview?.node?.blocksJSON ?? ''
-					: node?.blocksJSON ?? ''
+					? (node.preview?.node?.blocksJSON ?? node?.blocksJSON ?? '')
+					: (node?.blocksJSON ?? '')
 			),
 			getTemplateData(node),
 		])

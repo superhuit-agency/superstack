@@ -32,9 +32,7 @@ const BlocksWhitelist = (): JSX.Element | null => {
 				const block = unregisterBlockType(blockType.name);
 				if (block) {
 					//@ts-ignore // .parent is readOnly but we ignore it anyway
-					block.parent = [
-						'supt/fake-parent-to-hide-block-from-inserter',
-					];
+					block.parent = [];
 					registerBlockType(blockType.name, block);
 				}
 			}
