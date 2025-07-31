@@ -31,6 +31,8 @@ inputs:
 runs:
   using: 'composite'
   steps:
+    - name: Install Vercel CLI
+      run: npm install -g vercel@latest
     - uses: BetaHuhn/deploy-to-vercel-action@v1.10.0
       with:
         GITHUB_TOKEN: ${{ inputs.GITHUB_TOKEN }}
