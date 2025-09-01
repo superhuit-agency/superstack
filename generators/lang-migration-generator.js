@@ -212,7 +212,7 @@ module.exports = async function (plop) {
 				// Add multi-language plugins using composer require
 				actions.push(function (data) {
 					return new Promise((resolve, reject) => {
-						const command = `cd ${wordpressDir} && docker exec spck_wp composer require ${multilangPlugins.join(' ')}`;
+						const command = `cd ${wordpressDir} && docker exec superstack_wp composer require ${multilangPlugins.join(' ')}`;
 						exec(command, (error, stdout, stderr) => {
 							if (error) {
 								reject(`Error running composer require: ${error.message}`);
@@ -354,7 +354,7 @@ module.exports = async function (plop) {
 				// Remove multi-language plugins using composer remove
 				actions.push(function (data) {
 					return new Promise((resolve, reject) => {
-						const command = `cd ${wordpressDir} && docker exec spck_wp composer remove ${multilangPlugins.join(' ')}`;
+						const command = `cd ${wordpressDir} && docker exec superstack_wp composer remove ${multilangPlugins.join(' ')}`;
 						exec(command, (error, stdout, stderr) => {
 							if (error) {
 								reject(`Error running composer remove: ${error.message}`);

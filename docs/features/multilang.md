@@ -14,7 +14,7 @@ Run the script that will update the code and files depending on if your website 
 
 > 💡 You will need to have Docker running before executing this script, by running `npm run start` in `wordpress` folder
 
-> ⚠ You may need to change `spck_wp` container name with your project's container name inside the `generators/lang-migration-generator.js` file.
+> ⚠ You may need to change `superstack_wp` container name with your project's container name inside the `generators/lang-migration-generator.js` file.
 
 ```bash
 npm run generate:language-migration
