@@ -14,7 +14,7 @@ Run the script that will update the code and files depending on if your website 
 
 > 💡 You will need to have Docker running before executing this script, by running `npm run start` in `wordpress` folder
 
-> ⚠ You may need to change `spck_wp` container name with your project's container name inside the `generators/lang-migration-generator.js` file.
+> ⚠ You may need to change `superstack_wp` container name with your project's container name inside the `generators/lang-migration-generator.js` file.
 
 ```bash
 npm run generate:language-migration
@@ -34,12 +34,12 @@ On WP admin, set the languages and the default one in Polylang settings
 
 If working on a multilang website :
 
--   Use language-aware data fetching in GraphQL queries
--   Use the `useLocale` hook to get the current `locale`, and the `dictionary` object to get the static strings translations
--   If you need to add static strings translations, set them on the `[language].json` file which is located inside the `src/i18n/dictionaries/` folder. The locales used in here are the ones set on WP Polylang plugin.
--   Any component that needs to use the `useLocale` hook will need to be a Client component
--   For the language switcher, we use the `<link rel="alternate" hrefLang="x" href="url">` tags to get the available translations on each page
--   The 404 page won't have a header or footer, as we can't know which language to use when fetching the datas in this specific case.
+- Use language-aware data fetching in GraphQL queries
+- Use the `useLocale` hook to get the current `locale`, and the `dictionary` object to get the static strings translations
+- If you need to add static strings translations, set them on the `[language].json` file which is located inside the `src/i18n/dictionaries/` folder. The locales used in here are the ones set on WP Polylang plugin.
+- Any component that needs to use the `useLocale` hook will need to be a Client component
+- For the language switcher, we use the `<link rel="alternate" hrefLang="x" href="url">` tags to get the available translations on each page
+- The 404 page won't have a header or footer, as we can't know which language to use when fetching the datas in this specific case.
 
 ## Language Migration Generator
 

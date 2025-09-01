@@ -72,7 +72,7 @@ module.exports = async function (plop) {
 				'superhuit-agency/starterpack-i18n',
 				'valu/wp-graphql-polylang',
 				'wpackagist-plugin/acf-options-for-polylang',
-				'wpackagist-plugin/polylang'
+				'wpackagist-plugin/polylang',
 			];
 
 			if (data.migrationType === 'toMultilang') {
@@ -212,20 +212,23 @@ module.exports = async function (plop) {
 				// Add multi-language plugins using composer require
 				actions.push(function (data) {
 					return new Promise((resolve, reject) => {
-						const command = `cd ${wordpressDir} && docker exec spck_wp composer require ${multilangPlugins.join(' ')}`;
+						const command = `cd ${wordpressDir} && docker exec superstack_wp composer require ${multilangPlugins.join(' ')}`;
 						exec(command, (error, stdout, stderr) => {
 							if (error) {
-								reject(`Error running composer require: ${error.message}`);
+								reject(
+									`Error running composer require: ${error.message}`
+								);
 								return;
 							}
 							if (stderr) {
 								console.warn(`Composer stderr: ${stderr}`);
 							}
-							resolve('Successfully installed multi-language plugins via composer');
+							resolve(
+								'Successfully installed multi-language plugins via composer'
+							);
 						});
 					});
 				});
-
 			} else if (data.migrationType === 'toSinglelang') {
 				// Update the root layout.tsx file using the singlelang template
 				actions.push({
@@ -354,16 +357,20 @@ module.exports = async function (plop) {
 				// Remove multi-language plugins using composer remove
 				actions.push(function (data) {
 					return new Promise((resolve, reject) => {
-						const command = `cd ${wordpressDir} && docker exec spck_wp composer remove ${multilangPlugins.join(' ')}`;
+						const command = `cd ${wordpressDir} && docker exec superstack_wp composer remove ${multilangPlugins.join(' ')}`;
 						exec(command, (error, stdout, stderr) => {
 							if (error) {
-								reject(`Error running composer remove: ${error.message}`);
+								reject(
+									`Error running composer remove: ${error.message}`
+								);
 								return;
 							}
 							if (stderr) {
 								console.warn(`Composer stderr: ${stderr}`);
 							}
-							resolve('Successfully removed multi-language plugins via composer');
+							resolve(
+								'Successfully removed multi-language plugins via composer'
+							);
 						});
 					});
 				});
