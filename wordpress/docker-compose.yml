@@ -1,4 +1,16 @@
 services:
+  nginx:
+    image: nginx:alpine
+    ports:
+      - '443:443'
+    volumes:
+      - './nginx/nginx.conf:/etc/nginx/nginx.conf'
+      - './nginx/vhosts:/etc/nginx/vhosts'
+      - './nginx/certs:/etc/nginx/certs'
+    depends_on:
+      - wp
+    container_name: "${THEME_NAME:-'superstack'}_nginx"
+    restart: unless-stopped
   wp:
     build: .
     depends_on:
@@ -9,6 +21,7 @@ services:
       - '80:80'
     volumes:
       - './composer.json:/var/www/html/composer.json'
+      - './.htaccess:/var/www/html/.htaccess:ro'
       - './composer.lock:/var/www/html/composer.lock'
       - './theme:/var/www/html/wp-content/themes/${THEME_NAME:-superstack}'
       - './plugins:/var/www/html/wp-content/plugins'
@@ -28,10 +41,17 @@ services:
         define('WP_DEBUG_LOG', '/dev/stderr');        // write logs to stderr
         define('DISALLOW_FILE_EDIT', true);           // Disable theme & plugins editor
         define('FS_METHOD', 'direct');                // Auto-update without FTP
-        define('MULTISITE', 0);                       
-        define('WP_ALLOW_MULTISITE', 0);              
         define('WP_AUTO_UPDATE_CORE', 'minor');              
         define('GRAPHQL_JWT_AUTH_SECRET_KEY', 'y8151qr3T-5PfcRnNOE3}8@vtO=m[PchP:bP:oZC4MD_EsPD.A@&|>xFAY*WM');
+
+        # // WP Multi Site
+        define('WP_ALLOW_MULTISITE', 0);
+        define( 'MULTISITE', true );
+        define( 'SUBDOMAIN_INSTALL', false );
+        define( 'DOMAIN_CURRENT_SITE', 'localhost' );
+        define( 'PATH_CURRENT_SITE', '/' );
+        define( 'SITE_ID_CURRENT_SITE', 1 );
+        define( 'BLOG_ID_CURRENT_SITE', 1 );
 
         // WP Memory Limit
         // define('WP_MEMORY_LIMIT', '128M');

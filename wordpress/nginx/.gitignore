@@ -1,0 +1,6 @@
+# Ignore SSL certificates and private keys
+*.pem
+*.crt
+*.key
+*.p12
+*.pfx

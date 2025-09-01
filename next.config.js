@@ -8,16 +8,14 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 	enabled: process.env.ANALYZE === 'true',
 });
 
-console.log('images domains:', getWpDomain());
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
 	trailingSlash: true, // to match wp links format
 	images: {
 		remotePatterns: [
-			{
-				hostname: getWpDomain(),
-			},
+			{ hostname: getWpDomain() },
+			{ hostname: 'samantree.local' },
+			{ hostname: '*.samantree.local' },
 		],
 	},
 	rewrites() {
