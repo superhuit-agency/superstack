@@ -1,7 +1,7 @@
 import { imageData, menuItemData } from '@/components/molecules/data';
+import configs from '@/configs.json';
 import { fetchAPI } from '@/lib';
 import { gql } from '@/utils';
-import configs from '@/configs.json';
 
 import block from './block.json';
 

@@ -1,5 +1,5 @@
-import { gql } from '@/utils';
 import { fetchAPI } from '@/lib';
+import { gql } from '@/utils';
 
 /**
  *

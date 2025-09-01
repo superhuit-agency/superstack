@@ -1,6 +1,6 @@
 import cx from 'classnames';
-import { FC, forwardRef } from 'react';
 import NextImage from 'next/image';
+import { FC, forwardRef } from 'react';
 
 import block from './block.json';
 

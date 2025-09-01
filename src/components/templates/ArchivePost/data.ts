@@ -1,7 +1,7 @@
 import * as cardNewsData from '@/components/molecules/cards/CardNews/data';
 import { termNodeFragment } from '@/components/templates/SingleCategory/data';
-import { gql } from '@/utils';
 import configs from '@/configs.json';
+import { gql } from '@/utils';
 
 export const slug = 'archive-post';
 

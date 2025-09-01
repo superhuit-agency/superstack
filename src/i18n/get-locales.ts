@@ -1,4 +1,5 @@
 import configs from '@/configs.json';
+
 import fetchAPI from '../lib/fetch-api';
 
 export const getLocales = async () => {

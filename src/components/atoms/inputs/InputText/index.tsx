@@ -1,7 +1,7 @@
 'use client';
 
-import { FC, forwardRef, useId } from 'react';
 import cx from 'classnames';
+import { FC, forwardRef, useId } from 'react';
 
 import { useLocale } from '@/contexts/locale-context';
 

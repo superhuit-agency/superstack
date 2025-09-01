@@ -1,5 +1,6 @@
 import configs from '@/configs.json';
 import { fetchAPI } from '@/lib';
+
 import { languageFields, translationsFields } from './fragments';
 
 const GRAPHQL_MAX_SIZE = 100;

@@ -13,6 +13,7 @@ import {
 } from 'react';
 
 import { useLocale } from '@/contexts/locale-context';
+
 import block from './block.json';
 
 import './styles.css';

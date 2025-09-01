@@ -2,10 +2,10 @@
 
 import { FC } from 'react';
 
-import { useLocale } from '@/contexts/locale-context';
 import { Button } from '@/components/atoms';
-
 import configs from '@/configs.json';
+import { useLocale } from '@/contexts/locale-context';
+
 import block from './block.json';
 
 import './styles.css';

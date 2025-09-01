@@ -1,17 +1,17 @@
-import { useCallback } from 'react';
-import cx from 'classnames';
 import {
 	BlockControls,
 	InspectorControls,
 	MediaPlaceholder,
 	MediaReplaceFlow,
-	MediaUpload,
 } from '@wordpress/block-editor';
 import { PanelBody, RadioControl } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { _x } from '@wordpress/i18n';
+import cx from 'classnames';
+import { useCallback } from 'react';
 
 import { ImageEdit, VideoEdit } from '#/components';
+
 import block from './block.json';
 
 // styles

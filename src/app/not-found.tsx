@@ -1,9 +1,9 @@
-import { getLocales } from '@/i18n/get-locales';
-import { getDictionaries } from '@/i18n/dictionaries';
-
+import { Page404 } from '@/components/global/Page404';
 import * as footerData from '@/components/organisms/Footer/data';
 import * as mainNavData from '@/components/organisms/MainNav/data';
-import { Page404 } from '@/components/global/Page404';
+import { getDictionaries } from '@/i18n/dictionaries';
+import { getLocales } from '@/i18n/get-locales';
+
 
 async function NotFoundPage() {
 	const { defaultLocale } = await getLocales();

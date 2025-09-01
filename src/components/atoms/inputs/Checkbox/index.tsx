@@ -1,7 +1,9 @@
 import { FC, forwardRef, useId, useMemo } from 'react';
 import slugify from 'slugify';
+
 // internal imports
 import { SLUGIFY_ARGS } from '@/components/atoms/inputs/constants';
+
 import block from './block.json';
 // styles
 import './styles.css';

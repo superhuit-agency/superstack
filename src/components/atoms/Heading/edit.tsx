@@ -1,9 +1,9 @@
-import { ComponentType, useLayoutEffect, useState } from 'react';
-import { createHigherOrderComponent } from '@wordpress/compose';
-import { BlockEditProps, getBlockType } from '@wordpress/blocks';
 import { BlockControls } from '@wordpress/block-editor';
-import { select } from '@wordpress/data';
+import { BlockEditProps, getBlockType } from '@wordpress/blocks';
 import { ToolbarDropdownMenu } from '@wordpress/components';
+import { createHigherOrderComponent } from '@wordpress/compose';
+import { select } from '@wordpress/data';
+import { ComponentType, useLayoutEffect, useState } from 'react';
 
 // internal imports
 import { H1Icon } from '#/assets/icons/Heading/H1';

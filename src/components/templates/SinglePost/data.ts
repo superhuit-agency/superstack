@@ -1,5 +1,4 @@
 import { cardNewsData, imageData } from '@/components/molecules/data';
-
 import {
 	languageFields,
 	translationsFields,

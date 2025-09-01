@@ -1,5 +1,5 @@
-import { FC, useCallback } from 'react';
 import cx from 'classnames';
+import { FC, useCallback } from 'react';
 
 import { useLocale } from '@/contexts/locale-context';
 

@@ -1,7 +1,7 @@
-import { FC } from 'react';
-import { _x } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
 import { PanelBody, ToggleControl } from '@wordpress/components';
+import { useState } from '@wordpress/element';
+import { _x } from '@wordpress/i18n';
+import { FC } from 'react';
 
 import { PostsSelectControl, TermsSelectControl } from '#/components';
 import { CATEGORY_TAX_NAME, POST_PT_NAME, TAG_TAX_NAME } from '#/constants';

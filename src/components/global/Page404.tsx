@@ -1,15 +1,16 @@
 'use client';
 
-import { FC } from 'react';
 import { useParams } from 'next/navigation';
-
-import { LocaleProvider } from '@/contexts/locale-context';
-
-import { Container } from './Container';
-import { Footer, MainNav, Section404 } from '../organisms';
-import { Gdpr } from '../molecules';
+import { FC } from 'react';
 
 import configs from '@/configs.json';
+import { LocaleProvider } from '@/contexts/locale-context';
+
+import { Gdpr } from '../molecules';
+import { Footer, MainNav, Section404 } from '../organisms';
+
+import { Container } from './Container';
+
 
 interface Page404Props {
 	mainNavProps?: MainNavProps | null;

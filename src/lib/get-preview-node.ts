@@ -1,4 +1,5 @@
 import { PREVIEW_STATI, fetchAPI } from '@/lib';
+
 import { languageFields } from './fragments';
 
 const POST_TYPES = ['Page', 'Post'];

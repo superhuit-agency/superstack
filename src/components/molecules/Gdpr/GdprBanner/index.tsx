@@ -9,9 +9,9 @@ import {
 	useCallback,
 } from 'react';
 
+import { Button } from '@/components/atoms';
 import { useLocale } from '@/contexts/locale-context';
 
-import { Button } from '@/components/atoms';
 
 import './styles.css';
 

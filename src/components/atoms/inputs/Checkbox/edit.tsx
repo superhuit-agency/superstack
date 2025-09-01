@@ -4,6 +4,7 @@ import { TextControl } from '@wordpress/components';
 import { _x } from '@wordpress/i18n';
 
 import { IdControl } from '#/components';
+
 import block from './block.json';
 
 // styles

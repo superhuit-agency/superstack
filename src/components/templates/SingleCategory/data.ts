@@ -1,14 +1,12 @@
 import * as cardNewsData from '@/components/molecules/cards/CardNews/data';
-
+import { singlePageData, archivePostData } from '@/components/templates/data';
+import configs from '@/configs.json';
 import {
 	languageFields,
 	translationsFields,
 	seoTaxFragment,
 } from '@/lib/fragments';
 import { gql } from '@/utils';
-import configs from '@/configs.json';
-
-import { singlePageData, archivePostData } from '@/components/templates/data';
 
 export const termNodeFragment = gql`
 	fragment termNodeFragment on TermNode {

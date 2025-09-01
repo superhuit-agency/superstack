@@ -1,16 +1,16 @@
 'use client';
 
-import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import Cookies from 'js-cookie';
 import Script from 'next/script';
+import { FC, useCallback, useEffect, useRef, useState } from 'react';
 
 import { useLocale } from '@/contexts/locale-context';
 import gdprConfigs from '@/gdpr-configs.json';
 
-import { GdprBanner } from './GdprBanner';
-import { GdprModal, type GdprModalProps } from './GdprModal';
-import { type GdprCategoryType } from './GdprCategory';
 import block from './block.json';
+import { GdprBanner } from './GdprBanner';
+import { type GdprCategoryType } from './GdprCategory';
+import { GdprModal, type GdprModalProps } from './GdprModal';
 
 /**
  * Constants

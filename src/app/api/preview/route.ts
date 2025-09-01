@@ -1,6 +1,6 @@
-import { NextResponse, type NextRequest } from 'next/server';
 import { draftMode, cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { NextResponse, type NextRequest } from 'next/server';
 
 import { getAuthToken, getPreviewNode } from '@/lib';
 

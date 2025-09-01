@@ -8,7 +8,9 @@ import { PanelBody, PanelRow, ToggleControl } from '@wordpress/components';
 import { _x } from '@wordpress/i18n';
 
 import { IdControl, NameControl } from '#/components';
+
 import { CheckboxBlock } from '../Checkbox/edit';
+
 import block from './block.json';
 
 // styles

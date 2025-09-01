@@ -1,10 +1,10 @@
-import { gql } from '@/utils';
-
 import {
 	languageFields,
 	translationsFields,
 	seoPostTypeFragment,
 } from '@/lib/fragments';
+import { gql } from '@/utils';
+
 
 export const fragment = gql`
 	fragment singlePageFragment on Page {

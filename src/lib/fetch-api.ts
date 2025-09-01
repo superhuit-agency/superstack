@@ -1,6 +1,6 @@
-import { getWpGraphqlUrl } from '@/utils/node-utils';
-import { dedupeFragments } from '@/utils';
 import { getQueryAttrs } from '#/utils';
+import { dedupeFragments } from '@/utils';
+import { getWpGraphqlUrl } from '@/utils/node-utils';
 
 const WP_GRAPHQL_URL = getWpGraphqlUrl();
 

@@ -1,4 +1,5 @@
 import { FC } from 'react';
+
 // internal imports
 import block from './block.json';
 

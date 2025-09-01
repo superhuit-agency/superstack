@@ -1,5 +1,5 @@
-import { MouseEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import { MouseEvent } from 'react';
 
 // handle user-generated links with next/router
 const useHandleInternalLinks = () => {

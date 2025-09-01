@@ -2,10 +2,10 @@
 
 import { useMemo } from 'react';
 
+import { SectionNews, Image, Button } from '@/components';
+import { Blocks, Container } from '@/components/global';
 import { useLocale } from '@/contexts/locale-context';
 import { Link } from '@/helpers/Link';
-import { Blocks, Container } from '@/components/global';
-import { SectionNews, Image, Button } from '@/components';
 
 import './styles.css';
 

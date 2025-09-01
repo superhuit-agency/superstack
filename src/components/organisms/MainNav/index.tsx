@@ -4,12 +4,13 @@ import cx from 'classnames';
 import { usePathname } from 'next/navigation';
 import { FC, useCallback, useEffect, useRef, useState } from 'react';
 
+import { Image } from '@/components/molecules/Image';
+import { LangSwitcher } from '@/components/molecules/LangSwitcher';
+import configs from '@/configs.json';
 import { useLocale } from '@/contexts/locale-context';
 import { Link } from '@/helpers/Link';
-import configs from '@/configs.json';
 
-import { LangSwitcher } from '@/components/molecules/LangSwitcher';
-import { Image } from '@/components/molecules/Image';
+
 import block from './block.json';
 
 import './styles.css';

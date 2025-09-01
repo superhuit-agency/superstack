@@ -1,5 +1,6 @@
-import { getSitemapData } from '@/lib';
 import { type NextRequest } from 'next/server';
+
+import { getSitemapData } from '@/lib';
 
 export const dynamic = 'force-static';
 

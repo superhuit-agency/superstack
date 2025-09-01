@@ -1,18 +1,18 @@
-import { useMemo } from 'react';
 import { InspectorControls } from '@wordpress/block-editor';
-import { PanelBody, Spinner, TextControl } from '@wordpress/components';
 import { InnerBlocks } from '@wordpress/block-editor';
+import { PanelBody, Spinner, TextControl } from '@wordpress/components';
 import { _x } from '@wordpress/i18n';
+import { useMemo } from 'react';
 
 import { PreviewBlockImage, SectionEdit } from '#/components';
 import { useGraphQlApi } from '#/hooks';
-
 import { CardNews } from '@/components/molecules/cards/CardNews';
-import EditNewsControls from './EditNewsControls';
+
 
 // Data
 import block from './block.json';
 import { getData } from './data';
+import EditNewsControls from './EditNewsControls';
 
 // styles
 import './styles.css';

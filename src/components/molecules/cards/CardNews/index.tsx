@@ -2,9 +2,9 @@
 
 import { FC, useCallback, useMemo } from 'react';
 
-import { useLocale } from '@/contexts/locale-context';
 import { Image } from '@/components/molecules/Image';
 import configs from '@/configs.json';
+import { useLocale } from '@/contexts/locale-context';
 import { Link } from '@/helpers/Link';
 import { phpToJsDateFormat } from '@/utils';
 

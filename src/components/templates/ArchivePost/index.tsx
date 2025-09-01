@@ -3,10 +3,10 @@
 import cx from 'classnames';
 import { useMemo } from 'react';
 
+import { Pagination, Button, CardNews } from '@/components';
+import { Blocks, Container } from '@/components/global';
 import { useLocale } from '@/contexts/locale-context';
 import { Link } from '@/helpers/Link';
-import { Blocks, Container } from '@/components/global';
-import { Pagination, Button, CardNews } from '@/components';
 
 import './styles.css';
 

@@ -1,10 +1,8 @@
-import { FC } from 'react';
 import cx from 'classnames';
-
-import { Link } from '@/helpers/Link';
-import { Section } from '@/helpers/Section';
+import { FC } from 'react';
 
 import { CardNews } from '@/components/molecules/cards/CardNews';
+import { Section } from '@/helpers/Section';
 
 import block from './block.json';
 

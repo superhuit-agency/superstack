@@ -1,6 +1,7 @@
 import { Meta, StoryObj } from '@storybook/react';
 
 import { Button } from '@/components/atoms';
+
 import { SectionNews } from './index';
 
 const meta = {

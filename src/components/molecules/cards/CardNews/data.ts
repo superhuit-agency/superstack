@@ -1,7 +1,8 @@
+import * as imageData from '@/components/molecules/Image/data';
 import { gql } from '@/utils';
+
 import block from './block.json';
 
-import * as imageData from '@/components/molecules/Image/data';
 
 export const slug = block.slug;
 

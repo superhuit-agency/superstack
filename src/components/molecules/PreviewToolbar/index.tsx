@@ -1,8 +1,8 @@
 'use client';
 
+import Cookies from 'js-cookie';
 import debounce from 'lodash/debounce';
 import { useCallback, useEffect, useState } from 'react';
-import Cookies from 'js-cookie';
 
 import { useLocale } from '@/contexts/locale-context';
 

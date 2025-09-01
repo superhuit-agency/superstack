@@ -2,7 +2,9 @@ import cx from 'classnames';
 import { FC, forwardRef, useId } from 'react';
 
 import { useLocale } from '@/contexts/locale-context';
+
 import { Radio } from '../Radio';
+
 import block from './block.json';
 
 import './styles.css';

@@ -1,11 +1,11 @@
-import { ComponentType } from 'react';
-import domReady from '@wordpress/dom-ready';
-import { createHigherOrderComponent } from '@wordpress/compose';
 import {
 	BlockEditProps,
 	registerBlockStyle,
 	unregisterBlockStyle,
 } from '@wordpress/blocks';
+import { createHigherOrderComponent } from '@wordpress/compose';
+import domReady from '@wordpress/dom-ready';
+import { ComponentType } from 'react';
 
 // internal imports
 import block from './block.json';

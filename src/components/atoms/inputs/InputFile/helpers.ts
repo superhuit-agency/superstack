@@ -1,5 +1,5 @@
-import { sprintf } from 'sprintf-js';
 import mime from 'mime';
+import { sprintf } from 'sprintf-js';
 
 export const ONE_MEGA_BYTE = 1000 * 1024;
 

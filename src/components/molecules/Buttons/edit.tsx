@@ -1,6 +1,6 @@
-import { ComponentType } from 'react';
-import { createHigherOrderComponent } from '@wordpress/compose';
 import { BlockEditProps } from '@wordpress/blocks';
+import { createHigherOrderComponent } from '@wordpress/compose';
+import { ComponentType } from 'react';
 
 // internal imports
 import block from './block.json';

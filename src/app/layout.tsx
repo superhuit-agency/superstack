@@ -1,15 +1,14 @@
 import { Metadata, Viewport } from 'next';
 import { Inter, Roboto_Mono } from 'next/font/google';
 
-import { getLocales } from '@/i18n/get-locales';
-import { getDictionary } from '@/i18n/dictionaries';
-
-import { LocaleProvider } from '@/contexts/locale-context';
-
+import { Gdpr } from '@/components/molecules/Gdpr';
+import { Footer, MainNav } from '@/components/organisms';
 import * as footerData from '@/components/organisms/Footer/data';
 import * as mainNavData from '@/components/organisms/MainNav/data';
-import { Footer, MainNav } from '@/components/organisms';
-import { Gdpr } from '@/components/molecules/Gdpr';
+import { LocaleProvider } from '@/contexts/locale-context';
+import { getDictionary } from '@/i18n/dictionaries';
+import { getLocales } from '@/i18n/get-locales';
+
 
 import '@/css/base/index.css';
 

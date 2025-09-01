@@ -1,9 +1,10 @@
 'use client';
 
-import { FC, useCallback, useEffect, useState } from 'react';
 import cx from 'classnames';
+import { FC, useCallback, useEffect, useState } from 'react';
 
 import { Image } from '../Image';
+
 import block from './block.json';
 
 import './styles.css';

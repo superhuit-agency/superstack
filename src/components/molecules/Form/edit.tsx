@@ -5,12 +5,13 @@ import { useCallback } from '@wordpress/element';
 import { _x } from '@wordpress/i18n';
 import { useMemo } from 'react';
 
-import icon from '@/components/icons/FormIcon';
 import { useGraphQlApi } from '#/hooks';
+import icon from '@/components/icons/FormIcon';
 
-import { Form } from '.';
 import block from './block.json';
 import { getData, getFormsList } from './data';
+
+import { Form } from '.';
 import './styles.css';
 import './styles.edit.css';
 

@@ -14,12 +14,12 @@ import {
 } from 'react';
 import { sprintf } from 'sprintf-js';
 
-import { useLocale } from '@/contexts/locale-context';
 import {
 	IconDelete,
 	IconDocument,
 	IconInvalid,
 } from '@/components/icons/DocumentIcon';
+import { useLocale } from '@/contexts/locale-context';
 
 import block from './block.json';
 

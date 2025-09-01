@@ -1,9 +1,10 @@
-import { FC } from 'react';
 import cx from 'classnames';
+import { FC } from 'react';
 
 // internal imports
 import { Image } from '../Image';
 import { Video } from '../Video';
+
 import block from './block.json';
 
 // styles

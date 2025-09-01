@@ -1,5 +1,7 @@
 import configs from '@/configs.json';
+
 import { languageFields } from './fragments/language';
+
 import { fetchAPI } from '.';
 
 const POST_TYPES = ['pages', 'posts'];

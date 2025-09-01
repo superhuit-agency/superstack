@@ -1,5 +1,4 @@
 import { cardNewsData } from '@/components/data';
-
 import { gql } from '@/utils';
 
 import block from './block.json';

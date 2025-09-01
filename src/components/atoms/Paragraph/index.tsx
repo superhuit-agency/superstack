@@ -1,5 +1,5 @@
-import { FC } from 'react';
 import cx from 'classnames';
+import { FC } from 'react';
 
 // Internal dependencies
 import block from './block.json';

@@ -4,6 +4,7 @@ import { notFound, permanentRedirect, redirect } from 'next/navigation';
 
 import { Templates } from '@/components/global/Templates';
 import { PreviewToolbar } from '@/components/molecules/PreviewToolbar';
+import configs from '@/configs.json';
 import { useCanonical as getCanonicalUrl } from '@/hooks/use-canonical';
 import {
 	getAllURIs,
@@ -12,7 +13,6 @@ import {
 	getRedirection,
 	getWpUriFromNextPath,
 } from '@/lib';
-import configs from '@/configs.json';
 
 // see https://nextjs.org/docs/app/api-reference/file-conventions/route-segment-config
 export const revalidate = 3600; // revalidate at most every hour

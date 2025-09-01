@@ -11,7 +11,9 @@ import {
 } from 'react';
 
 import { useLocale } from '@/contexts/locale-context';
+
 import { Checkbox } from '../Checkbox';
+
 import block from './block.json';
 
 // styles

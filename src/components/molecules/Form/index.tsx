@@ -1,5 +1,8 @@
 'use client';
 
+import HCaptcha from '@hcaptcha/react-hcaptcha';
+import cx from 'classnames';
+import { usePathname } from 'next/navigation';
 import React, {
 	FC,
 	useState,
@@ -9,8 +12,6 @@ import React, {
 	useCallback,
 	useId,
 } from 'react';
-import cx from 'classnames';
-import { usePathname } from 'next/navigation';
 import {
 	RegisterOptions,
 	useForm,
@@ -21,14 +22,7 @@ import {
 	Merge,
 	FieldErrorsImpl,
 } from 'react-hook-form';
-import HCaptcha from '@hcaptcha/react-hcaptcha';
 
-import { useLocale } from '@/contexts/locale-context';
-import {
-	getAcceptValidator,
-	getMaxFilesizeValidator,
-	uploadFile,
-} from '@/components/atoms/inputs/InputFile/helpers';
 import {
 	Button,
 	FormSectionBreaker,
@@ -41,6 +35,13 @@ import {
 	InputRadio,
 	Checkbox,
 } from '@/components/atoms';
+import {
+	getAcceptValidator,
+	getMaxFilesizeValidator,
+	uploadFile,
+} from '@/components/atoms/inputs/InputFile/helpers';
+import { useLocale } from '@/contexts/locale-context';
+
 import block from './block.json';
 
 import './styles.css';

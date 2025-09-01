@@ -1,3 +1,4 @@
+import cx from 'classnames';
 import {
 	forwardRef,
 	useState,
@@ -8,10 +9,9 @@ import {
 	MouseEvent,
 	useCallback,
 } from 'react';
-import cx from 'classnames';
 
-import { useLocale } from '@/contexts/locale-context';
 import { ChevronIcon } from '@/components/icons';
+import { useLocale } from '@/contexts/locale-context';
 
 import './styles.css';
 
