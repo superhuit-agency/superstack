@@ -33,6 +33,9 @@ jobs:
       - name: Update project version in WP NPM
         run: bash ./.github/actions/automated/increment-semver.sh "./wordpress/package.json" ${{ env.NEW_VERSION }}
 
+      - name: Update project version in Theme's Style.css
+        run: bash ./.github/actions/automated/increment-semver.sh "./wordpress/theme/style.css" ${{ env.NEW_VERSION }}
+
       - name: Append Changelog if missing
         run: bash ./.github/actions/automated/update-changelog.sh "${{ github.repository }}" "${{ secrets.GITHUB_TOKEN }}" ./CHANGELOG.md ${{ env.LOG_VERSION }} ${{ env.NEW_VERSION }}
 
@@ -47,6 +50,7 @@ jobs:
           git add ./package.json
           git add ./wordpress/composer.json
           git add ./wordpress/package.json
+          git add ./wordpress/theme/style.css
           git add ./CHANGELOG.md
           git commit -m "ship: 🚀 upgrade to version ${{ env.NEW_VERSION }}"
           git push origin main

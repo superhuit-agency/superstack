@@ -20,8 +20,11 @@ do
     esac
 done
 
-# Extract the current version using awk
+# Extract the current version using awk (with or without quotes)
 current_version=$(awk -F'"' '/"version":/ {print $4; exit}' $file_path)
+if [ -z "$current_version" ]; then
+    current_version=$(awk -F': ' '/Version:/ {print $2; exit}' $file_path)
+fi
 
 if [ -z "$current_version" ]; then
 	echo "Version not found in $file_path"
@@ -62,9 +65,11 @@ fi
 # Be careful, only replace the first occurence at the top of the file
 if [[ "$OSTYPE" == "darwin"* ]]; then
     sed -i '' "1,/\"version\": \"$current_version\"/ s/\"version\": \"$current_version\"/\"version\": \"$new_version\"/1" $file_path
+    sed -i '' "1,/Version: $current_version/ s/Version: $current_version/Version: $new_version/1" $file_path
 else
     # Linux does not require the empty string
     sed -i "s/\"version\": \"$current_version\"/\"version\": \"$new_version\"/1" $file_path
+    sed -i "s/Version: $current_version/Version: $new_version/1" $file_path
 fi
 
 # Git commit and push
