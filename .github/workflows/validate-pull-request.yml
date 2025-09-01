@@ -69,7 +69,7 @@ jobs:
         run: |
           cd wordpress
           docker compose down -v
-          npm run start
+          DOCKER_COMPOSE_FILE=docker-compose.tests.yml npm run start
         env:
           THEME_NAME: ${{ vars.WORDPRESS_THEME_NAME }}
           RELEASE_BELT_USER: ${{ vars.RELEASE_BELT_USER }}

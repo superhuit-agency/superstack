@@ -5,12 +5,13 @@ THEME_NAME=${THEME_NAME:="superstack"}
 WORDPRESS_ADMIN_EMAIL=${WORDPRESS_ADMIN_EMAIL:="tech+superstack@superhuit.ch"}
 WORDPRESS_ADMIN_USER=${WORDPRESS_ADMIN_USER:="superstack"}
 WORDPRESS_ADMIN_PASSWORD=${WORDPRESS_ADMIN_PASSWORD:="stacksuper"}
+DOCKER_COMPOSE_FILE=${DOCKER_COMPOSE_FILE:="docker-compose.yml"}
 
 echo ""
 echo "=====================   STARTING WORDPRESS   ====================="
 echo ""
 sleep 0.2
-THEME_NAME=${THEME_NAME} $COMPOSE -f docker-compose.yml up "$@" --build -d --quiet-pull
+THEME_NAME=${THEME_NAME} $COMPOSE -f $DOCKER_COMPOSE_FILE up "$@" --build -d --quiet-pull
 echo $(docker ps)
 echo ""
 echo "=============   INSTALLING COMPOSER DEPENDENCIES   ==============="
