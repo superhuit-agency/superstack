@@ -4,8 +4,9 @@ import { useMemo } from 'react';
 
 import { useLocale } from '@/contexts/locale-context';
 import { Link } from '@/components/atoms/Link';
+import { rootBlocksList } from '@/components/root-block-lists';
 import { Blocks, Container } from '@/components/global';
-import { SectionNews, Image } from '@/components';
+import { SectionNews, Image, Button } from '@/components';
 
 import './styles.css';
 
@@ -83,6 +84,7 @@ export default function Post({ node }: any) {
 					) : null}
 					<div className="supt-single-post__content">
 						<Blocks
+							blocksList={rootBlocksList}
 							blocks={node.blocksJSON}
 							excludes={/^supt\/page-header/g}
 						/>
@@ -91,12 +93,13 @@ export default function Post({ node }: any) {
 				{node?.relatedPosts?.length ? (
 					<SectionNews
 						uptitle={dictionary.post?.relatedNews}
-						seeAllLink={{
-							title: dictionary.post?.seeAll,
-							href: node?.postsPage?.uri,
-						}}
 						posts={node.relatedPosts}
-					/>
+					>
+						<Button
+							text={dictionary.post?.seeAll}
+							url={node?.postsPage?.uri}
+						/>
+					</SectionNews>
 				) : null}
 			</Container>
 		</>

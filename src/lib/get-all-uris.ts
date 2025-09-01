@@ -1,14 +1,12 @@
 import configs from '@/configs.json';
 import { languageFields } from './fragments/language';
 import { fetchAPI } from '.';
-
-const POST_TYPES = ['pages', 'posts'];
-const TAXONOMIES = ['tags', 'categories'];
+import { POST_TYPES_PLURAL_SLUGS, TAXONOMIES_PLURAL_SLUGS } from '@/constant';
 
 export default async function getAllURIs() {
 	const nodeCounts = await fetchAPI(
 		`query nodeCounts {
-			${POST_TYPES.map(
+			${POST_TYPES_PLURAL_SLUGS.map(
 				(postType) => `
 				${postType} {
 					pageInfo {
@@ -31,7 +29,7 @@ export default async function getAllURIs() {
 	);
 
 	const nodesPromises: Promise<any>[] = [];
-	POST_TYPES.forEach((postType) => {
+	POST_TYPES_PLURAL_SLUGS.forEach((postType) => {
 		const nQueries = Math.ceil(
 			(nodeCounts?.[postType]?.pageInfo?.offsetPagination?.total ?? 0) /
 				100
@@ -57,7 +55,7 @@ export default async function getAllURIs() {
 	});
 
 	// TODO: improve to handle more than 100 terms in each taxonomy
-	TAXONOMIES.forEach((taxName) => {
+	TAXONOMIES_PLURAL_SLUGS.forEach((taxName) => {
 		nodesPromises.push(
 			fetchAPI(
 				`query AllURIs_${taxName} {

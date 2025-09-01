@@ -14,7 +14,6 @@ interface GraphqlSectionNewsFields {
 interface SectionNewsAttributes extends SectionAttributes {
 	postLinkLabel?: string;
 	queryVars?: GraphqlSectionNewsQueryArgs;
-	seeAllLink?: LinkProps;
 }
 
 interface SectionNewsData {

@@ -23,7 +23,7 @@ interface GdprBannerProps {
 	onPersonalizeClick: MouseEventHandler;
 	onAcceptClick: Function;
 	onRejectClick: Function;
-};
+}
 
 /**
  * COMPONENT
@@ -108,14 +108,14 @@ export const GdprBanner: FC<GdprBannerProps> = ({
 
 				<div className="supt-gdpr-banner__buttons">
 					<Button
-						title={dictionary.gdpr.banner.acceptAll}
+						text={dictionary.gdpr.banner.acceptAll}
 						className="supt-gdpr-banner__accept-button"
 						onClick={handleAcceptClick}
 						variant="link"
 					/>
 
 					<Button
-						title={dictionary.gdpr.banner.personalize}
+						text={dictionary.gdpr.banner.personalize}
 						className="supt-gdpr-banner__personalize-button"
 						onClick={onPersonalizeClick}
 						variant="link"
@@ -124,7 +124,7 @@ export const GdprBanner: FC<GdprBannerProps> = ({
 					<Button
 						className="supt-gdpr-banner__reject-button"
 						onClick={handleRejectClick}
-						title={dictionary.gdpr.banner.rejectAll}
+						text={dictionary.gdpr.banner.rejectAll}
 						variant="link"
 					/>
 				</div>

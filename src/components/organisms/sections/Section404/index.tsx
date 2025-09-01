@@ -24,8 +24,8 @@ export const Section404: FC<Section404Props> & BlockConfigs = ({}) => {
 						{dictionary.page404.description}
 					</p>
 					<Button
-						href={configs.isMultilang ? `/${locale}/` : '/'}
-						title={dictionary.page404.buttonLabel}
+						text={dictionary.page404.buttonLabel}
+						url={configs.isMultilang ? `/${locale}/` : '/'}
 					/>
 				</div>
 			</div>

@@ -17,9 +17,9 @@ export const SectionNews: FC<SectionNewsProps> & BlockConfigs = ({
 	uptitle,
 	title,
 	introduction,
-	seeAllLink,
 	posts,
 	postLinkLabel,
+	children, // For the button "See all news"
 }) => {
 	return (
 		<section
@@ -45,14 +45,9 @@ export const SectionNews: FC<SectionNewsProps> & BlockConfigs = ({
 						))}
 					</div>
 
-					{seeAllLink?.href ? (
+					{children ? (
 						<div className="supt-section__link-wrapper">
-							<Link
-								className="supt-section__link"
-								{...(seeAllLink as any)}
-							>
-								{seeAllLink?.title}
-							</Link>
+							{children}
 						</div>
 					) : null}
 				</div>

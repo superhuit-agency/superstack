@@ -1,60 +1,99 @@
-import { BlockEditProps } from '@wordpress/blocks';
-import { _x } from '@wordpress/i18n';
-import cx from 'classnames';
+import { ComponentType } from 'react';
+import domReady from '@wordpress/dom-ready';
+import { createHigherOrderComponent } from '@wordpress/compose';
+import {
+	BlockEditProps,
+	registerBlockStyle,
+	unregisterBlockStyle,
+} from '@wordpress/blocks';
 
-import { ButtonEdit } from '#/components';
-
+// internal imports
 import block from './block.json';
 
 // styles
-import './styles.css';
 import './styles.edit.css';
+import './styles.css';
 
 /**
- * COMPONENT EDITOR
+ * Add custom className to core/button block
  */
-const Edit = (props: BlockEditProps<ButtonAttributes>) => {
-	const { variant } = props.attributes;
+const withCustomClassName = createHigherOrderComponent(
+	(BlockListBlock: ComponentType<any>) => {
+		const EnhancedComponent = (props: BlockEditProps<any>) => {
+			if ((props as any).name !== block.slug)
+				return <BlockListBlock {...props} />;
 
-	return (
-		<ButtonEdit
-			attrs={props.attributes}
-			onChange={(attrs: ButtonProps) => props.setAttributes(attrs)}
-			isSelected={props.isSelected}
-			placeholder={_x('Discover', 'Button Placeholder', 'supt')}
-			toolbarPosition="right"
-			rootClass={cx('supt-button', `-${variant}`)}
-		/>
-	);
+			return <BlockListBlock {...props} className="supt-button" />;
+		};
+
+		return EnhancedComponent;
+	},
+	'withCustomClassName'
+);
+export const ButtonEditBlockClassName: WpFilterType = {
+	hook: 'editor.BlockListBlock',
+	namespace: 'supt/button-edit-classname',
+	callback: withCustomClassName,
 };
 
 /**
- * WORDPRESS BLOCK
+ * Add custom className to core/button inner block (which is the button itself)
  */
-export const ButtonBlock: WpBlockType<ButtonAttributes> = {
-	slug: block.slug,
-	settings: {
-		title: block.title,
-		description: _x('', 'Block description', 'supt'),
-		icon: 'button',
-		category: 'text',
-		postTypes: ['post'],
-		attributes: {
-			href: {
-				type: 'string',
-			},
-			target: {
-				type: 'string',
-			},
-			title: {
-				type: 'string',
-			},
-			variant: {
-				type: 'string',
-				default: 'primary',
-			},
-		},
-		edit: Edit,
-		save: () => null,
+const withCustomInnerClassName = createHigherOrderComponent(
+	(BlockEdit: ComponentType<any>) => {
+		const EnhancedComponent = (props: BlockEditProps<any>) => {
+			if ((props as any).name !== block.slug)
+				return <BlockEdit {...props} />;
+
+			return <BlockEdit {...props} className="supt-button__inner" />;
+		};
+
+		return EnhancedComponent;
 	},
+	'withCustomInnerClassName'
+);
+export const ButtonEditBlockInnerClassName: WpFilterType = {
+	hook: 'editor.BlockEdit',
+	namespace: 'supt/button-edit-inner-classname',
+	callback: withCustomInnerClassName,
+};
+
+/**
+ * Add custom `postTypes` to core/button block
+ */
+const withCustomPostTypesSetting = (
+	settings: WpBlockType<any>['settings'],
+	name: string
+) => {
+	if (name !== block.slug) {
+		return settings;
+	}
+
+	settings['postTypes'] = ['post', 'page'];
+
+	return settings;
+};
+export const ButtonEditBlockSettings: WpFilterType = {
+	hook: 'blocks.registerBlockType',
+	namespace: 'supt/button-edit-setting',
+	callback: withCustomPostTypesSetting,
+};
+
+// Unregister default button styles to register custom styles (primary + secondary variants)
+domReady(() => {
+	unregisterBlockStyle('core/button', 'fill');
+	unregisterBlockStyle('core/button', 'outline');
+	registerBlockStyle('core/button', {
+		name: 'primary',
+		label: 'Primary',
+		isDefault: true,
+	});
+	registerBlockStyle('core/button', {
+		name: 'secondary',
+		label: 'Secondary',
+	});
+});
+
+export const ButtonBlock = {
+	slug: block.slug,
 };

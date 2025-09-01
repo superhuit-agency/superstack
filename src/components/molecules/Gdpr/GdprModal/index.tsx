@@ -26,7 +26,7 @@ export interface GdprModalProps {
 	onCategoryChange: (param: { enabled: boolean; id: string }) => void;
 	onModalSaved: Function;
 	onModalClosed: Function;
-};
+}
 
 /**
  * COMPONENT
@@ -225,7 +225,7 @@ export const GdprModal = forwardRef(
 							</ul>
 							<footer className="supt-gdpr-modal__footer">
 								<Button
-									title={dictionary.gdpr.modal.save}
+									text={dictionary.gdpr.modal.save}
 									className="supt-gdpr-modal__save-button"
 									onClick={onSave}
 									variant="link"

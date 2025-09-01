@@ -1,4 +1,7 @@
 export {
+	ButtonEditBlockClassName,
+	ButtonEditBlockInnerClassName,
+	ButtonEditBlockSettings,
 	HeadingEditBlock,
 	HeadingEditBlockClassName,
 	HeadingEditBlockSettings,

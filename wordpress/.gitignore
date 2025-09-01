@@ -8,3 +8,5 @@
 !/plugins
 /plugins/*
 !/plugins/.gitkeep
+
+auth.json

@@ -7,7 +7,7 @@ import { InnerBlocks } from '@wordpress/block-editor';
 import { _x } from '@wordpress/i18n';
 
 {{#if (equals blockType "organisms")}}
-import { SectionEdit, PreviewBlockImage } from '#/components';
+import { SectionEdit, EditWithPreview } from '#/components';
 {{/if}}
 {{#if supportsData}}
 import { useGraphQlApi } from '#/hooks';
@@ -27,19 +27,11 @@ import './styles.edit.css';
  * COMPONENT EDITOR
  */
 const Edit = (props: WpBlockEditProps<{{ pascalCase blockTitle }}Attributes>) => {
-	{{#if (equals blockType "organisms")}}
-	const slug = props.name;
-	{{/if}}
 	const { {{join blockAttributes 'name'}}{{#if (hasLength blockAttributes)}}, {{/if}}{{#if (equals blockType "organisms")}}uptitle, title, introduction,{{/if}}{{#if supportsData}}queryVars,{{/if}} } = props.attributes;
 
 	{{#if supportsData}}
 	const variables = useMemo(() => ({ queryVars }), [queryVars]);
 	const { isLoading, data } = useGraphQlApi(getData, variables);
-	{{/if}}
-
-	{{#if (equals blockType "organisms")}}
-	// For block preview
-	if (slug && props.attributes.isPreview) return <PreviewBlockImage slug={slug} />;
 	{{/if}}
 
 	return (
@@ -165,7 +157,11 @@ export const {{pascalCase blockTitle}}Block: WpBlockType<{{ pascalCase blockTitl
 				isPreview: true,
 			},
 		},
-		edit: Edit,
+		{{#if (equals blockType "organisms")}}
+			edit: (props: WpBlockEditProps<{{ pascalCase blockTitle }}Attributes>) => EditWithPreview({ Edit, ...props }),
+		{{else}}
+			edit: Edit,
+		{{/if}}
 		save: () => {{#if supportsInnerBlocks}}<InnerBlocks.Content />{{else}}null{{/if}},
 	},
 };

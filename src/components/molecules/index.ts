@@ -1,3 +1,4 @@
+export { Buttons } from './Buttons';
 export { CardNews } from './cards/CardNews';
 export { Form } from './Form';
 export { Gdpr } from './Gdpr';

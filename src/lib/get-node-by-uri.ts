@@ -1,11 +1,9 @@
-import * as _templatesData from '@/components/templates/data';
 import configs from '@/configs.json';
+import { NODE_TYPES } from '@/constant';
 import { fetchAPI, formatBlocksJSON } from '@/lib';
+import * as _templatesData from '@/components/templates/data';
 
 const templatesData: any = _templatesData;
-
-const { singlePostData, singlePageData, singleCategoryData, singleTagData } =
-	templatesData;
 
 /**
  * NOTE: in preview, the `uri` could be in fact the ID (i.e. a draft doesn't have a slug/uri yet)
@@ -146,29 +144,6 @@ const commonFields = `
 	}
 `;
 
-const types = [
-	{
-		type: 'Page',
-		fragment: singlePageData.fragment,
-		fields: 'singlePageFragment',
-	},
-	{
-		type: 'Post',
-		fragment: singlePostData.fragment,
-		fields: 'singlePostFragment',
-	},
-	{
-		type: 'Tag',
-		fragment: singleTagData.fragment,
-		fields: 'singleTagFragment',
-	},
-	{
-		type: 'Category',
-		fragment: singleCategoryData.fragment,
-		fields: 'singleCategoryFragment',
-	},
-];
-
 const nodeByUriQuery = (lang: string) => `
 	query nodeByUriQuery(
 		$uri: String!
@@ -177,22 +152,20 @@ const nodeByUriQuery = (lang: string) => `
 	) {
 		node: nodeByUri(uri: $uri) {
 			__typename
-			${types
-				.map(({ type, fields }) =>
-					configs.isMultilang
-						? `...on ${type} {
+			${NODE_TYPES.map(({ type, fields }) =>
+				configs.isMultilang
+					? `...on ${type} {
 					translation(language: ${lang.toUpperCase()}) {
 						...${fields}
 					}
 				}`
-						: `...${fields}`
-				)
-				.join('\n')}
+					: `...${fields}`
+			).join('\n')}
 		}
 		${commonFields}
 	}
 
-	${types.map(({ fragment }) => fragment).join('\n')}
+	${NODE_TYPES.map(({ fragment }) => fragment).join('\n')}
 `;
 
 const nodeByIdQuery = (lang: string) => `
@@ -203,22 +176,20 @@ const nodeByIdQuery = (lang: string) => `
 	) {
 		node(id: $id, idType: DATABASE_ID) {
 			__typename
-			${types
-				.map(({ type, fields }) =>
-					configs.isMultilang
-						? `...on ${type} {
+			${NODE_TYPES.map(({ type, fields }) =>
+				configs.isMultilang
+					? `...on ${type} {
 					translation(language: ${lang.toUpperCase()}) {
 						...${fields}
 					}
 				}`
-						: `...${fields}`
-				)
-				.join('\n')}
+					: `...${fields}`
+			).join('\n')}
 		}
 		${commonFields}
 	}
 
-	${types.map(({ fragment }) => fragment).join('\n')}
+	${NODE_TYPES.map(({ fragment }) => fragment).join('\n')}
 `;
 
 const templatesDataList: any = {};

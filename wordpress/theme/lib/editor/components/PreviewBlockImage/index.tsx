@@ -17,7 +17,7 @@ export const PreviewBlockImage = ({ slug }: PreviewBlockImageType) => {
 			<img
 				src={`${window.supt.theme_uri}/lib/editor/blocks-preview/${filename}.jpg`}
 				style={{ width: '100%' }}
-				alt="Preview block image"
+				alt=""
 			/>
 		</picture>
 	);

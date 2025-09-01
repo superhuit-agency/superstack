@@ -21,6 +21,47 @@
 			"textDecoration": false,
 			"textTransform": false,
 			"letterSpacing": false
+		},
+		"blocks": {
+			"core/button": {
+				"color": {
+					"custom": false,
+					"palette": [],
+					"background": false
+				},
+				"typography": {
+					"customFontSize": false,
+					"fontSizes": [],
+					"fontFamilies": [],
+					"lineHeight": false,
+					"letterSpacing": false,
+					"textDecoration": false,
+					"textTransform": false,
+					"dropCap": false,
+					"fontStyle": false,
+					"fontWeight": false,
+					"writingMode": false
+				},
+				"spacing": {
+					"padding": false,
+					"margin": false
+				},
+				"border": {
+					"radius": false,
+					"width": false,
+					"color": false,
+					"style": false
+				},
+				"shadow": {},
+				"layout": {
+					"contentSize": "840px",
+					"wideSize": "1100px",
+					"allowEditing": false
+				},
+				"settings": {
+					"width": false
+				}
+			}
 		}
 	}
 }

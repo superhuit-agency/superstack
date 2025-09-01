@@ -1,57 +1,5 @@
 import React, { FC } from 'react';
 
-import {
-	Button,
-	Checkbox,
-	Form,
-	FormSectionBreaker,
-	Heading,
-	Image,
-	InputCheckbox,
-	InputEmail,
-	InputFile,
-	InputRadio,
-	InputSelect,
-	InputText,
-	InputTextarea,
-	List,
-	ListItem,
-	Media,
-	Paragraph,
-	Radio,
-	SectionNews,
-	Video,
-	// -- GENERATOR IMPORT SLOT --
-} from '..';
-
-const blocksList: BlocksType = {
-	'core/heading': Heading,
-	'core/list': List,
-	'core/list-item': ListItem,
-	'core/paragraph': Paragraph,
-
-	'supt/button': Button,
-
-	'supt/checkbox': Checkbox,
-	'supt/form': Form,
-	'supt/form-section-breaker': FormSectionBreaker,
-	'supt/image': Image,
-	'supt/input-checkbox': InputCheckbox,
-	'supt/input-email': InputEmail,
-	'supt/input-file': InputFile,
-	'supt/input-radio': InputRadio,
-	'supt/input-select': InputSelect,
-	'supt/input-text': InputText,
-	'supt/input-textarea': InputTextarea,
-	'supt/media': Media,
-	'supt/radio': Radio,
-	'supt/section-news': SectionNews,
-	'supt/video': Video,
-	// -- GENERATOR BLOCK SLOT --
-};
-
-type BlocksType = Record<string, FC<any>>;
-
 // This is not possible anymore due to Server Side components
 // import * as allRenders from '../renders';
 // const allBlocks: Record<string, BlockType> = allRenders;
@@ -61,7 +9,10 @@ type BlocksType = Record<string, FC<any>>;
 // 	blocksList[blk.slug] = blk;
 // }
 
+export type BlocksType = Record<string, FC<any>>;
+
 interface PostBodyBlocksProps {
+	blocksList: BlocksType;
 	blocks: Array<BlockPropsType>;
 	includes?: RegExp;
 	excludes?: RegExp;
@@ -70,6 +21,7 @@ interface PostBodyBlocksProps {
 }
 
 export const Blocks: FC<PostBodyBlocksProps> = ({
+	blocksList,
 	blocks,
 	includes = /.*/g,
 	excludes = /^$/g,
@@ -101,6 +53,7 @@ export const Blocks: FC<PostBodyBlocksProps> = ({
 							>
 								{props.innerBlocks && (
 									<Blocks
+										blocksList={blocksList}
 										blocks={props.innerBlocks}
 										isRoot={false}
 										level={currentLevel + 1}

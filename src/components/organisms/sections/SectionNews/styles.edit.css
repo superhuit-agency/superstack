@@ -1,9 +1,9 @@
-.supt-section-news {
-	.supt-section__link-inner {
-		display: inline-block;
+@import '@resources/index.css';
 
-		textarea {
-			background: none;
+.supt-section-news {
+	.supt-section__link-wrapper {
+		.supt-button {
+			margin-left: auto;
 		}
 	}
 }

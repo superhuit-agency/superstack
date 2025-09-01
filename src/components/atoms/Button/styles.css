@@ -5,13 +5,20 @@
 
 	display: inline-block;
 	padding: 5px 10px;
-	border: 1px solid $color-text;
+	background-color: lightblue;
+	border: 1px solid purple;
+
+	/* Must have 2 levels of selectors nested to make sure it overrides the WordPress core button styles */
+	.supt-button__inner {
+		color: green;
+	}
 
 	&:last-child {
 		margin-right: 0;
 	}
 
-	&.-secondary {
+	&.-secondary,
+	&.is-style-secondary {
 		background-color: pink;
 	}
 }

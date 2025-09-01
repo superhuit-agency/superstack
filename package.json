@@ -23,6 +23,7 @@
     "@formatjs/intl-localematcher": "^0.6.1",
     "@hcaptcha/react-hcaptcha": "^1.12.0",
     "@next/bundle-analyzer": "^15.4.4",
+    "@next/third-parties": "^15.5.0",
     "classnames": "^2.5.1",
     "filesize": "^11.0.2",
     "js-cookie": "^3.0.5",

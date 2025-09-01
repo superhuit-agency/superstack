@@ -1,5 +1,6 @@
 import { Meta, StoryObj } from '@storybook/react';
 
+import { Button } from '@/components/atoms';
 import { SectionNews } from './index';
 
 const meta = {
@@ -18,10 +19,6 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
 	args: {
 		uptitle: 'Latest news',
-		seeAllLink: {
-			title: 'See all news',
-			href: '/news',
-		},
 		posts: [
 			{
 				date: '2023-10-02T15:08:27',
@@ -45,5 +42,6 @@ export const Default: Story = {
 				uri: '/article-url',
 			},
 		],
+		children: <Button text="See all news" url="/news" />,
 	},
 };

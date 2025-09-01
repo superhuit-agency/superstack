@@ -411,7 +411,7 @@ export const Form: FC<FormProps> & BlockConfigs = ({
 							isSubmitting: isSubmitting,
 							isSuccess: isSubmitSuccessful,
 						})}
-						title={
+						text={
 							isSubmitSuccessful
 								? dictionary.form?.status.success
 								: isSubmitting

@@ -9,7 +9,7 @@ import block from './block.json';
 import './styles.css';
 
 /**
- * Add custom className to core/paragraph block
+ * Add custom className to core/button block
  */
 const withCustomClassName = createHigherOrderComponent(
 	(BlockListBlock: ComponentType<any>) => {
@@ -17,21 +17,21 @@ const withCustomClassName = createHigherOrderComponent(
 			if ((props as any).name !== block.slug)
 				return <BlockListBlock {...props} />;
 
-			return <BlockListBlock {...props} className="supt-paragraph" />;
+			return <BlockListBlock {...props} className="supt-buttons" />;
 		};
 
 		return EnhancedComponent;
 	},
 	'withCustomClassName'
 );
-export const ParagraphEditBlockClassName: WpFilterType = {
+export const ButtonsEditBlockClassName: WpFilterType = {
 	hook: 'editor.BlockListBlock',
-	namespace: 'supt/paragraph-edit-classname',
+	namespace: 'supt/buttons-edit-classname',
 	callback: withCustomClassName,
 };
 
 /**
- * Add custom `postTypes` to core/paragraph block
+ * Add custom `postTypes` to core/button block
  */
 const withCustomPostTypesSetting = (
 	settings: WpBlockType<any>['settings'],
@@ -41,16 +41,24 @@ const withCustomPostTypesSetting = (
 		return settings;
 	}
 
-	settings['postTypes'] = ['post'];
+	settings['postTypes'] = ['post', 'page'];
+
+	// Remove layout controls in sidebar
+	// @ts-expect-error
+	settings.supports = {
+		...settings.supports,
+		align: false,
+		layout: false,
+	};
 
 	return settings;
 };
-export const ParagraphEditBlockSettings: WpFilterType = {
+export const ButtonsEditBlockSettings: WpFilterType = {
 	hook: 'blocks.registerBlockType',
-	namespace: 'supt/paragraph-edit-setting',
+	namespace: 'supt/buttons-edit-setting',
 	callback: withCustomPostTypesSetting,
 };
 
-export const ParagraphBlock = {
+export const ButtonsBlock = {
 	slug: block.slug,
 };

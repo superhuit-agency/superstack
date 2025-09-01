@@ -100,6 +100,14 @@ class MyCptCategory extends Taxonomy {
 }
 
 new MyCptCategory();
-
-
 ```
+
+## Display your CPT on the frontend
+
+Once your Custom Post Type or Taxonomy is created, you need to call it on the frontend.
+
+1. Update the [`src/constant.ts`](../../src/constant.ts) file to update the constants with the infos of the Post type (or Taxonomy) you've just created. This allows the different fetch methods to get the correct infos from WP.
+
+2. Create a new template in the `src/components/templates` folder for your CPT/Taxonomy.
+
+3. In [`src/components/global/Templates.tsx`](../../src/components/global/Templates.tsx) add an exception to return the correct template for your CPT/Taxonomy depending on the `contentType` or the `node`.

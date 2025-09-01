@@ -44,6 +44,6 @@ Among WP Core blocks, here is a list of blocks we recommend you to use / take in
 -   `core/table` ([code source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/table))
 -   `core/file` ([code source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/file))
 -   `core/columns` ([code source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/columns))
--   `core/table-of-contents` - may be useful Post ([code source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/table-of-contents))
+-   `core/table-of-contents` - may be useful for Post ([code source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/table-of-contents))
 
 You can have a look to the code source of all the Core Blocks [in here](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src).

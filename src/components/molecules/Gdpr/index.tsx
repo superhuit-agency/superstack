@@ -2,7 +2,7 @@
 
 import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import Cookies from 'js-cookie';
-import Script from 'next/script';
+import { GoogleTagManager } from '@next/third-parties/google';
 
 import { useLocale } from '@/contexts/locale-context';
 import gdprConfigs from '@/gdpr-configs.json';
@@ -36,6 +36,9 @@ export const Gdpr: FC<GdprProps> & BlockConfigs = () => {
 	const { locale } = useLocale();
 
 	const services = useRef({});
+	const didInitServicesFromCookies = useRef(false);
+	const pendingCategoryEnabled = useRef<Record<string, boolean>>({});
+	const isGranted = useRef<boolean>(false);
 
 	const modalRef = useRef<{
 		open: () => {};
@@ -46,10 +49,77 @@ export const Gdpr: FC<GdprProps> & BlockConfigs = () => {
 	}>(null);
 
 	// ##############################
+	// #region Google Consent Mode v2
+	// ##############################
+
+	const initConsentMode = useCallback(() => {
+		if (typeof window === 'undefined') return;
+
+		window.dataLayer = window.dataLayer || [];
+		const gtag = (...args: any[]) => {
+			window.dataLayer!.push(args);
+		};
+		window.gtag = window.gtag || gtag;
+
+		// Default: denied for all storages/signals until user consents
+		window.gtag('consent', 'default', {
+			ad_storage: 'denied',
+			analytics_storage: 'denied',
+			ad_user_data: 'denied',
+			ad_personalization: 'denied',
+			wait_for_update: 500,
+		});
+	}, []);
+
+	const updateConsentForEverything = useCallback((granted: boolean) => {
+		isGranted.current = granted;
+		window?.gtag?.('consent', 'update', {
+			ad_user_data: granted ? 'granted' : 'denied',
+			ad_personalization: granted ? 'granted' : 'denied',
+			ad_storage: granted ? 'granted' : 'denied',
+			analytics_storage: granted ? 'granted' : 'denied',
+		});
+	}, []);
+	const updateConsentFromSettings = useCallback(() => {
+		if (typeof window === 'undefined' || typeof window.gtag !== 'function')
+			return;
+
+		// Grant analytics when the analytics category is enabled. Others remain denied by default
+		const cats = gdprConfigs.categories.map((cat) => {
+			const cookie = Cookies.get(`${COOKIE_NAME}_${cat.id}_accepted`);
+			const enabled = cookie === ACCEPTED_VALUE;
+			return { ...cat, enabled } as any;
+		});
+
+		// TODO :: Update this if there's multiple/different categories (currently there's only one + the necessary one)
+		const analyticsEnabled =
+			cats.find((c: any) => c.id === 'analytics' && c.enabled)?.enabled ??
+			false;
+
+		if (isGranted.current !== analyticsEnabled) {
+			// Only update if the consent has changed
+			updateConsentForEverything(analyticsEnabled);
+		}
+	}, []);
+
+	useEffect(() => {
+		initConsentMode();
+		isGranted.current = false;
+
+		// Reflect persisted choices on first load
+		updateConsentFromSettings();
+	}, [initConsentMode, updateConsentFromSettings]);
+
+	// ##############################
+	// #endregion
+	// ##############################
+
+	// ##############################
 	// #region Event handler
 	// ##############################
 
 	const onPersonalizeClick = useCallback(() => {
+		pendingCategoryEnabled.current = {};
 		modalRef.current?.open();
 	}, []);
 
@@ -63,21 +133,6 @@ export const Gdpr: FC<GdprProps> & BlockConfigs = () => {
 			'Cookie Manager',
 			window.location.pathname + window.location.search
 		);
-	}, []);
-
-	const onModalClosed = useCallback(() => {
-		if (window.location.hash.indexOf(`#${gdprConfigs.hash}`) === -1) return;
-
-		window.history.replaceState(
-			'',
-			document.title,
-			window.location.pathname + window.location.search
-		);
-	}, []);
-
-	const onModalSaved = useCallback(() => {
-		setBannerDismissed(true);
-		Cookies.set(`${COOKIE_NAME}_banner`, 'dismiss', COOKIES_OPTIONS);
 	}, []);
 
 	const setCategoryCookie = useCallback(
@@ -102,14 +157,41 @@ export const Gdpr: FC<GdprProps> & BlockConfigs = () => {
 		[setGdprServices]
 	);
 
+	const onModalClosed = useCallback(() => {
+		if (window.location.hash.indexOf(`#${gdprConfigs.hash}`) === -1) return;
+
+		window.history.replaceState(
+			'',
+			document.title,
+			window.location.pathname + window.location.search
+		);
+	}, []);
+
+	const onModalSaved = useCallback(() => {
+		setBannerDismissed(true);
+		Cookies.set(`${COOKIE_NAME}_banner`, 'dismiss', COOKIES_OPTIONS);
+
+		// Persist buffered category changes
+		Object.entries(pendingCategoryEnabled.current).forEach(
+			([id, enabled]) => {
+				const cat = gdprConfigs.categories.find((c) => c.id === id);
+				if (cat) setCategoryCookie(cat as any, Boolean(enabled));
+			}
+		);
+		pendingCategoryEnabled.current = {};
+
+		updateConsentFromSettings();
+	}, [setCategoryCookie]);
+
 	const onCategoryChange: GdprModalProps['onCategoryChange'] = useCallback(
 		({ enabled, id }) => {
-			const changedCat = gdprConfigs.categories.find(
-				(cat) => cat.id === id
-			);
-			if (changedCat) setCategoryCookie(changedCat, enabled);
+			// Store the pending category changes to be persisted when the modal is saved
+			pendingCategoryEnabled.current = {
+				...pendingCategoryEnabled.current,
+				[id]: enabled,
+			};
 		},
-		[setCategoryCookie]
+		[]
 	);
 
 	// ##############################
@@ -123,6 +205,8 @@ export const Gdpr: FC<GdprProps> & BlockConfigs = () => {
 			setCategoryCookie(cat, true);
 			modalRef.current?.setCategoryEnabled(cat, true);
 		});
+
+		updateConsentFromSettings();
 	}, [setCategoryCookie]);
 
 	const rejectAll = useCallback(() => {
@@ -132,6 +216,8 @@ export const Gdpr: FC<GdprProps> & BlockConfigs = () => {
 			setCategoryCookie(cat, false);
 			modalRef.current?.setCategoryEnabled(cat, false);
 		});
+
+		updateConsentFromSettings();
 	}, [setCategoryCookie]);
 
 	// TODO :: Move to category file ??
@@ -159,6 +245,14 @@ export const Gdpr: FC<GdprProps> & BlockConfigs = () => {
 	useEffect(() => {
 		const cats = getCategoriesSettings();
 		setCategories(cats);
+
+		// Initialize services map from persisted cookies on first load
+		if (!didInitServicesFromCookies.current) {
+			cats.forEach((cat) =>
+				setCategoryCookie(cat as any, Boolean(cat.enabled))
+			);
+			didInitServicesFromCookies.current = true;
+		}
 	}, [locale, getCategoriesSettings]);
 
 	return (
@@ -178,19 +272,9 @@ export const Gdpr: FC<GdprProps> & BlockConfigs = () => {
 					onModalClosed={onModalClosed}
 				/>
 			</div>
-			{gdprServices?.gtm ? (
-				<>
-					<Script
-						id="gtm-script"
-						dangerouslySetInnerHTML={{
-							__html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-	new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-	j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-	'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-	})(window,document,'script','dataLayer','${process.env.NEXT_PUBLIC_GTM_KEY}');`,
-						}}
-					/>
-				</>
+
+			{gdprServices?.gtm && process.env.NEXT_PUBLIC_GTM_KEY ? (
+				<GoogleTagManager gtmId={process.env.NEXT_PUBLIC_GTM_KEY} />
 			) : null}
 		</>
 	);

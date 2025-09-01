@@ -1,7 +1,6 @@
 import { PREVIEW_STATI, fetchAPI } from '@/lib';
 import { languageFields } from './fragments';
-
-const POST_TYPES = ['Page', 'Post'];
+import { POST_TYPES_GRAPHQL_SINGLE_NAMES } from '@/constant';
 
 export default async function getPreviewNode({
 	id,
@@ -25,7 +24,7 @@ export default async function getPreviewNode({
 		`query findNode($id: ID, $idType: ContentNodeIdTypeEnum, $stati: [PostStatusEnum]) {
 			node(id: $id, idType: $idType, stati: $stati) {
 				__typename
-				${POST_TYPES.map(
+				${POST_TYPES_GRAPHQL_SINGLE_NAMES.map(
 					(postType) => `...on ${postType} {
 					databaseId
 					slug
