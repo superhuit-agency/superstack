@@ -21,7 +21,7 @@ This stack does not start a phpmyadmin instance.
 Plugins are handled with **composer**, in `./wordpress/composer.json` file. You don't need to have composer installed on your device as it's all handled on Docker directly. To add, update or remove a plugin:
 
 - Add plugins with `docker exec superstack_wp composer require vendor/plugin-name`
-- Remove with `docker exec superstack_wp composer remove vendore/plugin-name`
+- Remove with `docker exec superstack_wp composer remove vendor/plugin-name`
 - Install / Update plugins with `docker exec superstack_wp composer install` or `docker exec superstack_wp composer update`
 
 Composer will automatically run while deploying to staging/production.
