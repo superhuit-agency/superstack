@@ -60,7 +60,7 @@ export const InputCheckbox: FC<InputCheckboxProps> & BlockConfigs = forwardRef(
 					{
 						'-error': invalid && typeof invalid === 'string',
 						'-disabled': disabled,
-						'-single': options.length === 1,
+						'-single': options == null || options.length === 1,
 					}
 				)}
 			>

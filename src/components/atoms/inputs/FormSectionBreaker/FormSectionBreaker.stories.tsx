@@ -25,4 +25,5 @@ export const Empty: Story = {
 	args: {
 		title: '',
 	},
+	tags: ['!dev'], // Does not show in storybook's sidebar
 };

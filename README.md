@@ -13,7 +13,7 @@ An opinionated boilerplate for decoupled (headless) websites that are both perfo
 
 **Next.js**
 
--   Next.js 14 with App Router and React Server Components
+-   Next.js 15 with App Router and React Server Components
 -   Next.js Preview Mode
 -   Next.js Cache Revalidation (via WordPress Plugin)
 

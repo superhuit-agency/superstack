@@ -59,4 +59,5 @@ export const Empty: Story = {
 		url: 'https://superhuit.ch',
 		target: '_blank',
 	},
+	tags: ['!dev'], // Does not show in storybook's sidebar
 };

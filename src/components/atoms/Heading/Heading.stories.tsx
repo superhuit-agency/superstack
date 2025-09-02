@@ -62,4 +62,5 @@ export const Invalid: Story = {
 		content: '',
 		level: 0,
 	},
+	tags: ['!dev'], // Does not show in storybook's sidebar
 };
