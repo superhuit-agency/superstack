@@ -1,32 +1,11 @@
-import { getLocales } from '@/i18n/get-locales';
-import { getDictionaries } from '@/i18n/dictionaries';
-
-import * as footerData from '@/components/organisms/Footer/data';
-import * as mainNavData from '@/components/organisms/MainNav/data';
-import { Page404 } from '@/components/global/Page404';
+import { Container } from '@/components/global/Container';
+import { Section404 } from '@/components/organisms';
 
 async function NotFoundPage() {
-	const { defaultLocale } = await getLocales();
-
-	const dictionaries = await getDictionaries();
-
-	const [navPromise, footerPromise] = await Promise.allSettled([
-		mainNavData.getData({ language: defaultLocale }),
-		footerData.getData({ language: defaultLocale }),
-	]);
-
-	const mainNavProps =
-		navPromise.status === 'fulfilled' ? navPromise.value : null;
-	const footerProps =
-		footerPromise.status === 'fulfilled' ? footerPromise.value : null;
-
 	return (
-		<Page404
-			mainNavProps={mainNavProps}
-			footerProps={footerProps}
-			dictionaries={dictionaries}
-			defaultLocale={defaultLocale}
-		/>
+		<Container className="supt-single-page">
+			<Section404 />
+		</Container>
 	);
 }
 
