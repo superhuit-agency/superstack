@@ -1,10 +1,24 @@
+import { getAppConfigs } from '@/lib/config';
+
 export default function getWpUriFromNextPath(
-	path: Array<string>
+	path: Array<string>,
+	region?: string
 	// lang?: string,
 	// defaultLocale?: string
 ) {
 	let uri = path?.length ? `/${path.join('/')}/` : `/`;
 
+	if (region) {
+		const configs = getAppConfigs();
+		if (configs.multisite) {
+			const site = configs.multisite.find(
+				(site: MultisiteConfig) => site.region === region
+			);
+			if (site && uri !== '/') {
+				uri = `${site.basePath}${uri}`;
+			}
+		}
+	}
 	// if (lang) uri = '/' + lang + uri;
 
 	// // exception: in WordPress, the polylang option Hide URL language information for default language

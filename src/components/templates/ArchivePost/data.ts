@@ -56,6 +56,8 @@ export const getData = async (
 	node: GetDataAttributes<ArchivePostNodeProps>,
 	context: GetDataContext
 ): Promise<ArchivePostData> => {
+	const { region = 'global' } = context;
+
 	const languageCode = node.language.code.toLocaleUpperCase();
 
 	const query = gql`
@@ -115,7 +117,7 @@ export const getData = async (
 		offset: pageSize * pageNum - pageSize,
 	};
 
-	const data = await fetcher(query, { variables });
+	const data = await fetcher(query, { variables, region });
 
 	return formatter({ ...data, currentPage: pageNum }, node);
 };

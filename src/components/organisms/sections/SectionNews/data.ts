@@ -43,7 +43,7 @@ export const getData = async (
 	attrs: GetDataAttributes<SectionNewsAttributes> | null = null,
 	context: GetDataContext
 ): Promise<SectionNewsData> => {
-	const { isEditor = false } = context;
+	const { isEditor = false, region = 'global' } = context;
 
 	const query = gql`
 		query sectionNewsQuery(
@@ -72,7 +72,7 @@ export const getData = async (
 	`;
 
 	// construct the query variables (maybe based on the `attributes` argument)
-	const options = { variables: attrs?.queryVars };
+	const options = { variables: attrs?.queryVars, region };
 
 	const data = await fetcher(query, options);
 

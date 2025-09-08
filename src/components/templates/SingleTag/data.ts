@@ -39,6 +39,8 @@ export const getData = async (
 	node: GetDataAttributes<SingleTagNodeProps>,
 	context: GetDataContext
 ): Promise<SingleTagData> => {
+	const { region = 'global' } = context;
+
 	const query = gql`
 		query singleTagQuery(
 			$tagIn: [ID]!
@@ -109,7 +111,7 @@ export const getData = async (
 		offset: pageSize * pageNum - pageSize,
 	};
 
-	const data = await fetcher(query, { variables });
+	const data = await fetcher(query, { variables, region });
 
 	const { posts, categories, tags, readingSettings } = data as any;
 

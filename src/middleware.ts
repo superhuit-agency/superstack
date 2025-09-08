@@ -2,7 +2,7 @@ import { match } from '@formatjs/intl-localematcher';
 import Negotiator from 'negotiator';
 import { NextRequest, NextResponse } from 'next/server';
 
-import configs from '@/configs.json';
+import { getAppConfigs } from '@/lib/config';
 
 const locales = ['en'];
 const defaultLocale = 'en';
@@ -19,26 +19,53 @@ function getLocale(request: NextRequest) {
 }
 
 export function middleware(request: NextRequest) {
-	if (!configs.isMultilang) return; // Bail early if multilang is disabled
+	const configs = getAppConfigs();
 
-	// Check if there is any supported locale in the pathname
-	const { pathname } = request.nextUrl;
-	const pathnameHasLocale = locales.some(
-		(locale) =>
-			pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
-	);
+	if (configs.isMultilang) {
+		// Check if there is any supported locale in the pathname
+		const { pathname } = request.nextUrl;
+		const pathnameHasLocale = locales.some(
+			(locale) =>
+				pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
+		);
 
-	if (pathnameHasLocale) return;
+		if (!pathnameHasLocale) {
+			// Redirect if there is no locale
+			const locale = getLocale(request);
+			request.nextUrl.pathname = `/${locale}${pathname}`;
+			return NextResponse.redirect(request.nextUrl);
+		}
+	}
 
-	// Redirect if there is no locale
-	const locale = getLocale(request);
-	request.nextUrl.pathname = `/${locale}${pathname}`;
-	return NextResponse.redirect(request.nextUrl);
+	if (
+		request.nextUrl.pathname.startsWith('/_next') ||
+		request.nextUrl.pathname.startsWith('/api')
+	) {
+		return NextResponse.next();
+	}
+
+	// MULTISITE region from domain
+	if (configs.multisite) {
+		const host = request.headers.get('host') || '';
+
+		const site = configs.multisite.find(
+			(site: MultisiteConfig) => site.domain === host
+		);
+		if (site) {
+			const response = NextResponse.next();
+
+			response.cookies.set('region', site.region);
+			return response;
+		}
+	}
+
+	return NextResponse.next();
 }
 
-export const config = {
-	matcher: [
-		// Only run on root (/) URL
-		'/',
-	],
-};
+//  Run middleware on all routes
+// export const config = {
+// 	matcher: [
+// 		// Only run on root (/) URL
+// 		'/',
+// 	],
+// };

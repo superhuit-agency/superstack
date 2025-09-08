@@ -4,7 +4,10 @@ import { fetchAPI } from '@/lib';
  * Refresh the auth-token, thanks to the refresh-token
  * @returns {boolean} true if successful, false if auth failed
  */
-export default async function getAuthToken(refreshToken: string) {
+export default async function getAuthToken(
+	refreshToken: string,
+	region: string
+) {
 	try {
 		const data = await fetchAPI(
 			`
@@ -19,6 +22,7 @@ export default async function getAuthToken(refreshToken: string) {
 				variables: {
 					refreshToken,
 				},
+				region,
 			}
 		);
 		return data?.refreshJwtAuthToken?.authToken ?? false;

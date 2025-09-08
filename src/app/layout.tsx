@@ -10,6 +10,8 @@ import * as footerData from '@/components/organisms/Footer/data';
 import * as mainNavData from '@/components/organisms/MainNav/data';
 import { Footer, MainNav } from '@/components/organisms';
 import { Gdpr } from '@/components/molecules/Gdpr';
+import { fetchAPI } from '@/lib';
+import { getRegionFromCookie } from '@/utils/get-region-from-cookie';
 
 import '@/css/base/index.css';
 
@@ -46,10 +48,11 @@ export default async function Layout({
 	children: React.ReactNode;
 }) {
 	const { defaultLocale } = await getLocales();
+	const region = await getRegionFromCookie();
 
 	const [navPromise, footerPromise] = await Promise.allSettled([
-		mainNavData.getData({language: defaultLocale}),
-		footerData.getData({language: defaultLocale}),
+		mainNavData.getData(fetchAPI, { language: defaultLocale }, { region }),
+		footerData.getData(fetchAPI, { language: defaultLocale }, { region }),
 	]);
 
 	const mainNavProps =

@@ -5,7 +5,7 @@ import { fetchAPI } from '@/lib';
  *
  * @param {string} uri
  */
-export default async function getRedirection(uri: string) {
+export default async function getRedirection(uri: string, region: string) {
 	const { redirections } = await fetchAPI(
 		gql`
 			query redirectionsQuery($uri: String!) {
@@ -19,6 +19,7 @@ export default async function getRedirection(uri: string) {
 			variables: {
 				uri,
 			},
+			region: 'global',
 		}
 	);
 

@@ -100,7 +100,7 @@ export const Gdpr: FC<GdprProps> & BlockConfigs = () => {
 			// Only update if the consent has changed
 			updateConsentForEverything(analyticsEnabled);
 		}
-	}, []);
+	}, [updateConsentForEverything]);
 
 	useEffect(() => {
 		initConsentMode();
@@ -253,7 +253,7 @@ export const Gdpr: FC<GdprProps> & BlockConfigs = () => {
 			);
 			didInitServicesFromCookies.current = true;
 		}
-	}, [locale, getCategoriesSettings]);
+	}, [locale, getCategoriesSettings, setCategoryCookie]);
 
 	return (
 		<>

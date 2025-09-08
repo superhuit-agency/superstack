@@ -29,6 +29,7 @@ export const getData = async (
 ): Promise<any> => {
   const {
     isEditor = false,
+    region = 'global',
   } = context;
 
   // GraphQL query and fetching logic goes here
@@ -40,7 +41,7 @@ export const getData = async (
     }
   `;
 
-  const data = await fetcher(query, { variables: {...} });
+  const data = await fetcher(query, { variables: {...} }, { region });
 
   return formatter(data);
 };

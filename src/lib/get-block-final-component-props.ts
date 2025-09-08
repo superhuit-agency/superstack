@@ -32,7 +32,10 @@ interface GetBlockFinalComponentPropsContext extends GetDataContext {}
  */
 export default function getBlockFinalComponentProps(
 	{ name, attributes, innerBlocks }: GetBlockFinalComponentPropsBlockProps,
-	context: GetBlockFinalComponentPropsContext = { isEditor: false }
+	context: GetBlockFinalComponentPropsContext = {
+		isEditor: false,
+		region: 'global',
+	}
 ): Promise<BlockPropsType> {
 	return new Promise(async (res, rej) => {
 		const props: BlockPropsType = {

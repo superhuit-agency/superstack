@@ -6,12 +6,14 @@ interface GetPreviewNodeProps {
 	id: string;
 	idType: string;
 	auth?: { authToken: string };
+	region: string;
 }
 
 export default async function getPreviewNode({
 	id,
 	idType = 'DATABASE_ID',
 	auth = undefined,
+	region = 'global',
 }: GetPreviewNodeProps) {
 	const supportedPreviewIdTypes = ['DATABASE_ID'];
 	if (!supportedPreviewIdTypes.includes(idType)) {
@@ -44,6 +46,7 @@ export default async function getPreviewNode({
 				idType: 'DATABASE_ID',
 			},
 			auth,
+			region,
 		}
 	);
 

@@ -2,19 +2,22 @@ import { getWpGraphqlUrl } from '@/utils/node-utils';
 import { dedupeFragments } from '@/utils';
 import { getQueryAttrs } from '#/utils';
 
-const WP_GRAPHQL_URL = getWpGraphqlUrl();
-
 // // Debug performances
 // export const fetchAPITester = PerfsTester();
 
 const fetchAPI: FetchApiFuncType = async (query, options) => {
-	const {
+	let {
 		variables,
 		auth,
 		headers = {},
-		endpoint = WP_GRAPHQL_URL,
+		endpoint,
 		cache = 'force-cache',
+		region,
 	} = options ?? {};
+
+	if (!endpoint) {
+		endpoint = getWpGraphqlUrl(region);
+	}
 
 	headers['Content-Type'] = 'application/json';
 

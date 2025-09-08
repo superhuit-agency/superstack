@@ -32,6 +32,7 @@ export const getData = async (
 ): Promise<{{ pascalCase blockTitle }}Data> => {
 	const {
 		isEditor = false,
+		region = 'global',
 	} = context;
 
 	// declare the GraphQL query string.
@@ -51,7 +52,7 @@ export const getData = async (
 	const variables = {};
 
 	// retrieves the data
-	const data = await fetcher(query, { variables });
+	const data = await fetcher(query, { variables }, { region });
 
 	return formatter(data, isEditor);
 };

@@ -46,6 +46,8 @@ export const getData = async (
 	node: GetDataAttributes<SingleCategoryNodeProps>,
 	context: GetDataContext
 ): Promise<SingleCategoryData> => {
+	const { region = 'global' } = context;
+
 	const languageCode = node.language.code.toLocaleUpperCase();
 
 	const query = gql`
@@ -120,7 +122,7 @@ export const getData = async (
 		offset: pageSize * pageNum - pageSize,
 	};
 
-	const data = await fetcher(query, { variables });
+	const data = await fetcher(query, { variables, region });
 
 	const { posts, categories, tags, readingSettings } = data;
 

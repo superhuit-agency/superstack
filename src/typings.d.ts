@@ -82,6 +82,7 @@ declare global {
 			endpoint?: string;
 			headers?: any;
 			cache?: RequestCache;
+			region: string;
 		}
 	) => Promise<any>;
 
@@ -113,6 +114,7 @@ declare global {
 	type NextParams = Promise<{
 		uri: string[];
 		lang: Locale;
+		region: string;
 	}>;
 
 	type TestableComponentMeta<T> = Meta<T> & {

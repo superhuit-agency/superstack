@@ -13,6 +13,7 @@ import {
 	getWpUriFromNextPath,
 } from '@/lib';
 import configs from '@/configs.json';
+import { getRegionFromCookie } from '@/utils/get-region-from-cookie';
 
 // see https://nextjs.org/docs/app/api-reference/file-conventions/route-segment-config
 export const revalidate = 3600; // revalidate at most every hour
@@ -32,6 +33,7 @@ export async function generateMetadata(props: {
 	params: NextParams;
 }): Promise<Metadata> {
 	const params = (await props.params) ?? {};
+	const region = await getRegionFromCookie();
 
 	const uri = getWpUriFromNextPath(params.uri ?? []);
 
@@ -50,6 +52,7 @@ export async function generateMetadata(props: {
 		lang: languageCode,
 		previewDraft: false,
 		blockEnrichment: false,
+		region: region,
 	});
 
 	const imageSEO =
@@ -132,6 +135,7 @@ export async function generateMetadata(props: {
 
 export default async function Page(props: { params: NextParams }) {
 	const params = (await props.params) ?? {};
+	const region = await getRegionFromCookie();
 
 	const { isEnabled: isDraftModeEnable } = await draftMode();
 
@@ -139,8 +143,8 @@ export default async function Page(props: { params: NextParams }) {
 		token = '';
 
 	const uri = getWpUriFromNextPath(
-		params.uri ?? []
-		// params.lang,
+		params.uri ?? [],
+		region
 		// defaultLocale
 	);
 	let auth: { authToken?: string } = {};
@@ -158,7 +162,7 @@ export default async function Page(props: { params: NextParams }) {
 		if (token) {
 			// Get a fresh auth token
 			auth = {
-				authToken: await getAuthToken(token),
+				authToken: await getAuthToken(token, region),
 			};
 		}
 
@@ -169,7 +173,7 @@ export default async function Page(props: { params: NextParams }) {
 	}
 
 	// Redirect if the URI is a redirection
-	const redirection = await getRedirection(uri);
+	const redirection = await getRedirection(uri, region);
 	if (redirection) {
 		if (redirection.isPermanent) {
 			permanentRedirect(redirection.destination);
@@ -183,6 +187,7 @@ export default async function Page(props: { params: NextParams }) {
 		auth,
 		lang: languageCode,
 		previewDraft: isDraft,
+		region: region,
 	});
 
 	if (!node || !node?.uri) {

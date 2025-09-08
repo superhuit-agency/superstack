@@ -45,7 +45,7 @@ export const getData = async (
 	attrs: GetDataAttributes<FormAttributes> | null = null,
 	context: GetDataContext
 ): Promise<FormComponentData> => {
-	const { isEditor = false } = context;
+	const { isEditor = false, region = 'global' } = context;
 	const query = gql`
 		query formQuey($id: ID!) {
 			form(id: $id, idType: DATABASE_ID) {
@@ -68,7 +68,7 @@ export const getData = async (
 
 	if (!attrs?.id) return {} as FormComponentData;
 
-	const options = { variables: { id: attrs.id } };
+	const options = { variables: { id: attrs.id }, region };
 	const data = await fetcher(query, options);
 
 	return formatter(data?.form, isEditor);

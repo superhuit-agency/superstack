@@ -72,6 +72,8 @@ export const getData = async (
 	node: GetDataAttributes<SinglePostNodeProps>,
 	context: GetDataContext
 ): Promise<SinglePostData> => {
+	const { region = 'global' } = context;
+
 	const query = gql`
 		query singlePostQuery(
 			$size: Int = 3
@@ -103,7 +105,7 @@ export const getData = async (
 
 	const variables = node.relatedPosts;
 
-	const data = await fetcher(query, { variables });
+	const data = await fetcher(query, { variables, region });
 
 	return formatter(data);
 };

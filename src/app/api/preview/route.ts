@@ -3,8 +3,10 @@ import { draftMode, cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 import { getAuthToken, getPreviewNode } from '@/lib';
+import { getRegionFromCookie } from '@/utils/get-region-from-cookie';
 
 export async function GET(request: NextRequest) {
+	const region = await getRegionFromCookie();
 	// pass an id or slug for page/post
 	// OR pass a uri for terms archives (category, tag)
 	const { secret, slug, token, uri, id, draft } = Object.fromEntries(
@@ -28,7 +30,7 @@ export async function GET(request: NextRequest) {
 	}
 
 	const auth = {
-		authToken: await getAuthToken(token),
+		authToken: await getAuthToken(token, region),
 	};
 
 	if (!auth.authToken) {
@@ -42,6 +44,7 @@ export async function GET(request: NextRequest) {
 			id: id ?? slug,
 			idType: id ? 'DATABASE_ID' : 'SLUG',
 			auth,
+			region,
 		});
 
 		if (!node) {

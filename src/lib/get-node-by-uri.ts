@@ -9,6 +9,7 @@ type ParamsType = {
 	preview: boolean;
 	auth: AuthType;
 	lang: string;
+	region: string;
 	previewDraft?: boolean;
 	blockEnrichment?: boolean;
 };
@@ -21,6 +22,7 @@ type ParamsType = {
  *                   - {boolean} preview
  *                   - {object}  auth
  *                   - {string}  lang
+ *                   - {string}  region Multisite region
  *                   - {boolean} previewDraft
  *                   - {boolean} blockEnrichment Whether to enrich the node with blocksJSON and templateData
  * @returns
@@ -32,6 +34,7 @@ export default async function getNodeByURI(uri: string, params: ParamsType) {
 		lang,
 		previewDraft = false,
 		blockEnrichment = true,
+		region,
 	} = params;
 
 	// uri = getUriWithoutPagination(uri); // Removes '/page/...' from uri if needed
@@ -58,6 +61,7 @@ export default async function getNodeByURI(uri: string, params: ParamsType) {
 	let response = await fetchAPI(query, {
 		variables,
 		auth,
+		region,
 	});
 
 	let { node, seo, generalSettings } = response;
@@ -97,7 +101,8 @@ export default async function getNodeByURI(uri: string, params: ParamsType) {
 			formatBlocksJSON(
 				previewDraft
 					? (node.preview?.node?.blocksJSON ?? node?.blocksJSON ?? '')
-					: (node?.blocksJSON ?? '')
+					: (node?.blocksJSON ?? ''),
+				{ region }
 			),
 			getTemplateData(node),
 		])

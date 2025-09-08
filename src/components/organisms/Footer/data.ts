@@ -21,6 +21,8 @@ export const getData = async (
 	attrs: GetDataAttributes<FooterAttributes>,
 	context: GetDataContext
 ): Promise<FooterData> => {
+	const { region = 'global' } = context;
+
 	const languageCode = attrs.language.toLocaleUpperCase();
 
 	const query = gql`
@@ -65,7 +67,7 @@ export const getData = async (
 		${menuItemData.fragment}
 	`;
 
-	const data = await fetcher(query);
+	const data = await fetcher(query, { region });
 
 	return formatter(data);
 };
