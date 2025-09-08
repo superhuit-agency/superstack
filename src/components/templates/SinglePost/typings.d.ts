@@ -44,3 +44,21 @@ interface GraphQLSinglePostFields
 		notIn: Array<number>;
 	};
 }
+
+interface SinglePostNodeProps extends ArchivePostData, ContentNodeData {
+	language: Language;
+	fullUri: string;
+	relatedPosts: {
+		size: number;
+		categoryIn: Array<number>;
+		tagIn: Array<number>;
+		notIn: Array<number>;
+	};
+}
+
+interface SinglePostData {
+	relatedPosts: Array<CardNewsProps>;
+	postsPage: {
+		uri: string;
+	};
+}

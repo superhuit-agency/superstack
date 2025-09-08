@@ -27,9 +27,13 @@ export const formatter = (data: Graphql{{ pascalCase blockTitle }}Fields, isEdit
  */
 export const getData = async (
 	fetcher: FetchApiFuncType,
-	attributes: {{ pascalCase blockTitle }}Attributes | null = null,
-	isEditor: boolean = false
+	attributes: GetDataAttributes<{{ pascalCase blockTitle }}Attributes> | null = null,
+	context: GetDataContext,
 ): Promise<{{ pascalCase blockTitle }}Data> => {
+	const {
+		isEditor = false,
+	} = context;
+
 	// declare the GraphQL query string.
 	const query = gql`
 		query {{camelCase blockTitle}}Query {

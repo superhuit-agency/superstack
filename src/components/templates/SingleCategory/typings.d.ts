@@ -7,3 +7,12 @@ interface GraphQLSingleCategoryFields extends GraphQLNodeFields {
 		type: string;
 	};
 }
+
+interface SingleCategoryNodeProps extends ArchivePostData, ContentNodeData {
+	language: Language;
+	fullUri: string;
+}
+
+interface SingleCategoryData extends ArchivePostData {
+	blocksJSON: Array<BlockPropsType>;
+}

@@ -2,15 +2,17 @@ import { PREVIEW_STATI, fetchAPI } from '@/lib';
 import { languageFields } from './fragments';
 import { POST_TYPES_GRAPHQL_SINGLE_NAMES } from '@/constant';
 
+interface GetPreviewNodeProps {
+	id: string;
+	idType: string;
+	auth?: { authToken: string };
+}
+
 export default async function getPreviewNode({
 	id,
 	idType = 'DATABASE_ID',
 	auth = undefined,
-}: {
-	id: string;
-	idType: string;
-	auth?: { authToken: string };
-}) {
+}: GetPreviewNodeProps) {
 	const supportedPreviewIdTypes = ['DATABASE_ID'];
 	if (!supportedPreviewIdTypes.includes(idType)) {
 		throw new Error(

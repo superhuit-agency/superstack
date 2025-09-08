@@ -17,3 +17,7 @@ interface FooterData {
 }
 
 interface FooterProps extends FooterData {}
+
+interface FooterAttributes {
+	language: Locale;
+}

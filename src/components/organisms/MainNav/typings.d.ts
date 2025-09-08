@@ -14,3 +14,7 @@ interface MainNavData {
 }
 
 interface MainNavProps extends MainNavData {}
+
+interface MainNavAttributes {
+	language: Locale;
+}

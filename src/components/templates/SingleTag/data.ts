@@ -36,8 +36,9 @@ export const fragment = gql`
 
 export const getData = async (
 	fetcher: FetchApiFuncType,
-	node: any = null
-): Promise<any> => {
+	node: GetDataAttributes<SingleTagNodeProps>,
+	context: GetDataContext
+): Promise<SingleTagData> => {
 	const query = gql`
 		query singleTagQuery(
 			$tagIn: [ID]!
@@ -96,8 +97,8 @@ export const getData = async (
 		${termNodeFragment}
 	`;
 
-	const uriSplitted = node.fullUri.split('/');
-	const currentPageNum = Number.parseInt(uriSplitted.slice(-2));
+	const match = new RegExp(/\/page\/(\d+)/).exec(node.fullUri);
+	const currentPageNum = parseInt(match?.[1] ?? '1');
 	const pageNum = isNaN(currentPageNum) ? 1 : currentPageNum;
 
 	const pageSize = node?.archivePage?.perPage ?? 9;

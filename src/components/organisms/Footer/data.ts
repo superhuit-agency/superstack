@@ -1,5 +1,4 @@
 import { menuItemData } from '@/components/molecules/data';
-import { fetchAPI } from '@/lib';
 import { gql } from '@/utils';
 import configs from '@/configs.json';
 
@@ -17,13 +16,19 @@ export const formatter = (data: GraphQLFooterFields): FooterData => ({
 	siteTitle: data.generalSettings?.title ?? 'Superstack',
 });
 
-export const getData = async ({language}: {language: Locale}): Promise<FooterData> => {
+export const getData = async (
+	fetcher: FetchApiFuncType,
+	attrs: GetDataAttributes<FooterAttributes>,
+	context: GetDataContext
+): Promise<FooterData> => {
+	const languageCode = attrs.language.toLocaleUpperCase();
+
 	const query = gql`
 		query footerQuery {
 			footer: menuItems(
 				where: {
 					location: FOOTER
-					${configs.isMultilang ? `, language: ${language.toUpperCase()}` : ''}
+					${configs.isMultilang ? `, language: ${languageCode}` : ''}
 				}
 				first: 9999
 			) {
@@ -34,7 +39,7 @@ export const getData = async ({language}: {language: Locale}): Promise<FooterDat
 			legal: menuItems(
 				where: {
 					location: LEGAL
-					${configs.isMultilang ? `, language: ${language.toUpperCase()}` : ''}
+					${configs.isMultilang ? `, language: ${languageCode}` : ''}
 				}
 				first: 9999
 			) {
@@ -45,7 +50,7 @@ export const getData = async ({language}: {language: Locale}): Promise<FooterDat
 			social: menuItems(
 				where: {
 					location: SOCIAL
-					${configs.isMultilang ? `, language: ${language.toUpperCase()}` : ''}
+					${configs.isMultilang ? `, language: ${languageCode}` : ''}
 				}
 				first: 9999
 			) {
@@ -60,7 +65,7 @@ export const getData = async ({language}: {language: Locale}): Promise<FooterDat
 		${menuItemData.fragment}
 	`;
 
-	const data = await fetchAPI(query);
+	const data = await fetcher(query);
 
 	return formatter(data);
 };

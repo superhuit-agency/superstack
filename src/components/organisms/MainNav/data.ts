@@ -1,5 +1,4 @@
 import { imageData, menuItemData } from '@/components/molecules/data';
-import { fetchAPI } from '@/lib';
 import { gql } from '@/utils';
 import configs from '@/configs.json';
 
@@ -18,13 +17,19 @@ export const formatter = (data: GraphQLMainNavFields): MainNavData => ({
 	siteTitle: data.generalSettings?.title ?? 'superstack',
 });
 
-export const getData = async ({language}: {language: Locale}): Promise<MainNavData> => {
+export const getData = async (
+	fetcher: FetchApiFuncType,
+	attrs: GetDataAttributes<MainNavAttributes>,
+	context: GetDataContext
+): Promise<MainNavData> => {
+	const languageCode = attrs.language.toLocaleUpperCase();
+
 	const query = gql`
 		query mainNavQuery {
 			header: menuItems(
 				where: {
 					location: HEADER
-					${configs.isMultilang ? `, language: ${language.toUpperCase()}` : ''}
+					${configs.isMultilang ? `, language: ${languageCode}` : ''}
 				}
 				first: 9999
 			) {
@@ -44,7 +49,7 @@ export const getData = async ({language}: {language: Locale}): Promise<MainNavDa
 		${menuItemData.fragment}
 	`;
 
-	const data = await fetchAPI(query);
+	const data = await fetcher(query);
 
 	return formatter(data);
 };

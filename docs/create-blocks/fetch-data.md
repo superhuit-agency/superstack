@@ -24,9 +24,13 @@ The `getData` function is responsible for fetching data from WP using GraphQL. I
 ```ts
 export const getData = async (
   fetcher: FetchApiFuncType,
-  attributes: Record<string, object> | null = null,
-  isEditor: boolean = false
+  attributes: GetDataAttributes<T> | null = null,
+  context: GetDataContext,
 ): Promise<any> => {
+  const {
+    isEditor = false,
+  } = context;
+
   // GraphQL query and fetching logic goes here
   const query = gql`
     query MyQuery {

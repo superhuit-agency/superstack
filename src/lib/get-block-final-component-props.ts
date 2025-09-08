@@ -16,21 +16,24 @@ for (const key in blocksData) {
 	}
 }
 
+interface GetBlockFinalComponentPropsBlockProps {
+	name: string;
+	attributes: object;
+	innerBlocks: Array<BlockPropsType>;
+}
+
+interface GetBlockFinalComponentPropsContext extends GetDataContext {}
+
 /**
  * Get a lightweight version of a block's data.
  * Used to reduce the amount of data served to the frontend.
  * @param block A block object coming from Wp GraphQl's blocksJSON
  * @returns the same block, with only necessary data
  */
-export default function getBlockFinalComponentProps({
-	name,
-	attributes,
-	innerBlocks,
-}: {
-	name: string;
-	attributes: object;
-	innerBlocks: Array<BlockPropsType>;
-}): Promise<BlockPropsType> {
+export default function getBlockFinalComponentProps(
+	{ name, attributes, innerBlocks }: GetBlockFinalComponentPropsBlockProps,
+	context: GetBlockFinalComponentPropsContext = { isEditor: false }
+): Promise<BlockPropsType> {
 	return new Promise(async (res, rej) => {
 		const props: BlockPropsType = {
 			name,
@@ -39,8 +42,8 @@ export default function getBlockFinalComponentProps({
 		};
 
 		Promise.allSettled([
-			getAttributes(name, attributes),
-			getInnerBlocks(innerBlocks),
+			getAttributes(name, attributes, context),
+			getInnerBlocks(innerBlocks, context),
 		]).then(([attrs, blks]) => {
 			if (attrs.status === 'fulfilled')
 				props.attributes =
@@ -63,29 +66,35 @@ export default function getBlockFinalComponentProps({
  * @param   {any}    attributes Initial block's attributes. Will be returned as it or enriched and/or formatted.
  * @returns {any}
  */
-const getAttributes = (name: string, attributes: object) =>
+const getAttributes = (
+	name: string,
+	attributes: object,
+	context: GetBlockFinalComponentPropsContext
+) =>
 	new Promise((res, rej) => {
 		if (!blocksDataList[name]) res(attributes);
 		else {
 			blocksDataList[name]
-				.getData(fetchAPI, attributes)
+				.getData(fetchAPI, attributes, context)
 				.then((data = {}) => {
 					res({ ...attributes, ...data });
 				});
 		}
 	});
 
-const getInnerBlocks = (blocks: Array<BlockPropsType>) =>
+const getInnerBlocks = (
+	blocks: Array<BlockPropsType>,
+	context: GetBlockFinalComponentPropsContext
+) =>
 	new Promise((res, rej) => {
 		if (!(blocks?.length > 0)) rej([]);
 		else {
-			Promise.allSettled(blocks.map(getBlockFinalComponentProps)).then(
-				(rs) =>
-					res(
-						rs.map((r) =>
-							r.status === 'fulfilled' ? r.value : null
-						)
-					)
+			Promise.allSettled(
+				blocks.map((block) =>
+					getBlockFinalComponentProps(block, context)
+				)
+			).then((rs) =>
+				res(rs.map((r) => (r.status === 'fulfilled' ? r.value : null)))
 			);
 		}
 	});

@@ -40,9 +40,11 @@ export const formatter = (
  */
 export const getData = async (
 	fetcher: FetchApiFuncType,
-	attrs: SectionNewsAttributes | null = null,
-	isEditor: boolean = false
+	attrs: GetDataAttributes<SectionNewsAttributes> | null = null,
+	context: GetDataContext
 ): Promise<SectionNewsData> => {
+	const { isEditor = false } = context;
+
 	const query = gql`
 		query sectionNewsQuery(
 			$categoryIn: [ID] = []

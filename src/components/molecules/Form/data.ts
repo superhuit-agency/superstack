@@ -42,9 +42,10 @@ export const formatter = (
  */
 export const getData = async (
 	fetcher: FetchApiFuncType,
-	attrs: any = null,
-	isEditor: boolean = false
+	attrs: GetDataAttributes<FormAttributes> | null = null,
+	context: GetDataContext
 ): Promise<FormComponentData> => {
+	const { isEditor = false } = context;
 	const query = gql`
 		query formQuey($id: ID!) {
 			form(id: $id, idType: DATABASE_ID) {

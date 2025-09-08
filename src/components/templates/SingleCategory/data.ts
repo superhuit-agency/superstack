@@ -41,7 +41,13 @@ export const fragment = gql`
 	${seoTaxFragment}
 `;
 
-export const getData = async (fetcher: FetchApiFuncType, node: any) => {
+export const getData = async (
+	fetcher: FetchApiFuncType,
+	node: GetDataAttributes<SingleCategoryNodeProps>,
+	context: GetDataContext
+): Promise<SingleCategoryData> => {
+	const languageCode = node.language.code.toLocaleUpperCase();
+
 	const query = gql`
 		query singleCategoryQuery(
 			$categoryIn: [ID]!
@@ -54,7 +60,7 @@ export const getData = async (fetcher: FetchApiFuncType, node: any) => {
 				where: {
 					categoryIn: $categoryIn
 					offsetPagination: { size: $size, offset: $offset }
-					${configs.isMultilang ? `language: ${node.language.code}` : ''}
+					${configs.isMultilang ? `language: ${languageCode}` : ''}
 				}
 			) {
 				nodes {
@@ -70,7 +76,7 @@ export const getData = async (fetcher: FetchApiFuncType, node: any) => {
 				first: 99
 				where: {
 					hideEmpty: true
-					${configs.isMultilang ? `, language: ${node.language.code}` : ''}
+					${configs.isMultilang ? `, language: ${languageCode}` : ''}
 				}
 			) {
 				nodes {
@@ -81,7 +87,7 @@ export const getData = async (fetcher: FetchApiFuncType, node: any) => {
 				first: 99
 				where: {
 					hideEmpty: true
-					${configs.isMultilang ? `, language: ${node.language.code}` : ''}
+					${configs.isMultilang ? `, language: ${languageCode}` : ''}
 				}
 			) {
 				nodes {

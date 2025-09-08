@@ -5,25 +5,35 @@ import * as _templatesData from '@/components/templates/data';
 
 const templatesData: any = _templatesData;
 
+type ParamsType = {
+	preview: boolean;
+	auth: AuthType;
+	lang: string;
+	previewDraft?: boolean;
+	blockEnrichment?: boolean;
+};
+
 /**
  * NOTE: in preview, the `uri` could be in fact the ID (i.e. a draft doesn't have a slug/uri yet)
  *
- * @param {string}      uri
- * @param {boolean}     preview
- * @param {object}      auth
- * @param {null|string} lang
- * @param {boolean}     blockEnrichment - Whether to enrich the node with blocksJSON and templateData
- *
+ * @param {string} uri
+ * @param {object} params
+ *                   - {boolean} preview
+ *                   - {object}  auth
+ *                   - {string}  lang
+ *                   - {boolean} previewDraft
+ *                   - {boolean} blockEnrichment Whether to enrich the node with blocksJSON and templateData
  * @returns
  */
-export default async function getNodeByURI(
-	uri: string,
-	preview: boolean,
-	auth: AuthType,
-	lang: string,
-	previewDraft: boolean,
-	blockEnrichment = true
-) {
+export default async function getNodeByURI(uri: string, params: ParamsType) {
+	const {
+		preview,
+		auth,
+		lang,
+		previewDraft = false,
+		blockEnrichment = true,
+	} = params;
+
 	// uri = getUriWithoutPagination(uri); // Removes '/page/...' from uri if needed
 
 	// The slug may be the id of an unpublished post

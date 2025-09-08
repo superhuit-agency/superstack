@@ -1,7 +1,10 @@
 import { getWpUrl } from '@/utils/node-utils';
 import { getFunkyWpUploadsURI, getBlockFinalComponentProps } from '@/lib';
 
-export default async function formatBlocksJSON(blocksJSON: string) {
+export default async function formatBlocksJSON(
+	blocksJSON: string,
+	context: GetDataContext
+) {
 	/**
 	 * Replace ocurrences of WP upload URIs with relative url
 	 * 'http://whatever/wp-content/uploads/*' becomes '/wp-content/uploads/*'
@@ -25,7 +28,9 @@ export default async function formatBlocksJSON(blocksJSON: string) {
 	return blocksJSON
 		? (
 				await Promise.allSettled(
-					JSON.parse(blocksJSON).map(getBlockFinalComponentProps)
+					JSON.parse(blocksJSON).map((block: BlockPropsType) =>
+						getBlockFinalComponentProps(block, context)
+					)
 				)
 			).map((p: PromiseSettledResult<BlockPropsType>) =>
 				p.status === 'fulfilled' ? p.value : null

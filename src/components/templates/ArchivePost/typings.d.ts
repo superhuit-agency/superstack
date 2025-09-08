@@ -17,7 +17,10 @@ interface ArchivePostData {
 	};
 }
 
-interface ArchivePostNodeProps extends ArchivePostData, ContentNodeData {}
+interface ArchivePostNodeProps extends ArchivePostData, ContentNodeData {
+	language: Language;
+	fullUri: string;
+}
 interface ArchivePostProps {
 	node: ArchivePostNodeProps;
 }

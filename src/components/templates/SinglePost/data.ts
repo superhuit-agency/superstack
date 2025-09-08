@@ -67,7 +67,11 @@ export const formatter = ({ posts, readingSettings }: any) => ({
 	postsPage: readingSettings.postsPage,
 });
 
-export const getData = async (fetcher: FetchApiFuncType, node: any = null) => {
+export const getData = async (
+	fetcher: FetchApiFuncType,
+	node: GetDataAttributes<SinglePostNodeProps>,
+	context: GetDataContext
+): Promise<SinglePostData> => {
 	const query = gql`
 		query singlePostQuery(
 			$size: Int = 3

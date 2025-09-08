@@ -53,14 +53,17 @@ export const formatter = (
  */
 export const getData = async (
 	fetcher: FetchApiFuncType,
-	node: any
-): Promise<any> => {
+	node: GetDataAttributes<ArchivePostNodeProps>,
+	context: GetDataContext
+): Promise<ArchivePostData> => {
+	const languageCode = node.language.code.toLocaleUpperCase();
+
 	const query = gql`
 		query archivePostQuery($size: Int = 10, $offset: Int = 0) {
 			posts(
 				where: {
 					offsetPagination: { size: $size, offset: $offset }
-					${configs.isMultilang ? `, language: ${node.language.code}` : ''}
+					${configs.isMultilang ? `, language: ${languageCode}` : ''}
 				}
 			) {
 				nodes {

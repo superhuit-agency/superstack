@@ -44,14 +44,13 @@ export async function generateMetadata(props: {
 		process.env.VERCEL_URL ??
 		'http://localhost:3000';
 
-	const node = await getNodeByURI(
-		uri,
-		false,
+	const node = await getNodeByURI(uri, {
+		preview: false,
 		auth,
-		languageCode,
-		false,
-		false
-	);
+		lang: languageCode,
+		previewDraft: false,
+		blockEnrichment: false,
+	});
 
 	const imageSEO =
 		node?.seo?.opengraphImage?.src ??
@@ -179,13 +178,12 @@ export default async function Page(props: { params: NextParams }) {
 		}
 	}
 
-	const node = await getNodeByURI(
-		uri,
-		isDraftModeEnable,
+	const node = await getNodeByURI(uri, {
+		preview: isDraftModeEnable,
 		auth,
-		languageCode,
-		isDraft
-	);
+		lang: languageCode,
+		previewDraft: isDraft,
+	});
 
 	if (!node || !node?.uri) {
 		return notFound();
