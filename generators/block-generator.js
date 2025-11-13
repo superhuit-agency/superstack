@@ -210,18 +210,18 @@ module.exports = async function (plop) {
 				});
 			}
 
-			// Import component in Blocks.tsx
+			// Import component in root-block-lists.tsx
 			actions.push({
 				type: 'modify',
-				path: `${CONFIG.paths.relativePath}/global/Blocks.tsx`,
+				path: `${CONFIG.paths.relativePath}/root-block-lists.tsx`,
 				pattern: /(\/\/ -- GENERATOR IMPORT SLOT --)/gi,
 				template: `{{ pascalCase blockTitle }},\r\n$1`,
 			});
 
-			// Add component to Blocks.tsx
+			// Add component to root-block-lists.tsx
 			actions.push({
 				type: 'modify',
-				path: `${CONFIG.paths.relativePath}/global/Blocks.tsx`,
+				path: `${CONFIG.paths.relativePath}/root-block-lists.tsx`,
 				pattern: /(\/\/ -- GENERATOR BLOCK SLOT --)/gi,
 				template: `'{{ blockName }}': {{ pascalCase blockTitle }},\r\n\t\t$1`,
 			});
