@@ -14,7 +14,7 @@ function reusable_block($block, $parser)
 	if (!$block_ref) return $block; // If no ref, return the block as is, fixes for the Pattern editor, where the ref doesn't exist, it calls the block itself
 
 	// Reusable block is saved as a post in the db
-	$raw_block = get_post($block['attrs']['ref']);
+	$raw_block = get_post($block_ref);
 
 	// Parse content of the reusable block (this returns an array of block)
 	$block_content = parse_blocks($raw_block->post_content);
