@@ -1,0 +1,209 @@
+/* Cookie Analytics Admin Styles */
+
+.cookie-analytics-wrap {
+	max-width: 1100px;
+}
+
+/* Card layout */
+.cookie-analytics-card {
+	background: #fff;
+	border: 1px solid #ccd0d4;
+	border-radius: 4px;
+	padding: 20px 24px;
+	margin: 20px 0;
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+}
+
+.cookie-analytics-card h2 {
+	margin-top: 0;
+	padding: 0;
+	font-size: 1.2em;
+	border-bottom: 1px solid #eee;
+	padding-bottom: 10px;
+	margin-bottom: 15px;
+}
+
+/* Date filter */
+.cookie-analytics-date-filter {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	flex-wrap: wrap;
+}
+
+.cookie-analytics-date-filter label {
+	font-weight: 600;
+}
+
+.cookie-analytics-date-filter input[type="date"] {
+	padding: 4px 8px;
+	min-width: 160px;
+}
+
+.cookie-analytics-date-label {
+	margin-top: 10px;
+	color: #666;
+}
+
+/* Export button */
+.cookie-analytics-export-button {
+	display: inline-flex !important;
+	align-items: center;
+}
+
+/* Chart */
+.cookie-analytics-chart-container {
+	position: relative;
+	width: 100%;
+	max-height: 400px;
+}
+
+/* Stats table */
+.cookie-analytics-table {
+	border-collapse: collapse;
+}
+
+.cookie-analytics-table th {
+	text-align: left;
+	background: #f9f9f9;
+}
+
+.cookie-analytics-table td,
+.cookie-analytics-table th {
+	padding: 10px 12px;
+}
+
+.cookie-analytics-table tfoot td {
+	background: #f6f7f7;
+	font-size: 0.95em;
+}
+
+/* Color dots */
+.cookie-analytics-dot {
+	display: inline-block;
+	width: 12px;
+	height: 12px;
+	border-radius: 50%;
+	margin-right: 6px;
+	vertical-align: middle;
+}
+
+.dot-impression {
+	background-color: #3b82f6;
+}
+
+.dot-accept {
+	background-color: #22c55e;
+}
+
+.dot-reject {
+	background-color: #ef4444;
+}
+
+.dot-personalize {
+	background-color: #f59e0b;
+}
+
+/* Rates */
+.cookie-analytics-rate {
+	font-weight: 600;
+	padding: 2px 8px;
+	border-radius: 10px;
+	font-size: 0.9em;
+}
+
+.rate-accept {
+	background: #dcfce7;
+	color: #166534;
+}
+
+.rate-reject {
+	background: #fee2e2;
+	color: #991b1b;
+}
+
+/* Blacklist form */
+.cookie-analytics-blacklist-form {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-top: 12px;
+}
+
+.cookie-analytics-blacklist-form input[type="text"] {
+	min-width: 220px;
+	padding: 4px 8px;
+}
+
+/* Empty state */
+.cookie-analytics-empty {
+	color: #999;
+	font-style: italic;
+}
+
+/* Danger Zone */
+.cookie-analytics-danger-zone {
+	border-color: #dc3232;
+	background: #fff8f8;
+}
+
+.cookie-analytics-danger-zone h2 {
+	color: #dc3232;
+	border-bottom-color: #f5c6c6;
+}
+
+.cookie-analytics-danger-section h3 {
+	margin: 0 0 4px;
+	font-size: 1em;
+}
+
+.cookie-analytics-danger-divider {
+	border: none;
+	border-top: 1px solid #f5c6c6;
+	margin: 20px 0;
+}
+
+.cookie-analytics-retention-form {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-top: 12px;
+	flex-wrap: wrap;
+}
+
+.cookie-analytics-retention-form label {
+	font-weight: 600;
+}
+
+.cookie-analytics-retention-form select {
+	min-width: 200px;
+}
+
+.cookie-analytics-danger-form {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-top: 12px;
+	flex-wrap: wrap;
+}
+
+.cookie-analytics-danger-form label {
+	font-weight: 600;
+}
+
+.cookie-analytics-danger-form input[type="text"] {
+	max-width: 160px;
+	padding: 4px 8px;
+}
+
+.cookie-analytics-delete-button {
+	background: #dc3232 !important;
+	border-color: #b52727 !important;
+	color: #fff !important;
+}
+
+.cookie-analytics-delete-button:hover {
+	background: #b52727 !important;
+	border-color: #8e1e1e !important;
+	color: #fff !important;
+}

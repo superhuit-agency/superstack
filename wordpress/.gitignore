@@ -9,3 +9,6 @@ auth.json
 !/plugins
 /plugins/*
 !/plugins/.gitkeep
+
+## keep google analytics plugin
+!/plugins/cookie-analytics
