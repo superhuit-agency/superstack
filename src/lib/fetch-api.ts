@@ -13,7 +13,7 @@ const fetchAPI: FetchApiFuncType = async (query, options) => {
 		auth,
 		headers = {},
 		endpoint = WP_GRAPHQL_URL,
-		cache = 'force-cache',
+		cache = 'default',
 	} = options ?? {};
 
 	headers['Content-Type'] = 'application/json';
