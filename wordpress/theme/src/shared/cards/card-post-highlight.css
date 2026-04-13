@@ -1,0 +1,73 @@
+.spck-card-post.-highlight {
+	gap: 0;
+
+	.spck-card-post__body {
+		position: initial;
+		flex-wrap: wrap;
+
+		@media (min-width: 600px) {
+			align-items: center;
+			flex-direction: row;
+			flex-grow: 1;
+			flex-wrap: nowrap;
+		}
+		@media (min-width: 768px) {
+			&:not(:has(.wp-block-post-featured-image)) {
+				.spck-card-post__content {
+					max-width: 66%;
+				}
+			}
+		}
+	}
+
+	.spck-card-post__inner {
+		order: 1;
+
+		@media (min-width: 600px) {
+			order: initial;
+		}
+	}
+
+	.spck-card-post__content {
+		flex-grow: initial;
+
+		.wp-block-post-excerpt__excerpt {
+			font-size: var(--wp--preset--font-size--large);
+		}
+	}
+
+	.wp-block-post-featured-image {
+		flex-shrink: 0;
+		width: 100%;
+		height: auto;
+		aspect-ratio: 16/9 !important;
+
+		@media (min-width: 600px) {
+			width: 40%;
+			height: 100%;
+		}
+
+		img {
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+			border-radius: var(--wp--preset--spacing--20, 10px);
+		}
+	}
+
+	.wp-block-post-excerpt__excerpt {
+		line-clamp: 6;
+		-webkit-line-clamp: 6;
+	}
+
+	/*
+
+	@media (max-width: 600px) {
+		.spck-card-post__content {
+			.wp-block-post-title a::after {
+				right: 0;
+				width: 100%;
+			}
+		}
+	} */
+}

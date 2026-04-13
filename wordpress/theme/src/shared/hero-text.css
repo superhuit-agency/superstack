@@ -1,0 +1,22 @@
+.spck-hero-text {
+	background-color: var(--wp--preset--color--accent-7);
+
+	.spck-hero-text__inner {
+		justify-content: center;
+		min-height: clamp(220px, 20vw, 350px);
+		overflow: hidden;
+		background-image: url(../assets/hero-text-tree-background.svg);
+		background-position: calc(100% - var(--wp--preset--spacing--50)) bottom;
+		background-repeat: no-repeat;
+
+		background-size: clamp(100px, 11vw, 180px);
+	}
+
+	.spck-hero-text__stack {
+		@media (min-width: 600px) {
+			> * {
+				max-width: 70%;
+			}
+		}
+	}
+}

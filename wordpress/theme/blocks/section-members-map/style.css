@@ -1,0 +1,219 @@
+.spck-section-members-map {
+	position: relative;
+	background-color: var(--wp--preset--color--accent-6);
+
+	overflow: hidden;
+
+	max-width: none !important;
+	margin: 0 !important;
+
+	.spck-section-members-map__inner {
+		height: 100%;
+		display: flex;
+		flex-direction: column;
+		gap: 20px;
+
+		max-width: var(--wp--style--global--content-size);
+		margin-inline: auto;
+		padding-inline: var(--wp--preset--spacing--50);
+		padding-block: var(--wp--preset--spacing--80);
+		box-sizing: border-box;
+	}
+
+	.spck-section-members-map__content,
+	.spck-section-members-map__members {
+		width: 100%;
+		@media (min-width: 768px) {
+			width: 43%;
+		}
+		@media (min-width: 900px) {
+			width: 39%;
+		}
+	}
+
+	.spck-section-members-map__content {
+		position: relative;
+		gap: 10px;
+
+		p {
+			@media (min-width: 768px) {
+				position: absolute;
+				top: calc(100% + 10px);
+				left: 0;
+				right: 0;
+			}
+		}
+	}
+
+	.spck-section-members-map__infos {
+		margin: auto 0 0;
+
+		@media (min-width: 768px) {
+			order: 2;
+		}
+
+	}
+
+	/* MEMBERS */
+	.spck-section-members-map__members {
+		order: 2;
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity 0.3s;
+
+		@media (min-width: 768px) {
+			order: unset;
+			width: 42%;
+			height: 460px;
+			margin-bottom: 45px;
+		}
+		@media (min-width: 900px) {
+			width: 39.5%;
+		}
+	}
+
+	.spck-section-members-map__members__inner {
+		border-radius: var(--wp--preset--spacing--20, 10px);
+		background-color: var(--wp--preset--color--base);
+		padding-inline: var(--wp--preset--spacing--30);
+
+		max-height: 460px;
+		overflow-y: auto;
+	}
+
+	.spck-section-members-map__members__list {
+		margin: -1px 0 0;
+		padding: 0;
+	}
+
+	.spck-section-members-map__member {
+		display: none;
+		flex-direction: column;
+		padding-block: var(--wp--preset--spacing--30);
+		border-top: 1px solid var(--wp--preset--color--accent-2);
+
+		&.-visible {
+			display: flex;
+			&:first-of-type {
+				border-top: none;
+			}
+		}
+	}
+
+	.spck-section-members-map__member__name {
+		font-size: var(--wp--preset--font-size--large);
+		letter-spacing: -0.2px;
+		margin: 0;
+	}
+	.spck-section-members-map__member__content {
+		margin-top: 5px;
+		display: grid;
+		gap: 10px;
+		@media (min-width: 600px) {
+			grid-template-columns: 1fr 1fr;
+		}
+		@media (min-width: 768px) {
+			grid-template-columns: 1fr;
+		}
+		@media (min-width: 1024px) {
+			grid-template-columns: 1fr 1fr;
+		}
+		p {
+			margin: 0;
+			&.spck-section-members-map__member__website {
+				margin-top: 20px;
+				font-weight: 500;
+			}
+		}
+	}
+
+	/* MAP */
+	.spck-section-members-map__map {
+		position: relative;
+		margin: -40px -150% 20px 0;
+		pointer-events: none;
+
+		@media (min-width: 480px) {
+			margin-right: -100%;
+		}
+		@media (min-width: 600px) {
+			margin: -30px -50% 20px 10%;
+		}
+		@media (min-width: 768px) {
+			position: absolute;
+			top: 10px;
+			left: 50%;
+			bottom: 68px;
+			margin: 0;
+		}
+
+		img {
+			display: block;
+			width: 100%;
+
+			@media (min-width: 768px) {
+				width: auto;
+				height: 100%;
+			}
+		}
+	}
+
+	.spck-section-members-map__pins {
+		position: absolute;
+		inset: 0;
+	}
+
+	.spck-section-members-map__pin {
+		pointer-events: auto;
+		transform: translate(-50%, -100%);
+		background: none;
+		border: none;
+		padding: 0;
+		position: absolute;
+		cursor: pointer;
+
+		svg {
+			path,
+			ellipse {
+				transition: fill 0.2s, opacity 0.2s;
+			}
+		}
+
+		&:hover,
+		&:focus-visible,
+		&.-current {
+			svg {
+				path {
+					fill: var(--wp--preset--color--contrast);
+				}
+				ellipse {
+					fill: var(--wp--preset--color--accent-1);
+				}
+			}
+		}
+	}
+
+	.spck-section-members-map__cluster-count {
+		position: absolute;
+		bottom: 5px;
+		left: 33px;
+
+		font-size: 14px;
+		font-weight: 600;
+		letter-spacing: -0.14px;
+	}
+
+
+	&.-has-open-members {
+		.spck-section-members-map__content p {
+			@media (min-width: 768px) {
+				opacity: 0;
+				pointer-events: none;
+			}
+		}
+		.spck-section-members-map__members {
+			opacity: 1;
+			pointer-events: auto;
+		}
+	}
+}

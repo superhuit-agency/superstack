@@ -1,0 +1,84 @@
+.spck-section-cards {
+	.spck-section-cards__list {
+		grid-template-columns: repeat(1, 1fr);
+
+		> * {
+			margin: 0;
+		}
+
+		&:not([class*="has-"][class*="-columns"]) {
+			@media (min-width: 600px) {
+				grid-template-columns: repeat(2, 1fr);
+			}
+			@media (min-width: 900px) {
+				grid-template-columns: repeat(3, 1fr);
+			}
+			@media (min-width: 1024px) {
+				grid-template-columns: repeat(4, 1fr);
+			}
+		}
+
+		&.has-3-columns {
+			@media (min-width: 900px) {
+				grid-template-columns: repeat(3, 1fr);
+			}
+		}
+	}
+
+	&.-text,
+	&.-text-link {
+		/* Odd sections (1st, 3rd, 5th...) - normal order: 2,3,4,5,6 */
+		&:nth-of-type(odd) {
+			.spck-section-cards__list > * {
+				&:nth-child(5n + 1) {
+					--card-bg-color: var(--wp--preset--color--accent-2);
+				}
+
+				&:nth-child(5n + 2) {
+					--card-bg-color: var(--wp--preset--color--accent-3);
+				}
+
+				&:nth-child(5n + 3) {
+					--card-bg-color: var(--wp--preset--color--accent-4);
+				}
+
+				&:nth-child(5n + 4) {
+					--card-bg-color: var(--wp--preset--color--accent-5);
+				}
+
+				&:nth-child(5n + 5) {
+					--card-bg-color: var(--wp--preset--color--accent-6);
+				}
+
+				background-color: var(--card-bg-color);
+			}
+		}
+
+		/* Even sections (2nd, 4th, 6th...) - reversed order: 6,5,4,3,2 */
+		&:nth-of-type(even) {
+			.spck-section-cards__list > * {
+				&:nth-child(5n + 1) {
+					--card-bg-color: var(--wp--preset--color--accent-6);
+				}
+
+				&:nth-child(5n + 2) {
+					--card-bg-color: var(--wp--preset--color--accent-5);
+				}
+
+				&:nth-child(5n + 3) {
+					--card-bg-color: var(--wp--preset--color--accent-4);
+				}
+
+				&:nth-child(5n + 4) {
+					--card-bg-color: var(--wp--preset--color--accent-3);
+				}
+
+				&:nth-child(5n + 5) {
+					--card-bg-color: var(--wp--preset--color--accent-2);
+				}
+
+				background-color: var(--card-bg-color);
+			}
+		}
+	}
+}

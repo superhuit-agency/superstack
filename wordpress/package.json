@@ -1,0 +1,33 @@
+{
+  "name": "Superstack",
+  "version": "2.0.0",
+  "description": "Superstack Future Theme made with love by superhuit.ch",
+  "main": "index.js",
+  "scripts": {
+    "postinstall": "npm --prefix ./theme \"$npm_command\"",
+    "prestart": "sh ./scripts/pre-start.sh",
+    "start": "sh ./scripts/start-wp.sh",
+    "stop": "sh ./scripts/stop-wp.sh",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "clear-cache": "wp @local transient delete --all && wp @local db query \"DELETE FROM wp_options where option_name LIKE '%wp_theme_files_patterns%'\"",
+    "dev": "npm --prefix ./theme run dev",
+    "build": "npm --prefix ./theme run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/superhuit-agency/superstack.git"
+  },
+  "keywords": [
+    "wordpress"
+  ],
+  "author": "superhuit",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/superhuit-agency/superstack/issues"
+  },
+  "homepage": "https://github.com/superhuit-agency/superstack#readme",
+  "devDependencies": {
+    "@wordpress/stylelint-config": "^23.30.0",
+    "stylelint": "^16.26.1"
+  }
+}

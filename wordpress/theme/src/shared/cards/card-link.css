@@ -1,0 +1,19 @@
+.spck-card-link {
+	background-color: var(--wp--preset--color--accent-7);
+	border-radius: 20px;
+	min-height: clamp(170px, 13.333vw, 210px); /* ~192px @ 1440px */
+	height: 100%;
+
+	.wp-block-group.is-vertical.is-layout-flex {
+		justify-content: space-between;
+		align-items: flex-start;
+		flex-wrap: nowrap;
+		height: 100%;
+	}
+
+	.wp-block-heading {
+		/* Apply h5 styles */
+		font-size: clamp(14px, calc(14px + (6 * (100vw - 320px) / 1020)), 20px);
+		letter-spacing: -0.4px;
+	}
+}

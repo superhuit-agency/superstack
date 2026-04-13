@@ -1,0 +1,18 @@
+
+.spck-card-text {
+	background-color: var(--wp--preset--color--accent-7);
+	border-radius: 20px;
+	min-height: clamp(240px, 18vw, 280px);
+	height: 100%;
+
+	.wp-block-group.is-vertical.is-layout-flex {
+		justify-content: space-between;
+		align-items: flex-start;
+		height: 100%;
+	}
+
+	/* Description */
+	p {
+		font-weight: 500;
+	}
+}

@@ -1,0 +1,36 @@
+.spck-section-members-map {
+	.spck-section-members-map__inner {
+		flex-direction: row;
+
+		> .block-editor-inner-blocks {
+			width: 50%;
+			flex-shrink: 0;
+
+			> .block-editor-block-list__layout {
+				height: 100%;
+				display: flex;
+				flex-direction: column;
+			}
+		}
+	}
+
+	.spck-section-members-map__content {
+		width: 80%;
+		p {
+			@media (min-width: 768px) {
+				position: static;
+			}
+		}
+	}
+
+	.spck-section-members-map__map {
+		position: relative;
+		width: auto;
+		margin-right: -30%;
+		left: 0;
+
+		img {
+			width: 100%;
+		}
+	}
+}

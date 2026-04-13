@@ -1,0 +1,29 @@
+.wp-block-button {
+	&:not(.is-style-link) {
+		.wp-block-button__link {
+			transition-property: color, background-color, border-color;
+			transition-duration: 0.2s;
+			transition-timing-function: ease-in-out;
+		}
+
+		&:hover .wp-block-button__link,
+		.wp-block-button__link:hover {
+			background-color: var(--wp--preset--color--contrast);
+			color: var(--wp--preset--color--accent-1);
+			border-color: var(--wp--preset--color--contrast);
+		}
+	}
+
+	&.is-style-link {
+		.wp-block-button__link {
+			transition: color 0.2s ease-in-out;
+
+			border-color: currentColor;
+		}
+
+		&:hover .wp-block-button__link,
+		.wp-block-button__link:hover {
+			color: var(--wp--preset--color--contrast-light);
+		}
+	}
+}

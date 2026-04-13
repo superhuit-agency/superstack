@@ -1,0 +1,83 @@
+<!-- wp:template-part {"slug":"header","theme":"superstack"} /-->
+
+<!-- wp:group {"tagName":"main","layout":{"type":"default"}} -->
+<main class="wp-block-group">
+  <!-- wp:group {"layout":{"type":"constrained"}} -->
+  <div class="wp-block-group">
+    <!-- wp:group {"tagName":"header","templateLock":false,"lock":{"move":false,"remove":false},"metadata":{"name":"En-tête avec image","patternName":"superstack/hero-text-media","categories":["header"]},"className":"spck-header-text-media","style":{"spacing":{"padding":{"top":"var:preset|spacing|50","bottom":"var:preset|spacing|50","left":"var:preset|spacing|50","right":"var:preset|spacing|50"}}},"layout":{"type":"constrained"},"allowedBlocks":[]} -->
+    <header
+      class="wp-block-group spck-header-text-media"
+      style="
+        padding-top: var(--wp--preset--spacing--50);
+        padding-right: var(--wp--preset--spacing--50);
+        padding-bottom: var(--wp--preset--spacing--50);
+        padding-left: var(--wp--preset--spacing--50);
+      "
+    >
+      <!-- wp:columns {"verticalAlignment":"center","templateLock":"all","lock":{"move":true,"remove":true},"style":{"spacing":{"blockGap":{"left":"var:preset|spacing|50"}}}} -->
+      <div class="wp-block-columns are-vertically-aligned-center">
+        <!-- wp:column {"verticalAlignment":"center","width":"50%","allowedBlocks":[]} -->
+        <div
+          class="wp-block-column is-vertically-aligned-center"
+          style="flex-basis: 50%"
+        >
+          <!-- wp:group {"style":{"spacing":{"blockGap":"var:preset|spacing|50"}},"layout":{"type":"flex","orientation":"vertical"},"allowedBlocks":["core/buttons"]} -->
+          <div class="wp-block-group">
+            <!-- wp:group {"style":{"spacing":{"blockGap":"var:preset|spacing|30"}},"layout":{"type":"constrained"},"allowedBlocks":["core/heading","core/paragraph"]} -->
+            <div class="wp-block-group">
+              <!-- wp:heading {"level":1} -->
+              <h1 class="wp-block-heading">La page est introuvable</h1>
+              <!-- /wp:heading -->
+
+              <!-- wp:paragraph {"fontSize":"large"} -->
+              <p class="has-large-font-size">
+                La page que vous recherchez n’existe pas, ou elle a été
+                déplacée.
+              </p>
+              <!-- /wp:paragraph -->
+            </div>
+            <!-- /wp:group -->
+
+            <!-- wp:buttons {"lock":{"move":true,"remove":false}} -->
+            <div class="wp-block-buttons">
+              <!-- wp:button -->
+              <div class="wp-block-button">
+                <a
+                  class="wp-block-button__link wp-element-button"
+                  href="http://localhost/"
+                  >Aller à la page d'accueil</a
+                >
+              </div>
+              <!-- /wp:button -->
+            </div>
+            <!-- /wp:buttons -->
+          </div>
+          <!-- /wp:group -->
+        </div>
+        <!-- /wp:column -->
+
+        <!-- wp:column {"verticalAlignment":"center","width":"50%"} -->
+        <div
+          class="wp-block-column is-vertically-aligned-center"
+          style="flex-basis: 50%"
+        >
+          <!-- wp:image {"aspectRatio":"1","scale":"contain","sizeSlug":"full","linkDestination":"none","style":{"layout":{"selfStretch":"fit","flexSize":null}}} -->
+          <figure class="wp-block-image size-full">
+            <img
+              alt="Superstack"
+              style="aspect-ratio: 1; object-fit: contain"
+            />
+          </figure>
+          <!-- /wp:image -->
+        </div>
+        <!-- /wp:column -->
+      </div>
+      <!-- /wp:columns -->
+    </header>
+    <!-- /wp:group -->
+  </div>
+  <!-- /wp:group -->
+</main>
+<!-- /wp:group -->
+
+<!-- wp:template-part {"slug":"footer","theme":"superstack"} /-->

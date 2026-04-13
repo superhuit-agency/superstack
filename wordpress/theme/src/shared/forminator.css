@@ -1,0 +1,174 @@
+.forminator-ui.forminator-design--material {
+	.forminator-field-select .select2-container {
+		display: none !important;
+	}
+
+	.forminator-select--field {
+		appearance: none;
+		-webkit-appearance: none;
+		display: block !important;
+		position: static !important;
+		clip: auto !important;
+		clip-path: none !important;
+		overflow: visible !important;
+		background: transparent
+			url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23111' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+			no-repeat right center !important;
+		border: none !important;
+		border-bottom: 1px solid rgb(118, 118, 118) !important;
+		border-radius: 0 !important;
+		font-size: var(--wp--preset--font-size--medium) !important;
+		padding: 10px 20px 9px 0 !important;
+		width: 100% !important;
+		height: auto !important;
+		cursor: pointer;
+		color: var(--wp--preset--color--contrast);
+
+		&:focus {
+			outline: none;
+			border-bottom-color: var(--wp--preset--color--contrast) !important;
+		}
+	}
+
+	.forminator-all-group-copies {
+		background: transparent !important;
+		padding: 0 !important;
+		border-radius: 0 !important;
+		box-shadow: none !important;
+	}
+
+	.forminator-field-group,
+	.forminator-field-section {
+		margin-top: var(--wp--preset--spacing--40) !important;
+	}
+
+	.forminator-repeater-label {
+		font-size: clamp(
+			20px,
+			calc(20px + (8 * (100vw - 320px) / 1020)),
+			28px
+		) !important;
+		font-weight: 700 !important;
+		line-height: 1.1 !important;
+		letter-spacing: -0.56px !important;
+		margin-bottom: var(--wp--preset--spacing--20) !important;
+	}
+
+	.forminator-field-section .forminator-title {
+		font-size: clamp(
+			20px,
+			calc(20px + (8 * (100vw - 320px) / 1020)),
+			28px
+		) !important;
+		font-weight: 700 !important;
+		line-height: 1.1 !important;
+		letter-spacing: -0.56px !important;
+	}
+
+	.forminator-field-section .forminator-subtitle,
+	.forminator-field-group .forminator-description {
+		font-size: var(--wp--preset--font-size--small) !important;
+		font-weight: 400;
+		line-height: 1.3 !important;
+		letter-spacing: -0.16px !important;
+	}
+
+	.forminator-field-date {
+		.forminator-icon-calendar {
+			display: none !important;
+		}
+
+		.forminator-input-with-icon {
+			padding-left: 0 !important;
+		}
+
+		input[type="date"] {
+			-webkit-appearance: none;
+			appearance: none;
+			min-height: 40px;
+			font-size: var(--wp--preset--font-size--medium) !important;
+			color: var(--wp--preset--color--contrast);
+			background: transparent !important;
+			border: none !important;
+			border-bottom: 1px solid rgb(118, 118, 118) !important;
+			border-radius: 0 !important;
+			padding: 10px 0 9px !important;
+
+			&::-webkit-date-and-time-value {
+				text-align: left;
+			}
+		}
+	}
+
+	.forminator-field-consent {
+		> .forminator-field > .forminator-label {
+			display: none !important;
+		}
+
+		.forminator-checkbox__wrapper {
+			display: flex !important;
+			align-items: baseline !important;
+			gap: 10px;
+		}
+
+		.forminator-checkbox.forminator-consent {
+			flex-shrink: 0;
+			width: 24px !important;
+			height: 24px !important;
+			position: relative;
+			top: 4px;
+		}
+
+		.forminator-checkbox-box {
+			width: 24px !important;
+			height: 24px !important;
+			border: 1px solid rgb(118, 118, 118) !important;
+			border-radius: 3px !important;
+			background: transparent !important;
+		}
+
+		.forminator-consent__label {
+			margin-left: 0 !important;
+			color: var(--wp--preset--color--contrast) !important;
+
+			&,
+			p {
+				font-size: var(--wp--preset--font-size--medium) !important;
+				line-height: 1.3 !important;
+				letter-spacing: -0.16px !important;
+			}
+		}
+	}
+
+	.forminator-button {
+		cursor: pointer;
+		font-size: var(--wp--preset--font-size--medium) !important;
+		font-weight: 500 !important;
+		line-height: 1.1 !important;
+
+		color: var(--wp--preset--color--contrast);
+		background-color: transparent;
+		border: 1px solid currentColor !important;
+		color: currentColor;
+		padding: calc(1rem - 1px) calc(2.25rem - 1px) !important;
+		border-radius: 9999px !important;
+		box-shadow: none;
+
+		background: transparent none;
+
+		transition-property: color, background-color, border-color;
+		transition-duration: 0.2s;
+		transition-timing-function: ease-in-out;
+
+		&.forminator-button-submit {
+			background-color: var(--wp--preset--color--accent-1) !important;
+			border: none !important;
+		}
+
+		&:hover {
+			background-color: var(--wp--preset--color--contrast) !important;
+			color: var(--wp--preset--color--accent-1) !important;
+			border-color: var(--wp--preset--color--contrast) !important;
+		}
+	}
+}

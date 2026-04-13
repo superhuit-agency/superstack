@@ -1,0 +1,126 @@
+{
+    "key": "group_698df9fa2d35a",
+    "title": "Revue de presse - détails",
+    "fields": [
+        {
+            "key": "field_67ae2a1b3c4d5",
+            "label": "Type",
+            "name": "press_review_type",
+            "aria-label": "",
+            "type": "button_group",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "choices": {
+                "link": "Lien",
+                "audio": "Audio"
+            },
+            "default_value": "link",
+            "return_format": "value",
+            "allow_null": 0,
+            "allow_in_bindings": 0,
+            "layout": "horizontal"
+        },
+        {
+            "key": "field_698dfa9b9bb5e",
+            "label": "Lien de l'article",
+            "name": "url",
+            "aria-label": "",
+            "type": "url",
+            "instructions": "",
+            "required": 1,
+            "conditional_logic": [
+                [
+                    {
+                        "field": "field_67ae2a1b3c4d5",
+                        "operator": "==",
+                        "value": "link"
+                    }
+                ]
+            ],
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "allow_in_bindings": 0,
+            "placeholder": "https:\/\/"
+        },
+        {
+            "key": "field_67ae2b2c3d4e6",
+            "label": "Fichier audio",
+            "name": "audio_file",
+            "aria-label": "",
+            "type": "file",
+            "instructions": "",
+            "required": 1,
+            "conditional_logic": [
+                [
+                    {
+                        "field": "field_67ae2a1b3c4d5",
+                        "operator": "==",
+                        "value": "audio"
+                    }
+                ]
+            ],
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "return_format": "array",
+            "library": "all",
+            "mime_types": "mp3,m4a,ogg,wav,flac",
+            "allow_in_bindings": 0,
+            "min_size": "",
+            "max_size": ""
+        },
+        {
+            "key": "field_698dfea314b09",
+            "label": "Courte description",
+            "name": "excerpt",
+            "aria-label": "",
+            "type": "textarea",
+            "instructions": "120 caractères maximum",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": 250,
+            "allow_in_bindings": 0,
+            "rows": 4,
+            "placeholder": "",
+            "new_lines": ""
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "post_type",
+                "operator": "==",
+                "value": "press_review"
+            }
+        ]
+    ],
+    "menu_order": 0,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": "",
+    "show_in_rest": 0,
+    "display_title": "",
+    "modified": 1770992573
+}

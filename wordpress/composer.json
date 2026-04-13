@@ -1,0 +1,64 @@
+{
+  "name": "superhuit/superstack",
+  "version": "1.0.0",
+  "type": "project",
+  "authors": [
+    {
+      "name": "Superhuit",
+      "email": "tech@superhuit.ch"
+    }
+  ],
+  "config": {
+    "allow-plugins": {
+      "composer/installers": true
+    }
+  },
+  "extra": {
+    "installer-paths": {
+      "wp-content/plugins/{$name}/": [
+        "type:wordpress-plugin"
+      ]
+    }
+  },
+  "require": {
+    "php": "^8.3",
+    "wpackagist-plugin/disable-comments": "^2.6",
+    "wpackagist-plugin/disable-emojis": "^1.7",
+    "wpackagist-plugin/duplicate-post": "^4.5",
+    "wpackagist-plugin/redirection": "^5.6",
+    "wpackagist-plugin/simple-custom-post-order": "^2.5",
+    "wpackagist-plugin/svg-support": "^2.5",
+    "wpackagist-plugin/wordpress-seo": "^27.0",
+    "wpengine/advanced-custom-fields-pro": "^6.7",
+    "superhuit-agency/forminator": "dev-main",
+    "wpackagist-plugin/content-control": "^2.6",
+    "wpackagist-plugin/user-role-editor": "^4.64",
+    "wpackagist-plugin/gallery-block-lightbox": "^1.16",
+    "wpackagist-plugin/wp-nested-pages": "^3.2",
+    "superhuit/cookie-law-consent": "^1.8"
+  },
+  "repositories": [
+    {
+      "name": "release-belt.superhuit.ch",
+      "type": "composer",
+      "url": "https://release-belt.superhuit.ch/"
+    },
+    {
+      "name": "acf",
+      "type": "composer",
+      "url": "https://connect.advancedcustomfields.com"
+    },
+    {
+      "type": "composer",
+      "url": "https://wpackagist.org",
+      "only": [
+        "wpackagist-plugin/*",
+        "wpackagist-theme/*"
+      ]
+    },
+    {
+      "type": "vcs",
+      "url": "https://github.com/superhuit-agency/forminator"
+    }
+  ]
+}

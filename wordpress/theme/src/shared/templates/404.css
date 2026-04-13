@@ -1,0 +1,7 @@
+.error404 {
+	main > .wp-block-group {
+		min-height: 80dvh;
+		display: flex;
+		align-items: center;
+	}
+}

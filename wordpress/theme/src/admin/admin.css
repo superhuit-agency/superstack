@@ -1,0 +1,33 @@
+/* Write CSS for the admin */
+
+/**
+ * Clean-up user-profile BE page
+ */
+#profile-page,
+.profile-php,
+.user-edit-php {
+	#your-profile {
+		.user-url-wrap,
+		.user-facebook-wrap,
+		.user-instagram-wrap,
+		.user-linkedin-wrap,
+		.user-myspace-wrap,
+		.user-pinterest-wrap,
+		.user-soundcloud-wrap,
+		.user-tumblr-wrap,
+		.user-twitter-wrap,
+		.user-youtube-wrap,
+		.user-wikipedia-wrap,
+		#application-passwords-section,
+		> h2:nth-of-type(1),
+		> h2:nth-of-type(1) + table,
+		> h2:nth-of-type(4),
+		> h2:nth-of-type(4) + table,
+		> h3:nth-of-type(1) + table tr:nth-of-type(2),
+		> h3:nth-of-type(2),
+		> h3:nth-of-type(2) + table,
+		.yoast-settings {
+			display: none;
+		}
+	}
+}

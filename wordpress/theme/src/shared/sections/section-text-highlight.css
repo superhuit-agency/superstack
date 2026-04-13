@@ -1,0 +1,17 @@
+.spck-section-text-highlight {
+	background-color: var(--wp--preset--color--accent-7);
+
+	.spck-section-text-highlight__inner {
+		max-width: var(--wp--custom--layout--narrow);
+
+		.wp-block-heading {
+			border-bottom: 2px solid var(--wp--preset--color--accent-1);
+			font-size: 14px;
+			font-weight: 800;
+			line-height: 1.1;
+			letter-spacing: 0.7px;
+			text-transform: uppercase;
+			padding-bottom: var(--wp--preset--spacing--20);
+		}
+	}
+}
