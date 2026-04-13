@@ -35,7 +35,14 @@
     "wpackagist-plugin/user-role-editor": "^4.64",
     "wpackagist-plugin/gallery-block-lightbox": "^1.16",
     "wpackagist-plugin/wp-nested-pages": "^3.2",
-    "superhuit/cookie-law-consent": "^1.8"
+    "superhuit/cookie-law-consent": "^1.8",
+    "ashhitch/wp-graphql-yoast-seo": "^5.0",
+    "pristas-peter/wp-graphql-gutenberg": "^0.4.1",
+    "superhuit/wp-graphql-redirection": "^1.1",
+    "superhuit-agency/nextjs-revalidate": "^1.6",
+    "valu/wp-graphql-offset-pagination": "^0.2.1",
+    "wp-graphql/wp-graphql-jwt-authentication": "^0.7.2",
+    "wpackagist-plugin/wp-graphql": "^2.11"
   },
   "repositories": [
     {
@@ -47,6 +54,42 @@
       "name": "acf",
       "type": "composer",
       "url": "https://connect.advancedcustomfields.com"
+    },
+    {
+      "type": "package",
+      "package": {
+        "name": "superhuit-agency/nextjs-revalidate",
+        "version": "1.6.4",
+        "type": "wordpress-plugin",
+        "dist": {
+          "url": "https://github.com/superhuit-agency/nextjs-revalidate/releases/download/v1.6.4/nextjs-revalidate-v1.6.4.zip",
+          "type": "zip"
+        }
+      }
+    },
+    {
+      "type": "package",
+      "package": {
+        "name": "superhuit-agency/wp-graphql-gutenberg",
+        "version": "0.4.1",
+        "type": "wordpress-plugin",
+        "dist": {
+          "url": "https://github.com/superhuit-agency/wp-graphql-gutenberg/archive/refs/tags/v0.4.1.supt-fix.zip",
+          "type": "zip"
+        }
+      }
+    },
+    {
+      "type": "package",
+      "package": {
+        "name": "superhuit-agency/wp-graphql-offset-pagination",
+        "version": "0.2.1",
+        "type": "wordpress-plugin",
+        "dist": {
+          "url": "https://github.com/superhuit-agency/wp-graphql-offset-pagination/releases/download/v0.2.1/wp-graphql-offset-pagination.zip",
+          "type": "zip"
+        }
+      }
     },
     {
       "type": "composer",

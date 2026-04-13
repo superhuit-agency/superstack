@@ -21,3 +21,16 @@ IN REDACTION
 ```
 
 ## Next.js
+
+### Installation
+
+```bash
+    cd next
+    npm install
+```
+
+## Development
+
+```bash
+    npm run dev
+```
