@@ -3,7 +3,7 @@
 use function SUPT\get_next_url;
 use function SUPT\get_remote_json;
 
-const WEBPACK_PORT = 3500;
+const VITE_PORT = 3500;
 
 class SuptTheme {
 
@@ -109,54 +109,80 @@ class SuptTheme {
 	}
 
 	function register_assets() {
-		// vars
-		$manifest = null;
-		$assets_uri = '';
+		$vite_origin = sprintf( 'http%s://host.docker.internal:%d', ( is_ssl() ? 's' : '' ), VITE_PORT );
 
 		// In dev mode
-		// -> try to load assets from webpack-dev-server
-		if ( WP_DEBUG && $manifest = get_remote_json( sprintf('http%s://host.docker.internal:%d/manifest.json', (is_ssl() ? 's':''), WEBPACK_PORT) ) ) {
-			$assets_uri = "";
+		// -> check if Vite dev server is running by requesting its client endpoint
+		if ( WP_DEBUG ) {
+			$response = wp_remote_get( $vite_origin . '/@vite/client', [ 'timeout' => 1 ] );
+			if ( ! is_wp_error( $response ) && 200 === wp_remote_retrieve_response_code( $response ) ) {
+				// Vite dev server is running: serve scripts directly from the dev server.
+				// CSS is injected at runtime by the module scripts – no separate stylesheet needed.
+				$this->assets['vite_dev']      = true;
+				$this->assets['vite_origin']   = $vite_origin;
+				$this->assets['editor']['js']  = $vite_origin . '/theme/lib/editor/_loader.ts';
+				$this->assets['admin']['js']   = $vite_origin . '/theme/lib/admin/_loader.ts';
+				return;
+			}
 		}
 
 		// Not in dev mode
-		// OR webpack-dev-server is not running
-		// -> try to load from the filesystem  [/wp-content/themes/superstack/static/manifest.json]
-		elseif ( file_exists(THEME_PATH . '/static/manifest.json') && $manifest = json_decode(file_get_contents(THEME_PATH . '/static/manifest.json', true)) ) {
-			$assets_uri = THEME_URI . '/static';
+		// OR Vite dev server is not running
+		// -> try to load from the filesystem  [/wp-content/themes/superstack/static/.vite/manifest.json]
+		$manifest_path = THEME_PATH . '/static/.vite/manifest.json';
+		if ( ! file_exists( $manifest_path ) ) {
+			wp_die( 'Please build the theme assets (run <code>npm run build</code> in the wordpress/ directory).' );
 		}
 
-		// Manifest not found…
-		// -> bail
-		else {
-			wp_die('Please build the theme with webpack (manifest.json cannot be found).');
-		}
+		$manifest   = json_decode( file_get_contents( $manifest_path ) );
+		$assets_uri = THEME_URI . '/static';
 
-		$this->assets['editor']['css'] = !empty($manifest->{'editor.css'}) ? $assets_uri . $manifest->{'editor.css'} : null;
-		$this->assets['editor']['js']  = !empty($manifest->{'editor.js'})  ? $assets_uri . $manifest->{'editor.js'}  : null;
-		$this->assets['admin']['css']  = !empty($manifest->{'admin.css'})  ? $assets_uri . $manifest->{'admin.css'}  : null;
-		$this->assets['admin']['js']   = !empty($manifest->{'admin.js'})   ? $assets_uri . $manifest->{'admin.js'}   : null;
+		// Vite manifest format (v5+):
+		// { "theme/lib/editor/_loader.ts": { "file": "editor.hash.js", "css": ["editor.hash.css"] } }
+		$editor_entry = $manifest->{'theme/lib/editor/_loader.ts'} ?? null;
+		$admin_entry  = $manifest->{'theme/lib/admin/_loader.ts'}  ?? null;
+
+		$this->assets['editor']['css'] = ! empty( $editor_entry->css[0] ) ? $assets_uri . '/' . $editor_entry->css[0] : null;
+		$this->assets['editor']['js']  = ! empty( $editor_entry->file )   ? $assets_uri . '/' . $editor_entry->file   : null;
+		$this->assets['admin']['css']  = ! empty( $admin_entry->css[0] )  ? $assets_uri . '/' . $admin_entry->css[0]  : null;
+		$this->assets['admin']['js']   = ! empty( $admin_entry->file )    ? $assets_uri . '/' . $admin_entry->file    : null;
 	}
 
 	function enqueue_admin_assets() {
-		if ( !empty($this->assets['admin']['css']) ) wp_enqueue_style( 'supt-admin-style', $this->assets['admin']['css'], false, null );
-		if ( !empty($this->assets['admin']['js']) ) wp_enqueue_script( 'supt-admin-js', $this->assets['admin']['js'], false, null );
+		if ( ! empty( $this->assets['admin']['css'] ) ) {
+			wp_enqueue_style( 'supt-admin-style', $this->assets['admin']['css'], false, null );
+		}
+
+		if ( ! empty( $this->assets['admin']['js'] ) ) {
+			// In dev mode also enqueue the Vite HMR client
+			if ( ! empty( $this->assets['vite_dev'] ) ) {
+				wp_enqueue_script( 'vite-client', $this->assets['vite_origin'] . '/@vite/client', [], null, false );
+				add_filter( 'script_loader_tag', [ $this, 'add_module_type_to_vite_scripts' ], 10, 2 );
+			}
+			wp_enqueue_script( 'supt-admin-js', $this->assets['admin']['js'], [], null, false );
+		}
 	}
 
 	function enqueue_editor_assets() {
-		// Styles
-		if ( !empty($this->assets['editor']['css']) ) {
-			$style_deps = apply_filters( 'supt-style-deps', [ 'wp-editor' ]);
+		// Styles (production only – in dev mode CSS is injected by the module script)
+		if ( ! empty( $this->assets['editor']['css'] ) ) {
+			$style_deps = apply_filters( 'supt-style-deps', [ 'wp-editor' ] );
 			wp_enqueue_style( 'supt-editor-style', $this->assets['editor']['css'], $style_deps, null );
 		}
 
 		// Scripts
-		if ( !empty($this->assets['editor']['js']) ) {
+		if ( ! empty( $this->assets['editor']['js'] ) ) {
+			// In dev mode also enqueue the Vite HMR client
+			if ( ! empty( $this->assets['vite_dev'] ) ) {
+				wp_enqueue_script( 'vite-client', $this->assets['vite_origin'] . '/@vite/client', [], null, false );
+				add_filter( 'script_loader_tag', [ $this, 'add_module_type_to_vite_scripts' ], 10, 2 );
+			}
+
 			$script_deps = apply_filters( 'supt-script-deps', [
 				'wp-editor', 'wp-blocks', 'wp-dom-ready', 'wp-edit-post',
 				'wp-hooks', 'wp-components', 'wp-blocks', 'wp-element',
 				'wp-data', 'wp-date', 'wp-i18n', 'wp-api-fetch', 'wp-core-data'
-			]);
+			] );
 
 			$localized_script = apply_filters( 'supt-localize-script', [ 'theme_uri' => THEME_URI ] );
 
@@ -164,8 +190,21 @@ class SuptTheme {
 			wp_localize_script( 'supt-editor-script', 'supt', $localized_script );
 			wp_enqueue_script( 'supt-editor-script' );
 
-			wp_set_script_translations('supt-editor-script', 'supt', THEME_PATH . '/languages');
+			wp_set_script_translations( 'supt-editor-script', 'supt', THEME_PATH . '/languages' );
 		}
+	}
+
+	/**
+	 * Add type="module" to Vite-generated script tags so the browser
+	 * can handle ES module imports (including HMR in dev mode).
+	 */
+	function add_module_type_to_vite_scripts( $tag, $handle ) {
+		$module_handles = [ 'vite-client', 'supt-editor-script', 'supt-admin-js' ];
+		if ( ! in_array( $handle, $module_handles, true ) ) {
+			return $tag;
+		}
+		// Replace the opening <script> tag to add type="module"
+		return preg_replace( '/(<script\b[^>]*?)(?:\btype=["\'][^"\']*["\'])?(.*?>)/i', '$1 type="module"$2', $tag, 1 );
 	}
 
 	/**
