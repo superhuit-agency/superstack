@@ -214,17 +214,17 @@ export default defineConfig({
 			plugins: [
 				postcssImport({
 					resolve(id, basedir) {
-						// resolve alias @resources -> src/css/resources
-						if (/^@resources/.test(id))
+						// Resolve the @resources alias → src/css/resources/<path>
+						if (/^@resources(\/|$)/.test(id))
 							return path.resolve(
 								rootDir,
 								'src/css/resources',
-								id.slice(11)
+								id.replace(/^@resources\/?/, '')
 							);
-						// resolve node_modules via @ prefix
+						// Resolve @-scoped npm packages from the repo-root node_modules
 						if (/^@/.test(id))
 							return path.resolve(rootDir, 'node_modules', id);
-						// default: relative path
+						// Default: resolve relative to the current file
 						return path.resolve(basedir, id);
 					},
 				}),

@@ -203,8 +203,9 @@ class SuptTheme {
 		if ( ! in_array( $handle, $module_handles, true ) ) {
 			return $tag;
 		}
-		// Replace the opening <script> tag to add type="module"
-		return preg_replace( '/(<script\b[^>]*?)(?:\btype=["\'][^"\']*["\'])?(.*?>)/i', '$1 type="module"$2', $tag, 1 );
+		// Remove any existing type attribute, then inject type="module".
+		$tag = preg_replace( '/\s+type=["\'][^"\']*["\']/i', '', $tag );
+		return str_replace( '<script ', '<script type="module" ', $tag );
 	}
 
 	/**
