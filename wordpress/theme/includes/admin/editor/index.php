@@ -69,7 +69,7 @@ class Index {
 		$unique_id = SUPERSTACK_THEME_NAME . '-editor';
 
 		/*Scripts dependency files*/
-		$deps_file = SUPERSTACK_PATH . 'static/admin/editor.asset.php';
+		$deps_file = SUPERSTACK_PATH . 'static/editor/editor.asset.php';
 
 
 		if (file_exists($deps_file)) {
@@ -78,10 +78,10 @@ class Index {
 			$dependency = $deps_file['dependencies'] ?? [];
 			$version    = $deps_file['version'] ?? SUPERSTACK_VERSION;
 
-			wp_enqueue_script($unique_id, SUPERSTACK_URL . 'static/admin/editor.js', $dependency, $version, true);
+			wp_enqueue_script($unique_id, SUPERSTACK_URL . 'static/editor/editor.js', $dependency, $version, true);
 		}
 
-		wp_enqueue_style($unique_id, SUPERSTACK_URL . 'static/admin/editor.css', [], SUPERSTACK_VERSION);
+		wp_enqueue_style($unique_id, SUPERSTACK_URL . 'static/editor/editor.css', [], SUPERSTACK_VERSION);
 	}
 }
 
