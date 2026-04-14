@@ -7,6 +7,7 @@ type BlockModule = {
 const blocksList: Record<string, () => Promise<BlockModule>> = {
   'core/audio': () => import('../core/Audio'),
   'core/cover': () => import('../core/Cover'),
+  'core/file': () => import('../core/File'),
   'core/heading': () => import('../core/Heading'),
   'core/paragraph': () => import('../core/Paragraph'),
   'core/image': () => import('../core/Image'),
