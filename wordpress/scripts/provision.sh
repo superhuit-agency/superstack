@@ -29,13 +29,21 @@
 #
 #===========================================
 
-THEME_NAME=${THEME_NAME:="superstack"}
+IS_MULTILANG=${IS_MULTILANG:=false}
+HTTP_HOST=${WORDPRESS_URL}
+WORDPRESS_ADMIN_PASSWORD=${WORDPRESS_ADMIN_PASSWORD:="stacksuper"}
+WORDPRESS_ADMIN_EMAIL=${WORDPRESS_ADMIN_EMAIL:="tech+superstack@superhuit.ch"}
+WORDPRESS_ADMIN_USER=${WORDPRESS_ADMIN_USER:="superstack"}
+WORDPRESS_THEME_NAME=${WORDPRESS_THEME_NAME:="superstack"}
+WORDPRESS_LOCALE=${WORDPRESS_LOCALE:="en_US"}
 
 # #===========================================
 # # /!\ STOP to edit here /!\
 # #===========================================
 
 # vars
+FIRSTTIME_INSTALL=false
+
 if [ -z "${WORDPRESS_PATH}" ]; then
 	echo "ERROR: Please define WORDPRESS_PATH environment variable" 1>&2
 	exit 1
@@ -65,54 +73,90 @@ fi
 # install wp (if not installed)
 # /!\ dev note: don't write anything in the folder before this or it will fail, saying 'the folder is not empty'
 if ! $WPCLI core is-installed --quiet &> /dev/null; then
-	echo
-	echo "----------------------------------"
-	echo "     WordPress installation       "
-	echo "----------------------------------"
+	echo "------------------------------------------------------------------"
+	echo "                   WordPress installation                         "
+	echo "------------------------------------------------------------------"
 	echo
 	if [ ! -z "${WORDPRESS_ENV}" ] && [ "${WORDPRESS_ENV}" = "dev" ]; then # we are on local dev environment (in docker)
-		echo $en "- Installing WordPress $ec"
-		$WPCLI core install --url="http://localhost" --title="Superstack - Future" --admin_user="superhuit" --admin_password="superhuit" --admin_email="tech@superhuit.ch" --quiet &> /dev/null
+		# Wait for database to be ready (for dev environment)
+		echo $en "- Waiting for local database to be ready... $ec"
+		timeout=60
+		attempt=1
+		while ! mysqladmin ping -h db -u wordpress --password=wordpress --silent &>/dev/null; do
+			if [ $timeout -le 0 ]; then
+				echo "✗"
+				echo "  [ERROR] Timeout. Final database connection attempt with verbose output:"
+				mysqladmin ping -h db -u wordpress --password=wordpress 2>&1 || true
+				docker ps --filter "name=db" || true
+				echo "  [DEBUG] Database container logs (last 20 lines):"
+				docker logs --tail 20 "${THEME_NAME:-superstack}_db" 2>&1 || true
+				exit 1
+			fi
+			sleep 3
+			timeout=$((timeout-3))
+			attempt=$((attempt+1))
+		done
 		echo "✔"
+		
+		echo $en "- Installing WordPress as localhost $ec"
+		$WPCLI core install --url="http://localhost" --title="$WORDPRESS_THEME_NAME" --admin_user="$WORDPRESS_ADMIN_USER" --admin_password="$WORDPRESS_ADMIN_PASSWORD" --admin_email="$WORDPRESS_ADMIN_EMAIL" &> /dev/null
+		echo "✔"
+		FIRSTTIME_INSTALL=true
+
 	elif [ ! -f "$WORDPRESS_PATH/p.txt" ]; then
 		echo "ERROR: WordPress does not seem to be installed. Add a file 'p.txt' containing the database password if you want this script to automatically install WordPress for you." 1>&2
 		exit 1
 	else
 		# bail early if missing env vars
-		[ -z "${WORDPRESS_VERSION}" ] && echo "ERROR: Please define WORDPRESS_VERSION environment variable" 1>&2 && exit 1
-		[ -z "${WORDPRESS_LOCALE}" ] && echo "ERROR: Please define WORDPRESS_LOCALE environment variable" 1>&2 && exit 1
+		[ -z "${WORDPRESS_ADMIN_USER}" ] && echo "ERROR: Please define WORDPRESS_ADMIN_USER environment variable" 1>&2 && exit 1
+		[ -z "${WORDPRESS_ADMIN_EMAIL}" ] && echo "ERROR: Please define WORDPRESS_ADMIN_EMAIL environment variable" 1>&2 && exit 1
 		[ -z "${WORDPRESS_DB_HOST}" ] && echo "ERROR: Please define WORDPRESS_DB_HOST environment variable" 1>&2 && exit 1
 		[ -z "${WORDPRESS_DB_NAME}" ] && echo "ERROR: Please define WORDPRESS_DB_NAME environment variable" 1>&2 && exit 1
 		[ -z "${WORDPRESS_DB_USER}" ] && echo "ERROR: Please define WORDPRESS_DB_USER environment variable" 1>&2 && exit 1
+		[ -z "${WORDPRESS_LOCALE}" ] && echo "ERROR: Please define WORDPRESS_LOCALE environment variable" 1>&2 && exit 1
+		[ -z "${WORDPRESS_PATH}" ] && echo "ERROR: Please define WORDPRESS_PATH environment variable" 1>&2 && exit 1
+		[ -z "${WORDPRESS_THEME_NAME}" ] && echo "ERROR: Please define WORDPRESS_THEME_NAME environment variable (no space)" 1>&2 && exit 1
+		[ -z "${WORDPRESS_THEME_TITLE}" ] && echo "ERROR: Please define WORDPRESS_THEME_TITLE environment variable" 1>&2 && exit 1
 		[ -z "${WORDPRESS_URL}" ] && echo "ERROR: Please define WORDPRESS_URL environment variable" 1>&2 && exit 1
-		[ -z "${WORDPRESS_TITLE}" ] && echo "ERROR: Please define WORDPRESS_TITLE environment variable (with no space character)" 1>&2 && exit 1
-		[ -z "${WORDPRESS_ADMIN_USER}" ] && echo "ERROR: Please define WORDPRESS_ADMIN_USER environment variable" 1>&2 && exit 1
-		[ -z "${WORDPRESS_ADMIN_EMAIL}" ] && echo "ERROR: Please define WORDPRESS_ADMIN_EMAIL environment variable" 1>&2 && exit 1
+		[ -z "${WORDPRESS_VERSION}" ] && echo "ERROR: Please define WORDPRESS_VERSION environment variable" 1>&2 && exit 1
 		# install
-		echo $en "- Installing WordPress $ec"
-		$WPCLI core download --version="$WORDPRESS_VERSION" --locale="$WORDPRESS_LOCALE"  --quiet &> /dev/null
-		$WPCLI config create --dbhost="$WORDPRESS_DB_HOST" --dbname="$WORDPRESS_DB_NAME" --dbuser="$WORDPRESS_DB_USER" --prompt=dbpass < $WORDPRESS_PATH/p.txt  --quiet &> /dev/null
-		$WPCLI core install --url="$WORDPRESS_URL" --title="$WORDPRESS_TITLE" --admin_user="$WORDPRESS_ADMIN_USER" --admin_email="$WORDPRESS_ADMIN_EMAIL"  --quiet &> /dev/null
-		rm $WORDPRESS_PATH/p.txt
-		echo "✔"
+
+		if ! $WPCLI core is-installed --quiet; then
+			echo $en "- Installing WordPress $ec"
+			$WPCLI core download --version="$WORDPRESS_VERSION" --locale="$WORDPRESS_LOCALE"  --quiet &> /dev/null
+			$WPCLI config create --dbhost="$WORDPRESS_DB_HOST" --dbname="$WORDPRESS_DB_NAME" --dbuser="$WORDPRESS_DB_USER" --prompt=dbpass < $WORDPRESS_PATH/p.txt  --quiet &> /dev/null
+			$WPCLI core install --version="$WORDPRESS_VERSION" --locale="$WORDPRESS_LOCALE" --url="$WORDPRESS_URL" --title="$WORDPRESS_THEME_TITLE" --admin_user="$WORDPRESS_ADMIN_USER" --admin_email="$WORDPRESS_ADMIN_EMAIL"
+			rm $WORDPRESS_PATH/p.txt
+			echo "✔"
+		else
+			echo "Already installed"
+			CURRENT_VERSION=$($WPCLI core version --quiet)
+			if [ "$CURRENT_VERSION" != "$WORDPRESS_VERSION" ]; then
+				echo $en "- Updating WordPress from $CURRENT_VERSION to $WORDPRESS_VERSION $ec"
+				$WPCLI core update --version="$WORDPRESS_VERSION" --force --quiet &> /dev/null
+				echo "✔"
+			else
+				echo "- WordPress version $WORDPRESS_VERSION already installed"
+			fi
+		fi
+
 	fi
 fi
 
 # update theme if new version available
 if [ -d "$WORDPRESS_PATH/wp-content/themes/_new" ]; then
-	[ -d "$WORDPRESS_PATH/wp-content/themes/$THEME_NAME" ] && mv "$WORDPRESS_PATH/wp-content/themes/$THEME_NAME" "$WORDPRESS_PATH/wp-content/themes/_old"
-	mv "$WORDPRESS_PATH/wp-content/themes/_new" "$WORDPRESS_PATH/wp-content/themes/$THEME_NAME" && rm -rf "$WORDPRESS_PATH/wp-content/themes/_old"
+	[ -d "$WORDPRESS_PATH/wp-content/themes/$WORDPRESS_THEME_NAME" ] && mv "$WORDPRESS_PATH/wp-content/themes/$WORDPRESS_THEME_NAME" "$WORDPRESS_PATH/wp-content/themes/_old"
+	mv "$WORDPRESS_PATH/wp-content/themes/_new" "$WORDPRESS_PATH/wp-content/themes/$WORDPRESS_THEME_NAME" && rm -rf "$WORDPRESS_PATH/wp-content/themes/_old"
 fi
 
-echo
-echo "----------------------------------"
-echo "  Theme install & configuration   "
-echo "----------------------------------"
+echo "------------------------------------------------------------------"
+echo "                  Theme install & configuration                   "
+echo "------------------------------------------------------------------"
 echo
 
-if ! $($WPCLI theme is-active $THEME_NAME --skip-plugins); then
+if ! $($WPCLI theme is-active $WORDPRESS_THEME_NAME --skip-plugins); then
 	echo $en "- Activate theme $ec"
-	$WPCLI theme activate "$THEME_NAME" --skip-plugins --quiet
+	$WPCLI theme activate "$WORDPRESS_THEME_NAME" --skip-plugins --quiet
 	echo "✔"
 else
 	echo "- Theme already active"
@@ -125,9 +169,9 @@ $WPCLI theme uninstall twentytwentyfive --quiet &> /dev/null
 echo "✔"
 
 echo
-echo "----------------------------------"
-echo "            Plugins               "
-echo "----------------------------------"
+echo "------------------------------------------------------------------"
+echo "                  Plugins install & configuration                 "
+echo "------------------------------------------------------------------"
 echo
 
 echo $en "- Uninstalling default plugins $ec"
@@ -135,86 +179,132 @@ $WPCLI plugin uninstall hello --deactivate --quiet &> /dev/null
 $WPCLI plugin uninstall akismet --deactivate --quiet &> /dev/null
 echo "✔"
 
-echo $en "- Activating plugins $ec"
-$WPCLI plugin activate $($WPCLI plugin list --status=inactive --field=name --skip-update-check) --quiet &> /dev/null
+echo $en "- Activating all plugins $ec"
+$WPCLI plugin activate --all --quiet &> /dev/null
 echo "✔"
+INACTIVE_PLUGINS=$($WPCLI plugin list --status=inactive --field=name --skip-update-check)
 
-echo
-echo "----------------------------------"
-echo "          Other configs           "
-echo "----------------------------------"
-echo
-
-# Disable major updates
-if [ -z $($WPCLI config get "WP_AUTO_UPDATE_CORE") ]; then
-	$WPCLI config set "WP_AUTO_UPDATE_CORE" "minor"
+if [ ! -z "$INACTIVE_PLUGINS" ]; then
+	echo "  - Activating inactive plugins (2nd attempt)"
+	# Iterate over inactive plugins and activate them
+	for plugin in $INACTIVE_PLUGINS; do
+		echo $en "    - Activating $plugin $ec"
+		$WPCLI plugin activate "$plugin" --quiet &> /dev/null
+		echo "✔"
+	done
 fi
 
-# Setup redirection tables
-$WPCLI redirection database install --quiet &> /dev/null
-$WPCLI redirection database upgrade --quiet &> /dev/null
+# Multilang
+__dir="$(dirname "${BASH_SOURCE[0]:-$0}")"
+if [ "$IS_MULTILANG" = true ]; then
+	echo $en "- Activating multilang plugins $ec"
+	if ! $WPCLI plugin is-active polylang; then $WPCLI plugin activate "polylang" --quiet &> /dev/null; fi
+	if ! $WPCLI plugin is-active acf-options-for-polylang; then $WPCLI plugin activate "acf-options-for-polylang" --quiet &> /dev/null; fi
+	if ! $WPCLI plugin is-active wp-graphql-polylang; then $WPCLI plugin activate "wp-graphql-polylang" --quiet &> /dev/null; fi
+	if ! $WPCLI plugin is-active starterpack-i18n; then $WPCLI plugin activate "starterpack-i18n" --quiet &> /dev/null; fi
+	echo "✔"
+else
+	echo $en "- Deactivating multilang plugins $ec"
+	if $WPCLI plugin is-active acf-options-for-polylang; then $WPCLI plugin deactivate "acf-options-for-polylang" --quiet &> /dev/null; fi
+	if $WPCLI plugin is-active wp-graphql-polylang; then $WPCLI plugin deactivate "wp-graphql-polylang" --quiet &> /dev/null; fi
+	if $WPCLI plugin is-active starterpack-i18n; then $WPCLI plugin deactivate "starterpack-i18n" --quiet &> /dev/null; fi
+	if $WPCLI plugin is-active polylang; then $WPCLI plugin deactivate "polylang" --quiet &> /dev/null; fi
+	echo "✔"
+fi
 
-# YOAST options
-## Disable XML sitemap
-$WPCLI option patch update wpseo enable_xml_sitemap false --quiet &> /dev/null
-## hide meta box for press review post type
-$WPCLI option patch update wpseo_titles noindex-press_review false --quiet &> /dev/null
-$WPCLI option patch update wpseo_titles noindex-ptarchive-press_review false --quiet &> /dev/null
-$WPCLI option patch update wpseo_titles display-metabox-pt-press_review false --quiet &> /dev/null
-
-## hide meta box for member post type
-$WPCLI option patch update wpseo_titles noindex-member false --quiet &> /dev/null
-$WPCLI option patch update wpseo_titles noindex-ptarchive-member false --quiet &> /dev/null
-$WPCLI option patch update wpseo_titles display-metabox-pt-member false --quiet &> /dev/null
-
-## hide meta box for partner post type
-$WPCLI option patch update wpseo_titles noindex-partner false --quiet &> /dev/null
-$WPCLI option patch update wpseo_titles noindex-ptarchive-partner false --quiet &> /dev/null
-$WPCLI option patch update wpseo_titles display-metabox-pt-partner false --quiet &> /dev/null
-
-# Disable comments system
-$WPCLI option update disable_comments_options '{"disabled_post_types":["post","page","event","attachment"],"remove_everywhere":true,"permanent":false,"extra_post_types":false,"db_version":6}' --format=json
-
-# Nested pages configs
-$WPCLI option update nestedpages_menusync nosync --quiet &> /dev/null
-$WPCLI option update nestedpages_menu '' --quiet &> /dev/null
-$WPCLI option update nestedpages_disable_menu true --quiet &> /dev/null
-$WPCLI option update nestedpages_allowsorting '{"administrator","editor"}' --format=json --quiet &> /dev/null
-
-# Forminator appearance presets
-$WPCLI option update forminator_appearance_preset_default --format=json '{"form-border-style":"solid","form-padding":"","form-border":"","fields-style":"open","field-image-size":"custom","form-style":"default","form-substyle":"material","indicator-label":"Soumission en cours\u2026","cform-color-option":"theme","basic-field-image-size":"custom","basic-fields-style":"open","input-focus-outline-color":"#254DEB","radio-border-hover":"#097BAA","radio-background-hover":"#E1F6FF","select-focus-outline-color":"#254DEB","button-submit-focus-outline-color":"#254DEB","prev-focus-outline-color":"#254DEB","next-focus-outline-color":"#254DEB","button-upload-focus-outline-color":"#254DEB","button-upload-delete-focus-outline-color":"#254DEB","multiupload-panel-focus-outline-color":"#254DEB","multiupload-panel-link-focus-outline-color":"#254DEB","repeater-icon-outline-focus":"#254DEB","consent-cbox-border-hover":"#254DEB","consent-cbox-background-hover":"#254DEB","slider-handle-outline-color":"#254DEB","rating-focus-outline-color":"#254DEB"}'
-
-$WPCLI rewrite structure '/actualites/%postname%/'
-$WPCLI rewrite flush --hard --quiet
-
-# Update WP translations
-$WPCLI language core update --quiet &> /dev/null
-
-# Clear transients & theme files patterns cache
-$WPCLI transient delete --all
-$WPCLI db query "DELETE FROM wp_options where option_name LIKE '%wp_theme_files_patterns%'"
-
-# Run database migrations
-echo
-echo "----------------------------------"
-echo "          Migrations              "
-echo "----------------------------------"
-echo
-
-PENDING=$($WPCLI spck migrate --pending-count)
-if [ "$PENDING" -gt 0 ]; then
-	BACKUP_FILE="$WORDPRESS_PATH/db-backup-$(date +%Y%m%d_%H%M%S).sql"
-	echo $en "- $PENDING pending migration(s), backing up database $ec"
-	$WPCLI db export "$BACKUP_FILE" --quiet
-	echo "✔ ($BACKUP_FILE)"
+if [ "$FIRSTTIME_INSTALL" = true ]; then
+	echo
+	echo "------------------------------------------------------------------"
+	echo "                        First time install                        "
+	echo "------------------------------------------------------------------"
 	echo
 
-	$WPCLI spck migrate
-else
-	echo "- No pending migrations"
+	# Update Sample Page to be the Home
+	echo $en "- Updating Sample Page to be the Home $ec"
+	$WPCLI post update 2 --post_title="Home" --post_name="home" --quiet &> /dev/null
+	$WPCLI option update show_on_front page --quiet &> /dev/null
+	$WPCLI option update page_on_front 2 --quiet &> /dev/null
+	echo "✔"
+
+	# Add WP Graphql Gutenberg Registry if not yet registered in the db (=> avoids Vercel first deployment to fail)
+	$WPCLI option get wp_graphql_gutenberg_block_types &> /dev/null
+	if [ $? -ne 0 ]; then
+		echo $en "- Adding Graphql Gutenberg Registry"
+		$WPCLI option add wp_graphql_gutenberg_block_types --format=json '{"core/paragraph":{"name":"core/paragraph","keywords":["text"],"attributes":{"align":{"type":"string"},"content":{"type":"string","source":"html","selector":"p","default":"","__experimentalRole":"content"},"dropCap":{"type":"boolean","default":false},"placeholder":{"type":"string","default":"Start writing"},"direction":{"type":"string","enum":["ltr","rtl"]},"lock":{"type":"object"},"style":{"type":"object"},"backgroundColor":{"type":"string"},"textColor":{"type":"string"},"gradient":{"type":"string"},"className":{"type":"string"},"fontSize":{"type":"string"},"fontFamily":{"type":"string"},"anchor":{"type":"string","source":"attribute","attribute":"id","selector":"*"},"isPreview":{"type":"boolean","default":false}},"providesContext":[],"usesContext":[],"supports":{"anchor":true,"className":false,"color":{"gradients":true,"link":true,"__experimentalDefaultControls":{"background":true,"text":true}},"spacing":{"margin":true,"padding":true},"typography":{"fontSize":true,"lineHeight":true,"__experimentalFontFamily":true,"__experimentalTextDecoration":true,"__experimentalFontStyle":true,"__experimentalFontWeight":true,"__experimentalLetterSpacing":true,"__experimentalTextTransform":true,"__experimentalDefaultControls":{"fontSize":true}},"__experimentalSelector":"p","__unstablePasteTextInline":true},"styles":[],"variations":[],"apiVersion":2,"title":"Paragraph","description":"Start with the basic building block of all narrative.","category":"text","example":{"name":"core/paragraph","attributes":{"isPreview":true}},"deprecated":[{"supports":{"className":false},"attributes":{"align":{"type":"string"},"content":{"type":"string","source":"html","selector":"p","default":""},"dropCap":{"type":"boolean","default":false},"placeholder":{"type":"string","default":"Start writing"},"textColor":{"type":"string"},"backgroundColor":{"type":"string"},"fontSize":{"type":"string"},"direction":{"type":"string","enum":["ltr","rtl"]},"customTextColor":{"type":"string"},"customBackgroundColor":{"type":"string"},"customFontSize":{"type":"number"},"lock":{"type":"object"},"className":{"type":"string"},"isPreview":{"type":"boolean","default":false}}},{"supports":{"className":false},"attributes":{"align":{"type":"string"},"content":{"type":"string","source":"html","selector":"p","default":""},"dropCap":{"type":"boolean","default":false},"placeholder":{"type":"string","default":"Start writing"},"textColor":{"type":"string"},"backgroundColor":{"type":"string"},"fontSize":{"type":"string"},"direction":{"type":"string","enum":["ltr","rtl"]},"customTextColor":{"type":"string"},"customBackgroundColor":{"type":"string"},"customFontSize":{"type":"number"},"lock":{"type":"object"},"className":{"type":"string"},"isPreview":{"type":"boolean","default":false}}},{"supports":{"className":false},"attributes":{"align":{"type":"string"},"content":{"type":"string","source":"html","selector":"p","default":""},"dropCap":{"type":"boolean","default":false},"placeholder":{"type":"string","default":"Start writing"},"textColor":{"type":"string"},"backgroundColor":{"type":"string"},"fontSize":{"type":"string"},"direction":{"type":"string","enum":["ltr","rtl"]},"customTextColor":{"type":"string"},"customBackgroundColor":{"type":"string"},"customFontSize":{"type":"number"},"lock":{"type":"object"},"className":{"type":"string"},"isPreview":{"type":"boolean","default":false}}},{"supports":{"className":false},"attributes":{"align":{"type":"string"},"content":{"type":"string","source":"html","selector":"p","default":""},"dropCap":{"type":"boolean","default":false},"placeholder":{"type":"string","default":"Start writing"},"textColor":{"type":"string"},"backgroundColor":{"type":"string"},"fontSize":{"type":"string"},"direction":{"type":"string","enum":["ltr","rtl"]},"customTextColor":{"type":"string"},"customBackgroundColor":{"type":"string"},"customFontSize":{"type":"number"},"width":{"type":"string"},"lock":{"type":"object"},"className":{"type":"string"},"isPreview":{"type":"boolean","default":false}}},{"supports":{"className":false},"attributes":{"align":{"type":"string"},"content":{"type":"string","source":"html","selector":"p","default":""},"dropCap":{"type":"boolean","default":false},"placeholder":{"type":"string","default":"Start writing"},"textColor":{"type":"string"},"backgroundColor":{"type":"string"},"fontSize":{"type":"number"},"direction":{"type":"string","enum":["ltr","rtl"]},"lock":{"type":"object"},"className":{"type":"string"},"isPreview":{"type":"boolean","default":false}}},{"supports":{"className":false},"attributes":{"align":{"type":"string"},"content":{"type":"string","source":"html","default":""},"dropCap":{"type":"boolean","default":false},"placeholder":{"type":"string","default":"Start writing"},"textColor":{"type":"string"},"backgroundColor":{"type":"string"},"fontSize":{"type":"string"},"direction":{"type":"string","enum":["ltr","rtl"]},"style":{"type":"object"},"lock":{"type":"object"},"className":{"type":"string"},"isPreview":{"type":"boolean","default":false}}}]}}' --quiet &> /dev/null
+		echo "✔"
+	fi
+
+	echo $en "- Setting rewrite structure $ec"
+	$WPCLI rewrite structure '/blog/%postname%/' --quiet &> /dev/null
+	echo "✔"
+
 fi
 
 echo
-echo "----------------------------------"
-echo "       Installation complete      "
-echo "----------------------------------"
+echo "------------------------------------------------------------------"
+echo "                          Other configs                           "
+echo "------------------------------------------------------------------"
+echo
+
+# Setup redirection tables
+echo $en "- Setting up redirection tables $ec"
+$WPCLI redirection database install --quiet &> /dev/null
+$WPCLI redirection database upgrade --quiet &> /dev/null
+echo "✔"
+
+# Update WP translations
+echo $en "- Updating WP translations $ec"
+$WPCLI language core update --quiet &> /dev/null
+echo "✔"
+
+# Disable YOAST XML sitemap
+echo $en "- Disabling Yoast XML sitemap $ec"
+$WPCLI option update wpseo '{"enable_xml_sitemap":false}' --format=json --quiet
+echo "✔"
+
+# Disable comments system
+echo $en "- Disabling comments system $ec"
+$WPCLI option update disable_comments_options '{"disabled_post_types":["post","page","event","attachment"],"remove_everywhere":true,"permanent":false,"extra_post_types":false,"db_version":6}' --format=json --quiet &> /dev/null
+echo "✔"
+
+# ONLY FOR DEV ENV
+if [ ! -z "${WORDPRESS_ENV}" ] && [ "${WORDPRESS_ENV}" = "dev" ]; then
+	# Enables WP-GraphQL introspection for VSCode to be able to get graphql schema for autocompletion
+	echo $en "- Enabling WP-GraphQL introspection for dev environment $ec"
+	$WPCLI option update graphql_general_settings --format=json '{"graphql_endpoint":"graphql","restrict_endpoint_to_logged_in_users":"off","batch_queries_enabled":"on","batch_limit":"10","query_depth_enabled":"off","query_depth_max":"10","graphiql_enabled":"on","show_graphiql_link_in_admin_bar":"on","delete_data_on_deactivate":"on","debug_mode_enabled":"off","tracing_enabled":"off","tracing_user_role":"administrator","query_logs_enabled":"off","query_log_user_role":"administrator","public_introspection_enabled":"on"}' --quiet &> /dev/null
+	echo "✔"
+fi
+
+# Add Next.js url
+if [ ! -z "${NEXT_URL}" ]; then
+	echo $en "- Adding Next.js url to WP options $ec"
+	$WPCLI option update next_url "$NEXT_URL" --quiet &> /dev/null
+	echo "✔"
+fi
+
+# Add GraphQL JWT Auth Key
+if [ ! -z "${WORDPRESS_GRAPHQL_JWT_AUTH_SECRET_KEY}" ]; then
+	echo $en "- Adding GraphQL JWT Auth secret key to WP config $ec"
+	$WPCLI config set GRAPHQL_JWT_AUTH_SECRET_KEY "$WORDPRESS_GRAPHQL_JWT_AUTH_SECRET_KEY" --quiet &> /dev/null
+	echo "✔"
+fi
+
+# Disable major updates
+if ! $WPCLI config get "WP_AUTO_UPDATE_CORE" --quiet > /dev/null 2>&1; then
+	echo $en "- Setting WP_AUTO_UPDATE_CORE to 'minor' to disable major updates $ec"
+	$WPCLI config set "WP_AUTO_UPDATE_CORE" "minor" --quiet &> /dev/null
+	echo "✔"
+fi
+
+echo $en "- Flushing rewrite rules $ec"
+$WPCLI rewrite flush --hard --quiet &> /dev/null
+echo "✔"
+echo ""
+echo "------------------------------------------------------------------"
+echo ""
+echo "Wordpress running on version $($WPCLI core version --quiet) !"
+echo ""
+$WPCLI plugin status
+echo ""
+echo "==================   INSTALLATION COMPLETE !   ==================="
+echo ""
