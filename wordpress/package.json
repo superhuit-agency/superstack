@@ -6,6 +6,7 @@
   "scripts": {
     "postinstall": "npm --prefix ./theme \"$npm_command\"",
     "prestart": "sh ./scripts/pre-start.sh",
+    "setup-composer-auth": "sh ./scripts/setup-composer-auth.sh",
     "start": "sh ./scripts/start-wp.sh",
     "stop": "sh ./scripts/stop-wp.sh",
     "test": "echo \"Error: no test specified\" && exit 1",
