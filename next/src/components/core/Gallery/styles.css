@@ -1,0 +1,22 @@
+.supt-gallery {
+
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--wp--style--unstable-gallery-gap, 16px);
+
+    .supt-image {
+        flex-grow: 1;
+
+        img {
+            max-width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    }
+
+    &.-has-3-columns {
+        .supt-image {        
+            width: calc(33.33% - var(--wp--style--unstable-gallery-gap, 16px) * .66667);
+        }
+    }
+}

@@ -8,6 +8,7 @@ const blocksList: Record<string, () => Promise<BlockModule>> = {
   'core/heading': () => import('../core/Heading'),
   'core/paragraph': () => import('../core/Paragraph'),
   'core/image': () => import('../core/Image'),
+  'core/gallery': () => import('../core/Gallery'),
   'core/list': () => import('../core/List'),
   'core/list-item': () => import('../core/ListItem'),
   'core/quote': () => import('../core/Quote'),
