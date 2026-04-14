@@ -9,6 +9,7 @@ const blocksList: Record<string, () => Promise<BlockModule>> = {
   'core/paragraph': () => import('../core/Paragraph'),
   'core/list': () => import('../core/List'),
   'core/list-item': () => import('../core/ListItem'),
+  'core/quote': () => import('../core/Quote'),
 };
 
 interface PostBodyBlocksProps {

@@ -4,6 +4,7 @@
 @import '_html.css';
 @import '_global.css';
 @import '_section.css';
+@import '_wp-theme.css';
 
 /* Animations */
 @import '_animations.css';
