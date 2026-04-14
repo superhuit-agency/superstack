@@ -13,6 +13,9 @@ const blocksList: Record<string, () => Promise<BlockModule>> = {
   'core/code': () => import('../core/Code'),
   'core/details': () => import('../core/Details'),
   'core/math': () => import('../core/Math'),
+  'core/preformatted': () => import('../core/Preformatted'),
+  'core/pullquote': () => import('../core/Pullquote'),
+  'core/table': () => import('../core/Table'),
 };
 
 interface PostBodyBlocksProps {
