@@ -28,7 +28,7 @@
   },
   "homepage": "https://github.com/superhuit-agency/superstack#readme",
   "devDependencies": {
-    "@wordpress/stylelint-config": "^23.30.0",
+    "@wordpress/stylelint-config": "^23.35.0",
     "stylelint": "^16.26.1"
   }
 }
