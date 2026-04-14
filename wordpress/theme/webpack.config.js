@@ -1,3 +1,4 @@
+const path = require('path');
 const defaultConfig = require('@wordpress/scripts/config/webpack.config');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
@@ -30,6 +31,13 @@ module.exports = {
 		entrypoints: true,
 		errorDetails: false,
 		moduleTrace: false,
+	},
+	resolve: {
+		...defaultConfig.resolve,
+		alias: {
+			...(defaultConfig.resolve?.alias || {}),
+			'@': path.resolve(__dirname, '../../next/src'),
+		},
 	},
 	output: {
 		...defaultConfig.output,
