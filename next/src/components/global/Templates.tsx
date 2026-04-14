@@ -1,6 +1,7 @@
-import Fallback from '../templates/Fallback';
-import SinglePage from '../templates/SinglePage';
+import dynamic from 'next/dynamic';
 
+const SinglePage = dynamic(() => import('../templates/SinglePage'));
+const Fallback = dynamic(() => import('../templates/Fallback'));
 interface TemplatesProps {
   node: any;
   contentType: string;

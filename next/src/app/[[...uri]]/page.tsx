@@ -1,9 +1,9 @@
 import { Metadata } from 'next';
+import dynamic from 'next/dynamic';
 import { draftMode, cookies } from 'next/headers';
 import { notFound, permanentRedirect, redirect } from 'next/navigation';
 
 import { Templates } from '@/components/global/Templates';
-import { PreviewToolbar } from '@/components/admin/PreviewToolbar';
 import { useCanonical as getCanonicalUrl } from '@/hooks/use-canonical';
 import {
   getAllURIs,
@@ -111,6 +111,10 @@ export async function generateMetadata({
     },
   };
 }
+
+const PreviewToolbar = dynamic(
+  () => import('@/components/admin/PreviewToolbar'),
+);
 
 export default async function Page({ params }: { params: { uri: string[] } }) {
   const resolvedParams = await params;

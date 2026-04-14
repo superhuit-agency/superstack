@@ -6,7 +6,10 @@ import Cookies from 'js-cookie';
 
 import './styles.css';
 
-export function PreviewToolbar({ isDraft, editLink }: PreviewToolbarProps) {
+export default function PreviewToolbar({
+  isDraft,
+  editLink,
+}: PreviewToolbarProps) {
   const [viewport, setViewport] = useState<{ w: number; h: number }>();
   const [isDraftPreview, setIsDraftPreview] = useState(isDraft);
 
