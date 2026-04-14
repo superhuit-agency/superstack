@@ -2,24 +2,14 @@
 
 ## Automatic Github Actions
 
-Automatic Github Actions are available but disabled by default.
-To enable them, uncomment the relevant blocks in the `.github/workflows/deploy-preview.yml` and `.github/workflows/deploy-production.yml` files.
+Automatic Github Actions are enabled by default:
 
-> _Example below of what you should uncomment to enable automatic deployment_
+- **Staging** (`.github/workflows/deploy-preview.yml`): triggered on push to `main` and on pull requests.
+- **Production** (`.github/workflows/deploy-production.yml`): triggered on push to the `production` branch.
 
-```
-name: Deploy WP & Nextjs to Production - builds and deploys
-on:
-  # ######## Uncomment below block to enable automatic deployment <======= 🗑️ remove
-  # push:                                                         <======= 📣 uncomment
-  #   branches:                                                   <======= 📣 uncomment
-  #     - 'production'                                            <======= 📣 uncomment
-  #   # # Only run workflow if push a server tag                  <======= 📣 uncomment
-  #   # tags:                                                     <======= 📣 uncomment
-  #   #   - 'v*.*.*'                                              <======= 📣 uncomment
-  # ########                                                      <======= 🗑️ remove
-[...]
-```
+Both workflows can also be triggered manually from the Actions tab.
+
+> ℹ️ WordPress is only deployed when files under `wordpress/` have changed. Next.js always deploys on every trigger.
 
 ## 🔐 Github Actions secrets
 
