@@ -141,37 +141,6 @@ echo "✔"
 
 echo
 echo "----------------------------------"
-echo "        Roles & Capabilities      "
-echo "----------------------------------"
-echo
-
-# Grant capabilities to editor role
-echo $en "- Grant capabilities to editor role $ec"
-$WPCLI cap add editor edit_theme_options --quiet &> /dev/null
-$WPCLI cap add editor create_users --quiet &> /dev/null
-$WPCLI cap add editor delete_users --quiet &> /dev/null
-$WPCLI cap add editor edit_users --quiet &> /dev/null
-$WPCLI cap add editor list_users --quiet &> /dev/null
-$WPCLI cap add editor promote_users --quiet &> /dev/null
-$WPCLI cap add editor remove_users  --quiet &> /dev/null
-$WPCLI cap add editor ure_create_capabilities --quiet &> /dev/null
-$WPCLI cap add editor ure_create_roles --quiet &> /dev/null
-$WPCLI cap add editor ure_delete_roles --quiet &> /dev/null
-$WPCLI cap add editor ure_edit_roles --quiet &> /dev/null
-$WPCLI cap add editor ure_manage_options --quiet &> /dev/null
-$WPCLI cap add editor ure_reset_roles   --quiet &> /dev/null
-
-# Grant editors access to Content Control restrictions
-echo $en "- Adding manage_content_control_restriction cap to editor role $ec"
-$WPCLI cap add editor manage_content_control_restriction --quiet &> /dev/null
-echo "✔"
-
-echo $en "- Configuring Content Control permissions $ec"
-$WPCLI option patch update content_control_settings permissions '{"edit_restrictions":"manage_content_control_restriction"}' --format=json --quiet &> /dev/null
-echo "✔"
-
-echo
-echo "----------------------------------"
 echo "          Other configs           "
 echo "----------------------------------"
 echo
