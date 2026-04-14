@@ -1,3 +1,7 @@
+declare module '@wordpress/compose';
+declare module '@wordpress/blocks';
+declare module '@wordpress/data';
+
 interface WpBlockType<T> {
 	slug: string;
 	settings: Omit<BlockConfiguration<T>, 'attributes'> &

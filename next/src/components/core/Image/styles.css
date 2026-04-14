@@ -1,0 +1,8 @@
+.supt-image {
+
+    &.is-style-rounded {
+        img {
+            border-radius: 50%;
+        }
+    }
+}
