@@ -1,0 +1,30 @@
+.supt-cover {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-position: 50%;
+    overflow: hidden;
+    overflow: clip;
+    min-height: 430px;
+    padding: 1em;
+    position: relative;
+
+    &__background {
+        position: absolute;
+        inset: 0;
+        &.-is-dimmed-50 {
+            opacity: .5;
+        }   
+    }
+
+    &__image {
+        object-fit: cover;
+    }
+
+    &__content {
+        position: relative;
+        width: 100%;
+        text-align: center;
+    }
+
+}
