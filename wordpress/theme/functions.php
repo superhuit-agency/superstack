@@ -1,12 +1,4 @@
 <?php
-
-namespace Superstack;
-
-if (! defined('ABSPATH')) {
-	exit;
-}
-
-
 /**
  * Superstack functions and definitions
  *
@@ -22,11 +14,13 @@ if (! defined('ABSPATH')) {
  * Current theme name.
  * Current theme option name.
  */
+$theme = wp_get_theme();
+
 define('SUPERSTACK_PATH', trailingslashit(get_stylesheet_directory()));
 define('SUPERSTACK_URL', trailingslashit(get_stylesheet_directory_uri()));
 define('SUPERSTACK_VERSION', '1.0.0');
-define('SUPERSTACK_THEME_NAME', 'superstack');
-define('SUPERSTACK_OPTION_NAME', 'superstack');
+define('SUPERSTACK_THEME_NAME', $theme['Name']);
+define('SUPERSTACK_OPTION_NAME', $theme['Version']);
 
 require_once SUPERSTACK_PATH . '/lib/_loader.php';
 

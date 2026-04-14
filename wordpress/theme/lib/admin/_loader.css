@@ -1,0 +1,24 @@
+/**
+ * README
+ * ======
+ *
+ * This stylesheet is applied to the
+ * WordPress admin interface
+ * when the admin top bar is shown
+ * @see https://developer.wordpress.org/reference/hooks/admin_enqueue_scripts/
+ */
+
+/**
+ * Hide option "protected by password" in classic & block editor
+ */
+.editor-post-visibility__choice:last-child,
+#password-span,
+#visibility-radio-password, #visibility-radio-password + label, #visibility-radio-password + label + br {
+	display: none !important;
+}
+
+/* Hide static posts page default setting as we overwrite it with custom settings */
+#front-static-pages label[for="page_for_posts"],
+.options-reading-php tr:has(input[id="posts_per_page"]) {
+	display: none;
+}

@@ -8,3 +8,4 @@ namespace SUPT;
  */
 require_once __DIR__ . '/graphql/_loader.php';
 require_once __DIR__ . '/helpers/_loader.php';
+require_once __DIR__ . '/admin/_loader.php';
