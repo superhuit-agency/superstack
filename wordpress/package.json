@@ -8,6 +8,7 @@
     "prestart": "sh ./scripts/pre-start.sh",
     "start": "sh ./scripts/start-wp.sh",
     "stop": "sh ./scripts/stop-wp.sh",
+    "generate:theme-css": "npm --prefix ./theme run generate:theme-css",
     "test": "echo \"Error: no test specified\" && exit 1",
     "clear-cache": "wp @local transient delete --all && wp @local db query \"DELETE FROM wp_options where option_name LIKE '%wp_theme_files_patterns%'\"",
     "dev": "npm --prefix ./theme run dev",
