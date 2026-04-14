@@ -1,0 +1,18 @@
+.supt-section {
+	@mixin clamp padding-top, 80, 120, $breakpoint-xs, $breakpoint-lg;
+	@mixin clamp padding-bottom, 80, 120, $breakpoint-xs, $breakpoint-lg;
+
+	&__uptitle {
+		@extend %t-h6;
+	}
+	&__title {
+		@extend %t-h1;
+	}
+	&__introduction {
+		@extend %t-introduction;
+	}
+
+	&__link {
+		@extend %t-link;
+	}
+}

@@ -1,0 +1,18 @@
+import cx from 'classnames';
+
+import './styles.css';
+
+function Heading({ className = '', content, level }: HeadingProps) {
+  const HTag = `h${level}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+
+  if (!content) return null;
+
+  return (
+    <HTag
+      className={cx('supt-heading', className)}
+      dangerouslySetInnerHTML={{ __html: content }}
+    />
+  );
+}
+
+export default Heading;

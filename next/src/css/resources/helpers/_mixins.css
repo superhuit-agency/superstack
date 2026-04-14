@@ -1,0 +1,64 @@
+/**
+ * To make link inherit the size of the parent
+ * @param {String} element - tag or class
+ * @param {String} position - pseudo-element
+ *
+ * Example:
+ * @mixin expand-link a, before;
+ */
+@define-mixin expand-link $element: a, $position: before {
+	position: relative;
+
+	$(element) {
+		position: static;
+	}
+
+	$(element)::$(position) {
+		content: '';
+		display: block;
+		position: absolute;
+		inset: 0;
+		background-color: transparent;
+		z-index: 1;
+	}
+}
+
+/**
+ * Line Clamp
+ * @param {Number} maxLines - Number of lines
+ *
+ * Example:
+ * @mixin line-clamp 3;
+ */
+@define-mixin line-clamp $maxLines {
+	display: -webkit-box;
+	-webkit-line-clamp: $(maxLines);
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
+/**
+ * Mixin for aspect-ratio not working yet on some browsers
+ * @param ratioWidth Number
+ * @param ratioHeight Number
+ *
+ * Example:
+ * @mixin aspect-ratio 150, 200;
+ */
+@define-mixin aspect-ratio $ratioW, $ratioH {
+	aspect-ratio: $(ratioW) / $(ratioH);
+
+	@supports not (aspect-ratio: $(ratioW) / $(ratioH)) {
+		&::before {
+			content: '';
+			float: left;
+			padding-top: calc(($(ratioH) / $(ratioW)) * 100%);
+		}
+
+		&::after {
+			content: '';
+			display: block;
+			clear: both;
+		}
+	}
+}

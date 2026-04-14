@@ -37,7 +37,7 @@
     "wpackagist-plugin/wp-nested-pages": "^3.2",
     "superhuit/cookie-law-consent": "^1.8",
     "ashhitch/wp-graphql-yoast-seo": "^5.0",
-    "pristas-peter/wp-graphql-gutenberg": "^0.4.1",
+    "pristas-peter/wp-graphql-gutenberg": "dev-master",
     "superhuit/wp-graphql-redirection": "^1.1",
     "superhuit-agency/nextjs-revalidate": "^1.6",
     "valu/wp-graphql-offset-pagination": "^0.2.1",
@@ -68,16 +68,8 @@
       }
     },
     {
-      "type": "package",
-      "package": {
-        "name": "superhuit-agency/wp-graphql-gutenberg",
-        "version": "0.4.1",
-        "type": "wordpress-plugin",
-        "dist": {
-          "url": "https://github.com/superhuit-agency/wp-graphql-gutenberg/archive/refs/tags/v0.4.1.supt-fix.zip",
-          "type": "zip"
-        }
-      }
+      "type": "vcs",
+      "url": "https://github.com/superhuit-agency/wp-graphql-gutenberg"
     },
     {
       "type": "package",

@@ -1,0 +1,79 @@
+/**
+ * Set a minimalistic set of global rules.
+ */
+html {
+	font-family: sans-serif;
+	box-sizing: border-box;
+	-moz-osx-font-smoothing: grayscale;
+	-webkit-font-smoothing: antialiased;
+	scroll-behavior: smooth;
+
+	/* visibility: hidden;
+	opacity: 0;
+	pointer-events: none; */
+}
+@media screen and (prefers-reduced-motion: reduce) {
+	html {
+		scroll-behavior: auto;
+	}
+}
+
+html.is-loaded {
+	visibility: visible;
+	opacity: 1;
+	pointer-events: auto;
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: inherit;
+	font-family: inherit;
+	/* outline: none; */
+}
+
+body {
+	font-size: 1rem;
+	margin: 0;
+	color: #000000;
+	background-color: #fff;
+}
+
+button,
+a {
+	text-decoration: none;
+	color: inherit;
+}
+
+b,
+strong {
+	font-weight: bold;
+}
+em {
+	font-style: italic;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+	margin: 0;
+}
+
+fieldset {
+	padding: 0;
+	border: 0;
+}
+
+figure {
+	margin: 0;
+}
+
+ul,
+ol {
+	margin: 0;
+	padding: 0;
+}
