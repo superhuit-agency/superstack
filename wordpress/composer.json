@@ -22,39 +22,25 @@
   },
   "require": {
     "php": "^8.3",
+    "wpackagist-plugin/advanced-custom-fields": "^6.8",
     "wpackagist-plugin/disable-comments": "^2.6",
     "wpackagist-plugin/disable-emojis": "^1.7",
     "wpackagist-plugin/duplicate-post": "^4.5",
+    "wpackagist-plugin/gallery-block-lightbox": "^1.16",
     "wpackagist-plugin/redirection": "^5.6",
     "wpackagist-plugin/simple-custom-post-order": "^2.5",
     "wpackagist-plugin/svg-support": "^2.5",
     "wpackagist-plugin/wordpress-seo": "^27.0",
-    "wpengine/advanced-custom-fields-pro": "^6.7",
-    "superhuit-agency/forminator": "dev-main",
-    "wpackagist-plugin/content-control": "^2.6",
-    "wpackagist-plugin/user-role-editor": "^4.64",
-    "wpackagist-plugin/gallery-block-lightbox": "^1.16",
+    "wpackagist-plugin/wp-graphql": "^2.11",
     "wpackagist-plugin/wp-nested-pages": "^3.2",
-    "superhuit/cookie-law-consent": "^1.8",
     "ashhitch/wp-graphql-yoast-seo": "^5.0",
     "pristas-peter/wp-graphql-gutenberg": "dev-master",
     "superhuit/wp-graphql-redirection": "^1.1",
-    "superhuit-agency/nextjs-revalidate": "^1.6",
     "valu/wp-graphql-offset-pagination": "^0.2.1",
     "wp-graphql/wp-graphql-jwt-authentication": "^0.7.2",
-    "wpackagist-plugin/wp-graphql": "^2.11"
+    "superhuit-agency/nextjs-revalidate": "^1.6"
   },
   "repositories": [
-    {
-      "name": "release-belt.superhuit.ch",
-      "type": "composer",
-      "url": "https://release-belt.superhuit.ch/"
-    },
-    {
-      "name": "acf",
-      "type": "composer",
-      "url": "https://connect.advancedcustomfields.com"
-    },
     {
       "type": "package",
       "package": {
@@ -90,10 +76,6 @@
         "wpackagist-plugin/*",
         "wpackagist-theme/*"
       ]
-    },
-    {
-      "type": "vcs",
-      "url": "https://github.com/superhuit-agency/forminator"
     }
   ]
 }

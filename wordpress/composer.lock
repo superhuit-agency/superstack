@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0b2b3a3a0e001d62dc68e7761a072bac",
+    "content-hash": "e58265d3cf99e2c15dafe6fff506aff5",
     "packages": [
         {
             "name": "ashhitch/wp-graphql-yoast-seo",
@@ -674,52 +674,11 @@
             "time": "2025-11-04T16:30:35+00:00"
         },
         {
-            "name": "superhuit-agency/forminator",
-            "version": "dev-main",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/superhuit-agency/forminator.git",
-                "reference": "87e2ce99a3404409a7980ada58c4f7a7c0310459"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/superhuit-agency/forminator/zipball/87e2ce99a3404409a7980ada58c4f7a7c0310459",
-                "reference": "87e2ce99a3404409a7980ada58c4f7a7c0310459",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=7.4"
-            },
-            "default-branch": true,
-            "type": "wordpress-plugin",
-            "license": [
-                "GPL-2.0-or-later"
-            ],
-            "description": "Custom fork of the Forminator plugin.",
-            "support": {
-                "source": "https://github.com/superhuit-agency/forminator/tree/main",
-                "issues": "https://github.com/superhuit-agency/forminator/issues"
-            },
-            "time": "2026-02-13T11:42:57+00:00"
-        },
-        {
             "name": "superhuit-agency/nextjs-revalidate",
             "version": "1.6.4",
             "dist": {
                 "type": "zip",
                 "url": "https://github.com/superhuit-agency/nextjs-revalidate/releases/download/v1.6.4/nextjs-revalidate-v1.6.4.zip"
-            },
-            "type": "wordpress-plugin"
-        },
-        {
-            "name": "superhuit/cookie-law-consent",
-            "version": "1.8.3",
-            "dist": {
-                "type": "zip",
-                "url": "https://release-belt.superhuit.ch/superhuit/cookie-law-consent.1.8.3.zip"
-            },
-            "require": {
-                "composer/installers": "^1.12.0 || ^2.0.1"
             },
             "type": "wordpress-plugin"
         },
@@ -1054,22 +1013,22 @@
             "time": "2026-03-13T21:37:24+00:00"
         },
         {
-            "name": "wpackagist-plugin/content-control",
-            "version": "2.6.5",
+            "name": "wpackagist-plugin/advanced-custom-fields",
+            "version": "6.8.0",
             "source": {
                 "type": "svn",
-                "url": "https://plugins.svn.wordpress.org/content-control/",
-                "reference": "tags/2.6.5"
+                "url": "https://plugins.svn.wordpress.org/advanced-custom-fields/",
+                "reference": "tags/6.8.0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://downloads.wordpress.org/plugin/content-control.2.6.5.zip"
+                "url": "https://downloads.wordpress.org/plugin/advanced-custom-fields.6.8.0.zip"
             },
             "require": {
                 "composer/installers": "^1.0 || ^2.0"
             },
             "type": "wordpress-plugin",
-            "homepage": "https://wordpress.org/plugins/content-control/"
+            "homepage": "https://wordpress.org/plugins/advanced-custom-fields/"
         },
         {
             "name": "wpackagist-plugin/disable-comments",
@@ -1198,34 +1157,16 @@
             "homepage": "https://wordpress.org/plugins/svg-support/"
         },
         {
-            "name": "wpackagist-plugin/user-role-editor",
-            "version": "4.64.6",
-            "source": {
-                "type": "svn",
-                "url": "https://plugins.svn.wordpress.org/user-role-editor/",
-                "reference": "tags/4.64.6"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://downloads.wordpress.org/plugin/user-role-editor.4.64.6.zip"
-            },
-            "require": {
-                "composer/installers": "^1.0 || ^2.0"
-            },
-            "type": "wordpress-plugin",
-            "homepage": "https://wordpress.org/plugins/user-role-editor/"
-        },
-        {
             "name": "wpackagist-plugin/wordpress-seo",
-            "version": "27.3",
+            "version": "27.4",
             "source": {
                 "type": "svn",
                 "url": "https://plugins.svn.wordpress.org/wordpress-seo/",
-                "reference": "tags/27.3"
+                "reference": "tags/27.4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://downloads.wordpress.org/plugin/wordpress-seo.27.3.zip"
+                "url": "https://downloads.wordpress.org/plugin/wordpress-seo.27.4.zip"
             },
             "require": {
                 "composer/installers": "^1.0 || ^2.0"
@@ -1268,30 +1209,13 @@
             },
             "type": "wordpress-plugin",
             "homepage": "https://wordpress.org/plugins/wp-nested-pages/"
-        },
-        {
-            "name": "wpengine/advanced-custom-fields-pro",
-            "version": "6.8.0.1",
-            "dist": {
-                "type": "zip",
-                "url": "https://connect.advancedcustomfields.com/v2/plugins/composer_download?s=composer&p=pro&t=6.8.0.1"
-            },
-            "require": {
-                "composer/installers": "~1.0 || ~2.0"
-            },
-            "replace": {
-                "wpackagist-plugin/advanced-custom-fields": "self.version",
-                "wpengine/advanced-custom-fields": "self.version"
-            },
-            "type": "wordpress-plugin"
         }
     ],
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "pristas-peter/wp-graphql-gutenberg": 20,
-        "superhuit-agency/forminator": 20
+        "pristas-peter/wp-graphql-gutenberg": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
