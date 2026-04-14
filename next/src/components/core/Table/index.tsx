@@ -1,10 +1,6 @@
 import './styles.css';
 
 export default function Table(props: TableProps) {
-  console.log(props.body);
-  console.log(props.head);
-  console.log(props.foot);
-  console.log(props.caption);
   return (
     <figure className="supt-table">
       <table>
