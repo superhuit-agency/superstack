@@ -34,7 +34,7 @@ fi
 mkdir -p "../next/public/css"
 
 # Generate CSS with wp_get_global_stylesheet.
-raw_css="$($WPCLI eval "ini_set('display_errors', '0'); error_reporting(E_ERROR | E_PARSE); switch_theme('${THEME_NAME}'); echo wp_get_global_stylesheet(array('variables', 'styles', 'presets'));")"
+raw_css="$($WPCLI eval "ini_set('display_errors', '0'); error_reporting(E_ERROR | E_PARSE); switch_theme('${THEME_NAME}'); echo wp_get_global_stylesheet(array('variables'));")"
 
 # Keep only content starting from the first :root{.
 css="$(printf "%s" "$raw_css" | awk '
