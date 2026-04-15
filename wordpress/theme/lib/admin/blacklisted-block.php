@@ -11,6 +11,11 @@ function filter_blacklisted_blocks($allowed_blocks) {
     $blacklisted_blocks = [
         'core/archives',
         'core/calendar',
+        'core/rss',
+        'core/search',
+        'core/shortcode',
+        'core/tag-cloud',
+        'core/page-list'
     ];
 
     return array_values(array_diff($all_blocks, $blacklisted_blocks));

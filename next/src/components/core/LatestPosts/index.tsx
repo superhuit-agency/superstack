@@ -1,4 +1,4 @@
-import CardPost from '@/components/molecules/Cards/CardPost';
+import CardPost from '@/components/custom/molecules/Cards/CardPost';
 import './styles.css';
 
 export default function LatestPosts(props: LatestPostProps) {
