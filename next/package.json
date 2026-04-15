@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "classnames": "^2.5.1",
@@ -17,6 +19,7 @@
     "react-dom": "19.2.4"
   },
   "devDependencies": {
+    "@storybook/nextjs-vite": "^10.3.5",
     "@types/js-cookie": "^3.0.6",
     "@types/lodash": "^4.17.24",
     "@types/node": "^20",
@@ -24,6 +27,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.3",
+    "eslint-plugin-storybook": "^10.3.5",
     "graphql": "^16.13.2",
     "postcss": "^8.5.9",
     "postcss-extend-rule": "^4.0.0",
@@ -35,6 +39,8 @@
     "postcss-normalize": "^13.0.1",
     "postcss-preset-env": "^11.2.1",
     "postcss-simple-vars": "^7.0.1",
-    "typescript": "^5"
+    "storybook": "^10.3.5",
+    "typescript": "^5",
+    "vite": "^8.0.8"
   }
 }
