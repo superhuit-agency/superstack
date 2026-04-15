@@ -5,7 +5,6 @@
   "main": "src/index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "generate:theme-css": "sh scripts/run-generate-theme-css.sh",
     "build": "npm run build:public & npm run build:editor & npm run build:admin",
     "build:public": "wp-scripts build src/public/index.ts --output-path=static/public ",
     "build:editor": "wp-scripts build src/editor/index.ts src/editor-content/index.ts --output-path=static/editor",
