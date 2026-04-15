@@ -100,3 +100,8 @@ type NextLayoutParams = {
 	uri: string[];
 	lang: Locale;
 };
+
+type FocalPoint = {
+	x: number;
+	y: number;
+};

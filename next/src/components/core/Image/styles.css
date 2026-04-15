@@ -1,4 +1,9 @@
 .wp-block-image {
+    position: relative;
+
+    img {
+        display: block;
+    }
 
     &.is-style-rounded {
         img {

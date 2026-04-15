@@ -3,10 +3,7 @@ interface CoverAttributes {
   url?: string;
   dimRatio?: number;
   minHeight?: number;
-  focalPoint?: {
-    x: number;
-    y: number;
-  };
+  focalPoint?: FocalPoint;
   children: React.ReactNode;
 }
 

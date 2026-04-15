@@ -1,15 +1,11 @@
 interface ImageAttributes {
   url: string;
-  alt: string;
-  width?: number;
-  height?: number;
   caption?: string;
+  sizeSlug?: string;
 }
 
 interface ImageProps
-  extends
-    Omit<HTMLProps<HTMLImageElement>, "width" | "height">,
-    ImageAttributes {
+  extends React.HTMLProps<HTMLImageElement>, ImageAttributes {
   priority?: boolean;
   fill?: boolean;
   quality?: number;

@@ -1,15 +1,15 @@
-import cx from 'classnames';
-import { FC, forwardRef } from 'react';
-import NextImage from 'next/image';
+import cx from "classnames";
+import { FC, forwardRef } from "react";
+import NextImage from "next/image";
 
-import block from './block.json';
-import './styles.css';
+import block from "./block.json";
+import "./styles.css";
 
 const getCaptionText = (caption?: string) => {
-  if (!caption) return '';
+  if (!caption) return "";
 
   // WP may send a full figcaption HTML string in block attributes.
-  return caption.replace(/<[^>]+>/g, '').trim();
+  return caption.replace(/<[^>]+>/g, "").trim();
 };
 
 const Image: FC<ImageProps> & BlockConfigs = forwardRef<
@@ -19,7 +19,7 @@ const Image: FC<ImageProps> & BlockConfigs = forwardRef<
   (
     {
       url,
-      alt = '',
+      alt = "",
       height,
       width,
       caption,
@@ -46,7 +46,9 @@ const Image: FC<ImageProps> & BlockConfigs = forwardRef<
       <figure
         ref={ref}
         style={style}
-        className={cx('wp-block-image', className, `size-${sizeSlug}`)}
+        className={cx("wp-block-image", className, {
+          [`size-${sizeSlug}`]: sizeSlug,
+        })}
       >
         <NextImage
           src={url}
@@ -58,8 +60,8 @@ const Image: FC<ImageProps> & BlockConfigs = forwardRef<
           quality={quality}
           fill={fill}
           unoptimized={
-            (url as string)?.endsWith?.('.svg') ||
-            process.env.NEXT_PUBLIC_IS_THIS_NEXT !== 'true' // Only optimise image if in Nextjs (we don't want to optimize images on WP side as there isn't Next server running)
+            (url as string)?.endsWith?.(".svg") ||
+            process.env.NEXT_PUBLIC_IS_THIS_NEXT !== "true" // Only optimise image if in Nextjs (we don't want to optimize images on WP side as there isn't Next server running)
           }
         />
         {captionText && (
@@ -70,7 +72,7 @@ const Image: FC<ImageProps> & BlockConfigs = forwardRef<
   },
 );
 
-Image.displayName = 'Image';
+Image.displayName = "Image";
 
 Image.slug = block.slug;
 Image.title = block.title;
