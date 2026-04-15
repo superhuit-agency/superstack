@@ -29,6 +29,7 @@ const Image: FC<ImageProps> & BlockConfigs = forwardRef<
       sizeSlug,
       className,
       style,
+      focalPoint
     },
     ref,
   ) => {
@@ -63,6 +64,11 @@ const Image: FC<ImageProps> & BlockConfigs = forwardRef<
             (url as string)?.endsWith?.(".svg") ||
             process.env.NEXT_PUBLIC_IS_THIS_NEXT !== "true" // Only optimise image if in Nextjs (we don't want to optimize images on WP side as there isn't Next server running)
           }
+          style={{
+            objectPosition: focalPoint
+              ? `${focalPoint.x}% ${focalPoint.y}%`
+              : undefined,
+          }}
         />
         {captionText && (
           <figcaption className="wp-element-caption">{captionText}</figcaption>

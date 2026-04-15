@@ -9,4 +9,5 @@ interface ImageProps
   priority?: boolean;
   fill?: boolean;
   quality?: number;
+  focalPoint?: FocalPoint;
 }

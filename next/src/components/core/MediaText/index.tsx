@@ -1,6 +1,7 @@
 import cx from "classnames";
-import NextImage from "next/image";
 
+import Video from "../Video";
+import Image from "../Image";
 import block from "./block.json";
 
 import "./styles.css";
@@ -14,9 +15,7 @@ export default function MediaText({
   imageFill,
   focalPoint,
   children,
-  ...props
 }: MediaTextProps) {
-  console.log(props);
   return (
     <div
       className={cx("wp-block-media-text", {
@@ -28,22 +27,17 @@ export default function MediaText({
           mediaWidth !== 50 ? `${mediaWidth}% auto` : undefined,
       }}
     >
-      <figure className="wp-block-media-text__media">
-        {mediaType === "video" ? (
-          <video src={mediaUrl} controls />
-        ) : (
-          <NextImage
-            src={mediaUrl}
-            alt={mediaAlt}
-            fill={true}
-            style={{
-              objectPosition: focalPoint
-                ? `${focalPoint.x}% ${focalPoint.y}%`
-                : undefined,
-            }}
-          />
-        )}
-      </figure>
+      {mediaType === "video" ? (
+        <Video src={mediaUrl} controls className="wp-block-media-text__media" />
+      ) : (
+        <Image
+          url={mediaUrl}
+          alt={mediaAlt}
+          fill={true}
+          focalPoint={focalPoint}
+          className="wp-block-media-text__media"
+        />
+      )}
       <div className="wp-block-media-text__content">{children}</div>
     </div>
   );
