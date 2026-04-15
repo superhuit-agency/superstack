@@ -44,12 +44,12 @@ export default async function getNodeByURI(
 
   const query = isId ? nodeByIdQuery() : nodeByUriQuery();
 
-  let response = await fetchAPI(query, {
+  const response = await fetchAPI(query, {
     variables,
     auth,
   });
 
-  let { node, seo, generalSettings } = response;
+  const { node, seo, generalSettings } = response;
 
   if (!node) return null;
 

@@ -22,6 +22,9 @@ const blocksList: Record<string, () => Promise<BlockModule>> = {
   'core/pullquote': () => import('../core/Pullquote'),
   'core/table': () => import('../core/Table'),
   'core/verse': () => import('../core/Preformatted'),
+  'core/social-links': () => import('../core/SocialLinks'),
+  'core/social-link': () => import('../core/SocialLink'),
+  'core/categories': () => import('../core/TaxonomyList'),
 };
 
 interface PostBodyBlocksProps {

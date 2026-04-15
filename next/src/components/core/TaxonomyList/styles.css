@@ -1,0 +1,13 @@
+.wp-block-categories-list,
+.wp-block-categories-dropdown {
+  margin: 1rem 0;
+}
+
+.wp-block-categories-list ul {
+  margin: 0.5rem 0 0 1rem;
+}
+
+.wp-block-categories-dropdown select {
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+}

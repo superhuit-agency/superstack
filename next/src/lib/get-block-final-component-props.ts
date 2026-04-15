@@ -1,7 +1,8 @@
 // import * as blocksData from '@/components/data';
+import { blocksDataList } from '@/components/global/blockRegistry';
 import { fetchAPI } from '@/lib';
 
-const blocksDataList: { [key: string]: any } = {};
+// const blocksDataList: { [key: string]: any } = {};
 // for (const key in blocksData) {
 //   const blkData = blocksData[key as keyof typeof blocksData] as any;
 
@@ -61,12 +62,16 @@ export default function getBlockFinalComponentProps({
  * @returns {any}
  */
 const getAttributes = (name: string, attributes: object) =>
-  new Promise((res, rej) => {
-    if (!blocksDataList[name]) res(attributes);
+  new Promise(async (res, rej) => {
+    if (!blocksDataList[name as keyof typeof blocksDataList]) res(attributes);
     else {
-      blocksDataList[name].getData(fetchAPI, attributes).then((data = {}) => {
-        res({ ...attributes, ...data });
-      });
+      const blockModule =
+        await blocksDataList[name as keyof typeof blocksDataList]?.();
+      blockModule
+        .getData(fetchAPI, attributes as unknown as TaxonomyListAttributes)
+        .then((data = {}) => {
+          res({ ...attributes, ...data });
+        });
     }
   });
 
