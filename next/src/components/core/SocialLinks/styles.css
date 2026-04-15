@@ -1,0 +1,21 @@
+.wp-block-social-links {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+
+  list-style: none;
+
+  &.-is-aligned-left {
+    justify-content: flex-start;
+  }
+
+  &.-is-aligned-center {
+    justify-content: center;
+  }
+
+  &.-is-aligned-right {
+    justify-content: flex-end;
+  }
+}
