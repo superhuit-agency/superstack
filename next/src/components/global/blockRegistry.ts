@@ -30,4 +30,6 @@ const blocksList: Record<string, () => Promise<BlockModule>> = {
 export const blocksDataList = {
   'core/categories': () => import('../core/TaxonomyList/data'),
   'core/latest-posts': () => import('../core/LatestPosts/data'),
+  'core/navigation': () => import('../core/Navigation/data'),
+  'core/site-logo': () => import('../core/SiteLogo/data'),
 };

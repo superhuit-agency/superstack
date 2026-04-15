@@ -33,6 +33,12 @@ const blocksList: Record<string, () => Promise<BlockModule>> = {
   'core/categories': () => import('../core/TaxonomyList'),
   'core/html': () => import('../core/CustomHtml'),
   'core/latest-posts': () => import('../core/LatestPosts'),
+  'core/navigation': () => import('../core/Navigation'),
+  'core/site-logo': () => import('../core/SiteLogo'),
+  'core/spacer': () => import('../core/Spacer'),
+  'core/navigation-link': () => import('../core/NavigationLink'),
+  'core/navigation-submenu': () => import('../core/NavigationSubmenu'),
+  'core/block': () => import('../core/Block'),
 };
 
 interface PostBodyBlocksProps {
@@ -65,12 +71,14 @@ export async function Blocks({
           if (isRoot && props.attributes) {
             if (i === 0) currentLevel = level - 1;
           }
+          const { ref, ...attributes } = props.attributes;
           return (
             <Block
               key={i}
               slug={name}
               level={currentLevel}
-              {...props.attributes}
+              {...(ref ? { attributesRef: ref } : {})}
+              {...attributes}
             >
               {props.innerBlocks && (
                 <Blocks

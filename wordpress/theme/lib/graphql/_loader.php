@@ -6,6 +6,7 @@ require_once __DIR__ .'/archive-page.php';
 require_once __DIR__ .'/post-edit-link.php';
 require_once __DIR__ .'/register-logo.php';
 require_once __DIR__ .'/node-idtype.php';
+require_once __DIR__ .'/navigation-inner-blocks.php';
 require_once __DIR__ .'/resolve-uris.php';
 
 
