@@ -15,7 +15,8 @@ if (! defined('ABSPATH')) {
  * @subpackage Superstack/Admin/Editor
  * @author     Superhuit <tech@superhuit.ch>
  */
-class Register_Block_Styles {
+class Register_Block_Styles
+{
 
 	use Singleton;
 
@@ -25,9 +26,10 @@ class Register_Block_Styles {
 	 * @access public
 	 * @return void
 	 */
-	public function init() {
+	public function init()
+	{
 		add_action('init', [$this, 'register_button_link_style']);
-		add_action('init', [$this, 'register_group_accent_style']);
+		// add_action('init', [$this, 'register_group_accent_style']);
 	}
 
 	/**
@@ -37,7 +39,8 @@ class Register_Block_Styles {
 	 * @access   public
 	 * @return   void
 	 */
-	public function register_button_link_style() {
+	public function register_button_link_style()
+	{
 		register_block_style(
 			'core/button',
 			[
@@ -47,23 +50,23 @@ class Register_Block_Styles {
 		);
 	}
 
-	/**
-	 * Register the "Accent" style for core/group block.
-	 *
-	 * @since    1.0.0
-	 * @access   public
-	 * @return   void
-	 */
-	public function register_group_accent_style() {
-		register_block_style(
-			'core/group',
-			[
-				'name'         => 'accent',
-				'label'        => _x('Accent', 'core/group block style', SUPERSTACK_THEME_NAME),
-				'inline_style' => '.wp-block-group.is-style-accent { background-color: var(--wp--preset--color--accent-7); }',
-			]
-		);
-	}
+	// /**
+	//  * Register the "Accent" style for core/group block.
+	//  *
+	//  * @since    1.0.0
+	//  * @access   public
+	//  * @return   void
+	//  */
+	// public function register_group_accent_style() {
+	// 	register_block_style(
+	// 		'core/group',
+	// 		[
+	// 			'name'         => 'accent',
+	// 			'label'        => _x('Accent', 'core/group block style', SUPERSTACK_THEME_NAME),
+	// 			'inline_style' => '.wp-block-group.is-style-accent { background-color: var(--wp--preset--color--accent-7); }',
+	// 		]
+	// 	);
+	// }
 }
 
 Register_Block_Styles::get_instance()->init();

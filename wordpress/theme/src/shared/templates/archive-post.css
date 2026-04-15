@@ -1,8 +1,0 @@
-.spck-archive.-post {
-	margin-top: 0;
-	margin-block-start: 0 !important;
-
-	.spck-archive-post__loop {
-		@extend %archive-block-query;
-	}
-}

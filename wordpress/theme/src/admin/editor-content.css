@@ -1,59 +1,30 @@
 /* Write CSS for the block editor content */
 
 /* Global */
-@import "../shared/header.css";
-@import "../shared/footer.css";
 
 /* Core blocks */
-@import "../shared/core/query-pagination.css";
 
 /* Cards */
-@import "../shared/cards/card-link.css";
-@import "../shared/cards/card-person.css";
-@import "../shared/cards/card-post.css";
-@import "../shared/cards/card-post-audio.css";
-@import "../shared/cards/card-post-highlight.css";
-@import "../shared/cards/card-member.css";
-@import "../shared/cards/card-partner.css";
-@import "../shared/cards/card-post-press-review.css";
-@import "../shared/cards/card-text.css";
-@import "../shared/cards/card-text-link.css";
 
 /* Hero */
-@import "../shared/hero-text.css";
 
 /* Sections */
-@import "../shared/sections/section-cards.css";
-@import "../shared/sections/section-cta.css";
-@import "../shared/sections/section-faq.css";
-@import "../shared/sections/section-latest-posts.css";
-@import "../shared/sections/section-people.css";
-@import "../shared/sections/section-related-posts.css";
-@import "../shared/sections/section-text-2cols.css";
-@import "../shared/sections/section-text-highlight.css";
-@import "../shared/sections/section-upcoming-events.css";
 
 /* Templates */
 @import "../shared/templates/archive.css";
-@import "../shared/templates/archive-post.css";
-@import "../shared/templates/archive-member.css";
-@import "../shared/templates/archive-partner.css";
-@import "../shared/templates/archive-press-review.css";
 @import "../shared/templates/single.css";
 
 /* Pages */
-@import "../shared/pages/history.css";
 
 /* Hide the post title in the editor */
 .block-editor-iframe__body {
-	&.post-type-page {
+	/* &.post-type-page {
 		.editor-visual-editor__post-title-wrapper.edit-post-visual-editor__post-title-wrapper {
 			display: none;
 		}
-	}
+	} */
 
-	&.post-type-post,
-	&.post-type-event {
+	&.post-type-post {
 		.editor-visual-editor__post-title-wrapper {
 			max-width: clamp(300px, 92vw, 920px);
 			margin-inline: auto;

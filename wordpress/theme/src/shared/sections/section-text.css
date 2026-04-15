@@ -1,6 +1,0 @@
-.spck-section-text {
-	.wp-block-column:has(p) {
-		/* Align text base to title base (title is h2 28px => 40px font-size) */
-		padding-top: clamp(14px, calc(14px + (6 * (100vw - 320px) / 1020)), 20px);
-	}
-}

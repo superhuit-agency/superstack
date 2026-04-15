@@ -1,7 +1,0 @@
-.wp-block-query-pagination {
-	.wp-block-query-pagination-numbers {
-		display: flex;
-		flex-wrap: wrap;
-		gap: var(--wp--preset--spacing--20);
-	}
-}

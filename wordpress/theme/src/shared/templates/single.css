@@ -1,5 +1,5 @@
 %single-content-layout {
-	> :where(:not(.alignleft):not(.alignright):not(.alignfull)) {
+	/* > :where(:not(.alignleft):not(.alignright):not(.alignfull)) {
 		max-width: clamp(280px, 68vw, 700px);
 	}
 
@@ -9,7 +9,7 @@
 	}
 	> .alignfull {
 		margin-inline: auto;
-	}
+	} */
 }
 
 .spck-single-content {
@@ -17,11 +17,11 @@
 		@extend %single-content-layout;
 	}
 
-	.wp-block-post-content {
+	/* .wp-block-post-content {
 		> .wp-block-image,
 		> .wp-block-embed,
 		> .wp-block-audio {
 			margin-block: 2.5rem;
 		}
-	}
+	} */
 }

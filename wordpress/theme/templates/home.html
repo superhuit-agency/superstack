@@ -5,40 +5,6 @@
   class="wp-block-group spck-archive -post"
   style="margin-bottom: var(--wp--preset--spacing--100)"
 >
-  <!-- wp:group {"tagName":"header","lock":{"move":false,"remove":false},"metadata":{"name":"En-tête texte","categories":["header"],"patternName":"superstack/hero-text"},"align":"full","className":"spck-hero-text","style":{"spacing":{"padding":{"top":"0","bottom":"0","left":"var:preset|spacing|50","right":"var:preset|spacing|50"}}},"layout":{"type":"constrained"},"allowedBlocks":[]} -->
-  <header
-    class="wp-block-group alignfull spck-hero-text"
-    style="
-      padding-top: 0;
-      padding-right: var(--wp--preset--spacing--50);
-      padding-bottom: 0;
-      padding-left: var(--wp--preset--spacing--50);
-    "
-  >
-    <!-- wp:group {"lock":{"move":true,"remove":true},"className":"spck-hero-text__inner","style":{"spacing":{"margin":{"top":"0","bottom":"0"},"padding":{"top":"var:preset|spacing|100","bottom":"var:preset|spacing|100","left":"var:preset|spacing|50","right":"var:preset|spacing|50"}}},"layout":{"type":"constrained"},"allowedBlocks":[]} -->
-    <div
-      class="wp-block-group spck-hero-text__inner"
-      style="
-        margin-top: 0;
-        margin-bottom: 0;
-        padding-top: var(--wp--preset--spacing--100);
-        padding-right: var(--wp--preset--spacing--50);
-        padding-bottom: var(--wp--preset--spacing--100);
-        padding-left: var(--wp--preset--spacing--50);
-      "
-    >
-      <!-- wp:group {"lock":{"move":true,"remove":true},"className":"spck-hero-text__stack","style":{"spacing":{"blockGap":"var:preset|spacing|30"}},"layout":{"type":"flex","orientation":"vertical"},"allowedBlocks":["core/paragraph","core/heading"]} -->
-      <div class="wp-block-group spck-hero-text__stack">
-        <!-- wp:heading {"level":1} -->
-        <h1 class="wp-block-heading">Actualités</h1>
-        <!-- /wp:heading -->
-      </div>
-      <!-- /wp:group -->
-    </div>
-    <!-- /wp:group -->
-  </header>
-  <!-- /wp:group -->
-
   <!-- wp:group {"style":{"spacing":{"blockGap":"var:preset|spacing|50","padding":{"left":"var:preset|spacing|50","right":"var:preset|spacing|50"}}},"layout":{"type":"constrained"}} -->
   <div
     class="wp-block-group"
@@ -46,35 +12,7 @@
       padding-right: var(--wp--preset--spacing--50);
       padding-left: var(--wp--preset--spacing--50);
     "
-  >
-    <!-- wp:query {"queryId":1,"namespace":"superstack/archive-post-highlight","query":{"perPage":1,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"only","inherit":false,"taxQuery":null,"parents":[],"format":[]}} -->
-    <div class="wp-block-query">
-      <!-- wp:post-template {"layout":{"type":"grid","columnCount":1}} -->
-      <!-- wp:pattern {"slug":"superstack/card-post-highlight"} /-->
-      <!-- /wp:post-template -->
-    </div>
-    <!-- /wp:query -->
-
-    <!-- wp:query {"queryId":2,"namespace":"superstack/archive-post","className":"spck-archive-post__loop","query":{"postType":"post","perPage":10,"pages":0,"offset":0,"order":"desc","orderBy":"date","inherit":false}} -->
-    <div class="wp-block-query spck-archive-post__loop">
-      <!-- wp:post-template {"layout":{"type":"grid"}} -->
-      <!-- wp:pattern {"slug":"superstack/card-post"} /-->
-      <!-- /wp:post-template -->
-
-      <!-- wp:query-pagination {"paginationArrow":"arrow","showLabel":false,"align":"center"} -->
-      <!-- wp:query-pagination-previous /-->
-      <!-- wp:query-pagination-numbers /-->
-      <!-- wp:query-pagination-next /-->
-      <!-- /wp:query-pagination -->
-
-      <!-- wp:query-no-results -->
-      <!-- wp:paragraph -->
-      <p>Aucune actualité trouvée.</p>
-      <!-- /wp:paragraph -->
-      <!-- /wp:query-no-results -->
-    </div>
-    <!-- /wp:query -->
-  </div>
+  ></div>
   <!-- /wp:group -->
 </main>
 <!-- /wp:group -->

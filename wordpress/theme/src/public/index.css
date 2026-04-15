@@ -3,60 +3,23 @@
 /* Global */
 @import "../shared/header.css";
 @import "../shared/footer.css";
-@import "../shared/forminator.css";
 
 /* Core blocks */
-@import "../shared/core/button.css";
-@import "../shared/core/navigation.css";
-@import "../shared/core/query-pagination.css";
 
 /* Cards */
-@import "../shared/cards/card-link.css";
-@import "../shared/cards/card-member.css";
-@import "../shared/cards/card-partner.css";
-@import "../shared/cards/card-person.css";
-@import "../shared/cards/card-post.css";
-@import "../shared/cards/card-post-audio.css";
-@import "../shared/cards/card-post-highlight.css";
-@import "../shared/cards/card-post-press-review.css";
-@import "../shared/cards/card-gallery.css";
-@import "../shared/cards/card-text.css";
-@import "../shared/cards/card-text-link.css";
 
 /* Hero */
-@import "../shared/hero-text.css";
 
 /* Sections */
-@import "../shared/sections/section-cards.css";
-@import "../shared/sections/section-cta.css";
-@import "../shared/sections/section-faq.css";
-@import "../shared/sections/section-latest-posts.css";
-@import "../shared/sections/section-people.css";
-@import "../shared/sections/section-related-posts.css";
-@import "../shared/sections/section-text.css";
-@import "../shared/sections/section-text-2cols.css";
-@import "../shared/sections/section-text-highlight.css";
-@import "../shared/sections/section-upcoming-events.css";
 
 /* Templates */
 @import "../shared/templates/archive.css";
-@import "../shared/templates/archive-post.css";
-@import "../shared/templates/archive-member.css";
-@import "../shared/templates/archive-partner.css";
 @import "../shared/templates/single.css";
 @import "../shared/templates/404.css";
 
 /* Pages */
-@import "../shared/pages/history.css";
-@import "../shared/pages/page-login.css";
 
 /* Global styles */
-.wp-site-blocks .spck-page__main,
-.wp-singular.page .wp-block-post-content.is-layout-constrained > *,
-footer.wp-block-template-part {
-	margin-block-start: 0;
-}
-
 
 /* Focus styles */
 :where(.wp-site-blocks *:focus) {
