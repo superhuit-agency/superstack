@@ -13,20 +13,20 @@ export default function File({
   displayPreview,
 }: FileProps) {
   return (
-    <div className="supt-file">
+    <div className="wp-block-file">
       {displayPreview && (
         <object
-          className="supt-file__embed"
+          className="wp-block-file__embed"
           data={href}
           type="application/pdf"
           aria-label={`Embed of ${fileName}.`}
           style={{ width: '100%', height: previewHeight }}
         />
       )}
-      <a href={textLinkHref} target={textLinkTarget ? textLinkTarget : undefined} className="supt-file__text-link">{fileName}</a>
+      <a href={textLinkHref} target={textLinkTarget ? textLinkTarget : undefined} className="wp-block-file__text-link">{fileName}</a>
       {/* TODO :: CHANGE TO BUTTON WHEN AVAILABLE! */}
       {showDownloadButton && (
-        <a href={textLinkHref} className="supt-file__download-button" download>
+        <a href={textLinkHref} className="wp-block-file__button" download>
           {downloadButtonText}
         </a>
       )}

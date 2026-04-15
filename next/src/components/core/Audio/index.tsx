@@ -9,7 +9,7 @@ export default function Audio({
   preload,
 }: AudioProps) {
   return (
-    <figure className="supt-audio">
+    <figure className="wp-block-audio">
       <audio
         src={src}
         controls

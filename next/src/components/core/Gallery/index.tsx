@@ -13,10 +13,10 @@ export default function Gallery({
   console.log(props);
   return (
     <div
-      className={cx("supt-gallery", {
-        [`-has-${columns}-columns`]: columns !== undefined,
-        [`-has-columns-default`]: columns === undefined,
-        "-is-cropped": imageCrop,
+      className={cx("wp-block-gallery", {
+        [`columns-${columns}`]: columns !== undefined,
+        [`columns-default`]: columns === undefined,
+        "is-cropped": imageCrop,
       })}
     >
       {children}

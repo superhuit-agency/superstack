@@ -14,13 +14,13 @@ export default function Cover({
   children
 }: CoverProps) {
   return (
-    <div className="supt-cover" style={{ minHeight }}>
+    <div className="wp-block-cover" style={{ minHeight }}>
       {url ? (
         <NextImage
           src={url}
           fill
           alt=""
-          className="supt-cover__image"
+          className="wp-block-cover__image-background"
           style={{
             objectPosition: focalPoint
               ? `${focalPoint.x}% ${focalPoint.y}%`
@@ -30,12 +30,12 @@ export default function Cover({
       ) : null}
       <span
         aria-hidden="true"
-        className={cx("supt-cover__background", `-is-dimmed-${dimRatio}`)}
+        className={cx("wp-block-cover__background", `has-background-dim-${dimRatio}`)}
         style={{
           backgroundColor: `var(--wp--preset--color--${overlayColor})`,
         }}
       />
-      <div className="supt-cover__content">{children}</div>
+      <div className="wp-block-cover__inner-container">{children}</div>
     </div>
   );
 }

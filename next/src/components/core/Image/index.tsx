@@ -41,12 +41,12 @@ const Image: FC<ImageProps> & BlockConfigs = forwardRef<HTMLImageElement, ImageP
     <figure
       ref={ref}
       style={style}
-      className={cx('supt-image', className, `size-${sizeSlug}`)}
+      className={cx('wp-block-image', className, `size-${sizeSlug}`)}
     >
       <NextImage
         src={url}
         alt={alt}
-        className="supt-figure__image"
+        className="wp-block__image"
         width={fill || !hasValidDimensions ? undefined : normalizedWidth}
         height={fill || !hasValidDimensions ? undefined : normalizedHeight}
         priority={priority}
@@ -58,7 +58,7 @@ const Image: FC<ImageProps> & BlockConfigs = forwardRef<HTMLImageElement, ImageP
         }
       />
       {captionText && (
-        <figcaption className="supt-image__caption">
+        <figcaption className="wp-element-caption">
           {captionText}
         </figcaption>
       )}

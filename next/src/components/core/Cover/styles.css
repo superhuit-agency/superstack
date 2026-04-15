@@ -1,4 +1,4 @@
-.supt-cover {
+.wp-block-cover {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -12,16 +12,16 @@
     &__background {
         position: absolute;
         inset: 0;
-        &.-is-dimmed-50 {
+        &.has-background-dim-50 {
             opacity: .5;
         }   
     }
 
-    &__image {
+    &__image-background {
         object-fit: cover;
     }
 
-    &__content {
+    &__inner-container {
         position: relative;
         width: 100%;
         text-align: center;
