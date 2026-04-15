@@ -1,22 +1,20 @@
-import cx from "classnames";
+import cx from 'classnames';
 
-import block from "./block.json";
+import block from './block.json';
 
-import "./styles.css";
+import './styles.css';
 
 export default function Gallery({
   children,
   columns,
   imageCrop,
-  ...props
 }: GalleryProps) {
-  console.log(props);
   return (
     <div
-      className={cx("wp-block-gallery", {
+      className={cx('wp-block-gallery', {
         [`columns-${columns}`]: columns !== undefined,
         [`columns-default`]: columns === undefined,
-        "is-cropped": imageCrop,
+        'is-cropped': imageCrop,
       })}
     >
       {children}
