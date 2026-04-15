@@ -1,0 +1,32 @@
+@import '@resources/index.css';
+
+.wp-block-buttons {
+	display: flex;
+	justify-content: flex-start;
+	gap: 10px;
+
+	&.is-content-justification-center {
+		justify-content: center;
+	}
+	&.is-content-justification-right {
+		justify-content: flex-end;
+	}
+	&.is-content-justification-space-between {
+		justify-content: space-between;
+	}
+
+	&.is-vertical {
+		flex-direction: column;
+		align-items: flex-start;
+		&.is-content-justification-center {
+			align-items: center;
+		}
+		&.is-content-justification-right {
+			align-items: flex-end;
+		}
+		&.is-content-justification-space-between {
+			align-items: space-between;
+		}
+	}
+
+}

@@ -1,0 +1,28 @@
+@import '@resources/index.css';
+
+.wp-block-button {
+	display: inline-block;
+
+	&__link {
+		@extend %reset-button, %t-button;
+		width: 100%;
+		padding: 5px 10px;
+		background-color: lightblue;
+		border: 1px solid transparent;
+	}
+
+	&.is-style-outline {
+		.wp-block-button__link {
+			background: none;
+			border-color: currentColor;
+		}
+	}
+	&.is-style-link {
+		.wp-block-button__link {
+			border-width: 0 0 1px 0;
+			padding: 0 0 4px 0;
+			border-color: currentColor;
+			background: none;
+		}
+	}
+}

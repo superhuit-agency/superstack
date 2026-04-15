@@ -49,7 +49,7 @@ type MenuItemType = LinkProps & {
 	items?: MenuItemType[];
 };
 
-type LinkProps = React.HTMLProps<HTMLAnchorElement> & {
+type LinkProps = Omit<React.HTMLProps<HTMLAnchorElement>> & {
 	scroll?: boolean;
 	prefetch?: boolean;
 	ref?: Ref<HTMLAnchorElement>;
