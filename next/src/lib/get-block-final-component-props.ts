@@ -30,7 +30,7 @@ export default function getBlockFinalComponentProps({
   attributes: object;
   innerBlocks: Array<BlockPropsType>;
 }): Promise<BlockPropsType> {
-  return new Promise(async (res, rej) => {
+  return new Promise(async (res) => {
     const props: BlockPropsType = {
       name,
       attributes: {},
@@ -62,16 +62,23 @@ export default function getBlockFinalComponentProps({
  * @returns {any}
  */
 const getAttributes = (name: string, attributes: object) =>
-  new Promise(async (res, rej) => {
+  new Promise(async (res) => {
     if (!blocksDataList[name as keyof typeof blocksDataList]) res(attributes);
     else {
       const blockModule =
         await blocksDataList[name as keyof typeof blocksDataList]?.();
-      blockModule
-        .getData(fetchAPI, attributes as unknown as TaxonomyListAttributes)
-        .then((data = {}) => {
-          res({ ...attributes, ...data });
-        });
+      const getData = (blockModule as {
+        getData?: (fetcher: FetchApiFuncType, attrs: object) => Promise<object>;
+      }).getData;
+
+      if (!getData) {
+        res(attributes);
+        return;
+      }
+
+      getData(fetchAPI, attributes).then((data = {}) => {
+        res({ ...attributes, ...data });
+      });
     }
   });
 

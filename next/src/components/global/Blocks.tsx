@@ -28,6 +28,7 @@ const blocksList: Record<string, () => Promise<BlockModule>> = {
   'core/social-link': () => import('../core/SocialLink'),
   'core/categories': () => import('../core/TaxonomyList'),
   'core/html': () => import('../core/CustomHtml'),
+  'core/latest-posts': () => import('../core/LatestPosts'),
 };
 
 interface PostBodyBlocksProps {

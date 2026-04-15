@@ -3,7 +3,6 @@ import cx from 'classnames';
 import './styles.css';
 
 export default function SocialLinks(props: SocialLinksProps) {
-  console.log('props - social links', props);
   return (
     <ul
       className={cx(

@@ -2,7 +2,7 @@ type BlockModule = {
   default: React.ElementType;
 };
 
-export const blocksList: Record<string, () => Promise<BlockModule>> = {
+const blocksList: Record<string, () => Promise<BlockModule>> = {
   'core/audio': () => import('../core/Audio'),
   'core/cover': () => import('../core/Cover'),
   'core/file': () => import('../core/File'),
@@ -23,8 +23,11 @@ export const blocksList: Record<string, () => Promise<BlockModule>> = {
   'core/social-links': () => import('../core/SocialLinks'),
   'core/social-link': () => import('../core/SocialLink'),
   'core/categories': () => import('../core/TaxonomyList'),
+  'core/html': () => import('../core/CustomHtml'),
+  'core/latest-posts': () => import('../core/LatestPosts'),
 };
 
 export const blocksDataList = {
   'core/categories': () => import('../core/TaxonomyList/data'),
+  'core/latest-posts': () => import('../core/LatestPosts/data'),
 };
