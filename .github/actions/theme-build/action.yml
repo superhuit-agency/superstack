@@ -30,7 +30,7 @@ runs:
       working-directory: ./wordpress
 
     - name: Save built artifacts
-      uses: actions/upload-artifact@v8
+      uses: actions/upload-artifact@v7
       with:
         name: wp-theme-assets
         path: |
