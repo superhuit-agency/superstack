@@ -33,6 +33,7 @@ export const blocksDataList = {
   'core/categories': () => import('../core/TaxonomyList/data'),
   'core/latest-posts': () => import('../core/LatestPosts/data'),
   'core/navigation': () => import('../core/Navigation/data'),
+  'core/post-author': () => import('../core/PostAuthor/data'),
   'core/post-title': () => import('../core/PostTitle/data'),
   'core/post-excerpt': () => import('../core/PostExcerpt/data'),
   'core/query': () => import('../core/Query/data'),

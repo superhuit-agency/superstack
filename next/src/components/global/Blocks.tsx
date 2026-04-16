@@ -32,6 +32,7 @@ const blocksList: Record<string, () => Promise<BlockModule>> = {
   'core/post-title': () => import('../core/PostTitle'),
   'core/post-excerpt': () => import('../core/PostExcerpt'),
   'core/post-featured-image': () => import('../core/PostFeaturedImage'),
+  'core/post-author': () => import('../core/PostAuthor'),
   'core/preformatted': () => import('../core/Preformatted'),
   'core/pullquote': () => import('../core/Pullquote'),
   'core/quote': () => import('../core/Quote'),
