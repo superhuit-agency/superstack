@@ -27,10 +27,6 @@ runs:
       shell: bash
       run: npm --prefix next ci
 
-    - name: Copy environment file
-      shell: bash
-      run: cp .env.next.example .env
-
     - name: Build Next
       shell: bash
       run: WORDPRESS_URL=${{ inputs.WORDPRESS_URL }} NEXT_URL=${{ inputs.NEXT_URL }} NODE_ENV=production npm run build
