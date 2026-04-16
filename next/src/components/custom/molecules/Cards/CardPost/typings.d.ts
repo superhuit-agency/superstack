@@ -1,5 +1,6 @@
+type NextImageProps = import("next/image").ImageProps;
 interface CardPostProps {
-  featuredimage: ImageAttributes | null;
+  featuredimage: NextImageProps | null;
   title: string;
   excerpt: string | null;
   link: string;

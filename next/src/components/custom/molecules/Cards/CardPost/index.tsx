@@ -10,7 +10,7 @@ export default function CardPost(props: CardPostProps) {
       {props.featuredimage && (
         <div className="supt-card-post__image-container">
           <Image
-            src={props.featuredimage.url}
+            src={props.featuredimage.src}
             alt={props.featuredimage.alt}
             width={props.featuredimage.width}
             height={props.featuredimage.height}
