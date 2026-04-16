@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import NextImage from 'next/image';
 
 import Heading from '@/components/core/Heading';
 
@@ -9,7 +9,7 @@ export default function CardPost(props: CardPostProps) {
     <article className="supt-card-post">
       {props.featuredimage && (
         <div className="supt-card-post__image-container">
-          <Image
+          <NextImage
             src={props.featuredimage.src}
             alt={props.featuredimage.alt}
             width={props.featuredimage.width}
