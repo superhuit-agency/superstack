@@ -29,7 +29,11 @@ runs:
 
     - name: Build Next
       shell: bash
-      run: WORDPRESS_URL=${{ inputs.WORDPRESS_URL }} NEXT_URL=${{ inputs.NEXT_URL }} NODE_ENV=production npm run build
+      run: |
+        WORDPRESS_URL=${{ inputs.WORDPRESS_URL }}
+        NEXT_URL=${{ inputs.NEXT_URL }}
+        NODE_ENV=production
+        npm --prefix next run build
 
     - name: Save built artifacts
       uses: actions/upload-artifact@v7
