@@ -25,6 +25,7 @@ const blocksList: Record<string, () => Promise<BlockModule>> = {
   'core/categories': () => import('../core/TaxonomyList'),
   'core/html': () => import('../core/CustomHtml'),
   'core/latest-posts': () => import('../core/LatestPosts'),
+  'core/site-tagline': () => import('../core/SiteTagline'),
 };
 
 export const blocksDataList = {
@@ -33,4 +34,5 @@ export const blocksDataList = {
   'core/navigation': () => import('../core/Navigation/data'),
   'core/site-logo': () => import('../core/SiteLogo/data'),
   'core/site-title': () => import('../core/SiteTitle/data'),
+  'core/site-tagline': () => import('../core/SiteTagline/data'),
 };
