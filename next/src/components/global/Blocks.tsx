@@ -7,6 +7,7 @@ type BlockModule = {
 const blocksList: Record<string, () => Promise<BlockModule>> = {
   'core/audio': () => import('../core/Audio'),
   'core/avatar': () => import('../core/Avatar'),
+  'core/block': () => import('../core/Block'),
   'core/button': () => import('../core/Button'),
   'core/buttons': () => import('../core/Buttons'),
   'core/categories': () => import('../core/TaxonomyList'),
@@ -25,6 +26,7 @@ const blocksList: Record<string, () => Promise<BlockModule>> = {
   'core/math': () => import('../core/Math'),
   'core/media-text': () => import('../core/MediaText'),
   'core/paragraph': () => import('../core/Paragraph'),
+  'core/post-title': () => import('../core/PostTitle'),
   'core/preformatted': () => import('../core/Preformatted'),
   'core/pullquote': () => import('../core/Pullquote'),
   'core/quote': () => import('../core/Quote'),
@@ -39,7 +41,6 @@ const blocksList: Record<string, () => Promise<BlockModule>> = {
   'core/site-logo': () => import('../core/SiteLogo'),
   'core/navigation-link': () => import('../core/NavigationLink'),
   'core/navigation-submenu': () => import('../core/NavigationSubmenu'),
-  'core/block': () => import('../core/Block'),
   'core/site-title': () => import('../core/SiteTitle'),
   'core/site-tagline': () => import('../core/SiteTagline'),
   'core/query': () => import('../core/Query'),

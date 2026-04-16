@@ -12,6 +12,7 @@ import {
   getRedirection,
   getWpUriFromNextPath,
 } from '@/lib';
+import { baseUriContext } from '@/hooks/use-base-uri';
 
 // see https://nextjs.org/docs/app/api-reference/file-conventions/route-segment-config
 export const revalidate = 3600; // revalidate at most every hour
@@ -149,6 +150,7 @@ export default async function Page({ params }: { params: { uri: string[] } }) {
 
   const baseUri = getWpUriFromNextPath(baseSegments);
   const uri = baseUri;
+  baseUriContext(uri);
 
   let auth: { authToken?: string } = {};
 
