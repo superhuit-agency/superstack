@@ -1,7 +1,7 @@
 import { Meta, StoryObj } from '@storybook/react';
 
-import { Button } from '@/components/core/Button';
-import { Buttons } from '.';
+import Button from '@/components/core/Button';
+import Buttons from '.';
 
 const meta = {
 	title: 'Components/Molecules/Buttons',
@@ -21,7 +21,7 @@ export const Default: Story = {
 		children: (
 			<>
 				<Button text="Button 1" url="#" />
-				<Button text="Button 2" url="#" variant="secondary" />
+				<Button text="Button 2" url="#" variant="outline" />
 			</>
 		),
 	},

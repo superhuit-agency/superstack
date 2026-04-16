@@ -1,6 +1,6 @@
 import { Meta, StoryObj } from '@storybook/react';
 
-import { Button } from '.';
+import Button from '.';
 
 const meta = {
 	title: 'Components/Atoms/Button',
@@ -26,20 +26,18 @@ export const Secondary: Story = {
 	args: {
 		text: 'Button Secondary',
 		url: '#',
-		variant: 'secondary',
+		variant: 'outline',
 	},
 };
 
 export const Submit: Story = {
 	args: {
-		type: 'submit',
 		text: 'Submit Form',
 	},
 };
 
 export const Download: Story = {
 	args: {
-		download: true,
 		text: 'Download file',
 		url: '/file.pdf',
 	},
@@ -49,7 +47,7 @@ export const External: Story = {
 	args: {
 		text: 'Made by Superhuit',
 		url: 'https://superhuit.ch',
-		target: '_blank',
+		linkTarget: '_blank',
 	},
 };
 
@@ -57,7 +55,7 @@ export const Empty: Story = {
 	args: {
 		text: undefined,
 		url: 'https://superhuit.ch',
-		target: '_blank',
+		linkTarget: '_blank',
 	},
 	tags: ['!dev'], // Does not show in storybook's sidebar
 };
