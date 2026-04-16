@@ -1,9 +1,8 @@
 import Avatar from '../Avatar';
+import PostAuthorName from '../PostAuthorName';
 import './styles.css';
 
 export default function PostAuthor(props: PostAuthorProps) {
-  const Tag = props.isLink ? 'a' : 'p';
-
   return (
     <div className="wp-block-post-author">
       {props.showAvatar && (
@@ -21,14 +20,12 @@ export default function PostAuthor(props: PostAuthorProps) {
         {props.byline && (
           <p className="wp-block-post-author__byline">{props.byline}</p>
         )}
-        <Tag
-          className="wp-block-post-author__name"
-          {...(props.isLink
-            ? { href: props.author.uri, target: props.linkTarget }
-            : {})}
-        >
-          {props.author.name}
-        </Tag>
+        <PostAuthorName
+          name={props.author.name}
+          uri={props.author.uri}
+          isLink={props.isLink}
+          linkTarget={props.linkTarget}
+        />
         {props.showBio && (
           <p className="wp-block-post-author__bio">
             {props.author.description}
