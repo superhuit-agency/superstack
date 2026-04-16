@@ -113,19 +113,19 @@ if ! $WPCLI core is-installed --quiet &> /dev/null; then
 		[ -z "${WORDPRESS_DB_HOST}" ] && echo "ERROR: Please define WORDPRESS_DB_HOST environment variable" 1>&2 && exit 1
 		[ -z "${WORDPRESS_DB_NAME}" ] && echo "ERROR: Please define WORDPRESS_DB_NAME environment variable" 1>&2 && exit 1
 		[ -z "${WORDPRESS_DB_USER}" ] && echo "ERROR: Please define WORDPRESS_DB_USER environment variable" 1>&2 && exit 1
-		[ -z "${WORDPRESS_LOCALE}" ] && echo "ERROR: Please define WORDPRESS_LOCALE environment variable" 1>&2 && exit 1
 		[ -z "${WORDPRESS_PATH}" ] && echo "ERROR: Please define WORDPRESS_PATH environment variable" 1>&2 && exit 1
 		[ -z "${WORDPRESS_THEME_NAME}" ] && echo "ERROR: Please define WORDPRESS_THEME_NAME environment variable (no space)" 1>&2 && exit 1
-		[ -z "${WORDPRESS_THEME_TITLE}" ] && echo "ERROR: Please define WORDPRESS_THEME_TITLE environment variable" 1>&2 && exit 1
+		[ -z "${WORDPRESS_SITE_TITLE}" ] && echo "ERROR: Please define WORDPRESS_SITE_TITLE environment variable" 1>&2 && exit 1
 		[ -z "${WORDPRESS_URL}" ] && echo "ERROR: Please define WORDPRESS_URL environment variable" 1>&2 && exit 1
-		[ -z "${WORDPRESS_VERSION}" ] && echo "ERROR: Please define WORDPRESS_VERSION environment variable" 1>&2 && exit 1
+		WORDPRESS_VERSION=${WORDPRESS_VERSION:="latest"}
+		WORDPRESS_LOCALE=${WORDPRESS_LOCALE:="en_US"}
 		# install
 
 		if ! $WPCLI core is-installed --quiet; then
 			echo $en "- Installing WordPress $ec"
 			$WPCLI core download --version="$WORDPRESS_VERSION" --locale="$WORDPRESS_LOCALE"  --quiet &> /dev/null
 			$WPCLI config create --dbhost="$WORDPRESS_DB_HOST" --dbname="$WORDPRESS_DB_NAME" --dbuser="$WORDPRESS_DB_USER" --prompt=dbpass < $WORDPRESS_PATH/p.txt  --quiet &> /dev/null
-			$WPCLI core install --version="$WORDPRESS_VERSION" --locale="$WORDPRESS_LOCALE" --url="$WORDPRESS_URL" --title="$WORDPRESS_THEME_TITLE" --admin_user="$WORDPRESS_ADMIN_USER" --admin_email="$WORDPRESS_ADMIN_EMAIL"
+			$WPCLI core install --version="$WORDPRESS_VERSION" --locale="$WORDPRESS_LOCALE" --url="$WORDPRESS_URL" --title="$WORDPRESS_SITE_TITLE" --admin_user="$WORDPRESS_ADMIN_USER" --admin_email="$WORDPRESS_ADMIN_EMAIL"
 			rm $WORDPRESS_PATH/p.txt
 			echo "✔"
 		else
