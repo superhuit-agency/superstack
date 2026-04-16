@@ -1,8 +1,12 @@
 import type { NextConfig } from 'next';
+import path from 'path';
 
 import { getWpUrl } from '@/utils/node-utils';
 
 const nextConfig: NextConfig = {
+  turbopack: {
+    root: path.join(__dirname, '.'),
+  },
   rewrites() {
     const wpUrl = getWpUrl();
 
