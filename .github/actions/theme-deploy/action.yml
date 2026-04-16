@@ -24,6 +24,7 @@ runs:
     - name: Deploy
       shell: bash
       run: |
+        ssh ${{ inputs.SERVER }} "mkdir -p '${{ inputs.WORDPRESS_PATH }}/wp-content/themes'"
         rsync -auzv --delete \
           --exclude='.github' \
           --exclude='.gitignore' \
