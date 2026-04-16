@@ -91,7 +91,6 @@ jobs:
                 WORDPRESS_PATH=\"${{ vars.WORDPRESS_PATH }}\" \
                 WORDPRESS_URL=\"${{ vars.WORDPRESS_URL }}\" \
                 WORDPRESS_THEME_NAME=\"${{ vars.WORDPRESS_THEME_NAME }}\" \
-                
                 WORDPRESS_DB_HOST=\"${{ vars.WORDPRESS_DB_HOST }}\" \
                 WORDPRESS_DB_NAME=\"${{ vars.WORDPRESS_DB_NAME }}\" \
                 WORDPRESS_DB_USER=\"${{ vars.WORDPRESS_DB_USER }}\" \
