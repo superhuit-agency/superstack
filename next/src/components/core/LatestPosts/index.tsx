@@ -22,10 +22,10 @@ export default function LatestPosts(props: LatestPostProps) {
           featuredimage={
             props.displayFeaturedImage
               ? {
-                  url: post.featuredImage?.node?.sourceUrl || '',
+                  src: post.featuredImage?.node?.sourceUrl || '',
                   alt: post.featuredImage?.node?.altText || '',
-                  width: post.featuredImage?.node?.mediaDetails?.width,
-                  height: post.featuredImage?.node?.mediaDetails?.height,
+                  width: post.featuredImage?.node?.mediaDetails?.width || 0,
+                  height: post.featuredImage?.node?.mediaDetails?.height || 0,
                 }
               : null
           }

@@ -25,11 +25,19 @@ const blocksList: Record<string, () => Promise<BlockModule>> = {
   'core/categories': () => import('../core/TaxonomyList'),
   'core/html': () => import('../core/CustomHtml'),
   'core/latest-posts': () => import('../core/LatestPosts'),
+  'core/site-tagline': () => import('../core/SiteTagline'),
 };
 
 export const blocksDataList = {
+  'core/avatar': () => import('../core/Avatar/data'),
   'core/categories': () => import('../core/TaxonomyList/data'),
   'core/latest-posts': () => import('../core/LatestPosts/data'),
   'core/navigation': () => import('../core/Navigation/data'),
+  'core/post-title': () => import('../core/PostTitle/data'),
+  'core/post-excerpt': () => import('../core/PostExcerpt/data'),
+  'core/query': () => import('../core/Query/data'),
   'core/site-logo': () => import('../core/SiteLogo/data'),
+  'core/site-title': () => import('../core/SiteTitle/data'),
+  'core/site-tagline': () => import('../core/SiteTagline/data'),
+  'core/post-featured-image': () => import('../core/PostFeaturedImage/data'),
 };

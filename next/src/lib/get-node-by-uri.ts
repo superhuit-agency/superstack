@@ -22,6 +22,7 @@ export default async function getNodeByURI(
   auth: AuthType,
   previewDraft: boolean,
   blockEnrichment = true,
+  routePage = 1,
 ) {
   // uri = getUriWithoutPagination(uri); // Removes '/page/...' from uri if needed
 
@@ -47,6 +48,9 @@ export default async function getNodeByURI(
   const response = await fetchAPI(query, {
     variables,
     auth,
+    headers: {
+      'X-Query-Page': String(routePage && routePage > 0 ? routePage : 1),
+    },
   });
 
   const { node, seo, generalSettings } = response;

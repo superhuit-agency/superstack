@@ -8,6 +8,7 @@ require_once __DIR__ .'/register-logo.php';
 require_once __DIR__ .'/node-idtype.php';
 require_once __DIR__ .'/navigation-inner-blocks.php';
 require_once __DIR__ .'/resolve-uris.php';
+require_once __DIR__ .'/query-pagination-offset.php';
 
 
 add_filter( 'supt-localize-script', function( $attrs ) {

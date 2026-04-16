@@ -6,6 +6,8 @@ type BlockModule = {
 
 const blocksList: Record<string, () => Promise<BlockModule>> = {
   'core/audio': () => import('../core/Audio'),
+  'core/avatar': () => import('../core/Avatar'),
+  'core/block': () => import('../core/Block'),
   'core/button': () => import('../core/Button'),
   'core/buttons': () => import('../core/Buttons'),
   'core/column': () => import('../core/Column'),
@@ -26,7 +28,13 @@ const blocksList: Record<string, () => Promise<BlockModule>> = {
   'core/list-item': () => import('../core/ListItem'),
   'core/math': () => import('../core/Math'),
   'core/media-text': () => import('../core/MediaText'),
+  'core/navigation': () => import('../core/Navigation'),
+  'core/navigation-link': () => import('../core/NavigationLink'),
+  'core/navigation-submenu': () => import('../core/NavigationSubmenu'),
   'core/paragraph': () => import('../core/Paragraph'),
+  'core/post-title': () => import('../core/PostTitle'),
+  'core/post-excerpt': () => import('../core/PostExcerpt'),
+  'core/post-featured-image': () => import('../core/PostFeaturedImage'),
   'core/preformatted': () => import('../core/Preformatted'),
   'core/pullquote': () => import('../core/Pullquote'),
   'core/quote': () => import('../core/Quote'),
@@ -37,11 +45,14 @@ const blocksList: Record<string, () => Promise<BlockModule>> = {
   'core/table': () => import('../core/Table'),
   'core/verse': () => import('../core/Preformatted'),
   'core/video': () => import('../core/Video'),
-  'core/navigation': () => import('../core/Navigation'),
   'core/site-logo': () => import('../core/SiteLogo'),
-  'core/navigation-link': () => import('../core/NavigationLink'),
-  'core/navigation-submenu': () => import('../core/NavigationSubmenu'),
-  'core/block': () => import('../core/Block'),
+  'core/site-title': () => import('../core/SiteTitle'),
+  'core/site-tagline': () => import('../core/SiteTagline'),
+  'core/query': () => import('../core/Query'),
+  'core/query-pagination': () => import('../core/QueryPagination'),
+  'core/query-pagination-previous': () =>
+    import('../core/QueryPaginationPrevious'),
+  'core/query-pagination-next': () => import('../core/QueryPaginationNext'),
 };
 
 interface PostBodyBlocksProps {

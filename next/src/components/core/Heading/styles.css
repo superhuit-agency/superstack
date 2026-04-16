@@ -1,6 +1,6 @@
 @import '@resources/index.css';
 
-.supt-heading {
+.wp-block-heading {
   h1& {
     @extend %t-h1;
   }
@@ -18,5 +18,15 @@
   }
   h6& {
     @extend %t-h6;
+  }
+
+  &.-center {
+    text-align: center;
+  }
+  &.-right {
+    text-align: right;
+  }
+  &.-left {
+    text-align: left;
   }
 }

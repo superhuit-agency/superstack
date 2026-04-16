@@ -1,0 +1,52 @@
+name: 'Deploy Next.js'
+description: 'Deploy Next.js on any Server via SSH'
+inputs:
+  NEXT_ENV:
+    description: 'Next environment: local, development, staging or production (default)'
+    required: false
+    default: 'production'
+  NEXT_URL:
+    description: 'Next URL'
+    required: true
+  WORDPRESS_URL:
+    description: 'WordPress URL'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Install node
+      uses: actions/setup-node@v6
+      with:
+        node-version: 24
+        cache: 'npm'
+        cache-dependency-path: |
+          next/package-lock.json
+
+    - name: Install node dependencies
+      shell: bash
+      run: npm --prefix next ci
+
+    - name: Build Next
+      shell: bash
+      run: |
+        WORDPRESS_URL=${{ inputs.WORDPRESS_URL }}
+        NEXT_URL=${{ inputs.NEXT_URL }}
+        NODE_ENV=production
+        npm --prefix next run build
+
+    - name: Save built artifacts
+      uses: actions/upload-artifact@v7
+      with:
+        name: next-build
+        if-no-files-found: error
+        path: |
+          ./next/.next
+          ./next/out
+          ./next/public
+          ./next/package.json
+          ./next/package-lock.json
+          ./next/next.config.ts
+          ./wordpress/theme/lib/editor
+          ./wordpress/package.json
+          ./wordpress/package-lock.json

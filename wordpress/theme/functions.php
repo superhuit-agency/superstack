@@ -22,6 +22,8 @@ define('SUPERSTACK_VERSION', '1.0.0');
 define('SUPERSTACK_THEME_NAME', $theme['Name']);
 define('SUPERSTACK_OPTION_NAME', $theme['Version']);
 
+add_post_type_support( 'page', 'excerpt' );
+
 require_once SUPERSTACK_PATH . '/lib/_loader.php';
 
 /**

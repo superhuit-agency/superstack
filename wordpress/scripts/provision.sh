@@ -31,11 +31,6 @@
 
 IS_MULTILANG=${IS_MULTILANG:=false}
 HTTP_HOST=${WORDPRESS_URL}
-WORDPRESS_ADMIN_PASSWORD=${WORDPRESS_ADMIN_PASSWORD:="stacksuper"}
-WORDPRESS_ADMIN_EMAIL=${WORDPRESS_ADMIN_EMAIL:="tech+superstack@superhuit.ch"}
-WORDPRESS_ADMIN_USER=${WORDPRESS_ADMIN_USER:="superstack"}
-WORDPRESS_THEME_NAME=${WORDPRESS_THEME_NAME:="superstack"}
-WORDPRESS_LOCALE=${WORDPRESS_LOCALE:="en_US"}
 
 # #===========================================
 # # /!\ STOP to edit here /!\
@@ -73,73 +68,36 @@ fi
 # install wp (if not installed)
 # /!\ dev note: don't write anything in the folder before this or it will fail, saying 'the folder is not empty'
 if ! $WPCLI core is-installed --quiet &> /dev/null; then
-	echo "------------------------------------------------------------------"
-	echo "                   WordPress installation                         "
-	echo "------------------------------------------------------------------"
+	echo
+	echo "----------------------------------"
+	echo "     WordPress installation       "
+	echo "----------------------------------"
 	echo
 	if [ ! -z "${WORDPRESS_ENV}" ] && [ "${WORDPRESS_ENV}" = "dev" ]; then # we are on local dev environment (in docker)
-		# Wait for database to be ready (for dev environment)
-		echo $en "- Waiting for local database to be ready... $ec"
-		timeout=60
-		attempt=1
-		while ! mysqladmin ping -h db -u wordpress --password=wordpress --silent &>/dev/null; do
-			if [ $timeout -le 0 ]; then
-				echo "✗"
-				echo "  [ERROR] Timeout. Final database connection attempt with verbose output:"
-				mysqladmin ping -h db -u wordpress --password=wordpress 2>&1 || true
-				docker ps --filter "name=db" || true
-				echo "  [DEBUG] Database container logs (last 20 lines):"
-				docker logs --tail 20 "${THEME_NAME:-superstack}_db" 2>&1 || true
-				exit 1
-			fi
-			sleep 3
-			timeout=$((timeout-3))
-			attempt=$((attempt+1))
-		done
+		echo $en "- Installing WordPress $ec"
+		$WPCLI core install --url="http://localhost" --title="superstack" --admin_user="superstack" --admin_password="superstack" --admin_email="tech+superstack@superhuit.ch" --quiet &> /dev/null
 		echo "✔"
-		
-		echo $en "- Installing WordPress as localhost $ec"
-		$WPCLI core install --url="http://localhost" --title="$WORDPRESS_THEME_NAME" --admin_user="$WORDPRESS_ADMIN_USER" --admin_password="$WORDPRESS_ADMIN_PASSWORD" --admin_email="$WORDPRESS_ADMIN_EMAIL" &> /dev/null
-		echo "✔"
-		FIRSTTIME_INSTALL=true
-
 	elif [ ! -f "$WORDPRESS_PATH/p.txt" ]; then
 		echo "ERROR: WordPress does not seem to be installed. Add a file 'p.txt' containing the database password if you want this script to automatically install WordPress for you." 1>&2
 		exit 1
 	else
 		# bail early if missing env vars
-		[ -z "${WORDPRESS_ADMIN_USER}" ] && echo "ERROR: Please define WORDPRESS_ADMIN_USER environment variable" 1>&2 && exit 1
-		[ -z "${WORDPRESS_ADMIN_EMAIL}" ] && echo "ERROR: Please define WORDPRESS_ADMIN_EMAIL environment variable" 1>&2 && exit 1
 		[ -z "${WORDPRESS_DB_HOST}" ] && echo "ERROR: Please define WORDPRESS_DB_HOST environment variable" 1>&2 && exit 1
 		[ -z "${WORDPRESS_DB_NAME}" ] && echo "ERROR: Please define WORDPRESS_DB_NAME environment variable" 1>&2 && exit 1
 		[ -z "${WORDPRESS_DB_USER}" ] && echo "ERROR: Please define WORDPRESS_DB_USER environment variable" 1>&2 && exit 1
-		[ -z "${WORDPRESS_LOCALE}" ] && echo "ERROR: Please define WORDPRESS_LOCALE environment variable" 1>&2 && exit 1
-		[ -z "${WORDPRESS_PATH}" ] && echo "ERROR: Please define WORDPRESS_PATH environment variable" 1>&2 && exit 1
-		[ -z "${WORDPRESS_THEME_NAME}" ] && echo "ERROR: Please define WORDPRESS_THEME_NAME environment variable (no space)" 1>&2 && exit 1
-		[ -z "${WORDPRESS_THEME_TITLE}" ] && echo "ERROR: Please define WORDPRESS_THEME_TITLE environment variable" 1>&2 && exit 1
 		[ -z "${WORDPRESS_URL}" ] && echo "ERROR: Please define WORDPRESS_URL environment variable" 1>&2 && exit 1
-		[ -z "${WORDPRESS_VERSION}" ] && echo "ERROR: Please define WORDPRESS_VERSION environment variable" 1>&2 && exit 1
+		[ -z "${WORDPRESS_TITLE}" ] && echo "ERROR: Please define WORDPRESS_TITLE environment variable (with no space character)" 1>&2 && exit 1
+		[ -z "${WORDPRESS_ADMIN_USER}" ] && echo "ERROR: Please define WORDPRESS_ADMIN_USER environment variable" 1>&2 && exit 1
+		[ -z "${WORDPRESS_ADMIN_EMAIL}" ] && echo "ERROR: Please define WORDPRESS_ADMIN_EMAIL environment variable" 1>&2 && exit 1
+		WORDPRESS_VERSION=${WORDPRESS_VERSION:="latest"}
+		WORDPRESS_LOCALE=${WORDPRESS_LOCALE:="en_US"}
 		# install
-
-		if ! $WPCLI core is-installed --quiet; then
-			echo $en "- Installing WordPress $ec"
-			$WPCLI core download --version="$WORDPRESS_VERSION" --locale="$WORDPRESS_LOCALE"  --quiet &> /dev/null
-			$WPCLI config create --dbhost="$WORDPRESS_DB_HOST" --dbname="$WORDPRESS_DB_NAME" --dbuser="$WORDPRESS_DB_USER" --prompt=dbpass < $WORDPRESS_PATH/p.txt  --quiet &> /dev/null
-			$WPCLI core install --version="$WORDPRESS_VERSION" --locale="$WORDPRESS_LOCALE" --url="$WORDPRESS_URL" --title="$WORDPRESS_THEME_TITLE" --admin_user="$WORDPRESS_ADMIN_USER" --admin_email="$WORDPRESS_ADMIN_EMAIL"
-			rm $WORDPRESS_PATH/p.txt
-			echo "✔"
-		else
-			echo "Already installed"
-			CURRENT_VERSION=$($WPCLI core version --quiet)
-			if [ "$CURRENT_VERSION" != "$WORDPRESS_VERSION" ]; then
-				echo $en "- Updating WordPress from $CURRENT_VERSION to $WORDPRESS_VERSION $ec"
-				$WPCLI core update --version="$WORDPRESS_VERSION" --force --quiet &> /dev/null
-				echo "✔"
-			else
-				echo "- WordPress version $WORDPRESS_VERSION already installed"
-			fi
-		fi
-
+		echo $en "- Installing WordPress $ec"
+		$WPCLI core download --version="$WORDPRESS_VERSION" --locale="$WORDPRESS_LOCALE"  --quiet &> /dev/null
+		$WPCLI config create --dbhost="$WORDPRESS_DB_HOST" --dbname="$WORDPRESS_DB_NAME" --dbuser="$WORDPRESS_DB_USER" --prompt=dbpass < $WORDPRESS_PATH/p.txt  --quiet &> /dev/null
+		$WPCLI core install --url="$WORDPRESS_URL" --title="$WORDPRESS_TITLE" --admin_user="$WORDPRESS_ADMIN_USER" --admin_email="$WORDPRESS_ADMIN_EMAIL"  --quiet &> /dev/null
+		rm $WORDPRESS_PATH/p.txt
+		echo "✔"
 	fi
 fi
 

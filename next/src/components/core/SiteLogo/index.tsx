@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import NextImage from 'next/image';
 import Link from 'next/link';
 
 export default function SiteLogo(props: SiteLogoProps) {
@@ -6,7 +6,7 @@ export default function SiteLogo(props: SiteLogoProps) {
 
   return (
     <Link href="/" className="wp-block-site-logo">
-      <Image
+      <NextImage
         src={props.url}
         alt="Site Logo"
         width={props.width}

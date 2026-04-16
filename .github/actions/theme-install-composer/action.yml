@@ -1,0 +1,27 @@
+name: 'Deploy Composer dependencies'
+description: 'Upload Composer files and install production dependencies'
+inputs:
+  SERVER:
+    description: 'SSH target (user@host -p port)'
+    required: true
+  WORDPRESS_PATH:
+    description: 'Path on the remote server. (default: /var/www/html)'
+    required: false
+    default: '/var/www/html'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Upload Composer files
+      shell: bash
+      run: |
+        rsync -raultzv --delete \
+          ./wordpress/composer.json \
+          ./wordpress/composer.lock \
+          ${{ inputs.SERVER }}:${{ inputs.WORDPRESS_PATH }}/
+
+    - name: Install Composer dependencies
+      shell: bash
+      run: |
+        ssh ${{ inputs.SERVER }} \
+          "cd ${{ inputs.WORDPRESS_PATH }}; composer install --no-dev --optimize-autoloader"

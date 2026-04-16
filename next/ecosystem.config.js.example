@@ -1,0 +1,9 @@
+module.exports = {
+	apps: [{
+        name: "superstack",
+        script: "PORT=3000 npm run start",
+        env: {
+            NODE_ENV: "production",
+        },
+    }],
+};

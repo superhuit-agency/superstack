@@ -67,9 +67,14 @@ const getAttributes = (name: string, attributes: object) =>
     else {
       const blockModule =
         await blocksDataList[name as keyof typeof blocksDataList]?.();
-      const getData = (blockModule as {
-        getData?: (fetcher: FetchApiFuncType, attrs: object) => Promise<object>;
-      }).getData;
+      const getData = (
+        blockModule as {
+          getData?: (
+            fetcher: FetchApiFuncType,
+            attrs: object,
+          ) => Promise<object>;
+        }
+      ).getData;
 
       if (!getData) {
         res(attributes);
@@ -86,7 +91,13 @@ const getInnerBlocks = (blocks: Array<BlockPropsType>) =>
   new Promise((res, rej) => {
     if (!(blocks?.length > 0)) rej([]);
     else {
-      Promise.allSettled(blocks.map(getBlockFinalComponentProps)).then((rs) =>
+      Promise.allSettled(
+        blocks.map((block) =>
+          getBlockFinalComponentProps({
+            ...block,
+          }),
+        ),
+      ).then((rs) =>
         res(rs.map((r) => (r.status === 'fulfilled' ? r.value : null))),
       );
     }
