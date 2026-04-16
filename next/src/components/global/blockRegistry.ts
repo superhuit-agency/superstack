@@ -32,4 +32,5 @@ export const blocksDataList = {
   'core/latest-posts': () => import('../core/LatestPosts/data'),
   'core/navigation': () => import('../core/Navigation/data'),
   'core/site-logo': () => import('../core/SiteLogo/data'),
+  'core/site-title': () => import('../core/SiteTitle/data'),
 };

@@ -39,6 +39,7 @@ const blocksList: Record<string, () => Promise<BlockModule>> = {
   'core/navigation-link': () => import('../core/NavigationLink'),
   'core/navigation-submenu': () => import('../core/NavigationSubmenu'),
   'core/block': () => import('../core/Block'),
+  'core/site-title': () => import('../core/SiteTitle'),
 };
 
 interface PostBodyBlocksProps {
