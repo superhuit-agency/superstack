@@ -42,4 +42,5 @@ export const blocksDataList = {
   'core/site-tagline': () => import('../core/SiteTagline/data'),
   'core/post-featured-image': () => import('../core/PostFeaturedImage/data'),
   'core/post-author-name': () => import('../core/PostAuthorName/data'),
+  'core/post-date': () => import('../core/PostDate/data'),
 };

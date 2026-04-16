@@ -16,6 +16,7 @@ function filter_blacklisted_blocks($allowed_blocks) {
         'core/shortcode',
         'core/tag-cloud',
         'core/page-list',
+        'core/comments',
         'core/post-comment',
         'core/post-comments-count',
         'core/post-comments-form',
