@@ -81,11 +81,11 @@ jobs:
         shell: bash
         run: |
           ssh ${{ steps.ssh.outputs.SERVER }} \
-            "docker exec -i \
-            -e NEXT_URL=${{ vars.NEXT_URL }} \
-            -e THEME_NAME=${{ vars.WORDPRESS_THEME_NAME }} \
-            -e WORDPRESS_PATH=${{ vars.WORDPRESS_PATH }} \
-            /bin/bash -s " < ./wordpress/scripts/provision.sh
+            "cd ${{ vars.WORDPRESS_PATH }}; \
+              env THEME_NAME=${{ vars.WORDPRESS_THEME_NAME }} \
+              NEXT_URL=${{ vars.NEXT_URL }} \
+              WORDPRESS_PATH=${{ vars.WORDPRESS_PATH }} \
+              /bin/bash -s " < ./wordpress/scripts/provision.sh
 
   deploy_frontend_vercel:
     environment: future
