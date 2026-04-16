@@ -25,7 +25,7 @@ runs:
 
     - name: Install node dependencies
       shell: bash
-      run: npm ci
+      run: npm --prefix next ci
 
     - name: Copy environment file
       shell: bash
