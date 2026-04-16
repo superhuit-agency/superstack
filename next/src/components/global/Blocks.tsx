@@ -10,32 +10,38 @@ const blocksList: Record<string, () => Promise<BlockModule>> = {
   'core/buttons': () => import('../core/Buttons'),
   'core/column': () => import('../core/Column'),
   'core/columns': () => import('../core/Columns'),
+  'core/categories': () => import('../core/TaxonomyList'),
+  'core/code': () => import('../core/Code'),
   'core/cover': () => import('../core/Cover'),
+  'core/details': () => import('../core/Details'),
+  'core/embed': () => import('../core/Embed'),
   'core/file': () => import('../core/File'),
-  'core/heading': () => import('../core/Heading'),
-  'core/paragraph': () => import('../core/Paragraph'),
-  'core/image': () => import('../core/Image'),
   'core/gallery': () => import('../core/Gallery'),
   'core/group': () => import('../core/Group'),
+  'core/heading': () => import('../core/Heading'),
+  'core/html': () => import('../core/CustomHtml'),
+  'core/image': () => import('../core/Image'),
+  'core/latest-posts': () => import('../core/LatestPosts'),
   'core/list': () => import('../core/List'),
   'core/list-item': () => import('../core/ListItem'),
-  'core/quote': () => import('../core/Quote'),
-  'core/code': () => import('../core/Code'),
-  'core/details': () => import('../core/Details'),
   'core/math': () => import('../core/Math'),
   'core/media-text': () => import('../core/MediaText'),
+  'core/paragraph': () => import('../core/Paragraph'),
   'core/preformatted': () => import('../core/Preformatted'),
   'core/pullquote': () => import('../core/Pullquote'),
+  'core/quote': () => import('../core/Quote'),
   'core/separator': () => import('../core/Separator'),
+  'core/social-link': () => import('../core/SocialLink'),
+  'core/social-links': () => import('../core/SocialLinks'),
   'core/spacer': () => import('../core/Spacer'),
   'core/table': () => import('../core/Table'),
   'core/verse': () => import('../core/Preformatted'),
   'core/video': () => import('../core/Video'),
-  'core/social-links': () => import('../core/SocialLinks'),
-  'core/social-link': () => import('../core/SocialLink'),
-  'core/categories': () => import('../core/TaxonomyList'),
-  'core/html': () => import('../core/CustomHtml'),
-  'core/latest-posts': () => import('../core/LatestPosts'),
+  'core/navigation': () => import('../core/Navigation'),
+  'core/site-logo': () => import('../core/SiteLogo'),
+  'core/navigation-link': () => import('../core/NavigationLink'),
+  'core/navigation-submenu': () => import('../core/NavigationSubmenu'),
+  'core/block': () => import('../core/Block'),
 };
 
 interface PostBodyBlocksProps {
@@ -68,12 +74,14 @@ export async function Blocks({
           if (isRoot && props.attributes) {
             if (i === 0) currentLevel = level - 1;
           }
+          const { ref, ...attributes } = props.attributes;
           return (
             <Block
               key={i}
               slug={name}
               level={currentLevel}
-              {...props.attributes}
+              {...(ref ? { attributesRef: ref } : {})}
+              {...attributes}
             >
               {props.innerBlocks && (
                 <Blocks

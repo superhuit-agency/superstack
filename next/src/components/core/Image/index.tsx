@@ -20,28 +20,32 @@ const Image: FC<ImageProps> & BlockConfigs = forwardRef<
     {
       url,
       alt = "",
-      height,
       width,
+      height,
       caption,
+      aspectRatio,
       priority = false,
       fill = false,
       quality = 95,
+      scale,
       sizeSlug,
       className,
       style,
-      focalPoint
+      focalPoint,
     },
     ref,
   ) => {
     if (!url) return null;
 
-    const normalizedWidth = Number(width);
-    const normalizedHeight = Number(height);
+    const isFilled = fill || !!aspectRatio;
+
+    const normalizedWidth = width ? parseInt(width) : undefined;
+    const normalizedHeight = height ? parseInt(height) : undefined;
     const hasValidDimensions =
       Number.isFinite(normalizedWidth) && Number.isFinite(normalizedHeight);
     const captionText = getCaptionText(caption);
 
-    if (!fill && !hasValidDimensions) return null;
+    if (!isFilled && !hasValidDimensions) return null;
 
     return (
       <figure
@@ -49,17 +53,18 @@ const Image: FC<ImageProps> & BlockConfigs = forwardRef<
         style={style}
         className={cx("wp-block-image", className, {
           [`size-${sizeSlug}`]: sizeSlug,
+          'has-aspect-ratio': aspectRatio,
         })}
       >
         <NextImage
           src={url}
           alt={alt}
           className="wp-block__image"
-          width={fill || !hasValidDimensions ? undefined : normalizedWidth}
-          height={fill || !hasValidDimensions ? undefined : normalizedHeight}
+          width={isFilled || !hasValidDimensions ? undefined : normalizedWidth}
+          height={isFilled || !hasValidDimensions ? undefined : normalizedHeight}
           priority={priority}
           quality={quality}
-          fill={fill}
+          fill={isFilled}
           unoptimized={
             (url as string)?.endsWith?.(".svg") ||
             process.env.NEXT_PUBLIC_IS_THIS_NEXT !== "true" // Only optimise image if in Nextjs (we don't want to optimize images on WP side as there isn't Next server running)
@@ -68,6 +73,8 @@ const Image: FC<ImageProps> & BlockConfigs = forwardRef<
             objectPosition: focalPoint
               ? `${focalPoint.x}% ${focalPoint.y}%`
               : undefined,
+            aspectRatio: aspectRatio || undefined,
+            objectFit: scale || undefined,
           }}
         />
         {captionText && (
