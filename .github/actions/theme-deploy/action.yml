@@ -1,0 +1,45 @@
+name: 'Deploy WP Theme'
+description: 'Deploy WordPress theme assets'
+inputs:
+  SERVER:
+    description: 'SSH target (user@host -p port)'
+    required: true
+  WORDPRESS_PATH:
+    description: 'Path on the remote server. (default: /var/www/html)'
+    required: false
+    default: '/var/www/html'
+  WORDPRESS_THEME_NAME:
+    description: 'WordPress Theme name'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Download artifacts
+      uses: actions/download-artifact@v8
+      with:
+        name: wp-theme-assets
+        path: wordpress/theme/static/
+
+    - name: Deploy
+      shell: bash
+      run: |
+        rsync -auzv --delete \
+          --exclude='.github' \
+          --exclude='.gitignore' \
+          --exclude='node_modules' \
+          --exclude='packages*.json' \
+          --exclude='webpack.config.js' \
+          ./wordpress/theme/ \
+          ${{ inputs.SERVER }}:${{ inputs.WORDPRESS_PATH }}/wp-content/themes/_new
+
+    - name: Replace theme folder with newly uploaded
+      shell: bash
+      run: |
+        ssh ${{ inputs.SERVER }} \
+          "[ -d '${{ inputs.WORDPRESS_PATH }}/wp-content/themes/${{ inputs.WORDPRESS_THEME_NAME }}' ] && \
+          mv '${{ inputs.WORDPRESS_PATH }}/wp-content/themes/${{ inputs.WORDPRESS_THEME_NAME }}' \
+             '${{ inputs.WORDPRESS_PATH }}/wp-content/themes/_old'; \
+          mv '${{ inputs.WORDPRESS_PATH }}/wp-content/themes/_new' \
+             '${{ inputs.WORDPRESS_PATH }}/wp-content/themes/${{ inputs.WORDPRESS_THEME_NAME }}' && \
+          rm -rf '${{ inputs.WORDPRESS_PATH }}/wp-content/themes/_old'"

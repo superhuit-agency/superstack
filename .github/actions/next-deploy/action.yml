@@ -1,0 +1,46 @@
+name: 'Deploy Next.js'
+description: 'Deploy Next.js on any Server via SSH'
+inputs:
+  SERVER:
+    description: 'SSH target (user@host -p port)'
+    required: true
+  NEXT_PATH:
+    description: 'Path on the remote server where Next.js is located (default: /var/www/next)'
+    required: false
+    default: '/var/www/next'
+
+  NEXT_RESTART_COMMAND:
+    description: 'Any command to run on the server after deployment (restart pm2 or anything)'
+    required: false
+    default: 'pm2 restart'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Download built artifacts
+      uses: actions/download-artifact@v8
+      with:
+        name: next-build
+        path: ./deploy-artifacts
+
+    - name: Deploy Next environment file (if does not exist)
+      shell: bash
+      run: |
+        rsync -auz --ignore-existing \
+        .env.example \
+        ${{ inputs.SERVER }}:${{ inputs.NEXT_PATH }}/.env
+
+    - name: Deploy Next files
+      shell: bash
+      run: |
+        rsync -auzv --delete \
+          --exclude='.env*' \
+          --exclude='ecosystem.config.js' \
+          ./deploy-artifacts/next/ \
+          ${{ inputs.SERVER }}:${{ inputs.NEXT_PATH }}/
+
+    - name: Restart PM2 app
+      if: inputs.NEXT_RESTART_COMMAND != ''
+      shell: bash
+      run: |
+        ssh ${{ inputs.SERVER }} -t "cd ${{ inputs.NEXT_PATH }}; ${{ inputs.NEXT_RESTART_COMMAND }}"

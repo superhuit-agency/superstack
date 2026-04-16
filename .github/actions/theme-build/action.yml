@@ -1,0 +1,37 @@
+name: 'Build WP theme'
+description: 'Build WordPress theme assets'
+inputs:
+  WORDPRESS_URL:
+    description: 'WordPress URL'
+    required: true
+  NEXT_URL:
+    description: 'Next URL'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Install node
+      uses: actions/setup-node@v6
+      with:
+        node-version: 24
+        cache: 'npm'
+        cache-dependency-path: |
+          wordpress/package-lock.json
+          wordpress/theme/package-lock.json
+
+    - name: Install node dependencies
+      shell: bash
+      run: npm --prefix ./wordpress ci
+
+    - name: Build assets
+      shell: bash
+      run: WORDPRESS_URL=${{ inputs.WORDPRESS_URL }} NEXT_URL=${{ inputs.NEXT_URL }} npm run build
+      working-directory: ./wordpress
+
+    - name: Save built artifacts
+      uses: actions/upload-artifact@v8
+      with:
+        name: wp-theme-assets
+        path: |
+          ./wordpress/theme/static

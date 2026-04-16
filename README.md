@@ -1,8 +1,45 @@
-IN REDACTION
+WIP in redaction
 
-# Superstack
+# Superstack: Next.js / WordPress Starter
 
-## Wordpress
+An opinionated boilerplate for decoupled (headless) websites that are both performant (Next.js) and easy to edit (WordPress with Gutenberg block editor) — focused on accelerating custom blocks development.
+
+## Features
+
+**Highlights**
+
+-   Create new blocks quickly via a CLI
+-   Iterate efficiently on your blocks — Gutenberg and frontend code in the same folder
+-   Easy data fetching through GraphQL
+-   Save time with pre-built blocks and hooks
+
+**Next.js**
+
+-   Next.js 16 with App Router and React Server Components
+-   Next.js Preview Mode
+-   Next.js Cache Revalidation (via WordPress Plugin)
+
+**The basics**
+
+-   Typing with TypeScript
+-   Styling with CSS (PostCSS) [why?](./docs/technical-choices.md)
+-   Dynamic styleguide with Storybook
+-   Dockerized
+-   Multilang support
+
+# Table of Contents
+
+1. [Project setup](#-project-setup)
+1. [WordPress](#wordpress)
+1. [Next.js](#nextjs)
+
+## 🏗 Project setup
+
+- Getting Started (TODO)
+- [Deploy](./docs/setup/deployment.md)
+
+
+## WordPress
 
 Custom WordPress theme built on top of the block editor (Gutenberg), running in a Docker-based local development environment.
 
@@ -55,3 +92,5 @@ For more details, see the [WordPress README](wordpress/README.md).
 ```bash
     npm run dev
 ```
+
+
