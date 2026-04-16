@@ -27,6 +27,7 @@ const blocksList: Record<string, () => Promise<BlockModule>> = {
   'core/media-text': () => import('../core/MediaText'),
   'core/paragraph': () => import('../core/Paragraph'),
   'core/post-title': () => import('../core/PostTitle'),
+  'core/post-excerpt': () => import('../core/PostExcerpt'),
   'core/preformatted': () => import('../core/Preformatted'),
   'core/pullquote': () => import('../core/Pullquote'),
   'core/quote': () => import('../core/Quote'),
