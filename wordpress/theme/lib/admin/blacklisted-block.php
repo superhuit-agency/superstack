@@ -15,7 +15,11 @@ function filter_blacklisted_blocks($allowed_blocks) {
         'core/search',
         'core/shortcode',
         'core/tag-cloud',
-        'core/page-list'
+        'core/page-list',
+        'core/post-comment',
+        'core/post-comments-count',
+        'core/post-comments-form',
+        'core/post-comments-link',
     ];
 
     return array_values(array_diff($all_blocks, $blacklisted_blocks));
