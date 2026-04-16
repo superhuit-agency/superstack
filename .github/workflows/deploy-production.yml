@@ -152,7 +152,7 @@ jobs:
             NEXT_URL
             WORDPRESS_URL
         env:
-          NEXT_URL: ${{ secrets.NEXT_URL }}
+          NEXT_URL: ${{ vars.NEXT_URL }}
           WORDPRESS_URL: ${{ vars.WORDPRESS_URL }}
 
 
