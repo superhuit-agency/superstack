@@ -6,6 +6,7 @@ type BlockModule = {
 
 const blocksList: Record<string, () => Promise<BlockModule>> = {
   'core/audio': () => import('../core/Audio'),
+  'core/avatar': () => import('../core/Avatar'),
   'core/button': () => import('../core/Button'),
   'core/buttons': () => import('../core/Buttons'),
   'core/categories': () => import('../core/TaxonomyList'),
@@ -41,6 +42,11 @@ const blocksList: Record<string, () => Promise<BlockModule>> = {
   'core/block': () => import('../core/Block'),
   'core/site-title': () => import('../core/SiteTitle'),
   'core/site-tagline': () => import('../core/SiteTagline'),
+  'core/query': () => import('../core/Query'),
+  'core/query-pagination': () => import('../core/QueryPagination'),
+  'core/query-pagination-previous': () =>
+    import('../core/QueryPaginationPrevious'),
+  'core/query-pagination-next': () => import('../core/QueryPaginationNext'),
 };
 
 interface PostBodyBlocksProps {

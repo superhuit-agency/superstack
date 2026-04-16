@@ -29,9 +29,11 @@ const blocksList: Record<string, () => Promise<BlockModule>> = {
 };
 
 export const blocksDataList = {
+  'core/avatar': () => import('../core/Avatar/data'),
   'core/categories': () => import('../core/TaxonomyList/data'),
   'core/latest-posts': () => import('../core/LatestPosts/data'),
   'core/navigation': () => import('../core/Navigation/data'),
+  'core/query': () => import('../core/Query/data'),
   'core/site-logo': () => import('../core/SiteLogo/data'),
   'core/site-title': () => import('../core/SiteTitle/data'),
   'core/site-tagline': () => import('../core/SiteTagline/data'),

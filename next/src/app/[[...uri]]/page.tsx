@@ -35,7 +35,7 @@ export async function generateMetadata({
   const resolvedParams = await params;
   const uri = getWpUriFromNextPath(resolvedParams.uri ?? []);
 
-  let auth = {};
+  const auth = {};
 
   const baseUrl =
     process.env.NEXT_URL ?? process.env.VERCEL_URL ?? 'http://localhost:3000';
@@ -64,7 +64,13 @@ export async function generateMetadata({
     alternates: {
       canonical: canonical,
       languages: node?.translations?.reduce(
-        (acc: Record<string, string>, t: any) => {
+        (
+          acc: Record<string, string>,
+          t: {
+            uri?: string;
+            language?: { locale?: string; code?: string } | null;
+          },
+        ) => {
           if (!t.language || !t.language.locale || !t.language.code) return acc;
 
           return {
@@ -123,11 +129,27 @@ export default async function Page({ params }: { params: { uri: string[] } }) {
   let isDraft = false,
     token = '';
 
-  const uri = getWpUriFromNextPath(
-    resolvedParams.uri ?? [],
-    // params.lang,
-    // defaultLocale
-  );
+  /** Query loop pagination */
+  const rawSegments = resolvedParams.uri ?? [];
+  const isPagedRoute =
+    rawSegments.length >= 2 && rawSegments[rawSegments.length - 2] === 'page';
+
+  const pageRaw = isPagedRoute ? rawSegments[rawSegments.length - 1] : null;
+  const routePage = pageRaw ? Number.parseInt(pageRaw, 10) : null;
+
+  const normalizedRoutePage =
+    Number.isFinite(routePage) && (routePage as number) > 0
+      ? (routePage as number)
+      : null;
+
+  const baseSegments = normalizedRoutePage
+    ? rawSegments.slice(0, -2)
+    : rawSegments;
+  /** End of query loop pagination */
+
+  const baseUri = getWpUriFromNextPath(baseSegments);
+  const uri = baseUri;
+
   let auth: { authToken?: string } = {};
 
   if (isDraftModeEnable) {
@@ -161,7 +183,14 @@ export default async function Page({ params }: { params: { uri: string[] } }) {
     }
   }
 
-  const node = await getNodeByURI(uri, isDraftModeEnable, auth, isDraft);
+  const node = await getNodeByURI(
+    uri,
+    isDraftModeEnable,
+    auth,
+    isDraft,
+    true,
+    normalizedRoutePage ?? 1, // Query loop pagination
+  );
 
   if (!node || !node?.uri) {
     return notFound();
