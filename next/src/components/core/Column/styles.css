@@ -1,0 +1,7 @@
+@import '@resources/index.css';
+
+.wp-block-column {
+  flex-grow: 1;
+  min-width: 0;
+}
+

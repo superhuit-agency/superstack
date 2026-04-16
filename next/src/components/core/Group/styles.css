@@ -1,0 +1,6 @@
+@import '@resources/index.css';
+
+.wp-block-group {
+  min-width: 0;
+}
+

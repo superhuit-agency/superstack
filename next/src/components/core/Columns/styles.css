@@ -1,0 +1,7 @@
+@import '@resources/index.css';
+
+.wp-block-columns {
+  display: flex;
+  flex-wrap: wrap;
+}
+
