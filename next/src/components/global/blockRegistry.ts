@@ -39,4 +39,5 @@ export const blocksDataList = {
   'core/site-logo': () => import('../core/SiteLogo/data'),
   'core/site-title': () => import('../core/SiteTitle/data'),
   'core/site-tagline': () => import('../core/SiteTagline/data'),
+  'core/post-featured-image': () => import('../core/PostFeaturedImage/data'),
 };
