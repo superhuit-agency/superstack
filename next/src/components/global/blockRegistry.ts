@@ -43,4 +43,5 @@ export const blocksDataList = {
   'core/post-featured-image': () => import('../core/PostFeaturedImage/data'),
   'core/post-author-name': () => import('../core/PostAuthorName/data'),
   'core/post-date': () => import('../core/PostDate/data'),
+  'core/post-terms': () => import('../core/PostTerms/data'),
 };

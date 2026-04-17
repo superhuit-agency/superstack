@@ -1,0 +1,55 @@
+@import '@resources/index.css';
+
+.supt-single-post {
+	&__inner {
+		@extend %grid;
+	}
+
+	&__content,
+	&__meta {
+		grid-column: 1 / span 12;
+		@media (min-width: $breakpoint-sm) {
+			grid-column: 2 / span 10;
+		}
+		@media (min-width: $breakpoint-md) {
+			grid-column: 3 / span 8;
+		}
+	}
+
+	&__meta {
+		@extend %t-h6;
+		color: $color-text;
+		a {
+			@extend %link-underline;
+			font-weight: 700;
+		}
+	}
+
+	&__content {
+		h2 {
+			@extend %t-h2;
+		}
+		h3 {
+			@extend %t-h3;
+		}
+		h4 {
+			@extend %t-h4;
+		}
+	}
+
+	> .supt-figure,
+	> .supt-video {
+		@mixin clamp padding-top, 40, 60, $breakpoint-xs, $breakpoint-lg;
+		@mixin clamp padding-bottom, 40, 60, $breakpoint-xs, $breakpoint-lg;
+
+		& + .supt-figure,
+		& + .supt-video {
+			@mixin clamp margin-top, -40, -60, $breakpoint-xs, $breakpoint-lg;
+		}
+	}
+
+	&__image {
+		@mixin clamp margin-top, 20, 40, $breakpoint-xs, $breakpoint-lg;
+		@mixin clamp margin-bottom, 20, 40, $breakpoint-xs, $breakpoint-lg;
+	}
+}

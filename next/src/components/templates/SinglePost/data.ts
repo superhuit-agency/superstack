@@ -1,0 +1,102 @@
+import { seoPostTypeFragment } from '@/lib/fragments';
+import { gql } from '@/utils';
+
+export const slug = 'single-post';
+
+export const fragment = gql`
+  fragment singlePostFragment on Post {
+    id: databaseId
+    title(format: RENDERED)
+    date
+    blocksJSON
+    uri
+
+    featuredImage {
+      node {
+        sourceUrl
+        altText
+        mediaDetails {
+          width
+          height
+        }
+      }
+    }
+
+    categories(first: 1, where: { exclude: [1] }) {
+      nodes {
+        id: databaseId
+        name
+        uri
+      }
+    }
+    tags {
+      nodes {
+        id: databaseId
+        name
+        uri
+      }
+    }
+
+    editLink @include(if: $isPreview)
+    preview @include(if: $isPreviewDraft) {
+      node {
+        blocksJSON
+      }
+    }
+    seo {
+      ...seoPostTypeFragment
+    }
+
+    # relatedPosts {
+    #   size: perPage
+    #   categoryIn
+    #   tagIn
+    #   notIn
+    # }
+  }
+  ${seoPostTypeFragment}
+`;
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const formatter = ({ posts, readingSettings }: any) => ({
+  relatedPosts: posts.nodes,
+  postsPage: readingSettings.postsPage,
+});
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const getData = async (fetcher: FetchApiFuncType, node: any = null) => {
+  const query = gql`
+    query singlePostQuery(
+      $size: Int = 3
+      $categoryIn: [ID] = []
+      $tagIn: [ID] = []
+      $notIn: [ID] = []
+    ) {
+      posts(
+        where: {
+          offsetPagination: { size: $size }
+          categoryIn: $categoryIn
+          tagIn: $tagIn
+          notIn: $notIn
+        }
+      ) {
+        nodes {
+          title
+          uri
+          excerpt
+        }
+      }
+      #   readingSettings {
+      #     postsPage {
+      #       uri
+      #     }
+      #   }
+    }
+  `;
+
+  const variables = node.relatedPosts;
+
+  const data = await fetcher(query, { variables });
+
+  return formatter(data);
+};

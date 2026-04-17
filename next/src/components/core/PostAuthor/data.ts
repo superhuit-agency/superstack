@@ -33,7 +33,7 @@ export const getData = async (fetcher: FetchApiFuncType) => {
   const uri = baseUriContext();
 
   const variables = {
-    uri: uri,
+    uri,
   };
 
   const data = await fetcher(query, { variables });

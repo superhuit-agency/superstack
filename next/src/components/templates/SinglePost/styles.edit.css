@@ -1,0 +1,40 @@
+@import '@resources/index.css';
+
+.post-type-post
+	.edit-post-visual-editor
+	.editor-styles-wrapper
+	.block-editor-block-list__layout {
+	@extend %grid;
+
+	margin-left: 0px !important;
+	margin-right: 0px !important;
+	max-width: none !important;
+
+	& > * {
+		max-width: none;
+		margin-left: 0;
+		margin-right: 0;
+	}
+
+	.supt-introduction {
+		@extend %t-introduction;
+		color: $color-text;
+
+		a {
+			@extend %link-underline;
+			word-break: break-word;
+			color: $color-text;
+		}
+	}
+
+	.supt-paragraph {
+		@extend %t-paragraph;
+		color: $color-text;
+
+		a {
+			@extend %link-underline;
+			word-break: break-word;
+			color: $color-text;
+		}
+	}
+}
