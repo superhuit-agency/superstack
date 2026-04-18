@@ -1,18 +1,16 @@
-/* eslint-disable no-console */
-
 /**
  * This script fetches the FSE templates and template parts from the WordPress instance
  * and stores them in the src/lib/fse/fse-templates-and-parts.json file
  * in order to be used by the Next.js app for templating the pages.
  */
 
-import fs from "node:fs";
-import path from "node:path";
+import fs from "fs";
+import path from "path";
 
-import { getWpGraphqlUrl } from "@/utils/node-utils";
-import formatBlocksJSON from "../src/lib/format-blocks-json";
-
-const WORDPRESS_GRAPHQL_URL = getWpGraphqlUrl();
+import fetchApi from "@/lib/fetch-api";
+import formatBlocksJSON from "@/lib/format-blocks-json";
+import { resolvePromises } from "@/utils/resolve-promises";
+import { getWpDomain, getWpGraphqlUrl } from "@/utils/node-utils";
 
 type GraphQlNode = {
   slug: string;
@@ -20,43 +18,8 @@ type GraphQlNode = {
   blocksJSON?: string;
 };
 
-type GraphQlResponse = {
-  templates?: { nodes?: GraphQlNode[] };
-  templateParts?: { nodes?: GraphQlNode[] };
-};
-
-async function fetchGraphQL(
-  query: string,
-  variables?: Record<string, unknown>,
-): Promise<GraphQlResponse> {
-  const res = await fetch(WORDPRESS_GRAPHQL_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      query,
-      variables,
-    }),
-  });
-
-  const text = await res.text();
-  let json: { data?: GraphQlResponse; errors?: Array<{ message: string }> };
-  try {
-    json = JSON.parse(text);
-  } catch (e) {
-    throw new Error(
-      `Failed to parse WPGraphQL response: ${text.slice(0, 500)}`,
-    );
-  }
-
-  if (json.errors?.length) {
-    const msg = json.errors.map((e) => e.message).join("\n");
-    throw new Error(`WPGraphQL returned errors:\n${msg}`);
-  }
-
-  return json.data ?? {};
-}
+const WORDPRESS_URL = getWpDomain();
+const WORDPRESS_GRAPHQL_URL = getWpGraphqlUrl();
 
 async function fetchAllTemplateParts() {
   const query = `
@@ -71,7 +34,7 @@ async function fetchAllTemplateParts() {
     }
   `;
 
-  const data = await fetchGraphQL(query);
+  const data = await fetchApi(query, { endpoint: WORDPRESS_GRAPHQL_URL });
   return data?.templateParts?.nodes ?? [];
 }
 
@@ -87,7 +50,7 @@ async function fetchAllTemplates() {
     }
   `;
 
-  const data = await fetchGraphQL(query);
+  const data = await fetchApi(query, { endpoint: WORDPRESS_GRAPHQL_URL });  
   return data?.templates?.nodes ?? [];
 }
 
@@ -97,23 +60,23 @@ async function main() {
     return;
   }
 
-  console.log(`[fse] Fetching templateParts from: ${WORDPRESS_GRAPHQL_URL}`);
+  console.log(`[fse] Fetching templateParts from ${WORDPRESS_URL}`);
 
-  const [templateParts, templates] = await Promise.all([
+  const [templateParts, templates] = await resolvePromises([
     fetchAllTemplateParts(),
     fetchAllTemplates(),
   ]);
 
-  const templatesCombined = await Promise.all(
-    templates.map(async (template) => {
+  const templatesCombined = await resolvePromises(
+    templates?.filter((t: GraphQlNode | null) => !!t)?.map(async (template: GraphQlNode) => {
       const blocks = await formatBlocksJSON(template.blocksJSON ?? "");
 
-      const formattedBlocks = await Promise.all(
-        blocks.map(async (block: any) => {
+      const formattedBlocks = await resolvePromises(
+        blocks.filter((b: BlockPropsType | null) => !!b).map(async (block: BlockPropsType) => {
           // For each block of type 'core/template-part', replace with the actual block from templateParts.
           if (block?.name === "core/template-part") {
             const templatePart = templateParts.find(
-              (part) => part.slug === block?.attributes?.slug,
+              (part: GraphQlNode) => part.slug === block?.attributes?.slug,
             );
             const formattedTemplatePart = await formatBlocksJSON(
               templatePart?.blocksJSON ?? "",
@@ -140,7 +103,7 @@ async function main() {
 
   const out = {
     generatedAt: new Date().toISOString(),
-    templates: templatesCombined,
+    templates: templatesCombined.filter(Boolean),
   };
 
   const outDir = path.join(__dirname, "../src/lib/fse");
