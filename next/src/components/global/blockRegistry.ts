@@ -44,4 +44,5 @@ export const blocksDataList = {
   'core/post-author-name': () => import('../core/PostAuthorName/data'),
   'core/post-date': () => import('../core/PostDate/data'),
   'core/post-terms': () => import('../core/PostTerms/data'),
+  'core/post-navigation-link': () => import('../core/PostNavigationLink/data'),
 };
