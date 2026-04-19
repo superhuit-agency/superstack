@@ -25,7 +25,6 @@ export default function PostTimeToRead({
   textAlign,
   ...props
 }: PostTimeToReadProps) {
-  console.log('props', props);
   const alignClass = {
     '-left': textAlign === 'left',
     '-center': textAlign === 'center',
