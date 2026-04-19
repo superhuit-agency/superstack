@@ -8,11 +8,10 @@ inputs:
     description: 'Path on the remote server where Next.js is located (default: /var/www/next)'
     required: false
     default: '/var/www/next'
-
-  NEXT_RESTART_COMMAND:
-    description: 'Any command to run on the server after deployment (restart pm2 or anything)'
+  KEEP_RELEASES:
+    description: 'Number of latest releases to keep on server'
     required: false
-    default: 'pm2 restart'
+    default: '5'
 
 runs:
   using: 'composite'
@@ -23,31 +22,71 @@ runs:
         name: next-build
         path: ./deploy-artifacts
 
-    - name: Deploy Next environment file (if does not exist)
+    - name: Prepare release folder
+      shell: bash
+      run: |
+        RELEASE_ID="$(date +%Y%m%d%H%M%S)-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+        CURRENT_PATH='${{ inputs.NEXT_PATH }}'
+        APP_ROOT="$(dirname "$CURRENT_PATH")"
+        RELEASES_DIR="$APP_ROOT/releases"
+        SHARED_DIR="$APP_ROOT/shared"
+        RELEASE_PATH="$RELEASES_DIR/$RELEASE_ID"
+
+        echo "RELEASE_ID=$RELEASE_ID" >> "$GITHUB_ENV"
+        echo "APP_ROOT=$APP_ROOT" >> "$GITHUB_ENV"
+        echo "RELEASES_DIR=$RELEASES_DIR" >> "$GITHUB_ENV"
+        echo "SHARED_DIR=$SHARED_DIR" >> "$GITHUB_ENV"
+        echo "RELEASE_PATH=$RELEASE_PATH" >> "$GITHUB_ENV"
+
+        ssh ${{ inputs.SERVER }} "mkdir -p '$RELEASES_DIR' '$SHARED_DIR' '$RELEASE_PATH'"
+
+    - name: Deploy shared environment file (if does not exist)
       shell: bash
       run: |
         rsync -auz --ignore-existing \
-        next/.env.example \
-        ${{ inputs.SERVER }}:${{ inputs.NEXT_PATH }}/.env
+          next/.env.example \
+          ${{ inputs.SERVER }}:${{ env.SHARED_DIR }}/.env
 
-    - name: Deploy Next files
+    - name: Upload release files
       shell: bash
       run: |
         rsync -auzv --delete \
           --exclude='.env*' \
           --exclude='ecosystem.config.js' \
           ./deploy-artifacts/next/ \
-          ${{ inputs.SERVER }}:${{ inputs.NEXT_PATH }}/
+          ${{ inputs.SERVER }}:${{ env.RELEASE_PATH }}/
 
-    - name: Install production dependencies
+    - name: Install production dependencies in release
       shell: bash
       run: |
-        ssh -o BatchMode=yes -o ConnectTimeout=30 -o ServerAliveInterval=30 -o ServerAliveCountMax=10 \
-          ${{ inputs.SERVER }} "cd ${{ inputs.NEXT_PATH }} && npm ci --omit=dev"
+        ssh ${{ inputs.SERVER }} "
+            cd '${{ env.RELEASE_PATH }}' &&
+            npm ci --omit=dev && 
+            ln -sfn '${{ env.SHARED_DIR }}/.env' .env
+          "
 
-    - name: Restart PM2 app
-      if: inputs.NEXT_RESTART_COMMAND != ''
+    - name: Switch current release atomically
       shell: bash
       run: |
-        ssh -o BatchMode=yes -o ConnectTimeout=30 -o ServerAliveInterval=30 -o ServerAliveCountMax=10 \
-          ${{ inputs.SERVER }} "cd ${{ inputs.NEXT_PATH }}; ${{ inputs.NEXT_RESTART_COMMAND }}"
+        ssh ${{ inputs.SERVER }} "
+            CURRENT_PATH='${{ inputs.NEXT_PATH }}';
+            if [ -d \"\$CURRENT_PATH\" ] && [ ! -L \"\$CURRENT_PATH\" ]; then
+              mv \"\$CURRENT_PATH\" \"\${CURRENT_PATH}.bak.\$(date +%s)\";
+            fi;
+            ln -sfn '${{ env.RELEASE_PATH }}' \"\$CURRENT_PATH\"
+          "
+
+    - name: Cleanup old releases
+      shell: bash
+      run: |
+        KEEP_RELEASES='${{ inputs.KEEP_RELEASES }}'
+        if ! [[ "$KEEP_RELEASES" =~ ^[0-9]+$ ]] || [ "$KEEP_RELEASES" -lt 1 ]; then
+          echo "KEEP_RELEASES must be an integer >= 1"
+          exit 1
+        fi
+
+        START_AT=$((KEEP_RELEASES + 1))
+        ssh ${{ inputs.SERVER }} "
+            cd '${{ env.RELEASES_DIR }}' || exit 0;
+            ls -1dt */ 2>/dev/null | tail -n +${START_AT} | xargs -r rm -rf
+          "

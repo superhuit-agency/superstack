@@ -151,10 +151,12 @@ jobs:
           variables: |
             NEXT_URL
             NEXT_PATH
+            PM2_APP_NAME
             WORDPRESS_URL
         env:
           NEXT_URL: ${{ vars.NEXT_URL }}
           NEXT_PATH: ${{ vars.NEXT_PATH }}
+          PM2_APP_NAME: ${{ vars.PM2_APP_NAME }}
           WORDPRESS_URL: ${{ vars.WORDPRESS_URL }}
 
       - name: Setup SSH
@@ -177,4 +179,10 @@ jobs:
         with:
           SERVER: ${{ steps.ssh.outputs.SERVER }}
           NEXT_PATH: ${{ vars.NEXT_PATH }}
-          NEXT_RESTART_COMMAND: ${{ vars.NEXT_RESTART_COMMAND }}
+
+      - name: Restart PM2 app
+        uses: ./.github/actions/next-pm2
+        with:
+          SERVER: ${{ steps.ssh.outputs.SERVER }}
+          NEXT_PATH: ${{ vars.NEXT_PATH }}
+          PM2_APP_NAME: ${{ vars.PM2_APP_NAME }}

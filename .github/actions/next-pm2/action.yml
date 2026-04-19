@@ -1,0 +1,52 @@
+name: 'Restart Next.js with PM2'
+description: 'Deploy PM2 runtime config and restart/start app using PM2_APP_NAME'
+inputs:
+  SERVER:
+    description: 'SSH target (user@host -p port)'
+    required: true
+  NEXT_PATH:
+    description: 'Path on the remote server where Next.js is located (default: /var/www/next)'
+    required: false
+    default: '/var/www/next'
+  PM2_APP_NAME:
+    description: 'PM2 application name (used for pm2 describe/restart/start --only)'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Prepare shared paths
+      shell: bash
+      run: |
+        CURRENT_PATH='${{ inputs.NEXT_PATH }}'
+        APP_ROOT="$(dirname "$CURRENT_PATH")"
+        SHARED_DIR="$APP_ROOT/shared"
+
+        echo "APP_ROOT=$APP_ROOT" >> "$GITHUB_ENV"
+        echo "SHARED_DIR=$SHARED_DIR" >> "$GITHUB_ENV"
+
+        ssh ${{ inputs.SERVER }} "mkdir -p '$SHARED_DIR'"
+
+    - name: Deploy shared ecosystem file (if does not exist)
+      shell: bash
+      run: |
+        rsync -auz --ignore-existing \
+          next/ecosystem.config.js.example \
+          ${{ inputs.SERVER }}:${{ env.SHARED_DIR }}/ecosystem.config.js
+
+    - name: Symlink ecosystem config in live release
+      shell: bash
+      run: |
+        ssh ${{ inputs.SERVER }} "cd '${{ inputs.NEXT_PATH }}' && ln -sfn '${{ env.SHARED_DIR }}/ecosystem.config.js' ecosystem.config.js"
+
+    - name: Restart or start PM2 app
+      shell: bash
+      run: |
+        ssh ${{ inputs.SERVER }} "
+            cd '${{ inputs.NEXT_PATH }}' &&
+            if pm2 describe '${{ inputs.PM2_APP_NAME }}' >/dev/null 2>&1; then
+              pm2 restart '${{ inputs.PM2_APP_NAME }}' --update-env;
+            else
+              pm2 start ecosystem.config.js --only '${{ inputs.PM2_APP_NAME }}';
+            fi
+          "
