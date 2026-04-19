@@ -1,6 +1,6 @@
-import { gql } from '@/utils';
+import { gql } from "@/utils";
 
-import { seoPostTypeFragment } from '@/lib/fragments';
+import { seoPostTypeFragment } from "@/lib/fragments";
 
 export const fragment = gql`
   fragment singlePageFragment on Page {
@@ -9,6 +9,9 @@ export const fragment = gql`
     blocksJSON
     uri
     isFrontPage
+    fseTemplate {
+      slug
+    }
     archivePage {
       baseUri
       perPage
@@ -27,4 +30,4 @@ export const fragment = gql`
   ${seoPostTypeFragment}
 `;
 
-export const slug = 'single-page';
+export const slug = "single-page";

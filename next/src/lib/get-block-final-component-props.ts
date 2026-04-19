@@ -1,6 +1,6 @@
 // import * as blocksData from '@/components/data';
 import { blocksDataList } from '@/components/global/blockRegistry';
-import { fetchAPI } from '@/lib';
+import fetchAPI from '@/lib/fetch-api';
 
 // const blocksDataList: { [key: string]: any } = {};
 // for (const key in blocksData) {

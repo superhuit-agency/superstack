@@ -3,7 +3,7 @@ import dynamic from 'next/dynamic';
 import { draftMode, cookies } from 'next/headers';
 import { notFound, permanentRedirect, redirect } from 'next/navigation';
 
-import { Templates } from '@/components/global/Templates';
+import Template from '@/components/global/Template';
 import { useCanonical as getCanonicalUrl } from '@/hooks/use-canonical';
 import {
   getAllURIs,
@@ -200,7 +200,7 @@ export default async function Page({ params }: { params: { uri: string[] } }) {
 
   return (
     <>
-      <Templates node={node} contentType={node?.__typename ?? 'error'} />
+      <Template node={node} />
 
       {isDraftModeEnable ? (
         <PreviewToolbar isDraft={isDraft} editLink={node?.editLink} />

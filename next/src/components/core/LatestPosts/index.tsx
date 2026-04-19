@@ -1,10 +1,12 @@
+import cx from 'classnames';
+
 import CardPost from '@/components/custom/molecules/Cards/CardPost';
 import './styles.css';
 
 export default function LatestPosts(props: LatestPostProps) {
   return (
     <div
-      className="wp-block-post-content"
+      className={cx('wp-block-latest-posts', props.className)}
       style={{ '--latest-posts-nb': props.postsToShow } as React.CSSProperties}
     >
       {props.data?.posts?.nodes?.map((post) => (

@@ -152,14 +152,39 @@ jobs:
         with:
           variables: |
             NEXT_URL
+            NEXT_PATH
+            PM2_APP_NAME
             WORDPRESS_URL
         env:
           NEXT_URL: ${{ vars.NEXT_URL }}
+          NEXT_PATH: ${{ vars.NEXT_PATH }}
+          PM2_APP_NAME: ${{ vars.PM2_APP_NAME }}
           WORDPRESS_URL: ${{ vars.WORDPRESS_URL }}
 
+      - name: Setup SSH
+        id: ssh
+        uses: kuuak/ssh-action@main
+        with:
+          SSH_USER: ${{ vars.SSH_USER }}
+          SSH_HOST: ${{ vars.SSH_HOST }}
+          SSH_PORT: ${{ vars.SSH_PORT }}
+          SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Build Next.js
         uses: ./.github/actions/next-build
         with:
           NEXT_URL: ${{ vars.NEXT_URL }} 
           WORDPRESS_URL: ${{ vars.WORDPRESS_URL }}
+      
+      - name: Deploy Next.js
+        uses: ./.github/actions/next-deploy
+        with:
+          SERVER: ${{ steps.ssh.outputs.SERVER }}
+          NEXT_PATH: ${{ vars.NEXT_PATH }}
+
+      - name: Restart PM2 app
+        uses: ./.github/actions/next-pm2
+        with:
+          SERVER: ${{ steps.ssh.outputs.SERVER }}
+          NEXT_PATH: ${{ vars.NEXT_PATH }}
+          PM2_APP_NAME: ${{ vars.PM2_APP_NAME }}

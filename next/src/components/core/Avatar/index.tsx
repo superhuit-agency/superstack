@@ -1,18 +1,25 @@
 import NextImage from 'next/image';
 import Link from 'next/link';
+import cx from 'classnames';
 
-export default function Avatar(props: AvatarProps) {
-  if (!props.data.url) return null;
+export default function Avatar({
+  data,
+  isLink = false,
+  linkTarget = '_self',
+  size,
+  className,
+}: AvatarProps) {
+  if (!data.url) return null;
 
-  if (props.isLink && props.data.uri) {
+  if (isLink && data.uri) {
     return (
-      <Link href={props.data.uri} target={props.linkTarget}>
+      <Link href={data.uri} target={linkTarget} className={className}>
         <NextImage
           className="wp-block-avatar"
-          src={props.data.url}
-          alt={props.data.alt ?? 'User Avatar'}
-          width={props.size}
-          height={props.size}
+          src={data.url}
+          alt={data.alt ?? 'User Avatar'}
+          width={size}
+          height={size}
         />
       </Link>
     );
@@ -20,11 +27,11 @@ export default function Avatar(props: AvatarProps) {
 
   return (
     <NextImage
-      className="wp-block-avatar"
-      src={props.data.url}
-      alt={props.data.alt ?? 'User Avatar'}
-      width={props.size}
-      height={props.size}
+      className={cx('wp-block-avatar', className)}
+      src={data.url}
+      alt={data.alt ?? 'User Avatar'}
+      width={size}
+      height={size}
     />
   );
 }

@@ -15,3 +15,6 @@ auth.json
 /node_modules/*
 /theme/node_modules
 /theme/node_modules/*
+
+# misc
+.DS_Store

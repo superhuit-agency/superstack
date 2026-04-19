@@ -105,3 +105,5 @@ type FocalPoint = {
 	x: number;
 	y: number;
 };
+
+type TagName = 'div' | 'main' | 'section' | 'article' | 'aside' | 'header' | 'footer';

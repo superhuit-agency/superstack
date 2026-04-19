@@ -1,5 +1,6 @@
 import { getWpUrl } from '@/utils/node-utils';
-import { getFunkyWpUploadsURI, getBlockFinalComponentProps } from '@/lib';
+import getFunkyWpUploadsURI from '@/lib/get-funky-wp-uploads-uri';
+import getBlockFinalComponentProps from '@/lib/get-block-final-component-props';
 
 export default async function formatBlocksJSON(blocksJSON: string) {
 	/**
