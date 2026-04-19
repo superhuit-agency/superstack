@@ -39,6 +39,11 @@ runs:
           ./deploy-artifacts/next/ \
           ${{ inputs.SERVER }}:${{ inputs.NEXT_PATH }}/
 
+    - name: Install production dependencies
+      shell: bash
+      run: |
+        ssh ${{ inputs.SERVER }} -t "cd ${{ inputs.NEXT_PATH }} && npm ci --omit=dev"
+
     - name: Restart PM2 app
       if: inputs.NEXT_RESTART_COMMAND != ''
       shell: bash
