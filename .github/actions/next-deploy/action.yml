@@ -42,10 +42,12 @@ runs:
     - name: Install production dependencies
       shell: bash
       run: |
-        ssh ${{ inputs.SERVER }} -t "cd ${{ inputs.NEXT_PATH }} && npm ci --omit=dev"
+        ssh -o BatchMode=yes -o ConnectTimeout=30 -o ServerAliveInterval=30 -o ServerAliveCountMax=10 \
+          ${{ inputs.SERVER }} "cd ${{ inputs.NEXT_PATH }} && npm ci --omit=dev"
 
     - name: Restart PM2 app
       if: inputs.NEXT_RESTART_COMMAND != ''
       shell: bash
       run: |
-        ssh ${{ inputs.SERVER }} -t "cd ${{ inputs.NEXT_PATH }}; ${{ inputs.NEXT_RESTART_COMMAND }}"
+        ssh -o BatchMode=yes -o ConnectTimeout=30 -o ServerAliveInterval=30 -o ServerAliveCountMax=10 \
+          ${{ inputs.SERVER }} "cd ${{ inputs.NEXT_PATH }}; ${{ inputs.NEXT_RESTART_COMMAND }}"
