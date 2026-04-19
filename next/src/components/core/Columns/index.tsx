@@ -1,21 +1,28 @@
 import cx from 'classnames';
+import { FC } from 'react';
 
 import block from './block.json';
 
 import './styles.css';
 
-export default function Columns({
+const Columns: FC<ColumnsProps> & BlockConfigs = ({
   isStackedOnMobile = true,
   verticalAlignment,
+  layout,
   className,
+  templateLock: _templateLock,
   children,
   ...props
-}: ColumnsProps) {
+}) => {
+  const layoutType = layout?.type ?? 'flex';
+
   return (
     <div
       className={cx(
         'wp-block-columns',
         className,
+        `is-layout-${layoutType}`,
+        `wp-block-columns-is-layout-${layoutType}`,
         {
           'is-not-stacked-on-mobile': !isStackedOnMobile,
         },
@@ -26,7 +33,9 @@ export default function Columns({
       {children}
     </div>
   );
-}
+};
 
 Columns.slug = block.slug;
 Columns.title = block.title;
+
+export default Columns;

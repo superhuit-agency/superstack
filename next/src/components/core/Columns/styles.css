@@ -1,7 +1,53 @@
 @import '@resources/index.css';
 
 .wp-block-columns {
+  box-sizing: border-box;
   display: flex;
   flex-wrap: wrap;
+  align-items: initial;
 }
 
+@media (min-width: $breakpoint-sm) {
+  .wp-block-columns {
+    flex-wrap: nowrap;
+  }
+}
+
+.wp-block-columns.is-not-stacked-on-mobile {
+  flex-wrap: nowrap;
+}
+
+:where(.wp-block-columns) {
+  margin-bottom: 1.75em;
+}
+
+:where(.wp-block-columns.is-layout-flex) {
+  gap: 2em;
+}
+
+@media (max-width: calc($breakpoint-sm - 1px)) {
+  .wp-block-columns:not(.is-not-stacked-on-mobile) > .wp-block-column {
+    flex-basis: 100%;
+  }
+}
+
+@media (min-width: $breakpoint-sm) {
+  .wp-block-columns:not(.is-not-stacked-on-mobile) > .wp-block-column {
+    flex-basis: 0;
+    flex-grow: 1;
+  }
+
+  .wp-block-columns:not(.is-not-stacked-on-mobile)
+    > .wp-block-column[style*='flex-basis'] {
+    flex-grow: 0;
+  }
+}
+
+.wp-block-columns.is-not-stacked-on-mobile > .wp-block-column {
+  flex-basis: 0;
+  flex-grow: 1;
+}
+
+.wp-block-columns.is-not-stacked-on-mobile > .wp-block-column[style*='flex-basis'] {
+  flex-grow: 0;
+}
