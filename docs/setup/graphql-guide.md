@@ -99,17 +99,18 @@ run_bench() {
     printf "  run %2d: %.3fs  %d B\n" "$i" "$t" "$sz"
   done
 
-  # Stats
-  printf '%s\n' "${times[@]}" | awk '
-    BEGIN { min=9999; max=0; sum=0; n=0 }
-    { v=$1+0; sum+=v; n++; if(v<min) min=v; if(v>max) max=v; a[n]=v }
-    END {
-      asort(a)
-      avg=sum/n; p50=a[int(n*0.50)+1]; p95=a[int(n*0.95)+1]
-      printf "  → avg=%.3fs  min=%.3fs  max=%.3fs  p50=%.3fs  p95=%.3fs\n",
-             avg, min, max, p50, p95
-    }
-  '
+  # Stats (sort -n is POSIX; avoids gawk-only asort)
+  local sorted
+  sorted=$(printf '%s\n' "${times[@]}" | sort -n)
+  local n_t=${#times[@]}
+  local avg min max p50 p95
+  avg=$(printf '%s\n' "${times[@]}" | awk '{s+=$1;n++} END {printf "%.3f", s/n}')
+  min=$(echo "$sorted" | head -1)
+  max=$(echo "$sorted" | tail -1)
+  p50=$(echo "$sorted" | awk -v n="$n_t" 'NR==int(n*0.50)+1{print;exit}')
+  p95=$(echo "$sorted" | awk -v n="$n_t" 'NR==int(n*0.95)+1{print;exit}')
+  printf "  → avg=%ss  min=%ss  max=%ss  p50=%ss  p95=%ss\n" \
+    "$avg" "$min" "$max" "$p50" "$p95"
 
   local avg_size
   avg_size=$(printf '%s\n' "${sizes[@]}" | awk '{s+=$1;n++} END {printf "%d", s/n}')
