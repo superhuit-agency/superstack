@@ -27,7 +27,7 @@ runs:
       shell: bash
       run: |
         rsync -auz --ignore-existing \
-        .env.example \
+        next/.env.example \
         ${{ inputs.SERVER }}:${{ inputs.NEXT_PATH }}/.env
 
     - name: Deploy Next files
