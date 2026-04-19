@@ -45,4 +45,5 @@ export const blocksDataList = {
   'core/post-date': () => import('../core/PostDate/data'),
   'core/post-terms': () => import('../core/PostTerms/data'),
   'core/post-navigation-link': () => import('../core/PostNavigationLink/data'),
+  'core/post-time-to-read': () => import('../core/PostTimeToRead/data'),
 };

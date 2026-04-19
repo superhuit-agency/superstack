@@ -38,6 +38,7 @@ const blocksList: Record<string, () => Promise<BlockModule>> = {
   'core/post-date': () => import('../core/PostDate'),
   'core/post-terms': () => import('../core/PostTerms'),
   'core/post-navigation-link': () => import('../core/PostNavigationLink'),
+  'core/post-time-to-read': () => import('../core/PostTimeToRead'),
   'core/preformatted': () => import('../core/Preformatted'),
   'core/pullquote': () => import('../core/Pullquote'),
   'core/quote': () => import('../core/Quote'),
