@@ -70,6 +70,7 @@ if ! command -v jq &>/dev/null; then
 fi
 
 # ── helper ────────────────────────────────────────────────────────────────────
+# run_bench LABEL  →  sets BENCH_AVG, BENCH_P50, BENCH_P95, BENCH_AVG_SIZE
 run_bench() {
   local label="$1"
   local times=()
@@ -116,10 +117,31 @@ run_bench() {
   avg_size=$(printf '%s\n' "${sizes[@]}" | awk '{s+=$1;n++} END {printf "%d", s/n}')
   printf "  → avg response size: %d B  (~%.1f KB)\n" \
     "$avg_size" "$(echo "$avg_size" | awk '{printf "%.1f", $1/1024}')"
+
+  # Export results for the comparison block
+  BENCH_AVG="$avg"
+  BENCH_P50="$p50"
+  BENCH_P95="$p95"
+  BENCH_AVG_SIZE="$avg_size"
+}
+
+# ── diff helper: prints "+X.XXXs (+Y%)" or "-X.XXXs (-Y%)" ───────────────────
+fmt_diff() {
+  # fmt_diff <before> <after> <unit>
+  awk -v b="$1" -v a="$2" -v u="$3" 'BEGIN {
+    d=a-b
+    p=(b!=0) ? (d/b)*100 : 0
+    sign=(d>=0)?"+":""
+    printf "%s%.3f%s (%s%.1f%%)\n", sign, d, u, sign, p
+  }'
 }
 # ──────────────────────────────────────────────────────────────────────────────
 
 run_bench "BEFORE"
+BEFORE_AVG="$BENCH_AVG"
+BEFORE_P50="$BENCH_P50"
+BEFORE_P95="$BENCH_P95"
+BEFORE_SIZE="$BENCH_AVG_SIZE"
 
 echo ""
 echo "────────────────────────────────────────────────────"
@@ -129,7 +151,19 @@ echo "────────────────────────�
 read -r
 
 run_bench "AFTER"
+AFTER_AVG="$BENCH_AVG"
+AFTER_P50="$BENCH_P50"
+AFTER_P95="$BENCH_P95"
+AFTER_SIZE="$BENCH_AVG_SIZE"
 
 echo ""
-echo "Done. Compare the BEFORE / AFTER rows above."
+echo "════════════════════════════════════════════════════"
+echo "  BEFORE vs AFTER comparison"
+echo "════════════════════════════════════════════════════"
+printf "  %-18s  %8s  %8s  %s\n"   "metric"  "BEFORE"  "AFTER"  "change"
+printf "  %-18s  %8ss  %8ss  %s\n" "avg time"  "$BEFORE_AVG"  "$AFTER_AVG"  "$(fmt_diff "$BEFORE_AVG" "$AFTER_AVG" s)"
+printf "  %-18s  %8ss  %8ss  %s\n" "p50 time"  "$BEFORE_P50"  "$AFTER_P50"  "$(fmt_diff "$BEFORE_P50" "$AFTER_P50" s)"
+printf "  %-18s  %8ss  %8ss  %s\n" "p95 time"  "$BEFORE_P95"  "$AFTER_P95"  "$(fmt_diff "$BEFORE_P95" "$AFTER_P95" s)"
+printf "  %-18s  %8sB  %8sB  %s\n" "avg size"  "$BEFORE_SIZE"  "$AFTER_SIZE"  "$(fmt_diff "$BEFORE_SIZE" "$AFTER_SIZE" B)"
+echo "════════════════════════════════════════════════════"
 ```
