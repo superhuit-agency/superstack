@@ -9,13 +9,16 @@ type GroupTagName =
 
 type GroupLayoutType = 'constrained' | 'flow' | 'flex' | 'grid';
 
-interface GroupAttributes extends BlockAttributes {
+interface GroupAttributes {
   tagName?: GroupTagName;
   templateLock?: 'all' | 'insert' | 'contentOnly' | false;
   layout?: {
     type?: GroupLayoutType;
     orientation?: 'horizontal' | 'vertical';
     flexWrap?: 'nowrap' | 'wrap';
+    justifyContent?: 'left' | 'center' | 'right' | 'space-between' | 'stretch';
+    columnCount?: number;
+    minimumColumnWidth?: string;
   };
 }
 
