@@ -4,6 +4,8 @@
  * in order to be used by the Next.js app for templating the pages.
  */
 
+import 'dotenv/config'
+
 import fs from "fs";
 import path from "path";
 
@@ -34,7 +36,7 @@ async function fetchAllTemplateParts() {
     }
   `;
 
-  const data = await fetchApi(query, { endpoint: WORDPRESS_GRAPHQL_URL });
+  const data = await fetchApi(query);
   return data?.templateParts?.nodes ?? [];
 }
 
@@ -50,7 +52,7 @@ async function fetchAllTemplates() {
     }
   `;
 
-  const data = await fetchApi(query, { endpoint: WORDPRESS_GRAPHQL_URL });  
+  const data = await fetchApi(query);  
   return data?.templates?.nodes ?? [];
 }
 
