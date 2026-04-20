@@ -51,6 +51,7 @@ require_once __DIR__ . '/blocks/core-group.php';
  * Load public classes.
  */
 require_once __DIR__ . '/public/index.php';
+require_once __DIR__ . '/public/next-redirect.php';
 
 /**
  * Load CLI commands.
