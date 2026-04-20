@@ -24,7 +24,7 @@ for (const key in filters) {
  * Excluded blocks from the editor.
  */
 
-const excludedBlocks = ["core/more", "core/nextpage"];
+const excludedBlocks = ["core/more", "core/nextpage", "core/details"];
 const excludedBlockGroups = ["yoast/", "yoast-seo/", "polylang/"];
 const allowedEmbedVariants = ["youtube", "vimeo"];
 
