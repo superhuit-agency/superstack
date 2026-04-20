@@ -24,7 +24,27 @@ for (const key in filters) {
  * Excluded blocks from the editor.
  */
 
-const excludedBlocks = ["core/more", "core/nextpage", "core/details"];
+const excludedBlocks = [
+  "core/archives",
+  "core/calendar",
+  "core/comments",
+  "core/details",
+  "core/loginout",
+  "core/more",
+  "core/nextpage",
+  "core/page-list",
+  "core/post-author-biography",
+  "core/post-comment",
+  "core/post-comments-count",
+  "core/post-comments-form",
+  "core/post-comments-link",
+  "core/query-title",
+  "core/read-more",
+  "core/rss",
+  "core/search",
+  "core/shortcode",
+  "core/tag-cloud",
+];
 const excludedBlockGroups = ["yoast/", "yoast-seo/", "polylang/"];
 const allowedEmbedVariants = ["youtube", "vimeo"];
 
