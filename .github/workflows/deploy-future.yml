@@ -144,15 +144,11 @@ jobs:
         uses: superhuit-agency/check-env-vars-secrets@v1
         with:
           variables: |
-            NEXT_URL
             NEXT_PATH
             PM2_APP_NAME
-            WORDPRESS_URL
         env:
-          NEXT_URL: ${{ vars.NEXT_URL }}
           NEXT_PATH: ${{ vars.NEXT_PATH }}
           PM2_APP_NAME: ${{ vars.PM2_APP_NAME }}
-          WORDPRESS_URL: ${{ vars.WORDPRESS_URL }}
 
       - name: Setup SSH
         id: ssh
@@ -166,8 +162,8 @@ jobs:
       - name: Build Next.js
         uses: ./.github/actions/next-build
         with:
-          NEXT_URL: ${{ vars.NEXT_URL }} 
-          WORDPRESS_URL: ${{ vars.WORDPRESS_URL }}
+          SERVER: ${{ steps.ssh.outputs.SERVER }}
+          NEXT_PATH: ${{ vars.NEXT_PATH }}
       
       - name: Deploy Next.js
         uses: ./.github/actions/next-deploy

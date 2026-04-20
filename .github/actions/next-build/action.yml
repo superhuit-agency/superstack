@@ -5,12 +5,13 @@ inputs:
     description: 'Next environment: local, development, staging or production (default)'
     required: false
     default: 'production'
-  NEXT_URL:
-    description: 'Next URL'
+  SERVER:
+    description: 'SSH target (user@host -p port)'
     required: true
-  WORDPRESS_URL:
-    description: 'WordPress URL'
-    required: true
+  NEXT_PATH:
+    description: 'Path on the remote server where Next.js is located (default: /var/www/next)'
+    required: false
+    default: '/var/www/next'
 
 runs:
   using: 'composite'
@@ -27,11 +28,20 @@ runs:
       shell: bash
       run: npm --prefix next ci
 
+    - name: Download environment file from remote server
+      shell: bash
+      run: |
+        SHARED_DIR="$(dirname '${{ inputs.NEXT_PATH }}')/shared"
+
+        if ssh ${{ inputs.SERVER }} "test -f '$SHARED_DIR/.env'"; then
+          rsync -az ${{ inputs.SERVER }}:"$SHARED_DIR/.env" next/.env
+        else
+          cp next/.env.example next/.env
+        fi
+
     - name: Build Next
       shell: bash
       run: |
-        WORDPRESS_URL=${{ inputs.WORDPRESS_URL }} \
-        NEXT_URL=${{ inputs.NEXT_URL }} \
         NODE_ENV=production \
         npm --prefix next run build
 
