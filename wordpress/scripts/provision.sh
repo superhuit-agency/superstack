@@ -44,6 +44,11 @@ if [ -z "${WORDPRESS_PATH}" ]; then
 	exit 1
 fi
 
+if [ -z "${WORDPRESS_THEME_NAME}" ]; then
+	echo "ERROR: Please define WORDPRESS_THEME_NAME environment variable" 1>&2
+	exit 1
+fi
+
 if [ "`echo -n`" = "-n" ]; then
   en=""
   ec="\c"
@@ -112,7 +117,7 @@ echo "                  Theme install & configuration                   "
 echo "------------------------------------------------------------------"
 echo
 
-if ! $($WPCLI theme is-active $WORDPRESS_THEME_NAME --skip-plugins); then
+if ! $WPCLI theme is-active "$WORDPRESS_THEME_NAME" --skip-plugins --quiet > /dev/null 2>&1; then
 	echo $en "- Activate theme $ec"
 	$WPCLI theme activate "$WORDPRESS_THEME_NAME" --skip-plugins --quiet
 	echo "✔"
