@@ -1,0 +1,10 @@
+.wp-block-site-logo {
+    display: inline-block;
+    max-width: 200px;
+
+    img {
+        display: block;
+        width: 100%;
+        height: auto;
+    }
+}

@@ -1,6 +1,8 @@
 import NextImage from 'next/image';
 import Link from 'next/link';
 
+import './styles.css';
+
 export default function SiteLogo(props: SiteLogoProps) {
   if (!props.url) return null;
 
