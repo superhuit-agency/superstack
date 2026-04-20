@@ -23,4 +23,8 @@ echo ""
 echo "===================   PROVISIONING WORDPRESS   ==================="
 echo ""
 sleep 0.5
-$COMPOSE exec -T -e WORDPRESS_THEME_NAME="$THEME_NAME" wp bash < ./scripts/provision.sh
+$COMPOSE exec -T \
+    -e WORDPRESS_THEME_NAME="$THEME_NAME" \
+    -e WORDPRESS_PATH="/var/www/html" \
+    -e WORDPRESS_ENV="dev" \
+wp bash < ./scripts/provision.sh

@@ -21,11 +21,6 @@ services:
       WORDPRESS_DB_NAME: wordpress
       WORDPRESS_DB_USER: wordpress
       WORDPRESS_DB_PASSWORD: wordpress
-      # TODO: clean provision script which requires these vars
-      THEME_NAME: ${THEME_NAME}
-      WORDPRESS_PATH: /var/www/html
-      WORDPRESS_ENV: dev
-      # END TODO
       WORDPRESS_DEBUG: 1
       WORDPRESS_CONFIG_EXTRA: |
         define('WP_DEBUG_LOG', '/dev/stderr');        // write logs to stderr
