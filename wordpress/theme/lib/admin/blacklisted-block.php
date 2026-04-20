@@ -21,6 +21,10 @@ function filter_blacklisted_blocks($allowed_blocks) {
         'core/post-comments-count',
         'core/post-comments-form',
         'core/post-comments-link',
+        'core/post-author-biography',
+        'core/read-more',
+        'core/loginout',
+        'core/query-title',
     ];
 
     return array_values(array_diff($all_blocks, $blacklisted_blocks));
