@@ -37,6 +37,7 @@ export const blocksDataList = {
   'core/post-title': () => import('../core/PostTitle/data'),
   'core/post-excerpt': () => import('../core/PostExcerpt/data'),
   'core/query': () => import('../core/Query/data'),
+  'core/terms-query': () => import('../core/TermsQuery/data'),
   'core/site-logo': () => import('../core/SiteLogo/data'),
   'core/site-title': () => import('../core/SiteTitle/data'),
   'core/site-tagline': () => import('../core/SiteTagline/data'),

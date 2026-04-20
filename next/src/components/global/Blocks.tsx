@@ -58,6 +58,7 @@ const blocksList: Record<string, () => Promise<BlockModule>> = {
   'core/query-pagination-previous': () =>
     import('../core/QueryPaginationPrevious'),
   'core/query-pagination-next': () => import('../core/QueryPaginationNext'),
+  'core/terms-query': () => import('../core/TermsQuery'),
 };
 
 interface PostBodyBlocksProps {
