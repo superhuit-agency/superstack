@@ -1,7 +1,6 @@
 import './styles.css';
 
 export default function TermsQuery(props: TermsQueryProps) {
-  console.log('props', props);
   const nodes = props.data?.terms?.nodes ?? [];
   const hasTerms = nodes.length > 0;
 
