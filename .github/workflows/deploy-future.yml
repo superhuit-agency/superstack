@@ -83,6 +83,7 @@ jobs:
           ssh ${{ steps.ssh.outputs.SERVER }} \
             "cd ${{ vars.WORDPRESS_PATH }}; \
               env \
+                NEXT_URL=\"${{ vars.NEXT_URL }}\" \
                 WORDPRESS_PATH=\"${{ vars.WORDPRESS_PATH }}\" \
                 WORDPRESS_URL=\"${{ vars.WORDPRESS_URL }}\" \
                 WORDPRESS_THEME_NAME=\"${{ vars.WORDPRESS_THEME_NAME }}\" \

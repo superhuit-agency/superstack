@@ -241,11 +241,29 @@ if [ ! -z "${NEXT_URL}" ]; then
 fi
 
 # Add GraphQL JWT Auth Key
-if [ ! -z "${WORDPRESS_GRAPHQL_JWT_AUTH_SECRET_KEY}" ]; then
-	echo $en "- Adding GraphQL JWT Auth secret key to WP config $ec"
+GRAPHQL_JWT_AUTH_SECRET_KEY=$($WPCLI config get GRAPHQL_JWT_AUTH_SECRET_KEY --quiet 2> /dev/null)
+if [ -z "${GRAPHQL_JWT_AUTH_SECRET_KEY}" ]; then
+	if [ -z "${WORDPRESS_GRAPHQL_JWT_AUTH_SECRET_KEY}" ]; then
+		if [ -x "$(command -v openssl)" ]; then
+			WORDPRESS_GRAPHQL_JWT_AUTH_SECRET_KEY="$(openssl rand -hex 32)"
+		else
+			WORDPRESS_GRAPHQL_JWT_AUTH_SECRET_KEY="$(date +%s | shasum | awk '{print $1}')"
+		fi
+		echo $en "- Generating GraphQL JWT Auth secret key for WP config $ec"
+	else
+		echo $en "- Adding GraphQL JWT Auth secret key to WP config $ec"
+	fi
 	$WPCLI config set GRAPHQL_JWT_AUTH_SECRET_KEY "$WORDPRESS_GRAPHQL_JWT_AUTH_SECRET_KEY" --quiet &> /dev/null
 	echo "✔"
 fi
+
+# Add Next.js frontend URL
+if [ ! -z "${NEXT_URL}" ]; then
+	echo $en "- Adding Next.js url to WP options $ec"
+	$WPCLI option update next_url "$NEXT_URL" --quiet &> /dev/null
+	echo "✔"
+fi
+
 
 # Disable major updates
 if ! $WPCLI config get "WP_AUTO_UPDATE_CORE" --quiet > /dev/null 2>&1; then
