@@ -1,6 +1,5 @@
 #!/usr/bin/env sh
 
-npm run --if-present ai:sync-rules &&
-git add -A docs/ai/assistant-guidance.md .cursor/rules/ai-core.mdc CLAUDE.md AGENTS.md .github/copilot-instructions.md 2>/dev/null || true
-
+npm run ai:sync-rules &&
+git add docs/ai/assistant-guidance.md .cursor/rules/ai-core.mdc CLAUDE.md AGENTS.md .github/copilot-instructions.md &&
 npx lint-staged
