@@ -9,6 +9,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepare": "husky",
+    "ai:sync-rules": "node scripts/sync-ai-rules.mjs",
     "format": "prettier --write \"next/**/*.{js,jsx,ts,tsx,json,css,md,yml,yaml}\" \"wordpress/theme/**/*.{js,jsx,ts,tsx,json,css,scss,md,yml,yaml}\"",
     "format:check": "prettier --check \"next/**/*.{js,jsx,ts,tsx,json,css,md,yml,yaml}\" \"wordpress/theme/**/*.{js,jsx,ts,tsx,json,css,scss,md,yml,yaml}\""
   },

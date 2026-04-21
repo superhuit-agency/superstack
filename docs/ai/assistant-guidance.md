@@ -1,9 +1,3 @@
-<!-- GENERATED FILE: do not edit directly -->
-<!-- Source: docs/ai/assistant-guidance.md -->
-<!-- Target: CLAUDE.md -->
-
-# CLAUDE Instructions
-
 # Superstack AI Assistant Guidance
 
 This document is the canonical source of truth for AI assistant behavior in this repository.
@@ -57,6 +51,8 @@ This document is the canonical source of truth for AI assistant behavior in this
 
 - Prefer structured updates for multi-step work.
 - Prefer implementation over long planning when requirements are clear.
+
+
 
 ## Recommended rules
 
