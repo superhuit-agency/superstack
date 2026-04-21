@@ -10,19 +10,15 @@ const Column: FC<ColumnProps> & BlockConfigs = ({
   style,
   width,
   verticalAlignment: _verticalAlignment,
-  templateLock: _templateLock,
   children,
   ...props
 }) => {
-  const mergedStyle: React.CSSProperties = {
-    ...(typeof style === 'object' && style && !Array.isArray(style) ? style : {}),
-    ...(width ? { flexBasis: width } : {}),
-  };
+  const columnStyle = width ? { ...style, flexBasis: width } : style;
 
   return (
     <div
       className={cx('wp-block-column', className)}
-      style={Object.keys(mergedStyle).length ? mergedStyle : undefined}
+      style={columnStyle}
       {...props}
     >
       {children}

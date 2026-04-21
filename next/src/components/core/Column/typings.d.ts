@@ -1,7 +1,6 @@
-interface ColumnAttributes extends BlockAttributes {
+interface ColumnAttributes {
 	width?: string;
 	verticalAlignment?: string;
-	templateLock?: 'all' | 'insert' | 'contentOnly' | false;
 }
 
 interface ColumnProps
