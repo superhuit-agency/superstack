@@ -8,7 +8,8 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prepare": "husky"
+    "prepare": "husky",
+    "ai:sync-rules": "node scripts/sync-ai-rules.mjs"
   },
   "repository": {
     "type": "git",
