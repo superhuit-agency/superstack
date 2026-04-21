@@ -1,0 +1,1 @@
+npm run ai:sync-rules && git add docs/ai/assistant-guidance.md .cursor/rules/ai-core.mdc CLAUDE.md AGENTS.md .github/copilot-instructions.md
