@@ -28,6 +28,7 @@ Made with ❤️ by [superhuit.ch](https://superhuit.ch)
 | `dev`         | Start development theme assets build                                             |
 | `build`       | Build theme assets                                                               |
 | `clear-cache` | Clear patterns cache                                                             |
+| `test`        | Placeholder test script                                                         |
 
 ## Database Migrations
 
@@ -42,6 +43,15 @@ wp @local spck migrate --status    # show all migrations and their state
 ```
 
 See [`wordpress/theme/migrations/README.md`](wordpress/theme/migrations/README.md) for details on creating and managing migrations.
+
+## Theme CSS Generation
+
+Theme CSS variables can be generated through a scripts in this repository.
+
+- Script location: `wordpress/scripts/theme-css.sh`
+- Command entrypoint (theme): `wp spck theme-css`
+
+Use this when you need to refresh frontend-consumed theme CSS from WordPress internals.
 
 ## License
 
@@ -86,5 +96,6 @@ or use the `.env.github.example` file and push the vars & secret with the Github
 | WORDPRESS_THEME_NAME | Variable | Yes       | Name of the WordPress theme on remote server. |
 | WORDPRESS_PATH       | Variable | Yes       | Absolute path to WP root directory.           |
 
-> ℹ️ Deployments are done automatically through Github workflows.
-> See `.github/workflows/deploy-production.yml` & `.github/workflows/deploy-staging.yml` for more details.
+> ℹ️ Deployments are done automatically through GitHub workflows.
+> See `.github/workflows/deploy-production.yml`, `.github/workflows/deploy-preview.yml` and `.github/workflows/deploy-future.yml` for workflow definitions.
+> Full deployment setup details are documented in `docs/setup/deployment.md`.
