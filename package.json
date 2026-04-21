@@ -8,7 +8,17 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prepare": "husky"
+    "prepare": "husky",
+    "format": "prettier --write \"next/**/*.{js,jsx,ts,tsx,json,css,md,yml,yaml}\" \"wordpress/theme/**/*.{js,jsx,ts,tsx,json,css,scss,md,yml,yaml}\"",
+    "format:check": "prettier --check \"next/**/*.{js,jsx,ts,tsx,json,css,md,yml,yaml}\" \"wordpress/theme/**/*.{js,jsx,ts,tsx,json,css,scss,md,yml,yaml}\""
+  },
+  "lint-staged": {
+    "next/**/*.{js,jsx,ts,tsx,json,css,md,yml,yaml}": [
+      "prettier --write"
+    ],
+    "wordpress/theme/**/*.{js,jsx,ts,tsx,json,css,scss,md,yml,yaml}": [
+      "prettier --write"
+    ]
   },
   "repository": {
     "type": "git",
@@ -22,6 +32,8 @@
   },
   "homepage": "https://github.com/superhuit-agency/superstack#readme",
   "devDependencies": {
-    "husky": "^9.1.7"
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.5",
+    "prettier": "^3.6.2"
   }
 }

@@ -1,0 +1,7 @@
+node_modules
+next/.next
+next/node_modules
+wordpress/node_modules
+wordpress/theme/node_modules
+wordpress/.data
+wordpress/plugins
