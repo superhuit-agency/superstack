@@ -10,7 +10,6 @@ const Columns: FC<ColumnsProps> & BlockConfigs = ({
   verticalAlignment,
   layout,
   className,
-  templateLock: _templateLock,
   children,
   ...props
 }) => {
