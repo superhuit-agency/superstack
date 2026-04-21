@@ -11,7 +11,6 @@ type GroupLayoutType = 'constrained' | 'flow' | 'flex' | 'grid';
 
 interface GroupAttributes {
   tagName?: GroupTagName;
-  templateLock?: 'all' | 'insert' | 'contentOnly' | false;
   layout?: {
     type?: GroupLayoutType;
     orientation?: 'horizontal' | 'vertical';

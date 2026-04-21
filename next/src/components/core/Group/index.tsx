@@ -9,7 +9,6 @@ export default function Group({
   tagName = 'div',
   layout,
   className,
-  templateLock: _templateLock,
   style,
   children,
   ...props
@@ -19,6 +18,7 @@ export default function Group({
   const isStack = isFlex && layout?.orientation === 'vertical';
   const isNoWrap = isFlex && layout?.flexWrap !== 'wrap';
   const justifyContent = layout?.justifyContent;
+  const isGrid = layoutType === 'grid';
 
   const classes = cx(
     'wp-block-group',
@@ -30,31 +30,26 @@ export default function Group({
     justifyContent && `is-content-justification-${justifyContent}`,
   );
 
-  const classColumnCount = className?.match(/\bhas-(\d+)-columns\b/)?.[1];
-  const columnCount = layout?.columnCount ?? Number(classColumnCount);
-  const minimumColumnWidth = layout?.minimumColumnWidth ?? '12rem';
+  const columnCount = layout?.columnCount;
+  const minimumColumnWidth = layout?.minimumColumnWidth ?? undefined;
 
-  const gridStyle: React.CSSProperties =
-    layoutType === 'grid'
-      ? columnCount > 0
-        ? { gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))` }
-        : {
-            gridTemplateColumns: `repeat(auto-fill, minmax(min(${minimumColumnWidth}, 100%), 1fr))`,
-            containerType: 'inline-size',
-          }
-      : {};
+  const gridStyle: React.CSSProperties | undefined = isGrid
+    ? columnCount && columnCount > 0
+      ? { gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))` }
+      : {
+          gridTemplateColumns: minimumColumnWidth ? `repeat(auto-fill, minmax(min(${minimumColumnWidth}, 100%), 1fr))` : undefined,
+          containerType: 'inline-size',
+        }
+    : undefined;
 
-  const mergedStyle: React.CSSProperties = {
-    ...(typeof style === 'object' && style && !Array.isArray(style) ? style : {}),
-    ...gridStyle,
-  };
+  const groupStyle = gridStyle ? { ...style, ...gridStyle } : style;
 
   return createElement(
     tagName,
     {
       ...props,
       className: classes,
-      style: Object.keys(mergedStyle).length ? mergedStyle : undefined,
+      style: groupStyle,
     },
     children,
   );
