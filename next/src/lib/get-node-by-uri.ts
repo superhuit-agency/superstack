@@ -237,12 +237,10 @@ const injectPostContentBlocks = (
 const getTemplateBlocks = (templateSlug: string): BlockPropsType[] => {
   if (!templateSlug) return [];
 
-  const templates = (fseTemplatesData?.templates ?? []) as Array<{
-    slug?: string;
-    blocks?: BlockPropsType[];
-  }>;
   const fseTemplate =
-    templates.find((tpl) => tpl.slug === templateSlug) ?? null;
+    fseTemplatesData?.templates?.find(
+      (tpl: any) => tpl?.slug === templateSlug,
+    ) ?? null;
 
   if (!fseTemplate?.blocks?.length) return [];
 

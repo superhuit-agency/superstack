@@ -8,7 +8,6 @@ use function Superstack\get_next_url;
 add_action('template_redirect', __NAMESPACE__ . '\redirect_preview_to_next', 1);
 
 function redirect_preview_to_next() {
-    return;
     if (is_admin() || wp_doing_ajax()) return;
 
     if (!is_user_logged_in()) return;
