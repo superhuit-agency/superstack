@@ -7,7 +7,6 @@ To enable them, uncomment the relevant trigger blocks in the workflow files:
 
 - `.github/workflows/deploy-preview.yml`
 - `.github/workflows/deploy-production.yml`
-- `.github/workflows/deploy-future.yml`
 
 > _Example below of what you should uncomment to enable automatic deployment_
 

@@ -97,5 +97,5 @@ or use the `.env.github.example` file and push the vars & secret with the Github
 | WORDPRESS_PATH       | Variable | Yes       | Absolute path to WP root directory.           |
 
 > ℹ️ Deployments are done automatically through GitHub workflows.
-> See `.github/workflows/deploy-production.yml`, `.github/workflows/deploy-preview.yml` and `.github/workflows/deploy-future.yml` for workflow definitions.
+> See `.github/workflows/deploy-production.yml` and `.github/workflows/deploy-preview.yml` for workflow definitions.
 > Full deployment setup details are documented in `docs/setup/deployment.md`.
