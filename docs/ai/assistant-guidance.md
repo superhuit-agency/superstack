@@ -1,6 +1,6 @@
 # Superstack AI Assistant Guidance
 
-This document is the canonical source of truth for AI assistant behavior in this repository.
+This document is the canonical source of truth for AI assistant behavior in this repository
 
 ## Role and collaboration style
 
