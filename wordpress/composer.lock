@@ -552,12 +552,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/superhuit-agency/wp-graphql-gutenberg.git",
-                "reference": "15d4dbd6f3c231a0e0b2fbcdb1fe196767ca0c98"
+                "reference": "725337ab7590b7bec9866b8069b7a0898034b8ab"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/superhuit-agency/wp-graphql-gutenberg/zipball/15d4dbd6f3c231a0e0b2fbcdb1fe196767ca0c98",
-                "reference": "15d4dbd6f3c231a0e0b2fbcdb1fe196767ca0c98",
+                "url": "https://api.github.com/repos/superhuit-agency/wp-graphql-gutenberg/zipball/725337ab7590b7bec9866b8069b7a0898034b8ab",
+                "reference": "725337ab7590b7bec9866b8069b7a0898034b8ab",
                 "shasum": ""
             },
             "require": {
@@ -592,7 +592,7 @@
             "support": {
                 "source": "https://github.com/superhuit-agency/wp-graphql-gutenberg/tree/master"
             },
-            "time": "2024-09-27T19:21:10+00:00"
+            "time": "2026-04-22T15:17:39+00:00"
         },
         {
             "name": "squizlabs/php_codesniffer",
