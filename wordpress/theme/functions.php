@@ -24,8 +24,6 @@ define('SUPERSTACK_OPTION_NAME', $theme['Version']);
 
 add_post_type_support( 'page', 'excerpt' );
 
-require_once SUPERSTACK_PATH . '/lib/_loader.php';
-
 /**
  * The core theme class that is used to define internationalization,
  * admin-specific hooks, and public-facing site hooks.

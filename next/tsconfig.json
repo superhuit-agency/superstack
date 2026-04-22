@@ -20,7 +20,7 @@
     ],
     "paths": {
       "@/*": ["./src/*"],
-      "#/*": ["../wordpress/theme/lib/editor/*"]
+      "#/*": ["../wordpress/theme/src/editor/*"]
     }
   },
   "include": [

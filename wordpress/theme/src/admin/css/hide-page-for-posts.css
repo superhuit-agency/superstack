@@ -1,0 +1,5 @@
+/* Hide static posts page default setting as we overwrite it with custom settings */
+#front-static-pages label[for='page_for_posts'],
+.options-reading-php tr:has(input[id='posts_per_page']) {
+	display: none;
+}

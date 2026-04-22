@@ -5,7 +5,7 @@ namespace Superstack\Public;
 use Superstack\Traits\Singleton;
 use WPGraphQL\JWT_Authentication\Auth;
 
-use function SUPT\get_next_url;
+use function Superstack\get_next_url;
 
 if (! defined('ABSPATH')) {
 	exit;

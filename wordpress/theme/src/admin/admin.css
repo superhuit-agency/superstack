@@ -1,4 +1,15 @@
-/* Write CSS for the admin */
+/**
+ * README
+ * ======
+ *
+ * This stylesheet is applied to the
+ * WordPress admin interface
+ * when the admin top bar is shown
+ * @see https://developer.wordpress.org/reference/hooks/admin_enqueue_scripts/
+ */
+
+@import "./css/hide-page-for-posts.css";
+@import "./css/hide-protected-by-password.css";
 
 /**
  * Clean-up user-profile BE page
