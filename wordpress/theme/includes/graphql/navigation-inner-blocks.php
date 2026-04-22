@@ -2,7 +2,7 @@
 
 namespace Superstack\GraphQL\NavigationInnerBlocks;
 
-add_filter( 'graphql_resolve_field', __NAMESPACE__ . '\\populate_navigation_inner_blocks', 20, 9 );
+add_filter('graphql_resolve_field', __NAMESPACE__ . '\\populate_navigation_inner_blocks', 20, 9);
 
 /**
  * Populate core/navigation innerBlocks for blocksJSON GraphQL field.
@@ -22,21 +22,21 @@ add_filter( 'graphql_resolve_field', __NAMESPACE__ . '\\populate_navigation_inne
  *
  * @return mixed
  */
-function populate_navigation_inner_blocks( $result, $source, $args, $context, $info, $type_name, $field_key, $field, $field_resolver ) {
-	if ( 'blocksJSON' !== $field_key || empty( $result ) || ! is_string( $result ) ) {
+function populate_navigation_inner_blocks($result, $source, $args, $context, $info, $type_name, $field_key, $field, $field_resolver) {
+	if ('blocksJSON' !== $field_key || empty($result) || ! is_string($result)) {
 		return $result;
 	}
 
-	$blocks = json_decode( $result, true );
-	if ( ! is_array( $blocks ) ) {
+	$blocks = json_decode($result, true);
+	if (! is_array($blocks)) {
 		return $result;
 	}
 
-	$navigation_refs = get_navigation_refs_from_source_content( $source );
+	$navigation_refs = get_navigation_refs_from_source_content($source);
 	$cache          = array();
-	$updated_blocks = populate_navigation_blocks_deep( $blocks, $cache, $navigation_refs );
+	$updated_blocks = populate_navigation_blocks_deep($blocks, $cache, $navigation_refs);
 
-	return wp_json_encode( $updated_blocks );
+	return wp_json_encode($updated_blocks);
 }
 
 /**
@@ -47,13 +47,13 @@ function populate_navigation_inner_blocks( $result, $source, $args, $context, $i
  *
  * @return array
  */
-function populate_navigation_blocks_deep( array $blocks, array &$cache, array &$navigation_refs = array() ): array {
-	foreach ( $blocks as $index => $block ) {
-		if ( ! is_array( $block ) ) {
+function populate_navigation_blocks_deep(array $blocks, array &$cache, array &$navigation_refs = array()): array {
+	foreach ($blocks as $index => $block) {
+		if (! is_array($block)) {
 			continue;
 		}
 
-		$blocks[ $index ] = populate_navigation_block( $block, $cache, $navigation_refs );
+		$blocks[$index] = populate_navigation_block($block, $cache, $navigation_refs);
 	}
 
 	return $blocks;
@@ -67,40 +67,40 @@ function populate_navigation_blocks_deep( array $blocks, array &$cache, array &$
  *
  * @return array
  */
-function populate_navigation_block( array $block, array &$cache, array &$navigation_refs = array() ): array {
+function populate_navigation_block(array $block, array &$cache, array &$navigation_refs = array()): array {
 	$block_name = $block['name'] ?? $block['blockName'] ?? '';
 
-	if ( 'core/navigation' === $block_name ) {
-		$ref = absint( $block['attrs']['ref'] ?? $block['attributes']['ref'] ?? 0 );
-		if ( $ref <= 0 && ! empty( $navigation_refs ) ) {
-			$ref = absint( array_shift( $navigation_refs ) );
+	if ('core/navigation' === $block_name) {
+		$ref = absint($block['attrs']['ref'] ?? $block['attributes']['ref'] ?? 0);
+		if ($ref <= 0 && ! empty($navigation_refs)) {
+			$ref = absint(array_shift($navigation_refs));
 		}
 
-		if ( $ref > 0 ) {
-			if ( ! array_key_exists( $ref, $cache ) ) {
-				$cache[ $ref ] = array();
-				$navigation_post = get_post( $ref );
+		if ($ref > 0) {
+			if (! array_key_exists($ref, $cache)) {
+				$cache[$ref] = array();
+				$navigation_post = get_post($ref);
 
-				if ( $navigation_post && 'publish' === $navigation_post->post_status ) {
-					$parsed_blocks = ! empty( $navigation_post->post_content )
-						? parse_blocks( $navigation_post->post_content )
+				if ($navigation_post && 'publish' === $navigation_post->post_status) {
+					$parsed_blocks = ! empty($navigation_post->post_content)
+						? parse_blocks($navigation_post->post_content)
 						: array();
-					$parsed_blocks = filter_out_empty_blocks_recursive( is_array( $parsed_blocks ) ? $parsed_blocks : array() );
+					$parsed_blocks = filter_out_empty_blocks_recursive(is_array($parsed_blocks) ? $parsed_blocks : array());
 
-					$cache[ $ref ] = is_array( $parsed_blocks )
-						? normalize_blocks_for_graphql_shape( $parsed_blocks )
+					$cache[$ref] = is_array($parsed_blocks)
+						? normalize_blocks_for_graphql_shape($parsed_blocks)
 						: array();
 				}
 			}
 
-			if ( ! empty( $cache[ $ref ] ) ) {
-				$block['innerBlocks'] = $cache[ $ref ];
+			if (! empty($cache[$ref])) {
+				$block['innerBlocks'] = $cache[$ref];
 			}
 		}
 	}
 
-	if ( ! empty( $block['innerBlocks'] ) && is_array( $block['innerBlocks'] ) ) {
-		$block['innerBlocks'] = populate_navigation_blocks_deep( $block['innerBlocks'], $cache, $navigation_refs );
+	if (! empty($block['innerBlocks']) && is_array($block['innerBlocks'])) {
+		$block['innerBlocks'] = populate_navigation_blocks_deep($block['innerBlocks'], $cache, $navigation_refs);
 	}
 
 	return $block;
@@ -113,35 +113,35 @@ function populate_navigation_block( array $block, array &$cache, array &$navigat
  *
  * @return array<int>
  */
-function get_navigation_refs_from_source_content( $source ): array {
+function get_navigation_refs_from_source_content($source): array {
 	$post_id = 0;
-	if ( is_object( $source ) ) {
-		if ( isset( $source->databaseId ) ) {
-			$post_id = absint( $source->databaseId );
-		} elseif ( isset( $source->ID ) ) {
-			$post_id = absint( $source->ID );
-		} elseif ( method_exists( $source, 'get_database_id' ) ) {
-			$post_id = absint( $source->get_database_id() );
+	if (is_object($source)) {
+		if (isset($source->databaseId)) {
+			$post_id = absint($source->databaseId);
+		} elseif (isset($source->ID)) {
+			$post_id = absint($source->ID);
+		} elseif (method_exists($source, 'get_database_id')) {
+			$post_id = absint($source->get_database_id());
 		}
 	}
 
-	if ( $post_id <= 0 ) {
+	if ($post_id <= 0) {
 		return array();
 	}
 
-	$post = get_post( $post_id );
-	if ( ! $post || empty( $post->post_content ) ) {
+	$post = get_post($post_id);
+	if (! $post || empty($post->post_content)) {
 		return array();
 	}
 
-	$parsed_blocks = parse_blocks( $post->post_content );
-	if ( ! is_array( $parsed_blocks ) ) {
+	$parsed_blocks = parse_blocks($post->post_content);
+	if (! is_array($parsed_blocks)) {
 		return array();
 	}
-	$parsed_blocks = filter_out_empty_blocks_recursive( $parsed_blocks );
+	$parsed_blocks = filter_out_empty_blocks_recursive($parsed_blocks);
 
 	$refs = array();
-	collect_navigation_refs( $parsed_blocks, $refs );
+	collect_navigation_refs($parsed_blocks, $refs);
 	return $refs;
 }
 
@@ -151,21 +151,21 @@ function get_navigation_refs_from_source_content( $source ): array {
  * @param array          $blocks Parsed blocks.
  * @param array<int,mixed> $refs   Collected refs.
  */
-function collect_navigation_refs( array $blocks, array &$refs ): void {
-	foreach ( $blocks as $block ) {
-		if ( ! is_array( $block ) ) {
+function collect_navigation_refs(array $blocks, array &$refs): void {
+	foreach ($blocks as $block) {
+		if (! is_array($block)) {
 			continue;
 		}
 
-		if ( 'core/navigation' === ( $block['blockName'] ?? '' ) ) {
-			$ref = absint( $block['attrs']['ref'] ?? 0 );
-			if ( $ref > 0 ) {
+		if ('core/navigation' === ($block['blockName'] ?? '')) {
+			$ref = absint($block['attrs']['ref'] ?? 0);
+			if ($ref > 0) {
 				$refs[] = $ref;
 			}
 		}
 
-		if ( ! empty( $block['innerBlocks'] ) && is_array( $block['innerBlocks'] ) ) {
-			collect_navigation_refs( $block['innerBlocks'], $refs );
+		if (! empty($block['innerBlocks']) && is_array($block['innerBlocks'])) {
+			collect_navigation_refs($block['innerBlocks'], $refs);
 		}
 	}
 }
@@ -182,19 +182,19 @@ function collect_navigation_refs( array $blocks, array &$refs ): void {
  *
  * @return array
  */
-function normalize_blocks_for_graphql_shape( array $blocks ): array {
-	foreach ( $blocks as $index => $block ) {
-		if ( ! is_array( $block ) ) {
+function normalize_blocks_for_graphql_shape(array $blocks): array {
+	foreach ($blocks as $index => $block) {
+		if (! is_array($block)) {
 			continue;
 		}
 
-		$blocks[ $index ]['name']       = $block['name'] ?? $block['blockName'] ?? '';
-		$blocks[ $index ]['attributes'] = $block['attributes'] ?? $block['attrs'] ?? array();
+		$blocks[$index]['name']       = $block['name'] ?? $block['blockName'] ?? '';
+		$blocks[$index]['attributes'] = $block['attributes'] ?? $block['attrs'] ?? array();
 
-		if ( ! empty( $block['innerBlocks'] ) && is_array( $block['innerBlocks'] ) ) {
-			$blocks[ $index ]['innerBlocks'] = normalize_blocks_for_graphql_shape( $block['innerBlocks'] );
+		if (! empty($block['innerBlocks']) && is_array($block['innerBlocks'])) {
+			$blocks[$index]['innerBlocks'] = normalize_blocks_for_graphql_shape($block['innerBlocks']);
 		} else {
-			$blocks[ $index ]['innerBlocks'] = array();
+			$blocks[$index]['innerBlocks'] = array();
 		}
 	}
 
@@ -208,21 +208,21 @@ function normalize_blocks_for_graphql_shape( array $blocks ): array {
  *
  * @return array
  */
-function filter_out_empty_blocks_recursive( array $blocks ): array {
+function filter_out_empty_blocks_recursive(array $blocks): array {
 	$filtered = array();
 
-	foreach ( $blocks as $block ) {
-		if ( ! is_array( $block ) ) {
+	foreach ($blocks as $block) {
+		if (! is_array($block)) {
 			continue;
 		}
 
 		$block_name = $block['name'] ?? $block['blockName'] ?? '';
-		if ( empty( $block_name ) ) {
+		if (empty($block_name)) {
 			continue;
 		}
 
-		if ( ! empty( $block['innerBlocks'] ) && is_array( $block['innerBlocks'] ) ) {
-			$block['innerBlocks'] = filter_out_empty_blocks_recursive( $block['innerBlocks'] );
+		if (! empty($block['innerBlocks']) && is_array($block['innerBlocks'])) {
+			$block['innerBlocks'] = filter_out_empty_blocks_recursive($block['innerBlocks']);
 		} else {
 			$block['innerBlocks'] = array();
 		}
@@ -230,5 +230,5 @@ function filter_out_empty_blocks_recursive( array $blocks ): array {
 		$filtered[] = $block;
 	}
 
-	return array_values( $filtered );
+	return array_values($filtered);
 }

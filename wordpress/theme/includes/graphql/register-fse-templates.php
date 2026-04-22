@@ -2,11 +2,9 @@
 
 namespace Superstack\GraphQL;
 
-class RegisterFseTemplates
-{
+class RegisterFseTemplates {
 
-	function __construct()
-	{
+	function __construct() {
 		add_filter('register_post_type_args', [$this, 'expose_block_templates_to_graphql'], 10, 2);
 		add_filter('graphql_register_types', [$this, 'register_resolved_template_field'], 20);
 		add_filter('graphql_register_types', [$this, 'register_template_part_area_field'], 20);
@@ -15,8 +13,7 @@ class RegisterFseTemplates
 	/**
 	 * Expose FSE internals (`wp_template` / `wp_template_part`) in WPGraphQL schema.
 	 */
-	function expose_block_templates_to_graphql($args, $post_type)
-	{
+	function expose_block_templates_to_graphql($args, $post_type) {
 		if (in_array($post_type, ['wp_template', 'wp_template_part'])) {
 			$args['public']             = true;
 			$args['publicly_queryable'] = true;
@@ -36,8 +33,7 @@ class RegisterFseTemplates
 	/**
 	 * Add the `fseTemplate` field to the Page and Post types
 	 */
-	function register_resolved_template_field()
-	{
+	function register_resolved_template_field() {
 		$resolver = function ($source) {
 			$post = get_post($source->databaseId);
 
@@ -89,8 +85,7 @@ class RegisterFseTemplates
 	/**
 	 * Expose the wp_template_part area taxonomy as a simple GraphQL field.
 	 */
-	function register_template_part_area_field()
-	{
+	function register_template_part_area_field() {
 		register_graphql_field('TemplatePart', 'area', [
 			'type'        => 'String',
 			'description' => _x('The template part area slug (header, footer, uncategorized, ...).', 'GraphQL field desc', 'supt'),

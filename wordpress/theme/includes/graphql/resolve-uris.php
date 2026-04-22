@@ -35,8 +35,8 @@ class ResolveUris {
 	];
 
 	public function init() {
-		add_filter( 'graphql_resolve_field', [$this, 'graphql_resolve_relative_uris'], 10, 9 );
-		add_filter( 'graphql_resolve_field', [$this, 'graphql_resolve_absolute_uris'], 10, 9 );
+		add_filter('graphql_resolve_field', [$this, 'graphql_resolve_relative_uris'], 10, 9);
+		add_filter('graphql_resolve_field', [$this, 'graphql_resolve_absolute_uris'], 10, 9);
 	}
 
 	/**
@@ -54,17 +54,17 @@ class ResolveUris {
 	 *
 	 * @return mixed
 	 */
-	public function graphql_resolve_relative_uris( $result, $source, $args, $context, $info, $type_name, $field_key, $field, $field_resolver ) {
+	public function graphql_resolve_relative_uris($result, $source, $args, $context, $info, $type_name, $field_key, $field, $field_resolver) {
 		// Bail early if not the field we are interrested in.
-		if ( !in_array($field_key, self::RELATIVE_URI_FIELDS) ) return $result;
+		if (!in_array($field_key, self::RELATIVE_URI_FIELDS)) return $result;
 
-		$site_url = preg_replace( '/https?:\/\//', '', get_site_url() );
-		$next_url = preg_replace( '/https?:\/\//', '', get_next_url() );
+		$site_url = preg_replace('/https?:\/\//', '', get_site_url());
+		$next_url = preg_replace('/https?:\/\//', '', get_next_url());
 
 		// Do not continue if the result is not a BE nor a FE url
-		if (! preg_match( "/^https?:\/\/($site_url|$next_url)/i", $result) ) return $result;
+		if (! preg_match("/^https?:\/\/($site_url|$next_url)/i", $result)) return $result;
 
-		return wp_make_link_relative( $result );
+		return wp_make_link_relative($result);
 	}
 
 	/**
@@ -82,9 +82,9 @@ class ResolveUris {
 	 *
 	 * @return mixed
 	 */
-	public function graphql_resolve_absolute_uris( $result, $source, $args, $context, $info, $type_name, $field_key, $field, $field_resolver ) {
-		return ( in_array($field_key, self::ABSOLUTE_URI_FIELDS)
-		 	? trailingslashit( trim(get_next_url(), "/") . wp_make_link_relative( $result ) )
+	public function graphql_resolve_absolute_uris($result, $source, $args, $context, $info, $type_name, $field_key, $field, $field_resolver) {
+		return (in_array($field_key, self::ABSOLUTE_URI_FIELDS)
+			? trailingslashit(trim(get_next_url(), "/") . wp_make_link_relative($result))
 			: $result
 		);
 	}

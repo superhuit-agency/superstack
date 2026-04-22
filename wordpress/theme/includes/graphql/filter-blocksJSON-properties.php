@@ -10,10 +10,10 @@ if (! defined('ABSPATH')) {
 
 class Filter_BlocksJSON_Properties {
 
-use Singleton;
+    use Singleton;
 
     public function init() {
-        add_filter( 'graphql_gutenberg_blocks_json_filtered_properties', [ $this, 'filter_blocks_json_props' ] );
+        add_filter('graphql_gutenberg_blocks_json_filtered_properties', [$this, 'filter_blocks_json_props']);
     }
 
     /**
@@ -21,9 +21,9 @@ use Singleton;
      * 
      * 
      */
-    public function filter_blocks_json_props( $properties ) {
-        return array_merge( 
-            $properties, 
+    public function filter_blocks_json_props($properties) {
+        return array_merge(
+            $properties,
             [
                 'attributesType',
                 'deprecated',
@@ -33,10 +33,9 @@ use Singleton;
                 'originalContent',
                 'saveContent',
                 'supports',
-            ] 
+            ]
         );
     }
-
 }
 
 Filter_BlocksJSON_Properties::get_instance()->init();

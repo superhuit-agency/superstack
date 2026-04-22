@@ -19,38 +19,44 @@ class WP_CLI {
 	 * @param array           $args
 	 * @return void
 	 */
-	public static function add_command($name, $callable, $args = []) {}
+	public static function add_command($name, $callable, $args = []) {
+	}
 
 	/**
 	 * @param string $message
 	 * @return void
 	 */
-	public static function log($message) {}
+	public static function log($message) {
+	}
 
 	/**
 	 * @param string $message
 	 * @return void
 	 */
-	public static function success($message) {}
+	public static function success($message) {
+	}
 
 	/**
 	 * @param string $message
 	 * @return void
 	 */
-	public static function warning($message) {}
+	public static function warning($message) {
+	}
 
 	/**
 	 * @param string $message
 	 * @return void
 	 */
-	public static function error($message) {}
+	public static function error($message) {
+	}
 
 	/**
 	 * @param string $command
 	 * @param array  $options
 	 * @return mixed
 	 */
-	public static function runcommand($command, $options = []) {}
+	public static function runcommand($command, $options = []) {
+	}
 }
 
 namespace WP_CLI\Utils;
@@ -61,7 +67,8 @@ namespace WP_CLI\Utils;
  * @param mixed  $default
  * @return mixed
  */
-function get_flag_value($assoc_args, $flag, $default = null) {}
+function get_flag_value($assoc_args, $flag, $default = null) {
+}
 
 /**
  * @param string $format
@@ -69,4 +76,5 @@ function get_flag_value($assoc_args, $flag, $default = null) {}
  * @param array  $fields
  * @return void
  */
-function format_items($format, $items, $fields) {}
+function format_items($format, $items, $fields) {
+}

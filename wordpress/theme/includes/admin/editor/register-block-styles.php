@@ -15,8 +15,7 @@ if (! defined('ABSPATH')) {
  * @subpackage Superstack/Admin/Editor
  * @author     Superhuit <tech@superhuit.ch>
  */
-class Register_Block_Styles
-{
+class Register_Block_Styles {
 
 	use Singleton;
 
@@ -26,8 +25,7 @@ class Register_Block_Styles
 	 * @access public
 	 * @return void
 	 */
-	public function init()
-	{
+	public function init() {
 		add_action('init', [$this, 'register_button_link_style']);
 		// add_action('init', [$this, 'register_group_accent_style']);
 	}
@@ -39,8 +37,7 @@ class Register_Block_Styles
 	 * @access   public
 	 * @return   void
 	 */
-	public function register_button_link_style()
-	{
+	public function register_button_link_style() {
 		register_block_style(
 			'core/button',
 			[

@@ -13,7 +13,7 @@ class GraphQL_Endpoint_Script {
     use Singleton;
 
     public function init() {
-        add_filter('spck-localize-script', [$this, 'localize_graphql_endpoint_script'] );
+        add_filter('spck-localize-script', [$this, 'localize_graphql_endpoint_script']);
     }
 
     /**
