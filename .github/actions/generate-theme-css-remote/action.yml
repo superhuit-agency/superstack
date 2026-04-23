@@ -1,0 +1,57 @@
+name: "Generate Theme CSS from Remote"
+description: "Generate theme CSS on remote WordPress via SSH and copy it into next/public/css"
+inputs:
+  SERVER:
+    description: "SSH target (user@host -p port)"
+    required: true
+  WORDPRESS_PATH:
+    description: "Absolute path to WordPress root on remote server"
+    required: true
+  OUTPUT_PATH:
+    description: "Local output path for generated css file"
+    required: false
+    default: "./next/public/css/theme-generated.css"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Generate and download theme css
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        SERVER='${{ inputs.SERVER }}'
+        WORDPRESS_PATH='${{ inputs.WORDPRESS_PATH }}'
+        OUTPUT_PATH='${{ inputs.OUTPUT_PATH }}'
+
+        TEMP_CSS="$(mktemp)"
+        REMOTE_TEMP="/tmp/theme-generated-$$.css"
+
+        cleanup() {
+          rm -f "$TEMP_CSS"
+          ssh $SERVER "rm -f '$REMOTE_TEMP'" >/dev/null 2>&1 || true
+        }
+        trap cleanup EXIT
+
+        echo "Generating theme css from remote WordPress"
+
+        ssh $SERVER \
+          "cd '$WORDPRESS_PATH' && \
+           wp spck theme-css > '$REMOTE_TEMP'"
+
+        scp $SERVER:"$REMOTE_TEMP" "$TEMP_CSS"
+
+        if [[ ! -s "$TEMP_CSS" ]]; then
+          echo "Generated css file is empty"
+          exit 1
+        fi
+
+        if ! grep -q ':root' "$TEMP_CSS"; then
+          echo "Warning: generated css does not contain :root block"
+        fi
+
+        mkdir -p "$(dirname "$OUTPUT_PATH")"
+        cp "$TEMP_CSS" "$OUTPUT_PATH"
+
+        FILE_SIZE="$(wc -c < "$OUTPUT_PATH")"
+        echo "Theme css generated at $OUTPUT_PATH ($FILE_SIZE bytes)"

@@ -131,7 +131,7 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
-          PR_PREVIEW_DOMAIN: '{REPO}-{PR}.vercel.app'
+          PR_PREVIEW_DOMAIN: "{REPO}-{PR}.vercel.app"
           GITHUB_DEPLOYMENT_ENV: staging
           VERCEL_SCOPE: superhuit-ch
           PRODUCTION: false
@@ -167,12 +167,18 @@ jobs:
           SSH_PORT: ${{ vars.SSH_PORT }}
           SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
+      - name: Generate Theme CSS from Remote
+        uses: ./.github/actions/generate-theme-css-remote
+        with:
+          SERVER: ${{ steps.ssh.outputs.SERVER }}
+          WORDPRESS_PATH: ${{ vars.WORDPRESS_PATH }}s
+
       - name: Build Next.js
         uses: ./.github/actions/next-build
         with:
           SERVER: ${{ steps.ssh.outputs.SERVER }}
           NEXT_PATH: ${{ vars.NEXT_PATH }}
-      
+
       - name: Deploy Next.js
         uses: ./.github/actions/next-deploy
         with:

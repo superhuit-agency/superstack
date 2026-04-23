@@ -85,3 +85,4 @@ require_once __DIR__ . '/public/next-redirect.php';
  * Load CLI commands.
  */
 require_once __DIR__ . '/cli/migrations.php';
+require_once __DIR__ . '/cli/theme-css.php';
