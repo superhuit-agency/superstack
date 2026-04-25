@@ -57,3 +57,18 @@ This document is the canonical source of truth for AI assistant behavior in this
 
 - Prefer structured updates for multi-step work.
 - Prefer implementation over long planning when requirements are clear.
+
+## Task-specific skill routing (required)
+
+Before implementation, determine if the task matches one or more domains below. If it does, apply the corresponding skill file(s) automatically without requiring the user to ask for a specific skill.
+
+- Gutenberg block implementation or updates:
+  - `docs/ai/skills/wordpress-block-change.md`
+- Next-WordPress data contract, query, or mapping changes:
+  - `docs/ai/skills/next-wordpress-data-flow.md`
+- Deployment/workflow/action/provisioning changes:
+  - `docs/ai/skills/deployment-change-safely.md`
+- Branch/PR scope cleanup and commit history corrections:
+  - `docs/ai/skills/pr-scope-and-history-cleanup.md`
+
+If a task spans multiple domains, combine relevant skills and explicitly state which skills are being applied before editing.
