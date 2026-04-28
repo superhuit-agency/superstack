@@ -19,7 +19,7 @@ Deliver block-related changes with minimal scope, no duplication, and full compa
 
 - WordPress side:
   - `wordpress/theme/src`
-  - `wordpress/theme/lib`
+  - `wordpress/theme/includes`
   - `wordpress/theme/functions.php`
 - Next.js side:
   - `next/src/components/core`
