@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+
+npm run ai:sync-rules &&
+git add CLAUDE.md AGENTS.md .github/copilot-instructions.md &&
+npx lint-staged
