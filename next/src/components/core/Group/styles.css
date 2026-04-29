@@ -1,63 +1,59 @@
-.wp-block-group {
-  box-sizing: border-box;
-  min-width: 0;
-}
+@import '@resources/index.css';
 
 .wp-block-group.is-layout-flex {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.5em;
-}
+  gap: $grid-gap;
 
-.wp-block-group.is-layout-flex.is-nowrap {
-  flex-wrap: nowrap;
-}
+  &.is-nowrap {
+    flex-wrap: nowrap;
+  }
 
-.wp-block-group.is-layout-flex.is-vertical {
-  flex-direction: column;
-  align-items: flex-start;
-}
+  &.is-vertical {
+    flex-direction: column;
+    align-items: flex-start;
 
-.wp-block-group.is-layout-flex:not(.is-vertical).is-content-justification-left {
-  justify-content: flex-start;
-}
+    &.is-content-justification-left {
+      align-items: flex-start;
+    }
 
-.wp-block-group.is-layout-flex:not(.is-vertical).is-content-justification-center {
-  justify-content: center;
-}
+    &.is-content-justification-center {
+      align-items: center;
+    }
 
-.wp-block-group.is-layout-flex:not(.is-vertical).is-content-justification-right {
-  justify-content: flex-end;
-}
+    &.is-content-justification-right {
+      align-items: flex-end;
+    }
 
-.wp-block-group.is-layout-flex:not(.is-vertical).is-content-justification-space-between {
-  justify-content: space-between;
-}
+    &.is-content-justification-stretch {
+      align-items: stretch;
+    }
+  }
 
-.wp-block-group.is-layout-flex.is-vertical.is-content-justification-left {
-  align-items: flex-start;
-}
+  &:not(.is-vertical) {
+    &.is-content-justification-left {
+      justify-content: flex-start;
+    }
 
-.wp-block-group.is-layout-flex.is-vertical.is-content-justification-center {
-  align-items: center;
-}
+    &.is-content-justification-center {
+      justify-content: center;
+    }
 
-.wp-block-group.is-layout-flex.is-vertical.is-content-justification-right {
-  align-items: flex-end;
-}
+    &.is-content-justification-right {
+      justify-content: flex-end;
+    }
 
-.wp-block-group.is-layout-flex.is-vertical.is-content-justification-stretch {
-  align-items: stretch;
+    &.is-content-justification-space-between {
+      justify-content: space-between;
+    }
+  }
 }
 
 .wp-block-group.is-layout-grid {
   display: grid;
-  gap: 0.5em;
+  gap: $grid-gap;
 }
-
-
-
 :where(.wp-block-group.wp-block-group-is-layout-constrained) {
   position: relative;
 }

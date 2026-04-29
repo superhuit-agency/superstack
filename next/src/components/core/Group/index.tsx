@@ -38,7 +38,6 @@ export default function Group({
       ? { gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))` }
       : {
           gridTemplateColumns: minimumColumnWidth ? `repeat(auto-fill, minmax(min(${minimumColumnWidth}, 100%), 1fr))` : undefined,
-          containerType: 'inline-size',
         }
     : undefined;
 

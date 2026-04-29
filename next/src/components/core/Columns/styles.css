@@ -1,53 +1,47 @@
 @import '@resources/index.css';
 
 .wp-block-columns {
-  box-sizing: border-box;
   display: flex;
   flex-wrap: wrap;
   align-items: initial;
-}
 
-@media (min-width: $breakpoint-sm) {
-  .wp-block-columns {
+  @media (min-width: $breakpoint-sm) {
     flex-wrap: nowrap;
   }
-}
 
-.wp-block-columns.is-not-stacked-on-mobile {
-  flex-wrap: nowrap;
-}
-
-:where(.wp-block-columns) {
-  margin-bottom: 1.75em;
-}
-
-:where(.wp-block-columns.is-layout-flex) {
-  gap: 2em;
-}
-
-@media (max-width: calc($breakpoint-sm - 1px)) {
-  .wp-block-columns:not(.is-not-stacked-on-mobile) > .wp-block-column {
-    flex-basis: 100%;
-  }
-}
-
-@media (min-width: $breakpoint-sm) {
-  .wp-block-columns:not(.is-not-stacked-on-mobile) > .wp-block-column {
-    flex-basis: 0;
-    flex-grow: 1;
+  &.is-not-stacked-on-mobile {
+    flex-wrap: nowrap;
   }
 
-  .wp-block-columns:not(.is-not-stacked-on-mobile)
-    > .wp-block-column[style*='flex-basis'] {
-    flex-grow: 0;
+  &:where(.is-layout-flex) {
+    gap: $grid-gap;
   }
-}
 
-.wp-block-columns.is-not-stacked-on-mobile > .wp-block-column {
-  flex-basis: 0;
-  flex-grow: 1;
-}
+  &:not(.is-not-stacked-on-mobile) {
+    > .wp-block-column {
+      @media (max-width: calc($breakpoint-sm - 1px)) {
+        flex-basis: 100%;
+      }
 
-.wp-block-columns.is-not-stacked-on-mobile > .wp-block-column[style*='flex-basis'] {
-  flex-grow: 0;
+      @media (min-width: $breakpoint-sm) {
+        flex-basis: 0;
+        flex-grow: 1;
+
+        &[style*='flex-basis'] {
+          flex-grow: 0;
+        }
+      }
+    }
+  }
+
+  &.is-not-stacked-on-mobile {
+    > .wp-block-column {
+      flex-basis: 0;
+      flex-grow: 1;
+
+      &[style*='flex-basis'] {
+        flex-grow: 0;
+      }
+    }
+  }
 }

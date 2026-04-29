@@ -1,6 +1,5 @@
 interface ColumnAttributes {
 	width?: string;
-	verticalAlignment?: string;
 }
 
 interface ColumnProps

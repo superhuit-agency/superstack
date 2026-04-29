@@ -9,7 +9,6 @@ const Column: FC<ColumnProps> & BlockConfigs = ({
   className,
   style,
   width,
-  verticalAlignment: _verticalAlignment,
   children,
   ...props
 }) => {
