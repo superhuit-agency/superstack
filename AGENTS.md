@@ -11,16 +11,16 @@ Superstack is a monorepo starter for headless WordPress + Next.js projects with 
 - Never expose secrets or credentials in code, docs, or commands.
 - Do not run destructive git operations unless explicitly requested.
 
-## Task Playbooks
+## Skills
 
-- Gutenberg block work:
-  - `docs/ai/skills/wordpress-block-change.md`
-- Next-WordPress data contract work:
-  - `docs/ai/skills/next-wordpress-data-flow.md`
-- Deployment/workflow/provisioning work:
-  - `docs/ai/skills/deployment-change-safely.md`
+Skills are stored in `.agents/skills` (single source of truth).
 
-If a task spans multiple areas, combine the relevant playbooks before editing.
+Available skills:
+- `grill-me` (opt-in, only when user explicitly asks to be grilled)
+- `ubiquitous-language`
+
+For tools that support slash commands, use `/grill-me` or `/ubiquitous-language`.
+For tools without slash support, follow the matching skill from `.agents/skills/<name>/SKILL.md`.
 
 ## Communication
 
