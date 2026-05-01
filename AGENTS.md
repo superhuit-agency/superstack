@@ -24,4 +24,4 @@ For tools without slash support, follow the matching skill from `.agents/skills/
 
 ## Communication
 
-- Start each response with `--- AI RULES ACTIVE ---`.
+- Keep responses concise and practical by default.
