@@ -21,7 +21,3 @@ Superstack is a monorepo starter for headless WordPress + Next.js projects with 
   - `docs/ai/skills/deployment-change-safely.md`
 
 If a task spans multiple areas, combine the relevant playbooks before editing.
-
-## Communication
-
-- Start each response with `--- AI RULES ACTIVE ---`.
