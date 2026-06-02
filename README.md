@@ -1,5 +1,3 @@
-WIP in redaction
-
 # Superstack: Next.js / WordPress Starter
 
 An opinionated boilerplate for decoupled (headless) websites that are both performant (Next.js) and easy to edit (WordPress with Gutenberg block editor) — focused on accelerating custom blocks development.
@@ -22,7 +20,7 @@ An opinionated boilerplate for decoupled (headless) websites that are both perfo
 **The basics**
 
 -   Typing with TypeScript
--   Styling with CSS (PostCSS) [why?](./docs/technical-choices.md)
+-   Styling with CSS (PostCSS)
 -   Dynamic styleguide with Storybook
 -   Dockerized
 -   Multilang support
@@ -35,7 +33,7 @@ An opinionated boilerplate for decoupled (headless) websites that are both perfo
 
 ## 🏗 Project setup
 
-- Getting Started (TODO)
+- Getting Started
 - [Deploy](./docs/setup/deployment.md)
 
 

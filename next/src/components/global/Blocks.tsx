@@ -5,6 +5,10 @@ type BlockModule = {
 };
 
 const blocksList: Record<string, () => Promise<BlockModule>> = {
+  'core/accordion': () => import('../core/Accordion'),
+  'core/accordion-heading': () => import('../core/AccordionHeading'),
+  'core/accordion-item': () => import('../core/AccordionItem'),
+  'core/accordion-panel': () => import('../core/AccordionPanel'),
   'core/audio': () => import('../core/Audio'),
   'core/avatar': () => import('../core/Avatar'),
   'core/block': () => import('../core/Block'),
@@ -15,7 +19,6 @@ const blocksList: Record<string, () => Promise<BlockModule>> = {
   'core/categories': () => import('../core/TaxonomyList'),
   'core/code': () => import('../core/Code'),
   'core/cover': () => import('../core/Cover'),
-  'core/details': () => import('../core/Details'),
   'core/embed': () => import('../core/Embed'),
   'core/file': () => import('../core/File'),
   'core/gallery': () => import('../core/Gallery'),
