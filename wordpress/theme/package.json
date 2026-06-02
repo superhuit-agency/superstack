@@ -32,7 +32,12 @@
     "@wordpress/blocks": "^15.16.0",
     "@wordpress/scripts": "^31.8.0",
     "postcss-extend-rule": "^4.0.0",
+    "postcss-gap-properties": "^7.0.0",
+    "postcss-hexrgba": "^2.1.0",
     "postcss-mixins": "^12.1.2",
+    "postcss-nested": "^7.0.2",
+    "postcss-normalize": "^13.0.1",
+    "postcss-preset-env": "^11.3.0",
     "postcss-simple-vars": "^7.0.1"
   }
 }

@@ -3,11 +3,13 @@
 .wp-block-button {
 	display: inline-block;
 
-	&__link {
+	/* Override WP default style by using nested selectors */
+	.wp-block-button__link {
 		@extend %reset-button, %t-button;
 		width: 100%;
 		padding: 5px 10px;
 		background-color: lightblue;
+		color: $color-text;
 		border: 1px solid transparent;
 	}
 

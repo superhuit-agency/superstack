@@ -25,11 +25,6 @@
 	} */
 
 	&.post-type-post {
-		.editor-visual-editor__post-title-wrapper {
-			max-width: clamp(300px, 92vw, 920px);
-			margin-inline: auto;
-		}
-
 		.block-editor-block-list__layout.is-root-container {
 			@extend %single-content-layout;
 		}

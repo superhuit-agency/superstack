@@ -1,8 +1,9 @@
 const path = require('path');
 
+// Mixin => DO NOT FORGET TO INCLUDE AS WELL IN THE WORDPRESS POSTCSS.CONFIG.JS
 const { clamp } = require('./src/css/mixins/clamp.js'); // Needs to be a Javascript file as Typescript isn't working with postcss-mixins
 
-const rootPath = process.cwd().replace('/wordpress', '');
+const rootPath = __dirname;
 
 module.exports = {
   plugins: {
