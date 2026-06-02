@@ -1,0 +1,59 @@
+@import '@resources/index.css';
+
+.wp-block-group.is-layout-flex {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $grid-gap;
+
+  &.is-nowrap {
+    flex-wrap: nowrap;
+  }
+
+  &.is-vertical {
+    flex-direction: column;
+    align-items: flex-start;
+
+    &.is-content-justification-left {
+      align-items: flex-start;
+    }
+
+    &.is-content-justification-center {
+      align-items: center;
+    }
+
+    &.is-content-justification-right {
+      align-items: flex-end;
+    }
+
+    &.is-content-justification-stretch {
+      align-items: stretch;
+    }
+  }
+
+  &:not(.is-vertical) {
+    &.is-content-justification-left {
+      justify-content: flex-start;
+    }
+
+    &.is-content-justification-center {
+      justify-content: center;
+    }
+
+    &.is-content-justification-right {
+      justify-content: flex-end;
+    }
+
+    &.is-content-justification-space-between {
+      justify-content: space-between;
+    }
+  }
+}
+
+.wp-block-group.is-layout-grid {
+  display: grid;
+  gap: $grid-gap;
+}
+:where(.wp-block-group.wp-block-group-is-layout-constrained) {
+  position: relative;
+}
