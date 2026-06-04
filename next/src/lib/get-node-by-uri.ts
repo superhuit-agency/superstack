@@ -1,7 +1,9 @@
-import * as _templatesData from '@/components/templates/data';
-import { fetchAPI, formatBlocksJSON } from '@/lib';
+import * as _templatesData from "@/components/templates/data";
+import { fetchAPI, formatBlocksJSON } from "@/lib";
 
-import fseTemplatesData from '@/lib/fse/fse-templates-and-parts.json';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore — file is gitignored and generated at dev/build time via predev/prebuild
+import fseTemplatesData from "@/lib/fse/fse-templates-and-parts.json";
 
 const templatesData: any = _templatesData;
 
@@ -51,7 +53,7 @@ export default async function getNodeByURI(
     variables,
     auth,
     headers: {
-      'X-Query-Page': String(routePage && routePage > 0 ? routePage : 1),
+      "X-Query-Page": String(routePage && routePage > 0 ? routePage : 1),
     },
   });
 
@@ -68,18 +70,18 @@ export default async function getNodeByURI(
     const { blocksJSON, templateData } = await Promise.allSettled([
       formatBlocksJSON(
         previewDraft
-          ? (node.preview?.node?.blocksJSON ?? '')
-          : (node?.blocksJSON ?? ''),
+          ? (node.preview?.node?.blocksJSON ?? "")
+          : (node?.blocksJSON ?? ""),
       ),
       getTemplateData(node),
     ])
       .then(([bProm, tProm]) => ({
-        blocksJSON: bProm.status === 'fulfilled' ? bProm.value : [],
-        templateData: tProm.status === 'fulfilled' ? tProm.value : {},
+        blocksJSON: bProm.status === "fulfilled" ? bProm.value : [],
+        templateData: tProm.status === "fulfilled" ? tProm.value : {},
       }))
       .catch(() => {
         console.error(
-          'Error while enriching & formatting blocksJSON and templateData',
+          "Error while enriching & formatting blocksJSON and templateData",
         );
         return {
           blocksJSON: [],
@@ -138,14 +140,14 @@ const commonFields = `
 
 const types = [
   {
-    type: 'Page',
+    type: "Page",
     fragment: singlePageData.fragment,
-    fields: 'singlePageFragment',
+    fields: "singlePageFragment",
   },
   {
-    type: 'Post',
+    type: "Post",
     fragment: singlePostData.fragment,
-    fields: 'singlePostFragment',
+    fields: "singlePostFragment",
   },
 ];
 
@@ -157,12 +159,12 @@ const nodeByUriQuery = () => `
 	) {
 		node: nodeByUri(uri: $uri) {
 			__typename
-			${types.map(({ fields }) => `...${fields}`).join('\n')}
+			${types.map(({ fields }) => `...${fields}`).join("\n")}
 		}
 		${commonFields}
 	}
 
-	${types.map(({ fragment }) => fragment).join('\n')}
+	${types.map(({ fragment }) => fragment).join("\n")}
 `;
 
 const nodeByIdQuery = () => `
@@ -173,12 +175,12 @@ const nodeByIdQuery = () => `
 	) {
 		node(id: $id, idType: DATABASE_ID) {
 			__typename
-			${types.map(({ fields }) => `...${fields}`).join('\n')}
+			${types.map(({ fields }) => `...${fields}`).join("\n")}
 		}
 		${commonFields}
 	}
 
-	${types.map(({ fragment }) => fragment).join('\n')}
+	${types.map(({ fragment }) => fragment).join("\n")}
 `;
 
 const templatesDataList: any = {};
@@ -194,7 +196,7 @@ for (const key in templatesData) {
 
 const getTemplateData = async (node: any) => {
   const type =
-    node.archivePage && node.__typename === 'Page'
+    node.archivePage && node.__typename === "Page"
       ? `archive-${node.archivePage.type}`
       : `single-${node.__typename}`.toLowerCase();
 
@@ -216,7 +218,7 @@ const injectPostContentBlocks = (
   pageBlocks: any[],
 ): BlockPropsType[] =>
   templateBlocks.map((block) => {
-    if (block.name === 'core/post-content') {
+    if (block.name === "core/post-content") {
       return {
         ...block,
         innerBlocks: pageBlocks,

@@ -4,7 +4,7 @@
  * in order to be used by the Next.js app for templating the pages.
  */
 
-import 'dotenv/config'
+import "dotenv/config";
 
 import fs from "fs";
 import path from "path";
@@ -52,9 +52,12 @@ async function fetchAllTemplates() {
     }
   `;
 
-  const data = await fetchApi(query);  
+  const data = await fetchApi(query);
   return data?.templates?.nodes ?? [];
 }
+
+const outDir = path.join(__dirname, "../src/lib/fse");
+const outPath = path.join(outDir, "fse-templates-and-parts.json");
 
 async function main() {
   if (process.env.FSE_SKIP_FETCH === "1") {
@@ -70,37 +73,41 @@ async function main() {
   ]);
 
   const templatesCombined = await resolvePromises(
-    templates?.filter((t: GraphQlNode | null) => !!t)?.map(async (template: GraphQlNode) => {
-      const blocks = await formatBlocksJSON(template.blocksJSON ?? "");
+    templates
+      ?.filter((t: GraphQlNode | null) => !!t)
+      ?.map(async (template: GraphQlNode) => {
+        const blocks = await formatBlocksJSON(template.blocksJSON ?? "");
 
-      const formattedBlocks = await resolvePromises(
-        blocks.filter((b: BlockPropsType | null) => !!b).map(async (block: BlockPropsType) => {
-          // For each block of type 'core/template-part', replace with the actual block from templateParts.
-          if (block?.name === "core/template-part") {
-            const templatePart = templateParts.find(
-              (part: GraphQlNode) => part.slug === block?.attributes?.slug,
-            );
-            const formattedTemplatePart = await formatBlocksJSON(
-              templatePart?.blocksJSON ?? "",
-            );
-            return {
-              ...block,
-              attributes: {
-                ...(block?.attributes ?? {}),
-                ...(templatePart?.area ? { area: templatePart.area } : {}),
-              },
-              innerBlocks: formattedTemplatePart,
-            };
-          }
-          return block;
-        }),
-      );
+        const formattedBlocks = await resolvePromises(
+          blocks
+            .filter((b: BlockPropsType | null) => !!b)
+            .map(async (block: BlockPropsType) => {
+              // For each block of type 'core/template-part', replace with the actual block from templateParts.
+              if (block?.name === "core/template-part") {
+                const templatePart = templateParts.find(
+                  (part: GraphQlNode) => part.slug === block?.attributes?.slug,
+                );
+                const formattedTemplatePart = await formatBlocksJSON(
+                  templatePart?.blocksJSON ?? "",
+                );
+                return {
+                  ...block,
+                  attributes: {
+                    ...(block?.attributes ?? {}),
+                    ...(templatePart?.area ? { area: templatePart.area } : {}),
+                  },
+                  innerBlocks: formattedTemplatePart,
+                };
+              }
+              return block;
+            }),
+        );
 
-      return {
-        slug: template.slug,
-        blocks: formattedBlocks,
-      };
-    }),
+        return {
+          slug: template.slug,
+          blocks: formattedBlocks,
+        };
+      }),
   );
 
   const out = {
@@ -108,10 +115,7 @@ async function main() {
     templates: templatesCombined.filter(Boolean),
   };
 
-  const outDir = path.join(__dirname, "../src/lib/fse");
   fs.mkdirSync(outDir, { recursive: true });
-
-  const outPath = path.join(outDir, "fse-templates-and-parts.json");
   fs.writeFileSync(outPath, JSON.stringify(out, null, 2), "utf8");
 
   console.log(`[fse] Wrote ${outPath}`);
@@ -121,6 +125,16 @@ async function main() {
 }
 
 main().catch((err) => {
-  console.error(err);
-  process.exit(1);
+  console.warn("[fse] Failed to fetch FSE data:", err?.message ?? err);
+  if (!fs.existsSync(outPath)) {
+    fs.mkdirSync(outDir, { recursive: true });
+    fs.writeFileSync(
+      outPath,
+      JSON.stringify({ generatedAt: "", templates: [] }, null, 2),
+      "utf8",
+    );
+    console.log("[fse] Wrote fallback file");
+  } else {
+    console.warn("[fse] Keeping existing file");
+  }
 });
