@@ -1,10 +1,10 @@
 {
-	"compilerOptions": {
-		"jsx": "preserve",
-		"allowImportingTsExtensions": true,
-		"noEmit": true,
-		"paths": {
-			"@/*": ["../../next/src/*"],
-		}
-	},
+  "compilerOptions": {
+    "jsx": "preserve",
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "paths": {
+      "@/*": ["../../next/src/*"]
+    }
+  }
 }
