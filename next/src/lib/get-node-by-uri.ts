@@ -1,5 +1,6 @@
-import * as _templatesData from "@/components/templates/data";
-import { fetchAPI, formatBlocksJSON } from "@/lib";
+import * as _templatesData from '@/components/templates/data';
+import { fetchAPI, formatBlocksJSON } from '@/lib';
+import getBlockFinalComponentProps from '@/lib/get-block-final-component-props';
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore — file is gitignored and generated at dev/build time via predev/prebuild
@@ -67,17 +68,19 @@ export default async function getNodeByURI(
    * Enrich & format node blocksJSON prop + archive
    */
   if (blockEnrichment) {
-    const { blocksJSON, templateData } = await Promise.allSettled([
+    const { blocksJSON, templateData, templateBlocks } = await Promise.allSettled([
       formatBlocksJSON(
         previewDraft
           ? (node.preview?.node?.blocksJSON ?? "")
           : (node?.blocksJSON ?? ""),
       ),
       getTemplateData(node),
+      enrichTemplateBlocks(getTemplateBlocks(node?.fseTemplate?.slug)),
     ])
-      .then(([bProm, tProm]) => ({
-        blocksJSON: bProm.status === "fulfilled" ? bProm.value : [],
-        templateData: tProm.status === "fulfilled" ? tProm.value : {},
+      .then(([bProm, tProm, tbProm]) => ({
+        blocksJSON: bProm.status === 'fulfilled' ? bProm.value : [],
+        templateData: tProm.status === 'fulfilled' ? tProm.value : {},
+        templateBlocks: tbProm.status === 'fulfilled' ? tbProm.value : [],
       }))
       .catch(() => {
         console.error(
@@ -86,10 +89,10 @@ export default async function getNodeByURI(
         return {
           blocksJSON: [],
           templateData: {},
+          templateBlocks: [],
         };
       });
 
-    const templateBlocks = getTemplateBlocks(node?.fseTemplate?.slug);
     const blocks =
       templateBlocks.length > 0
         ? injectPostContentBlocks(templateBlocks, blocksJSON)
@@ -248,3 +251,16 @@ const getTemplateBlocks = (templateSlug: string): BlockPropsType[] => {
 
   return fseTemplate.blocks.filter(Boolean) as BlockPropsType[];
 };
+
+/**
+ * Runs getData enrichment on template blocks at request time so dynamic data
+ * (navigation, site logo, etc.) is always fresh and not baked in at build time.
+ */
+const enrichTemplateBlocks = (blocks: BlockPropsType[]): Promise<BlockPropsType[]> =>
+  blocks.length === 0
+    ? Promise.resolve([])
+    : Promise.allSettled(blocks.map((block) => getBlockFinalComponentProps(block))).then((results) =>
+        results
+          .map((r) => (r.status === 'fulfilled' ? r.value : null))
+          .filter(Boolean) as BlockPropsType[],
+      );

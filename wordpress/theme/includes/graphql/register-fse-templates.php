@@ -8,6 +8,7 @@ class RegisterFseTemplates {
 		add_filter('register_post_type_args', [$this, 'expose_block_templates_to_graphql'], 10, 2);
 		add_filter('graphql_register_types', [$this, 'register_resolved_template_field'], 20);
 		add_filter('graphql_register_types', [$this, 'register_template_part_area_field'], 20);
+		add_filter('graphql_register_types', [$this, 'register_all_template_parts_field'], 20);
 	}
 
 	/**
@@ -115,6 +116,64 @@ class RegisterFseTemplates {
 				return ! empty($first->slug) ? $first->slug : null;
 			},
 		]);
+	}
+	/**
+	 * Register an `allTemplateParts` root query field that returns every template part —
+	 * including theme-file based ones that are never stored as database posts and therefore
+	 * invisible to the standard `templateParts` WPGraphQL connection.
+	 */
+	function register_all_template_parts_field()
+	{
+		register_graphql_object_type('FseTemplatePart', [
+			'description' => 'FSE template part data (DB or theme-file based)',
+			'fields'      => [
+				'slug'       => ['type' => 'String'],
+				'area'       => ['type' => 'String'],
+				'blocksJSON' => ['type' => 'String'],
+			],
+		]);
+
+		register_graphql_field('RootQuery', 'allTemplateParts', [
+			'type'        => ['list_of' => 'FseTemplatePart'],
+			'description' => 'All FSE template parts, including theme-file based ones',
+			'resolve'     => function () {
+				$parts = get_block_templates([], 'wp_template_part');
+				return array_map([$this, 'format_template_part'], $parts);
+			},
+		]);
+	}
+
+	private function format_template_part(\WP_Block_Template $part): array
+	{
+		return [
+			'slug'       => $part->slug,
+			'area'       => $part->area ?? null,
+			'blocksJSON' => $this->build_blocks_json($part->content ?? ''),
+		];
+	}
+
+	private function build_blocks_json(string $content): string
+	{
+		if (empty(trim($content))) return '[]';
+		return wp_json_encode($this->transform_blocks(parse_blocks($content)));
+	}
+
+	/**
+	 * Converts parse_blocks() output (blockName / attrs) to the format expected
+	 * by the Next.js app (name / attributes / innerBlocks).
+	 */
+	private function transform_blocks(array $blocks): array
+	{
+		$result = [];
+		foreach ($blocks as $block) {
+			if (empty($block['blockName'])) continue;
+			$result[] = [
+				'name'        => $block['blockName'],
+				'attributes'  => empty($block['attrs']) ? new \stdClass() : (object) $block['attrs'],
+				'innerBlocks' => $this->transform_blocks($block['innerBlocks'] ?? []),
+			];
+		}
+		return $result;
 	}
 }
 

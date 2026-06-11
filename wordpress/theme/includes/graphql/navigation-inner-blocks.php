@@ -3,6 +3,36 @@
 namespace Superstack\GraphQL\NavigationInnerBlocks;
 
 add_filter('graphql_resolve_field', __NAMESPACE__ . '\\populate_navigation_inner_blocks', 20, 9);
+add_filter('graphql_register_types', __NAMESPACE__ . '\\register_navigation_blocks_json_field');
+
+/**
+ * Register a root-level `navigationBlocksJSON(ref: Int!)` field so Next.js can
+ * fetch fresh navigation blocks at request time instead of relying on the
+ * build-time snapshot in fse-templates-and-parts.json.
+ */
+function register_navigation_blocks_json_field(): void {
+	register_graphql_field('RootQuery', 'navigationBlocksJSON', [
+		'type'        => 'String',
+		'description' => 'Returns the blocksJSON for a wp_navigation post by its database ID.',
+		'args'        => [
+			'ref' => ['type' => ['non_null' => 'Int']],
+		],
+		'resolve'     => function ($root, array $args): ?string {
+			$ref  = absint($args['ref'] ?? 0);
+			$post = $ref > 0 ? get_post($ref) : null;
+
+			if (! $post || 'wp_navigation' !== $post->post_type || 'publish' !== $post->post_status) {
+				return null;
+			}
+
+			$blocks = parse_blocks($post->post_content ?? '');
+			$blocks = filter_out_empty_blocks_recursive(is_array($blocks) ? $blocks : []);
+			$blocks = normalize_blocks_for_graphql_shape($blocks);
+
+			return wp_json_encode($blocks);
+		},
+	]);
+}
 
 /**
  * Populate core/navigation innerBlocks for blocksJSON GraphQL field.

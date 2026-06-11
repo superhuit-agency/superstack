@@ -12,7 +12,7 @@ import path from "path";
 import fetchApi from "@/lib/fetch-api";
 import formatBlocksJSON from "@/lib/format-blocks-json";
 import { resolvePromises } from "@/utils/resolve-promises";
-import { getWpDomain, getWpGraphqlUrl } from "@/utils/node-utils";
+import { getWpDomain } from "@/utils/node-utils";
 
 type GraphQlNode = {
   slug: string;
@@ -21,23 +21,20 @@ type GraphQlNode = {
 };
 
 const WORDPRESS_URL = getWpDomain();
-const WORDPRESS_GRAPHQL_URL = getWpGraphqlUrl();
 
 async function fetchAllTemplateParts() {
   const query = `
     query TemplateParts {
-      templateParts(first: 99) {
-        nodes {
-          area
-          slug
-          blocksJSON
-        }
+      allTemplateParts {
+        area
+        slug
+        blocksJSON
       }
     }
   `;
 
   const data = await fetchApi(query);
-  return data?.templateParts?.nodes ?? [];
+  return data?.allTemplateParts ?? [];
 }
 
 async function fetchAllTemplates() {
@@ -73,35 +70,32 @@ async function main() {
   ]);
 
   const templatesCombined = await resolvePromises(
-    templates
-      ?.filter((t: GraphQlNode | null) => !!t)
-      ?.map(async (template: GraphQlNode) => {
-        const blocks = await formatBlocksJSON(template.blocksJSON ?? "");
+    templates?.filter((t: GraphQlNode | null) => !!t)?.map(async (template: GraphQlNode) => {
+      const blocks = await formatBlocksJSON(template.blocksJSON ?? "", { skipGetData: true });
 
-        const formattedBlocks = await resolvePromises(
-          blocks
-            .filter((b: BlockPropsType | null) => !!b)
-            .map(async (block: BlockPropsType) => {
-              // For each block of type 'core/template-part', replace with the actual block from templateParts.
-              if (block?.name === "core/template-part") {
-                const templatePart = templateParts.find(
-                  (part: GraphQlNode) => part.slug === block?.attributes?.slug,
-                );
-                const formattedTemplatePart = await formatBlocksJSON(
-                  templatePart?.blocksJSON ?? "",
-                );
-                return {
-                  ...block,
-                  attributes: {
-                    ...(block?.attributes ?? {}),
-                    ...(templatePart?.area ? { area: templatePart.area } : {}),
-                  },
-                  innerBlocks: formattedTemplatePart,
-                };
-              }
-              return block;
-            }),
-        );
+      const formattedBlocks = await resolvePromises(
+        blocks.filter((b: BlockPropsType | null) => !!b).map(async (block: BlockPropsType) => {
+          // For each block of type 'core/template-part', replace with the actual block from templateParts.
+          if (block?.name === "core/template-part") {
+            const templatePart = templateParts.find(
+              (part: GraphQlNode) => part.slug === block?.attributes?.slug,
+            );
+            const formattedTemplatePart = await formatBlocksJSON(
+              templatePart?.blocksJSON ?? "",
+              { skipGetData: true },
+            );
+            return {
+              ...block,
+              attributes: {
+                ...(block?.attributes ?? {}),
+                ...(templatePart?.area ? { area: templatePart.area } : {}),
+              },
+              innerBlocks: formattedTemplatePart,
+            };
+          }
+          return block;
+        }),
+      );
 
         return {
           slug: template.slug,

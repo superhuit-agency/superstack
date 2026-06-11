@@ -21,15 +21,18 @@ import fetchAPI from '@/lib/fetch-api';
  * @param block A block object coming from Wp GraphQl's blocksJSON
  * @returns the same block, with only necessary data
  */
-export default function getBlockFinalComponentProps({
-  name,
-  attributes,
-  innerBlocks,
-}: {
-  name: string;
-  attributes: object;
-  innerBlocks: Array<BlockPropsType>;
-}): Promise<BlockPropsType> {
+export default function getBlockFinalComponentProps(
+  {
+    name,
+    attributes,
+    innerBlocks,
+  }: {
+    name: string;
+    attributes: object;
+    innerBlocks: Array<BlockPropsType>;
+  },
+  options?: { skipGetData?: boolean },
+): Promise<BlockPropsType> {
   return new Promise(async (res) => {
     const props: BlockPropsType = {
       name,
@@ -38,15 +41,25 @@ export default function getBlockFinalComponentProps({
     };
 
     Promise.allSettled([
-      getAttributes(name, attributes),
-      getInnerBlocks(innerBlocks),
-    ]).then(([attrs, blks]) => {
-      if (attrs.status === 'fulfilled')
-        props.attributes = (attrs?.value as Record<string, unknown>) ?? {};
+      getAttributes(name, attributes, options?.skipGetData),
+      getInnerBlocks(innerBlocks, options?.skipGetData),
+    ]).then(([attrsResult, blksResult]) => {
+      if (attrsResult.status === 'fulfilled') {
+        const { attrs, innerBlocks: dataInnerBlocks } = attrsResult.value as {
+          attrs: Record<string, unknown>;
+          innerBlocks?: BlockPropsType[];
+        };
+        props.attributes = attrs ?? {};
 
-      if (blks.status === 'fulfilled') {
-        props.innerBlocks =
-          (blks?.value as BlockPropsType['innerBlocks']) ?? [];
+        // If getData returned innerBlocks, use those (fresh) and skip the static ones.
+        // (this is a fix made for core/navigation for example, which has links as innerBlocks, but we want them to be always up to date, even if it's part of the FSE template)
+        if (dataInnerBlocks !== undefined) {
+          props.innerBlocks = dataInnerBlocks;
+        } else if (blksResult.status === 'fulfilled') {
+          props.innerBlocks = (blksResult.value as BlockPropsType['innerBlocks']) ?? [];
+        }
+      } else if (blksResult.status === 'fulfilled') {
+        props.innerBlocks = (blksResult.value as BlockPropsType['innerBlocks']) ?? [];
       }
 
       res(props);
@@ -61,9 +74,9 @@ export default function getBlockFinalComponentProps({
  * @param   {any}    attributes Initial block's attributes. Will be returned as it or enriched and/or formatted.
  * @returns {any}
  */
-const getAttributes = (name: string, attributes: object) =>
+const getAttributes = (name: string, attributes: object, skipGetData = false) =>
   new Promise(async (res) => {
-    if (!blocksDataList[name as keyof typeof blocksDataList]) res(attributes);
+    if (skipGetData || !blocksDataList[name as keyof typeof blocksDataList]) res({ attrs: attributes });
     else {
       const blockModule =
         await blocksDataList[name as keyof typeof blocksDataList]?.();
@@ -77,25 +90,27 @@ const getAttributes = (name: string, attributes: object) =>
       ).getData;
 
       if (!getData) {
-        res(attributes);
+        res({ attrs: attributes });
         return;
       }
 
       getData(fetchAPI, attributes).then((data = {}) => {
-        res({ ...attributes, ...data });
+        const { innerBlocks, ...restData } = data as { innerBlocks?: BlockPropsType[] } & Record<string, unknown>;
+        res({
+          attrs: { ...attributes, ...restData },
+          ...(innerBlocks !== undefined ? { innerBlocks } : {}),
+        });
       });
     }
   });
 
-const getInnerBlocks = (blocks: Array<BlockPropsType>) =>
+const getInnerBlocks = (blocks: Array<BlockPropsType>, skipGetData = false) =>
   new Promise((res, rej) => {
     if (!(blocks?.length > 0)) rej([]);
     else {
       Promise.allSettled(
         blocks.map((block) =>
-          getBlockFinalComponentProps({
-            ...block,
-          }),
+          getBlockFinalComponentProps({ ...block }, { skipGetData }),
         ),
       ).then((rs) =>
         res(rs.map((r) => (r.status === 'fulfilled' ? r.value : null))),

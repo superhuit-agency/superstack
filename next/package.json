@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "predev": "tsx scripts/fetch-fse-templates-and-parts.ts",
+    "predev": "npx tsx scripts/fetch-fse-templates-and-parts.ts",
     "dev": "next dev",
-    "prebuild": "tsx scripts/fetch-fse-templates-and-parts.ts",
+    "prebuild": "npx tsx scripts/fetch-fse-templates-and-parts.ts",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",

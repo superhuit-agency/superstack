@@ -27,13 +27,34 @@ const toNormalizedLocation = (attrs: NavigationAttributes | null) => {
   return location;
 };
 
+const navigationBlocksQuery = gql`
+  query NavigationBlocksJSON($ref: Int!) {
+    navigationBlocksJSON(ref: $ref)
+  }
+`;
+
 export const getData = async (
   fetcher: FetchApiFuncType,
   attrs: NavigationAttributes | null = null,
 ) => {
+  const submenuVisibility = getSubmenuVisibility(attrs);
+
+  // Block-based navigation: fetch fresh innerBlocks from the wp_navigation post.
+  if (typeof attrs?.ref === 'number' && attrs.ref > 0) {
+    try {
+      const data = await fetcher(navigationBlocksQuery, {
+        variables: { ref: attrs.ref },
+      });
+      const blocksJSON = data?.navigationBlocksJSON;
+      const innerBlocks: BlockPropsType[] = blocksJSON ? JSON.parse(blocksJSON) : [];
+      return { submenuVisibility, innerBlocks };
+    } catch {
+      return { submenuVisibility, innerBlocks: [] };
+    }
+  }
+
   const ref = toNormalizedRef(attrs);
   const location = toNormalizedLocation(attrs);
-  const submenuVisibility = getSubmenuVisibility(attrs);
 
   const query = gql`
     query NavigationMenuItems($id: Int, $location: MenuLocationEnum) {

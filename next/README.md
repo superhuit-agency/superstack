@@ -34,13 +34,14 @@ npm run dev
 | `storybook` | Start Storybook on port 6006 |
 | `build-storybook` | Build Storybook static output |
 
-## Notes
+## Pages FSE Templates
 
 - `predev` and `prebuild` run `scripts/fetch-fse-templates-and-parts.ts`.
 - This script writes data used by template rendering to `src/lib/fse/fse-templates-and-parts.json`.
+- See [docs/fse-templating.md](/docs/fse-templating.md) for a full explanation of the FSE templating architecture.
 
 ## Deployment
 
 Project deployment is handled from repository workflows and documented in:
 
-- `docs/setup/deployment.md`
+- [docs/setup/deployment.md](docs/setup/deployment.md)

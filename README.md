@@ -71,7 +71,7 @@ Custom WordPress theme built on top of the block editor (Gutenberg), running in 
 ### Development
 
 ```bash
-    npm --prefix ./wordpress run dev
+npm --prefix ./wordpress run dev
 ```
 
 For more details, see the [WordPress README](wordpress/README.md).
@@ -81,14 +81,14 @@ For more details, see the [WordPress README](wordpress/README.md).
 ### Installation
 
 ```bash
-    cd next
-    npm install
+cd next
+npm install
 ```
 
 ## Development
 
 ```bash
-    npm run dev
+npm run dev
 ```
 
 
