@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e58265d3cf99e2c15dafe6fff506aff5",
+    "content-hash": "82635ed5022e131afb3c0a3e4b686cc0",
     "packages": [
         {
             "name": "ashhitch/wp-graphql-yoast-seo",
@@ -1122,15 +1122,15 @@
         },
         {
             "name": "wpackagist-plugin/simple-custom-post-order",
-            "version": "2.6.0",
+            "version": "2.7.2",
             "source": {
                 "type": "svn",
                 "url": "https://plugins.svn.wordpress.org/simple-custom-post-order/",
-                "reference": "tags/2.6.0"
+                "reference": "tags/2.7.2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://downloads.wordpress.org/plugin/simple-custom-post-order.2.6.0.zip"
+                "url": "https://downloads.wordpress.org/plugin/simple-custom-post-order.2.7.2.zip"
             },
             "require": {
                 "composer/installers": "^1.0 || ^2.0"
@@ -1140,15 +1140,15 @@
         },
         {
             "name": "wpackagist-plugin/svg-support",
-            "version": "2.5.14",
+            "version": "2.5.16",
             "source": {
                 "type": "svn",
                 "url": "https://plugins.svn.wordpress.org/svg-support/",
-                "reference": "tags/2.5.14"
+                "reference": "tags/2.5.16"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://downloads.wordpress.org/plugin/svg-support.2.5.14.zip"
+                "url": "https://downloads.wordpress.org/plugin/svg-support.2.5.16.zip"
             },
             "require": {
                 "composer/installers": "^1.0 || ^2.0"
@@ -1158,15 +1158,15 @@
         },
         {
             "name": "wpackagist-plugin/wordpress-seo",
-            "version": "27.4",
+            "version": "27.7",
             "source": {
                 "type": "svn",
                 "url": "https://plugins.svn.wordpress.org/wordpress-seo/",
-                "reference": "tags/27.4"
+                "reference": "tags/27.7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://downloads.wordpress.org/plugin/wordpress-seo.27.4.zip"
+                "url": "https://downloads.wordpress.org/plugin/wordpress-seo.27.7.zip"
             },
             "require": {
                 "composer/installers": "^1.0 || ^2.0"
