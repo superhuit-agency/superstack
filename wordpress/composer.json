@@ -38,7 +38,8 @@
     "superhuit/wp-graphql-redirection": "^1.1",
     "valu/wp-graphql-offset-pagination": "^0.2.1",
     "wp-graphql/wp-graphql-jwt-authentication": "^0.7.2",
-    "superhuit-agency/nextjs-revalidate": "^1.6"
+    "superhuit-agency/nextjs-revalidate": "^1.6",
+    "wpackagist-plugin/wpgraphql-acf": "^2.6"
   },
   "repositories": [
     {
