@@ -40,8 +40,14 @@ npm run dev
 - This script writes data used by template rendering to `src/lib/fse/fse-templates-and-parts.json`.
 - See [docs/fse-templating.md](/docs/fse-templating.md) for a full explanation of the FSE templating architecture.
 
+## Custom Post Types
+
+Adding a new CPT requires changes on both the WordPress and Next.js sides:
+
+- [docs/custom-post-types.md](/docs/custom-post-types.md)
+
 ## Deployment
 
 Project deployment is handled from repository workflows and documented in:
 
-- [docs/setup/deployment.md](docs/setup/deployment.md)
+- [docs/setup/deployment.md](/docs/setup/deployment.md)
