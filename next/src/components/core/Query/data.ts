@@ -42,127 +42,79 @@ const normalizeIdList = (value?: Array<string> | string[]) => {
 	return ids.length ? ids : null;
 };
 
-const normalizeAuthorIn = (value?: string) => {
-	const id = toPositiveInt(value);
-	return typeof id === 'number' && id > 0 ? [id] : null;
-};
+const queryContentNodes = gql`
+  query QueryContentNodes(
+    $first: Int!
+    $offset: Int!
+    $order: OrderEnum!
+    $orderby: PostObjectsConnectionOrderbyEnum!
+    $notIn: [ID]
+    $search: String
+    $contentTypes: [ContentTypeEnum]
+  ) {
+    contentNodes(
+      first: $first
+      where: {
+        offsetPagination: { offset: $offset, size: $first }
+        orderby: { field: $orderby, order: $order }
+        notIn: $notIn
+        search: $search
+        stati: PUBLISH
+        contentTypes: $contentTypes
+      }
+    ) {
+      pageInfo {
+        offsetPagination {
+          total
+        }
+      }
+      nodes {
+        id
+        databaseId
+        uri
+        date
+        ... on NodeWithTitle {
+          title(format: RENDERED)
+        }
+        ... on NodeWithExcerpt {
+          excerpt(format: RENDERED)
+        }
+        ... on NodeWithContentEditor {
+          content(format: RENDERED)
+        }
+        ... on NodeWithAuthor {
+          author {
+            node {
+              name
+            }
+          }
+        }
+        ... on NodeWithFeaturedImage {
+          featuredImage {
+            node {
+              sourceUrl
+              altText
+              mediaDetails {
+                width
+                height
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
 
 export const getData = async (
 	fetcher: FetchApiFuncType,
 	attrs: QueryAttributes | null = null
 ) => {
-	const queryPosts = gql`
-		query QueryPosts(
-			$first: Int!
-			$offset: Int!
-			$order: OrderEnum!
-			$orderby: PostObjectsConnectionOrderbyEnum!
-			$authorIn: [ID]
-			$notIn: [ID]
-			$search: String
-		) {
-			posts(
-				first: $first
-				where: {
-					offsetPagination: { offset: $offset, size: $first }
-					orderby: { field: $orderby, order: $order }
-					authorIn: $authorIn
-					notIn: $notIn
-					search: $search
-					stati: PUBLISH
-				}
-			) {
-				pageInfo {
-					offsetPagination {
-						total
-					}
-				}
-				nodes {
-					id
-					databaseId
-					uri
-					date
-					title(format: RENDERED)
-					excerpt(format: RENDERED)
-					content(format: RENDERED)
-					author {
-						node {
-							name
-						}
-					}
-					featuredImage {
-						node {
-							sourceUrl
-							altText
-							mediaDetails {
-								width
-								height
-							}
-						}
-					}
-				}
-			}
-		}
-	`;
+  const perPageRaw = attrs?.query?.perPage;
+  const perPage = Math.min(100, Math.max(1, toPositiveInt(perPageRaw) ?? 10));
 
-	const queryPages = gql`
-		query QueryPages(
-			$first: Int!
-			$offset: Int!
-			$order: OrderEnum!
-			$orderby: PostObjectsConnectionOrderbyEnum!
-			$authorIn: [ID]
-			$notIn: [ID]
-			$search: String
-		) {
-			pages(
-				first: $first
-				where: {
-					offsetPagination: { offset: $offset, size: $first }
-					orderby: { field: $orderby, order: $order }
-					authorIn: $authorIn
-					notIn: $notIn
-					search: $search
-					stati: PUBLISH
-				}
-			) {
-				pageInfo {
-					offsetPagination {
-						total
-					}
-				}
-				nodes {
-					id
-					databaseId
-					uri
-					date
-					title(format: RENDERED)
-					content(format: RENDERED)
-					author {
-						node {
-							name
-						}
-					}
-					featuredImage {
-						node {
-							sourceUrl
-							altText
-							mediaDetails {
-								width
-								height
-							}
-						}
-					}
-				}
-			}
-		}
-	`;
-
-	const perPageRaw = attrs?.query?.perPage;
-	const perPage = Math.min(100, Math.max(1, toPositiveInt(perPageRaw) ?? 10));
-
-	const offsetRaw = attrs?.query?.offset;
-	const baseOffset = Math.max(0, toPositiveInt(offsetRaw) ?? 0);
+  const offsetRaw = attrs?.query?.offset;
+  const offset = Math.max(0, toPositiveInt(offsetRaw) ?? 0);
 
 	const order = toOrderEnum(attrs?.query?.order);
 	const orderby = toOrderByEnum(attrs?.query?.orderBy);
@@ -172,77 +124,51 @@ export const getData = async (
 			? attrs.query.search.trim()
 			: null;
 
-	const authorIn = normalizeAuthorIn(attrs?.query?.author);
-	const notIn = normalizeIdList(attrs?.query?.exclude);
+  const notIn = normalizeIdList(attrs?.query?.exclude);
 
-	const postType = attrs?.query?.postType?.toLowerCase();
+  const postType = attrs?.query?.postType;
+  const contentTypes = postType ? [postType.toUpperCase()] : null;
 
-	const offset = baseOffset;
+  const variables = {
+    first: perPage,
+    offset,
+    order,
+    orderby,
+    notIn,
+    search,
+    contentTypes,
+  };
 
-	const variables = {
-		first: perPage,
-		offset,
-		order,
-		orderby,
-		authorIn,
-		notIn,
-		search,
-	};
+  const data = await fetcher(queryContentNodes, { variables });
 
-	if (postType === 'page' || postType === 'pages') {
-		const data = await fetcher(queryPages, { variables });
-		const total =
-			typeof data?.pages?.pageInfo?.offsetPagination?.total === 'number'
-				? data.pages.pageInfo.offsetPagination.total
-				: null;
-		const totalPages =
-			typeof total === 'number' && total >= 0
-				? Math.ceil(total / perPage)
-				: null;
-		const currentPage = Math.floor(offset / perPage) + 1;
+  const total =
+    typeof data?.contentNodes?.pageInfo?.offsetPagination?.total === 'number'
+      ? data.contentNodes.pageInfo.offsetPagination.total
+      : null;
+  const totalPages =
+    typeof total === 'number' && total >= 0 ? Math.ceil(total / perPage) : null;
+  const currentPage = Math.floor(offset / perPage) + 1;
 
-		const nodes = (data?.pages?.nodes ?? []).map((node: unknown) => ({
-			...(node as Record<string, unknown>),
-			excerpt: '',
-		}));
-		return {
-			data: {
-				posts: {
-					nodes,
-				},
-			},
-			pagination: {
-				perPage,
-				offset,
-				currentPage,
-				total,
-				totalPages,
-			},
-		};
-	}
+  const nodes = (data?.contentNodes?.nodes ?? []).map((node: unknown) => ({
+    excerpt: '',
+    content: null,
+    author: null,
+    featuredImage: null,
+    ...(node as Record<string, unknown>),
+  }));
 
-	const data = await fetcher(queryPosts, { variables });
-	const total =
-		typeof data?.posts?.pageInfo?.offsetPagination?.total === 'number'
-			? data.posts.pageInfo.offsetPagination.total
-			: null;
-	const totalPages =
-		typeof total === 'number' && total >= 0
-			? Math.ceil(total / perPage)
-			: null;
-	const currentPage = Math.floor(offset / perPage) + 1;
-	return {
-		data: {
-			posts: {
-				nodes: data?.posts?.nodes ?? [],
-			},
-		},
-		pagination: {
-			perPage,
-			offset,
-			currentPage,
-			total,
-			totalPages,
-		},
-	};
+  return {
+    data: {
+      posts: {
+        nodes,
+      },
+    },
+    pagination: {
+      perPage,
+      offset,
+      currentPage,
+      total,
+      totalPages,
+    },
+  };
 };
