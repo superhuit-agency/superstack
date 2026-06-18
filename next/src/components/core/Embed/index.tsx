@@ -51,6 +51,7 @@ export default function Embed({
 						loading="lazy"
 						allowFullScreen
 						referrerPolicy="strict-origin-when-cross-origin"
+						title={type}
 					/>
 				) : (
 					<a href={url} target="_blank" rel="noreferrer">

@@ -1,0 +1,5 @@
+.wp-block-post-date a {
+	display: inline-flex;
+	align-items: center;
+	min-height: 24px;
+}

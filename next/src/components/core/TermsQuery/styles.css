@@ -1,0 +1,5 @@
+.wp-block-terms-query__list li a {
+	display: inline-flex;
+	align-items: center;
+	min-height: 24px;
+}

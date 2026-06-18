@@ -11,3 +11,9 @@
 	margin-left: 0.5rem;
 	margin-right: 0.5rem;
 }
+
+.wp-block-categories-list li a {
+	display: inline-flex;
+	align-items: center;
+	min-height: 24px;
+}

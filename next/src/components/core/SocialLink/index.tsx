@@ -11,8 +11,13 @@ export default async function SocialLink(props: SocialLinkProps) {
 
 	return (
 		<li className="supt-social-link">
-			<a href={props.url} target="_blank" rel="noopener noreferrer">
-				<Icon />
+			<a
+				href={props.url}
+				target="_blank"
+				rel="noopener noreferrer"
+				aria-label={props.service}
+			>
+				<Icon aria-hidden="true" />
 			</a>
 		</li>
 	);

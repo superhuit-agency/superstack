@@ -1,0 +1,5 @@
+a.wp-block-post-author__name {
+	display: inline-flex;
+	align-items: center;
+	min-height: 24px;
+}

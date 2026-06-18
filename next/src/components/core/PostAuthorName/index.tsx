@@ -8,7 +8,7 @@ export default function PostAuthorName({
 	linkTarget,
 	className,
 }: PostAuthorNameProps) {
-	const Tag = isLink ? 'a' : 'p';
+	const Tag = isLink && uri ? 'a' : 'p';
 
 	return (
 		<Tag

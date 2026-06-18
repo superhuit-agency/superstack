@@ -16,6 +16,7 @@ export default function Video({
 	playsInline,
 	preload,
 	className,
+	tracks,
 }: VideoProps) {
 	return (
 		<figure className={cx('wp-block-video', className)}>
@@ -28,7 +29,17 @@ export default function Video({
 				muted={muted}
 				playsInline={playsInline}
 				poster={poster ? poster : undefined}
-			/>
+			>
+				{tracks?.map((track) => (
+					<track
+						key={track.src}
+						src={track.src}
+						kind={track.kind}
+						label={track.label}
+						srcLang={track.srclang}
+					/>
+				))}
+			</video>
 			{caption && (
 				<figcaption className="wp-element-caption">
 					{caption}

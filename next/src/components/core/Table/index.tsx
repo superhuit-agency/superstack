@@ -13,9 +13,9 @@ export default function Table(props: TableProps) {
 										return (
 											<th
 												key={index}
-												colSpan={cell.colspan}
-												rowSpan={cell.rowspan}
-												scope={cell.scope}
+												colSpan={cell.colspan || 1}
+												rowSpan={cell.rowspan || 1}
+												scope={cell.scope || 'col'}
 												align={cell.align}
 											>
 												{cell.content}
@@ -35,9 +35,13 @@ export default function Table(props: TableProps) {
 								return (
 									<Tag
 										key={index}
-										colSpan={cell.colspan}
-										rowSpan={cell.rowspan}
-										scope={cell.scope}
+										colSpan={cell.colspan || 1}
+										rowSpan={cell.rowspan || 1}
+										scope={
+											cell.scope || cell.tag === 'th'
+												? 'col'
+												: ''
+										}
 										align={cell.align}
 									>
 										{cell.content}

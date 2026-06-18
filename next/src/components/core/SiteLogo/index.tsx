@@ -10,7 +10,7 @@ export default function SiteLogo(props: SiteLogoProps) {
 		<Link href="/" className="wp-block-site-logo">
 			<NextImage
 				src={props.url}
-				alt="Site Logo"
+				alt={props.alt ?? 'Site Logo'}
 				width={props.width}
 				height={props.height}
 				className="custom-logo"
