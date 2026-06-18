@@ -1,6 +1,7 @@
-# Skill: WordPress Block Change
-
-Use this skill when implementing or updating Gutenberg block behavior in this stack.
+---
+description: Implement or update Gutenberg block behavior in this headless WordPress + Next.js stack. Use when adding a new block, updating an existing block, changing block data/queries, or modifying block styles across WordPress and Next.js.
+compatibility: Superstack — headless WordPress + Next.js monorepo
+---
 
 ## Goal
 
@@ -11,7 +12,7 @@ Deliver block-related changes with minimal scope, no duplication, and full compa
 
 ## Required Pre-Checks
 
-1. Confirm exact scope with the user (new block, existing block update, data/query change, style change).
+1. Confirm exact scope (new block, existing block update, data/query change, style change).
 2. Identify affected block slug(s) and all touched files before editing.
 3. Reuse existing block patterns and utilities when possible.
 
@@ -43,17 +44,12 @@ Deliver block-related changes with minimal scope, no duplication, and full compa
 
 ## Verification Checklist
 
-1. Type check Next app:
-   - `cd next && npx tsc --noEmit`
-2. Run relevant build/dev command for modified area:
-   - `npm --prefix ./wordpress run build` (theme side) or
-   - `npm --prefix ./next run build` (frontend side)
+1. `cd next && npx tsc --noEmit`
+2. `npm --prefix ./wordpress run build` (theme side) or `npm --prefix ./next run build` (frontend side)
 3. Validate block renders in editor and frontend where applicable.
 4. Confirm no unrelated files changed.
 
-## Output Format For AI Agent
-
-When finishing the task, report:
+## Output Format
 
 1. What was changed (files + purpose).
 2. Why those changes were needed.

@@ -1,6 +1,7 @@
-# Skill: Deployment Change Safely
-
-Use this skill for deployment-related changes in workflows, actions, scripts, or deployment docs.
+---
+description: Apply deployment-related changes safely in this stack. Use when modifying GitHub Actions workflows, composite actions, provisioning scripts, deploy scripts, or deployment documentation.
+compatibility: Superstack — headless WordPress + Next.js monorepo
+---
 
 ## Goal
 
@@ -44,7 +45,7 @@ Apply deployment updates without regressions in environment handling, release fl
 4. Confirm docs remain accurate for changed flow.
 5. Confirm no unrelated file changes.
 
-## Output Format For AI Agent
+## Output Format
 
 1. What deployment behavior changed and why.
 2. Which files were updated.

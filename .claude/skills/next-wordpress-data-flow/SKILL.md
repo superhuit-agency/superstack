@@ -1,6 +1,7 @@
-# Skill: Next-WordPress Data Flow Change
-
-Use this skill for changes to data contracts between WordPress and Next.js.
+---
+description: Change data contracts between WordPress and Next.js in this headless stack. Use when modifying GraphQL queries or fragments, block props, template mappings, preview/auth-driven fetches, or any field crossing the WP→Next.js boundary.
+compatibility: Superstack — headless WordPress + Next.js monorepo
+---
 
 ## Goal
 
@@ -8,7 +9,7 @@ Keep cross-app data flow consistent when changing GraphQL queries, block props, 
 
 ## Required Pre-Checks
 
-1. Confirm exact data change requested (field addition, shape change, source change, fallback behavior).
+1. Confirm exact data change (field addition, shape change, source change, fallback behavior).
 2. Identify source and consumers before editing:
    - source query/mapping
    - downstream component usage
@@ -50,7 +51,7 @@ Keep cross-app data flow consistent when changing GraphQL queries, block props, 
 3. Confirm preview path still works when relevant.
 4. Confirm no unintended changes outside data-flow scope.
 
-## Output Format For AI Agent
+## Output Format
 
 1. Data contract change summary (before vs after).
 2. Source + consumer files updated.
