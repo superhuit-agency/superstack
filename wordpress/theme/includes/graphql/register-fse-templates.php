@@ -232,24 +232,14 @@ class RegisterFseTemplates {
 
 	private function build_blocks_json(string $content): string {
 		if (empty(trim($content))) return '[]';
-		return wp_json_encode($this->transform_blocks(parse_blocks($content)));
-	}
 
-	/**
-	 * Converts parse_blocks() output (blockName / attrs) to the format expected
-	 * by the Next.js app (name / attributes / innerBlocks).
-	 */
-	private function transform_blocks(array $blocks): array {
-		$result = [];
-		foreach ($blocks as $block) {
-			if (empty($block['blockName'])) continue;
-			$result[] = [
-				'name'        => $block['blockName'],
-				'attributes'  => empty($block['attrs']) ? new \stdClass() : (object) $block['attrs'],
-				'innerBlocks' => $this->transform_blocks($block['innerBlocks'] ?? []),
-			];
-		}
-		return $result;
+		$blocks = \WPGraphQLGutenberg\Blocks\Block::create_blocks(
+			parse_blocks($content),
+			0,
+			\WPGraphQLGutenberg\Blocks\Registry::get_registry()
+		);
+
+		return \WPGraphQLGutenberg\Blocks\BlocksJSON::encode_blocks($blocks, null);
 	}
 }
 
