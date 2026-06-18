@@ -8,8 +8,7 @@
  * @see https://developer.wordpress.org/reference/hooks/admin_enqueue_scripts/
  */
 
-@import './css/hide-page-for-posts.css';
-@import './css/hide-protected-by-password.css';
+@import "./css/hide-protected-by-password.css";
 
 /**
  * Clean-up user-profile BE page
