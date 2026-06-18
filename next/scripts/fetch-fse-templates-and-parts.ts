@@ -40,17 +40,15 @@ async function fetchAllTemplateParts() {
 async function fetchAllTemplates() {
 	const query = `
     query Templates {
-      templates(first: 99) {
-        nodes {
-          slug
-          blocksJSON
-        }
+      allTemplates {
+        slug
+        blocksJSON
       }
     }
   `;
 
-	const data = await fetchApi(query);
-	return data?.templates?.nodes ?? [];
+  const data = await fetchApi(query);
+  return data?.allTemplates ?? [];
 }
 
 const outDir = path.join(__dirname, '../src/lib/fse');
