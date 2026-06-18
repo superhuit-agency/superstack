@@ -1,6 +1,7 @@
 import { fetchAPI } from '.';
 
 const POST_TYPES: string[] = ['pages'];
+const ARCHIVES: string[] = ['contentTypes']; // contentTypes are for archives but have no where arg — use first: 100
 const TAXONOMIES: string[] = [];
 
 export default async function getAllURIs() {
@@ -44,11 +45,26 @@ export default async function getAllURIs() {
 		}
 	});
 
-	// TODO: improve to handle more than 100 terms in each taxonomy
-	TAXONOMIES.forEach((taxName) => {
-		nodesPromises.push(
-			fetchAPI(
-				`query AllURIs_${taxName} {
+  ARCHIVES.forEach((postType) => {
+    nodesPromises.push(
+      fetchAPI(
+        `query AllURIs_${postType} {
+				${postType}(first: 100) {
+					nodes {
+						uri
+						isRedirected
+					}
+				}
+			}`,
+      ),
+    );
+  });
+
+  // TODO: improve to handle more than 100 terms in each taxonomy
+  TAXONOMIES.forEach((taxName) => {
+    nodesPromises.push(
+      fetchAPI(
+        `query AllURIs_${taxName} {
 				${taxName}(first: 100) {
 					nodes {
 						uri
@@ -98,5 +114,5 @@ export default async function getAllURIs() {
 
 	const callback: (node: any) => {} = mapForSingleLang;
 
-	return nodes.filter((node: any) => !node.isRedirected).map(callback);
+  return nodes.filter((node: any) => node.uri && !node.isRedirected).map(callback);
 }

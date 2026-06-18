@@ -11,16 +11,20 @@ export const fragment = gql`
 		blocksJSON
 		uri
 
-		featuredImage {
-			node {
-				sourceUrl
-				altText
-				mediaDetails {
-					width
-					height
-				}
-			}
-		}
+    fseTemplate {
+      slug
+    }
+
+    featuredImage {
+      node {
+        sourceUrl
+        altText
+        mediaDetails {
+          width
+          height
+        }
+      }
+    }
 
 		categories(first: 1, where: { exclude: [1] }) {
 			nodes {
@@ -37,24 +41,17 @@ export const fragment = gql`
 			}
 		}
 
-		editLink @include(if: $isPreview)
-		preview @include(if: $isPreviewDraft) {
-			node {
-				blocksJSON
-			}
-		}
-		seo {
-			...seoPostTypeFragment
-		}
-
-		# relatedPosts {
-		#   size: perPage
-		#   categoryIn
-		#   tagIn
-		#   notIn
-		# }
-	}
-	${seoPostTypeFragment}
+    editLink @include(if: $isPreview)
+    preview @include(if: $isPreviewDraft) {
+      node {
+        blocksJSON
+      }
+    }
+    seo {
+      ...seoPostTypeFragment
+    }
+  }
+  ${seoPostTypeFragment}
 `;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

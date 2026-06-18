@@ -8,7 +8,7 @@ import fseTemplatesData from '@/lib/fse/fse-templates-and-parts.json';
 
 const templatesData: any = _templatesData;
 
-const { singlePageData, singlePostData } = templatesData;
+const { archiveData, singlePageData, singlePostData } = templatesData;
 
 /**
  * NOTE: in preview, the `uri` could be in fact the ID (i.e. a draft doesn't have a slug/uri yet)
@@ -147,16 +147,21 @@ const commonFields = `
 `;
 
 const types = [
-	{
-		type: 'Page',
-		fragment: singlePageData.fragment,
-		fields: 'singlePageFragment',
-	},
-	{
-		type: 'Post',
-		fragment: singlePostData.fragment,
-		fields: 'singlePostFragment',
-	},
+  {
+    type: "ContentType",
+    fragment: archiveData.fragment,
+    fields: "archiveFragment",
+  },
+  {
+    type: "Page",
+    fragment: singlePageData.fragment,
+    fields: "singlePageFragment",
+  },
+  {
+    type: "Post",
+    fragment: singlePostData.fragment,
+    fields: "singlePostFragment",
+  },
 ];
 
 const nodeByUriQuery = () => `
@@ -203,10 +208,7 @@ for (const key in templatesData) {
 }
 
 const getTemplateData = async (node: any) => {
-	const type =
-		node.archivePage && node.__typename === 'Page'
-			? `archive-${node.archivePage.type}`
-			: `single-${node.__typename}`.toLowerCase();
+  const type = `single-${node.__typename}`.toLowerCase();
 
 	const { getData } = templatesDataList?.[type] ?? {};
 
