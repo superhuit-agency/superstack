@@ -38,7 +38,7 @@ export default function getBlockFinalComponentProps(
 		attributes: object;
 		innerBlocks: Array<BlockPropsType>;
 	},
-	options?: { skipGetData?: boolean }
+	options?: { skipGetData?: boolean; lang?: string | null }
 ): Promise<BlockPropsType> {
 	return new Promise(async (res) => {
 		const props: BlockPropsType = {
@@ -48,8 +48,8 @@ export default function getBlockFinalComponentProps(
 		};
 
 		Promise.allSettled([
-			getAttributes(name, attributes, options?.skipGetData),
-			getInnerBlocks(innerBlocks, options?.skipGetData),
+			getAttributes(name, attributes, options),
+			getInnerBlocks(innerBlocks, options),
 		]).then(([attrsResult, blksResult]) => {
 			if (attrsResult.status === 'fulfilled') {
 				const { attrs, innerBlocks: dataInnerBlocks } =
@@ -85,9 +85,16 @@ export default function getBlockFinalComponentProps(
  * @param   {any}    attributes Initial block's attributes. Will be returned as it or enriched and/or formatted.
  * @returns {any}
  */
-const getAttributes = (name: string, attributes: object, skipGetData = false) =>
+const getAttributes = (
+	name: string,
+	attributes: object,
+	options?: { skipGetData?: boolean; lang?: string | null }
+) =>
 	new Promise(async (res) => {
-		if (skipGetData || !blocksDataList[name as keyof typeof blocksDataList])
+		if (
+			options?.skipGetData ||
+			!blocksDataList[name as keyof typeof blocksDataList]
+		)
 			res({ attrs: attributes });
 		else {
 			const blockModule =
@@ -96,7 +103,8 @@ const getAttributes = (name: string, attributes: object, skipGetData = false) =>
 				blockModule as {
 					getData?: (
 						fetcher: FetchApiFuncType,
-						attrs: object
+						attrs: object,
+						lang?: string | null
 					) => Promise<object>;
 				}
 			).getData;
@@ -106,25 +114,30 @@ const getAttributes = (name: string, attributes: object, skipGetData = false) =>
 				return;
 			}
 
-			getData(fetchAPI, attributes).then((data = {}) => {
-				const { innerBlocks, ...restData } = data as {
-					innerBlocks?: BlockPropsType[];
-				} & Record<string, unknown>;
-				res({
-					attrs: { ...attributes, ...restData },
-					...(innerBlocks !== undefined ? { innerBlocks } : {}),
-				});
-			});
+			getData(fetchAPI, attributes, options?.lang ?? null).then(
+				(data = {}) => {
+					const { innerBlocks, ...restData } = data as {
+						innerBlocks?: BlockPropsType[];
+					} & Record<string, unknown>;
+					res({
+						attrs: { ...attributes, ...restData },
+						...(innerBlocks !== undefined ? { innerBlocks } : {}),
+					});
+				}
+			);
 		}
 	});
 
-const getInnerBlocks = (blocks: Array<BlockPropsType>, skipGetData = false) =>
+const getInnerBlocks = (
+	blocks: Array<BlockPropsType>,
+	options?: { skipGetData?: boolean; lang?: string | null }
+) =>
 	new Promise((res, rej) => {
 		if (!(blocks?.length > 0)) rej([]);
 		else {
 			Promise.allSettled(
 				blocks.map((block) =>
-					getBlockFinalComponentProps({ ...block }, { skipGetData })
+					getBlockFinalComponentProps({ ...block }, options)
 				)
 			).then((rs) =>
 				res(rs.map((r) => (r.status === 'fulfilled' ? r.value : null)))

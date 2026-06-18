@@ -1,6 +1,10 @@
 import { gql } from '@/utils';
 
-import { seoPostTypeFragment } from '@/lib/fragments';
+import {
+	seoPostTypeFragment,
+	languageFields,
+	translationsFields,
+} from '@/lib/fragments';
 
 export const fragment = gql`
   fragment singlePageFragment on Page {
@@ -12,6 +16,11 @@ export const fragment = gql`
     fseTemplate {
       slug
     }
+    # archivePage {
+		# 	baseUri
+		# 	perPage
+		# 	type
+		# }    
     editLink @include(if: $isPreview)
     preview @include(if: $isPreviewDraft) {
       node {
@@ -21,6 +30,8 @@ export const fragment = gql`
     seo {
       ...seoPostTypeFragment
     }
+    ${languageFields}
+    ${translationsFields}
   }
   ${seoPostTypeFragment}
 `;

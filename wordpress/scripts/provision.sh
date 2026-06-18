@@ -29,7 +29,7 @@
 #
 #===========================================
 
-IS_MULTILANG=${IS_MULTILANG:=false}
+IS_MULTILANG=${IS_MULTILANG:=true}
 HTTP_HOST=${WORDPRESS_URL}
 
 # #===========================================

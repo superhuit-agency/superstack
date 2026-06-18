@@ -1,3 +1,4 @@
+import configs from '@/configs.json';
 import { baseUriContext } from '@/hooks/use-base-uri';
 import { gql } from '@/utils';
 
@@ -106,7 +107,8 @@ const fetchTermArchiveContext = async (
 
 export const getData = async (
 	fetcher: FetchApiFuncType,
-	attrs: TermsQueryAttributes | null = null
+	attrs: TermsQueryAttributes | null = null,
+	lang: string | null = null
 ) => {
 	const termQuery = mergeTermQuery(attrs?.termQuery ?? null);
 	const first = Math.min(
@@ -167,6 +169,8 @@ export const getData = async (
 		if (typeof childOf === 'number') where.childOf = childOf;
 	}
 
+	// The generic `terms` connection has no `language` where-arg (Polylang only
+	// adds it to post connections), so terms are filtered on the fetched result.
 	const termsQuery = gql`
 		query TermsQueryTerms(
 			$first: Int!
@@ -181,6 +185,20 @@ export const getData = async (
 					uri
 					count
 					taxonomyName
+					${
+						configs.isMultilang
+							? `... on Category {
+						language {
+							slug
+						}
+					}
+					... on Tag {
+						language {
+							slug
+						}
+					}`
+							: ''
+					}
 				}
 			}
 		}
@@ -193,10 +211,22 @@ export const getData = async (
 		},
 	});
 
+	let nodes = data?.terms?.nodes ?? [];
+
+	if (configs.isMultilang && lang) {
+		// Terms without an assigned language (empty slug) are kept: Polylang
+		// treats them as belonging to every language.
+		nodes = nodes.filter(
+			(node: { language?: { slug?: string } | null }) =>
+				!node.language?.slug ||
+				node.language.slug.toLowerCase() === lang.toLowerCase()
+		);
+	}
+
 	return {
 		data: {
 			terms: {
-				nodes: data?.terms?.nodes ?? [],
+				nodes,
 			},
 		},
 	};

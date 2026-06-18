@@ -1,3 +1,4 @@
+import configs from '@/configs.json';
 import { gql } from '@/utils';
 
 const ORDER_ENUMS = new Set(['ASC', 'DESC']);
@@ -45,7 +46,8 @@ const normalizeCategoryIds = (
 
 export const getData = async (
 	fetcher: FetchApiFuncType,
-	attrs: LatestPostAttributes | null = null
+	attrs: LatestPostAttributes | null = null,
+	lang: string | null = null
 ) => {
 	const query = gql`
 		query LatestPosts(
@@ -54,6 +56,7 @@ export const getData = async (
 			$orderby: PostObjectsConnectionOrderbyEnum!
 			$authorIn: [ID]
 			$categoryIn: [ID]
+			${configs.isMultilang ? '$language: LanguageCodeFilterEnum' : ''}
 		) {
 			posts(
 				first: $first
@@ -62,6 +65,7 @@ export const getData = async (
 					authorIn: $authorIn
 					categoryIn: $categoryIn
 					stati: PUBLISH
+					${configs.isMultilang ? 'language: $language' : ''}
 				}
 			) {
 				nodes {
@@ -109,6 +113,9 @@ export const getData = async (
 			orderby,
 			authorIn: selectedAuthor,
 			categoryIn: categories,
+			...(configs.isMultilang
+				? { language: lang ? lang.toUpperCase() : 'ALL' }
+				: {}),
 		},
 	});
 
