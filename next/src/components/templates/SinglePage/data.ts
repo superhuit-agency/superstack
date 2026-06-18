@@ -1,33 +1,33 @@
-import { gql } from "@/utils";
+import { gql } from '@/utils';
 
-import { seoPostTypeFragment } from "@/lib/fragments";
+import { seoPostTypeFragment } from '@/lib/fragments';
 
 export const fragment = gql`
-  fragment singlePageFragment on Page {
-    id: databaseId
-    title(format: RENDERED)
-    blocksJSON
-    uri
-    isFrontPage
-    fseTemplate {
-      slug
-    }
-    archivePage {
-      baseUri
-      perPage
-      type
-    }
-    editLink @include(if: $isPreview)
-    preview @include(if: $isPreviewDraft) {
-      node {
-        blocksJSON
-      }
-    }
-    seo {
-      ...seoPostTypeFragment
-    }
-  }
-  ${seoPostTypeFragment}
+	fragment singlePageFragment on Page {
+		id: databaseId
+		title(format: RENDERED)
+		blocksJSON
+		uri
+		isFrontPage
+		fseTemplate {
+			slug
+		}
+		archivePage {
+			baseUri
+			perPage
+			type
+		}
+		editLink @include(if: $isPreview)
+		preview @include(if: $isPreviewDraft) {
+			node {
+				blocksJSON
+			}
+		}
+		seo {
+			...seoPostTypeFragment
+		}
+	}
+	${seoPostTypeFragment}
 `;
 
-export const slug = "single-page";
+export const slug = 'single-page';

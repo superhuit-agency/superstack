@@ -10,21 +10,21 @@ import './styles.css';
  * Add custom `postTypes` to core/paragraph block
  */
 const withCustomPostTypesSetting = (
-  settings: WpBlockType<any>['settings'],
-  name: string,
+	settings: WpBlockType<any>['settings'],
+	name: string
 ) => {
-  if (name !== block.slug) {
-    return settings;
-  }
+	if (name !== block.slug) {
+		return settings;
+	}
 
-  settings['postTypes'] = ['post'];
+	settings['postTypes'] = ['post'];
 
-  return settings;
+	return settings;
 };
 export const ParagraphEditBlockSettings: WpFilterType = {
-  hook: 'blocks.registerBlockType',
-  namespace: 'supt/paragraph-edit-setting',
-  callback: withCustomPostTypesSetting,
+	hook: 'blocks.registerBlockType',
+	namespace: 'supt/paragraph-edit-setting',
+	callback: withCustomPostTypesSetting,
 };
 
 /**
@@ -34,12 +34,12 @@ export const ParagraphEditBlockSettings: WpFilterType = {
  * @see https://github.com/WordPress/gutenberg/tree/trunk/packages/format-library/src
  */
 domReady(() => {
-  unregisterFormatType('core/text-color'); // Highlight text
-  unregisterFormatType('core/image'); // Inline image
-  unregisterFormatType('core/keyboard');
-  unregisterFormatType('core/code');
+	unregisterFormatType('core/text-color'); // Highlight text
+	unregisterFormatType('core/image'); // Inline image
+	unregisterFormatType('core/keyboard');
+	unregisterFormatType('core/code');
 });
 
 export const ParagraphBlock = {
-  slug: block.slug,
+	slug: block.slug,
 };

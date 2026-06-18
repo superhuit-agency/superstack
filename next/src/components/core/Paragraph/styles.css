@@ -1,6 +1,6 @@
 .supt-paragraph {
-  font-family: var(--font-secondary);
-  font-size: var(--wp--preset--font-size--medium);
-  line-height: var(--wp--custom--line-height--medium);
-  font-weight: 400;
+	font-family: var(--font-secondary);
+	font-size: var(--wp--preset--font-size--medium);
+	line-height: var(--wp--custom--line-height--medium);
+	font-weight: 400;
 }

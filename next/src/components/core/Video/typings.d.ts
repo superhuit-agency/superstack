@@ -1,7 +1,7 @@
 interface VideoAttributes {
-  caption?: string;
-  autoplay?: boolean;
+	caption?: string;
+	autoplay?: boolean;
 }
 
 interface VideoProps
-  extends React.HTMLProps<HTMLVideoElement>, VideoAttributes {}
+	extends React.HTMLProps<HTMLVideoElement>, VideoAttributes {}

@@ -6,11 +6,11 @@ import { notFound, permanentRedirect, redirect } from 'next/navigation';
 import Template from '@/components/global/Template';
 import { useCanonical as getCanonicalUrl } from '@/hooks/use-canonical';
 import {
-  getAllURIs,
-  getAuthToken,
-  getNodeByURI,
-  getRedirection,
-  getWpUriFromNextPath,
+	getAllURIs,
+	getAuthToken,
+	getNodeByURI,
+	getRedirection,
+	getWpUriFromNextPath,
 } from '@/lib';
 import { baseUriContext } from '@/hooks/use-base-uri';
 
@@ -22,189 +22,200 @@ export const revalidate = 3600; // revalidate at most every hour
 
 // Generate static paths for build time
 export async function generateStaticParams() {
-  const allURIs = await getAllURIs();
+	const allURIs = await getAllURIs();
 
-  return allURIs;
+	return allURIs;
 }
 
 // Generate page metadata
 export async function generateMetadata({
-  params,
+	params,
 }: {
-  params: { uri: string[] };
+	params: { uri: string[] };
 }): Promise<Metadata> {
-  const resolvedParams = await params;
-  const uri = getWpUriFromNextPath(resolvedParams.uri ?? []);
+	const resolvedParams = await params;
+	const uri = getWpUriFromNextPath(resolvedParams.uri ?? []);
 
-  const auth = {};
+	const auth = {};
 
-  const baseUrl =
-    process.env.NEXT_URL ?? process.env.VERCEL_URL ?? 'http://localhost:3000';
+	const baseUrl =
+		process.env.NEXT_URL ??
+		process.env.VERCEL_URL ??
+		'http://localhost:3000';
 
-  const node = await getNodeByURI(uri, false, auth, false, false);
+	const node = await getNodeByURI(uri, false, auth, false, false);
 
-  const imageSEO =
-    node?.seo?.opengraphImage?.src ??
-    node?.siteSEO?.openGraph?.defaultImage?.src ??
-    '';
+	const imageSEO =
+		node?.seo?.opengraphImage?.src ??
+		node?.siteSEO?.openGraph?.defaultImage?.src ??
+		'';
 
-  const canonical = getCanonicalUrl(node);
+	const canonical = getCanonicalUrl(node);
 
-  // Fix SEO url for homepage
-  const urlSEO = node?.seo?.opengraphUrl?.startsWith('https')
-    ? node?.language
-      ? `/${node?.language.code.toLowerCase()}/`
-      : '/'
-    : node?.seo?.opengraphUrl;
+	// Fix SEO url for homepage
+	const urlSEO = node?.seo?.opengraphUrl?.startsWith('https')
+		? node?.language
+			? `/${node?.language.code.toLowerCase()}/`
+			: '/'
+		: node?.seo?.opengraphUrl;
 
-  return {
-    metadataBase: new URL(baseUrl),
-    title: node?.seo?.title ?? node?.title,
-    description: node?.seo?.opengraphDescription ?? node?.seo?.metaDesc ?? '',
-    // Canonical
-    alternates: {
-      canonical: canonical,
-      languages: node?.translations?.reduce(
-        (
-          acc: Record<string, string>,
-          t: {
-            uri?: string;
-            language?: { locale?: string; code?: string } | null;
-          },
-        ) => {
-          if (!t.language || !t.language.locale || !t.language.code) return acc;
+	return {
+		metadataBase: new URL(baseUrl),
+		title: node?.seo?.title ?? node?.title,
+		description:
+			node?.seo?.opengraphDescription ?? node?.seo?.metaDesc ?? '',
+		// Canonical
+		alternates: {
+			canonical: canonical,
+			languages: node?.translations?.reduce(
+				(
+					acc: Record<string, string>,
+					t: {
+						uri?: string;
+						language?: { locale?: string; code?: string } | null;
+					}
+				) => {
+					if (!t.language || !t.language.locale || !t.language.code)
+						return acc;
 
-          return {
-            ...acc,
-            [t.language.locale]:
-              (node?.baseUrl || '') +
-              (t.uri === '/' ? `/${t.language.code.toLowerCase()}/` : t.uri),
-          };
-        },
-        {},
-      ),
-    },
-    // Open Graph
-    openGraph: {
-      title: node?.seo?.title ?? node?.title,
-      description: node?.seo?.opengraphDescription ?? node?.seo?.metaDesc ?? '',
-      siteName: node?.siteSEO?.schema?.siteName,
-      images: [
-        {
-          url: imageSEO,
-          alt: node?.seo?.title,
-        },
-      ],
-      url: urlSEO,
-    },
-    // Socials
-    twitter: {
-      title: node?.seo?.twitterTitle ?? node?.seo?.title,
-      description:
-        node?.seo?.twitterDescription ?? node?.seo?.opengraphDescription,
-      images: [
-        {
-          url: node?.seo?.twitterImage?.src ?? imageSEO,
-          alt: node?.seo?.twitterImage?.alt ?? node?.seo?.title,
-        },
-      ],
-      card: node?.siteSEO?.social?.twitter?.cardType ?? 'summary_large_image',
-      creator: node?.siteSEO?.social?.twitter?.username,
-    },
-    // Robots
-    robots: {
-      index: node?.seo?.metaRobotsNoindex === 'index',
-      follow: node?.seo?.metaRobotsNofollow === 'follow',
-    },
-  };
+					return {
+						...acc,
+						[t.language.locale]:
+							(node?.baseUrl || '') +
+							(t.uri === '/'
+								? `/${t.language.code.toLowerCase()}/`
+								: t.uri),
+					};
+				},
+				{}
+			),
+		},
+		// Open Graph
+		openGraph: {
+			title: node?.seo?.title ?? node?.title,
+			description:
+				node?.seo?.opengraphDescription ?? node?.seo?.metaDesc ?? '',
+			siteName: node?.siteSEO?.schema?.siteName,
+			images: [
+				{
+					url: imageSEO,
+					alt: node?.seo?.title,
+				},
+			],
+			url: urlSEO,
+		},
+		// Socials
+		twitter: {
+			title: node?.seo?.twitterTitle ?? node?.seo?.title,
+			description:
+				node?.seo?.twitterDescription ??
+				node?.seo?.opengraphDescription,
+			images: [
+				{
+					url: node?.seo?.twitterImage?.src ?? imageSEO,
+					alt: node?.seo?.twitterImage?.alt ?? node?.seo?.title,
+				},
+			],
+			card:
+				node?.siteSEO?.social?.twitter?.cardType ??
+				'summary_large_image',
+			creator: node?.siteSEO?.social?.twitter?.username,
+		},
+		// Robots
+		robots: {
+			index: node?.seo?.metaRobotsNoindex === 'index',
+			follow: node?.seo?.metaRobotsNofollow === 'follow',
+		},
+	};
 }
 
 const PreviewToolbar = dynamic(
-  () => import('@/components/admin/PreviewToolbar'),
+	() => import('@/components/admin/PreviewToolbar')
 );
 
 export default async function Page({ params }: { params: { uri: string[] } }) {
-  const resolvedParams = await params;
-  const { isEnabled: isDraftModeEnable } = await draftMode();
+	const resolvedParams = await params;
+	const { isEnabled: isDraftModeEnable } = await draftMode();
 
-  let isDraft = false,
-    token = '';
+	let isDraft = false,
+		token = '';
 
-  /** Query loop pagination */
-  const rawSegments = resolvedParams.uri ?? [];
-  const isPagedRoute =
-    rawSegments.length >= 2 && rawSegments[rawSegments.length - 2] === 'page';
+	/** Query loop pagination */
+	const rawSegments = resolvedParams.uri ?? [];
+	const isPagedRoute =
+		rawSegments.length >= 2 &&
+		rawSegments[rawSegments.length - 2] === 'page';
 
-  const pageRaw = isPagedRoute ? rawSegments[rawSegments.length - 1] : null;
-  const routePage = pageRaw ? Number.parseInt(pageRaw, 10) : null;
+	const pageRaw = isPagedRoute ? rawSegments[rawSegments.length - 1] : null;
+	const routePage = pageRaw ? Number.parseInt(pageRaw, 10) : null;
 
-  const normalizedRoutePage =
-    Number.isFinite(routePage) && (routePage as number) > 0
-      ? (routePage as number)
-      : null;
+	const normalizedRoutePage =
+		Number.isFinite(routePage) && (routePage as number) > 0
+			? (routePage as number)
+			: null;
 
-  const baseSegments = normalizedRoutePage
-    ? rawSegments.slice(0, -2)
-    : rawSegments;
-  /** End of query loop pagination */
+	const baseSegments = normalizedRoutePage
+		? rawSegments.slice(0, -2)
+		: rawSegments;
+	/** End of query loop pagination */
 
-  const baseUri = getWpUriFromNextPath(baseSegments);
-  const uri = baseUri;
-  baseUriContext(uri);
+	const baseUri = getWpUriFromNextPath(baseSegments);
+	const uri = baseUri;
+	baseUriContext(uri);
 
-  let auth: { authToken?: string } = {};
+	let auth: { authToken?: string } = {};
 
-  if (isDraftModeEnable) {
-    // We are now in dynamic rendering
+	if (isDraftModeEnable) {
+		// We are now in dynamic rendering
 
-    const cookieStore = await cookies();
+		const cookieStore = await cookies();
 
-    token = cookieStore.get('token')?.value ?? '';
-    isDraft = cookieStore.get('preview-draft')?.value === 'true';
+		token = cookieStore.get('token')?.value ?? '';
+		isDraft = cookieStore.get('preview-draft')?.value === 'true';
 
-    if (token) {
-      // Get a fresh auth token
-      auth = {
-        authToken: await getAuthToken(token),
-      };
-    }
+		if (token) {
+			// Get a fresh auth token
+			auth = {
+				authToken: await getAuthToken(token),
+			};
+		}
 
-    if (!auth.authToken) {
-      // Exit preview mode if refresh token is invalid
-      redirect(`/api/preview-exit?redirect=${uri}`);
-    }
-  }
+		if (!auth.authToken) {
+			// Exit preview mode if refresh token is invalid
+			redirect(`/api/preview-exit?redirect=${uri}`);
+		}
+	}
 
-  // Redirect if the URI is a redirection
-  const redirection = await getRedirection(uri);
-  if (redirection) {
-    if (redirection.isPermanent) {
-      permanentRedirect(redirection.destination);
-    } else {
-      redirect(redirection.destination);
-    }
-  }
+	// Redirect if the URI is a redirection
+	const redirection = await getRedirection(uri);
+	if (redirection) {
+		if (redirection.isPermanent) {
+			permanentRedirect(redirection.destination);
+		} else {
+			redirect(redirection.destination);
+		}
+	}
 
-  const node = await getNodeByURI(
-    uri,
-    isDraftModeEnable,
-    auth,
-    isDraft,
-    true,
-    normalizedRoutePage ?? 1, // Query loop pagination
-  );
+	const node = await getNodeByURI(
+		uri,
+		isDraftModeEnable,
+		auth,
+		isDraft,
+		true,
+		normalizedRoutePage ?? 1 // Query loop pagination
+	);
 
-  if (!node || !node?.uri) {
-    return notFound();
-  }
+	if (!node || !node?.uri) {
+		return notFound();
+	}
 
-  return (
-    <>
-      <Template node={node} />
+	return (
+		<>
+			<Template node={node} />
 
-      {isDraftModeEnable ? (
-        <PreviewToolbar isDraft={isDraft} editLink={node?.editLink} />
-      ) : null}
-    </>
-  );
+			{isDraftModeEnable ? (
+				<PreviewToolbar isDraft={isDraft} editLink={node?.editLink} />
+			) : null}
+		</>
+	);
 }

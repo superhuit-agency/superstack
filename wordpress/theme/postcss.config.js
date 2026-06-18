@@ -1,20 +1,27 @@
 const path = require('path');
 
 // Mixin => DO NOT FORGET TO INCLUDE AS WELL IN THE NEXT POSTCSS.CONFIG.JS
-const { clamp } = require(path.resolve(__dirname, '../../next/src/css/mixins/clamp.js'));
+const { clamp } = require(
+	path.resolve(__dirname, '../../next/src/css/mixins/clamp.js')
+);
 
 module.exports = {
 	plugins: [
 		require('postcss-import')({
 			resolve: (id, basedir) => {
-       			// resolve alias @resources, @import '@resources/style.css';
+				// resolve alias @resources, @import '@resources/style.css';
 				if (/^@resources/.test(id))
-					return path.resolve(__dirname, '../../next/src/css/resources', id.slice(11));
+					return path.resolve(
+						__dirname,
+						'../../next/src/css/resources',
+						id.slice(11)
+					);
 
-        		// resolve node_modules, @import '@package-from-node-modules/*'
-				if (/^@/.test(id)) return path.resolve(__dirname, 'node_modules', id);
+				// resolve node_modules, @import '@package-from-node-modules/*'
+				if (/^@/.test(id))
+					return path.resolve(__dirname, 'node_modules', id);
 
-       			// resolve relative path, @import './components/style.css'
+				// resolve relative path, @import './components/style.css'
 				return path.resolve(basedir, id);
 			},
 		}),

@@ -1,6 +1,6 @@
 interface NavigationLinkAttributes extends BlockAttributes {
-  url: string;
-  label: string;
+	url: string;
+	label: string;
 }
 
 interface NavigationLinkProps extends NavigationLinkAttributes {}

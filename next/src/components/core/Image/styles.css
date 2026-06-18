@@ -1,21 +1,21 @@
 .wp-block-image {
-    position: relative;
+	position: relative;
 
-    img {
-        display: block;
-        max-width: 100%;
-    }
+	img {
+		display: block;
+		max-width: 100%;
+	}
 
-    &.is-style-rounded {
-        img {
-            border-radius: 50%;
-        }
-    }
-    &.has-aspect-ratio {
-        img {
-            position: static !important;
-            width: auto !important;
-            height: auto !important;
-        }
-    }
+	&.is-style-rounded {
+		img {
+			border-radius: 50%;
+		}
+	}
+	&.has-aspect-ratio {
+		img {
+			position: static !important;
+			width: auto !important;
+			height: auto !important;
+		}
+	}
 }

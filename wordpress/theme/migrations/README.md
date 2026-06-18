@@ -13,36 +13,36 @@ Migration scripts apply one-time database changes required by theme updates (e.g
 
 1. Create a new PHP file with the naming convention:
 
-   ```
-   YYYYMMDD_HHMMSS_short_description.php
-   ```
+    ```
+    YYYYMMDD_HHMMSS_short_description.php
+    ```
 
-   The timestamp prefix ensures migrations run in the correct order.
+    The timestamp prefix ensures migrations run in the correct order.
 
 2. The file must return an array of WP-CLI commands (without `wp` prefix):
 
-   ```php
-   <?php
+    ```php
+    <?php
 
-   /**
-    * Migration: Short description
-    *
-    * Longer explanation of what this migration does and why.
-    *
-    * Related commit: <commit-hash>
-    *
-    * @package Superstack
-    * @since   1.0.0
-    */
+    /**
+     * Migration: Short description
+     *
+     * Longer explanation of what this migration does and why.
+     *
+     * Related commit: <commit-hash>
+     *
+     * @package Superstack
+     * @since   1.0.0
+     */
 
-   if (! defined('ABSPATH')) {
-       exit;
-   }
+    if (! defined('ABSPATH')) {
+        exit;
+    }
 
-   return [
-       'search-replace "old-value" "new-value" --report-changed-only',
-   ];
-   ```
+    return [
+        'search-replace "old-value" "new-value" --report-changed-only',
+    ];
+    ```
 
 3. Commit the migration file alongside the theme changes that require it.
 

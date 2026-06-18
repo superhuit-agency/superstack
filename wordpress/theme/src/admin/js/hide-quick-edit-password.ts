@@ -1,6 +1,6 @@
 /**
  * Hide the password field in the quick edit form for password protected posts.
- * @returns 
+ * @returns
  */
 export function hideQuickEditPasswordProtected() {
 	const input = document.querySelector('.inline-edit-password-input');
@@ -13,7 +13,6 @@ export function hideQuickEditPasswordProtected() {
 		'none';
 }
 
-
 document.addEventListener('DOMContentLoaded', (event) => {
-  hideQuickEditPasswordProtected();
-})
+	hideQuickEditPasswordProtected();
+});

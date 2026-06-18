@@ -27,8 +27,7 @@ type SinglePageFormatterArgs = GraphQLSinglePageFields & {
 };
 
 interface GraphQLSinglePageFields
-	extends GraphQLNodeFields,
-		GraphQLContentNodeFields {
+	extends GraphQLNodeFields, GraphQLContentNodeFields {
 	isFrontPage;
 	archivePage: {
 		baseUri: string;

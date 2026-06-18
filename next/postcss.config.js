@@ -6,36 +6,41 @@ const { clamp } = require('./src/css/mixins/clamp.js'); // Needs to be a Javascr
 const rootPath = __dirname;
 
 module.exports = {
-  plugins: {
-    'postcss-import': {
-      resolve: (id, basedir) => {
-        // resolve alias @resources, @import '@resources/style.css';
-        if (/^@resources/.test(id))
-          return path.resolve(rootPath, 'src/css/resources', id.slice(11));
+	plugins: {
+		'postcss-import': {
+			resolve: (id, basedir) => {
+				// resolve alias @resources, @import '@resources/style.css';
+				if (/^@resources/.test(id))
+					return path.resolve(
+						rootPath,
+						'src/css/resources',
+						id.slice(11)
+					);
 
-        // resolve node_modules, @import '@package-from-node-modules/*'
-        if (/^@/.test(id)) return path.resolve(rootPath, 'node_modules', id);
+				// resolve node_modules, @import '@package-from-node-modules/*'
+				if (/^@/.test(id))
+					return path.resolve(rootPath, 'node_modules', id);
 
-        // resolve relative path, @import './components/style.css'
-        return path.resolve(basedir, id);
-      },
-    },
-    'postcss-preset-env': {
-      autoprefixer: {
-        flexbox: 'no-2009',
-      },
-      stage: 3,
-    },
-    'postcss-mixins': {
-      mixins: {
-        clamp,
-      },
-    },
-    'postcss-nested': {},
-    'postcss-simple-vars': {},
-    'postcss-extend-rule': {},
-    'postcss-gap-properties': {},
-    'postcss-hexrgba': {},
-    'postcss-normalize': {},
-  },
+				// resolve relative path, @import './components/style.css'
+				return path.resolve(basedir, id);
+			},
+		},
+		'postcss-preset-env': {
+			autoprefixer: {
+				flexbox: 'no-2009',
+			},
+			stage: 3,
+		},
+		'postcss-mixins': {
+			mixins: {
+				clamp,
+			},
+		},
+		'postcss-nested': {},
+		'postcss-simple-vars': {},
+		'postcss-extend-rule': {},
+		'postcss-gap-properties': {},
+		'postcss-hexrgba': {},
+		'postcss-normalize': {},
+	},
 };

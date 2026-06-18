@@ -1,1 +1,1 @@
-export * from "./core/Image/edit";
+export * from './core/Image/edit';

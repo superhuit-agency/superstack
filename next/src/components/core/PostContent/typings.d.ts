@@ -1,6 +1,6 @@
 interface PostContentAttributes {
-  tagName?: TagName;
+	tagName?: TagName;
 }
 
 interface PostContentProps
-  extends React.HTMLProps<HTMLDivElement>, PostContentAttributes {}
+	extends React.HTMLProps<HTMLDivElement>, PostContentAttributes {}

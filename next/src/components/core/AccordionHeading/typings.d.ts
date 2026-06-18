@@ -1,5 +1,5 @@
 interface AccordionHeadingAttributes extends BlockAttributes {
-  title: string;
+	title: string;
 }
 
 interface AccordionHeadingProps extends AccordionHeadingAttributes {}

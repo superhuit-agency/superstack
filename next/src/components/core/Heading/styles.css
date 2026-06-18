@@ -1,32 +1,32 @@
 @import '@resources/index.css';
 
 .wp-block-heading {
-  h1& {
-    @extend %t-h1;
-  }
-  h2& {
-    @extend %t-h2;
-  }
-  h3& {
-    @extend %t-h3;
-  }
-  h4& {
-    @extend %t-h4;
-  }
-  h5& {
-    @extend %t-h5;
-  }
-  h6& {
-    @extend %t-h6;
-  }
+	h1& {
+		@extend %t-h1;
+	}
+	h2& {
+		@extend %t-h2;
+	}
+	h3& {
+		@extend %t-h3;
+	}
+	h4& {
+		@extend %t-h4;
+	}
+	h5& {
+		@extend %t-h5;
+	}
+	h6& {
+		@extend %t-h6;
+	}
 
-  &.-center {
-    text-align: center;
-  }
-  &.-right {
-    text-align: right;
-  }
-  &.-left {
-    text-align: left;
-  }
+	&.-center {
+		text-align: center;
+	}
+	&.-right {
+		text-align: right;
+	}
+	&.-left {
+		text-align: left;
+	}
 }

@@ -1,6 +1,5 @@
 interface ListItemAttributes
-	extends React.HTMLProps<HTMLLIElement>,
-		BlockAttributes {
+	extends React.HTMLProps<HTMLLIElement>, BlockAttributes {
 	content: string;
 }
 

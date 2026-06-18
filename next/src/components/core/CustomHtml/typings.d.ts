@@ -1,5 +1,5 @@
 interface CustomHtmlAttributes extends BlockAttributes {
-  content: string;
+	content: string;
 }
 
 interface CustomHtmlProps extends CustomHtmlAttributes {}

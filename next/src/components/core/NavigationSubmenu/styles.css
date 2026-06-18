@@ -1,44 +1,44 @@
 .wp-block-navigation-submenu {
-  position: relative;
+	position: relative;
 
-  &:hover {
-    > .wp-block-navigation-submenu__items {
-      opacity: 1;
-    }
+	&:hover {
+		> .wp-block-navigation-submenu__items {
+			opacity: 1;
+		}
 
-    > .wp-block-navigation-submenu__label::after {
-      transform: rotate(180deg);
-    }
-  }
+		> .wp-block-navigation-submenu__label::after {
+			transform: rotate(180deg);
+		}
+	}
 
-  &__label {
-    display: flex;
-    align-items: center;
-    gap: 2px;
+	&__label {
+		display: flex;
+		align-items: center;
+		gap: 2px;
 
-    &::after {
-      content: url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216px%22%20height%3D%2216px%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%3E%3Cpath%20fill-rule%3D%22evenodd%22%20clip-rule%3D%22evenodd%22%20d%3D%22M4.29289%208.29289C4.68342%207.90237%205.31658%207.90237%205.70711%208.29289L12%2014.5858L18.2929%208.29289C18.6834%207.90237%2019.3166%207.90237%2019.7071%208.29289C20.0976%208.68342%2020.0976%209.31658%2019.7071%209.70711L12.7071%2016.7071C12.3166%2017.0976%2011.6834%2017.0976%2011.2929%2016.7071L4.29289%209.70711C3.90237%209.31658%203.90237%208.68342%204.29289%208.29289Z%22%20fill%3D%22%23000000%22%2F%3E%3C%2Fsvg%3E');
-      width: 16px;
-      height: 16px;
-      display: inline-block;
-      margin-left: 4px;
-      transition: transform 0.2s ease-in-out;
-      transform: rotate(0deg);
-      position: relative;
-      top: 2px;
-    }
-  }
+		&::after {
+			content: url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216px%22%20height%3D%2216px%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%3E%3Cpath%20fill-rule%3D%22evenodd%22%20clip-rule%3D%22evenodd%22%20d%3D%22M4.29289%208.29289C4.68342%207.90237%205.31658%207.90237%205.70711%208.29289L12%2014.5858L18.2929%208.29289C18.6834%207.90237%2019.3166%207.90237%2019.7071%208.29289C20.0976%208.68342%2020.0976%209.31658%2019.7071%209.70711L12.7071%2016.7071C12.3166%2017.0976%2011.6834%2017.0976%2011.2929%2016.7071L4.29289%209.70711C3.90237%209.31658%203.90237%208.68342%204.29289%208.29289Z%22%20fill%3D%22%23000000%22%2F%3E%3C%2Fsvg%3E');
+			width: 16px;
+			height: 16px;
+			display: inline-block;
+			margin-left: 4px;
+			transition: transform 0.2s ease-in-out;
+			transform: rotate(0deg);
+			position: relative;
+			top: 2px;
+		}
+	}
 
-  &__items {
-    list-style: none;
-    position: absolute;
-    top: calc(100% + 4px);
-    left: 0;
+	&__items {
+		list-style: none;
+		position: absolute;
+		top: calc(100% + 4px);
+		left: 0;
 
-    opacity: 0;
-    transition: opacity 0.2s 0.5sease-in-out;
+		opacity: 0;
+		transition: opacity 0.2s 0.5sease-in-out;
 
-    background-color: #fff;
-    padding: 8px;
-  }
+		background-color: #fff;
+		padding: 8px;
+	}
 }

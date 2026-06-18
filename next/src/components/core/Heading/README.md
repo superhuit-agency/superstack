@@ -19,8 +19,8 @@ The goal of this extension is to provide a way of customizing the heading levels
 
 An array of number, each number being a heading level.
 
--   Required: No
--   Default: `[1, 2, 3, 4, 5, 6]`
+- Required: No
+- Default: `[1, 2, 3, 4, 5, 6]`
 
 ### Usage
 
@@ -53,13 +53,13 @@ The default dropdown to select the heading level has been hidden and replaced by
 
 We use the `BlockEdit` filter hook to customize the edition of the edit block. Inside this hook we :
 
--   Check if the heading block is an inner block with the `innerBlocksHeadingAvailableLevels` prop
--   Set the available levels as options for the `<ToolbarDropdown />` component
--   Hide the default dropdown to select the heading level
--   If the current value of the heading level is not in the available levels, we set the value to the first available level
+- Check if the heading block is an inner block with the `innerBlocksHeadingAvailableLevels` prop
+- Set the available levels as options for the `<ToolbarDropdown />` component
+- Hide the default dropdown to select the heading level
+- If the current value of the heading level is not in the available levels, we set the value to the first available level
 
 See the [Heading Edit file](edit.tsx) for the complete code.
 
 ## Future improvements
 
--   [ ] Create a plugin or package for the block heading as it is highly dependent of WordPress version
+- [ ] Create a plugin or package for the block heading as it is highly dependent of WordPress version

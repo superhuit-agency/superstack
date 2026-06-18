@@ -1,5 +1,5 @@
 interface PreformattedAttributes extends BlockAttributes {
-  content: string;
+	content: string;
 }
 
 interface PreformattedProps extends PreformattedAttributes {}

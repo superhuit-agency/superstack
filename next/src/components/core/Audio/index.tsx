@@ -1,24 +1,24 @@
-import block from "./block.json";
+import block from './block.json';
 
-import "./styles.css";
+import './styles.css';
 
 export default function Audio({
-  src,
-  autoplay = false,
-  loop = false,
-  preload,
+	src,
+	autoplay = false,
+	loop = false,
+	preload,
 }: AudioProps) {
-  return (
-    <figure className="wp-block-audio">
-      <audio
-        src={src}
-        controls
-        autoPlay={autoplay}
-        loop={loop}
-        preload={preload ? preload : undefined}
-      />
-    </figure>
-  );
+	return (
+		<figure className="wp-block-audio">
+			<audio
+				src={src}
+				controls
+				autoPlay={autoplay}
+				loop={loop}
+				preload={preload ? preload : undefined}
+			/>
+		</figure>
+	);
 }
 
 Audio.slug = block.slug;

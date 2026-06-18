@@ -1,5 +1,5 @@
 interface MathAttributes extends BlockAttributes {
-  mathML: string;
+	mathML: string;
 }
 
 interface MathProps extends MathAttributes {}

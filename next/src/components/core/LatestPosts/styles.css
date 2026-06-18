@@ -1,5 +1,5 @@
 .wp-block-latest-posts {
-  display: grid;
-  grid-template-columns: repeat(min(var(--latest-posts-nb, 3), 3), 1fr);
-  grid-gap: var(--wp--preset--spacing--30, 16px);
+	display: grid;
+	grid-template-columns: repeat(min(var(--latest-posts-nb, 3), 3), 1fr);
+	grid-gap: var(--wp--preset--spacing--30, 16px);
 }

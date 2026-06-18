@@ -1,8 +1,8 @@
 interface TemplatePartAttributes {
-  slug: string;
-  area?: string;
-  tagName?: TagName;
+	slug: string;
+	area?: string;
+	tagName?: TagName;
 }
 
 interface TemplatePartProps
-  extends React.HTMLProps<HTMLDivElement>, TemplatePartAttributes {}
+	extends React.HTMLProps<HTMLDivElement>, TemplatePartAttributes {}

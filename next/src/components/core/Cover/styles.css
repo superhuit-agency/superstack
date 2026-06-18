@@ -1,30 +1,29 @@
 .wp-block-cover {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-position: 50%;
-    overflow: hidden;
-    overflow: clip;
-    min-height: 430px;
-    padding: 1em;
-    position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-position: 50%;
+	overflow: hidden;
+	overflow: clip;
+	min-height: 430px;
+	padding: 1em;
+	position: relative;
 
-    &__background {
-        position: absolute;
-        inset: 0;
-        &.has-background-dim-50 {
-            opacity: .5;
-        }   
-    }
+	&__background {
+		position: absolute;
+		inset: 0;
+		&.has-background-dim-50 {
+			opacity: 0.5;
+		}
+	}
 
-    &__image-background {
-        object-fit: cover;
-    }
+	&__image-background {
+		object-fit: cover;
+	}
 
-    &__inner-container {
-        position: relative;
-        width: 100%;
-        text-align: center;
-    }
-
+	&__inner-container {
+		position: relative;
+		width: 100%;
+		text-align: center;
+	}
 }

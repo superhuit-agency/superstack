@@ -1,7 +1,8 @@
 declare module '@wordpress/block-editor' {
 	module '@wordpress/block-editor' {
-		interface BlockControlsProps
-			extends React.ComponentProps<typeof OriginalBlockControls> {
+		interface BlockControlsProps extends React.ComponentProps<
+			typeof OriginalBlockControls
+		> {
 			group?: string;
 			controls?: string[];
 			children: React.ReactNode;

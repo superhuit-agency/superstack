@@ -17,15 +17,15 @@ import getRedirection from './get-redirection';
 export const PREVIEW_STATI = ['PUBLISH', 'DRAFT', 'FUTURE', 'PRIVATE'];
 
 export {
-  fetchAPI,
-  formatBlocksJSON,
-  getAllURIs,
-  getAuthToken,
-  getBlockFinalComponentProps,
-  getFunkyWpUploadsURI,
-  getNodeByURI,
-  getPreviewNode,
-  getSitemapData,
-  getRedirection,
-  getWpUriFromNextPath,
+	fetchAPI,
+	formatBlocksJSON,
+	getAllURIs,
+	getAuthToken,
+	getBlockFinalComponentProps,
+	getFunkyWpUploadsURI,
+	getNodeByURI,
+	getPreviewNode,
+	getSitemapData,
+	getRedirection,
+	getWpUriFromNextPath,
 };

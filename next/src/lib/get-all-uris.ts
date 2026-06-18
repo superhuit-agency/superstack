@@ -4,98 +4,99 @@ const POST_TYPES: string[] = ['pages'];
 const TAXONOMIES: string[] = [];
 
 export default async function getAllURIs() {
-  const nodeCounts = await fetchAPI(
-    `query nodeCounts {
+	const nodeCounts = await fetchAPI(
+		`query nodeCounts {
 			${POST_TYPES.map(
-        (postType) => `
+				(postType) => `
 				${postType} {
 					pageInfo {
 						offsetPagination {
 							total
 						}
 					}
-				}`,
-      )}
-		}`,
-  );
+				}`
+			)}
+		}`
+	);
 
-  const nodesPromises: Promise<any>[] = [];
-  POST_TYPES.forEach((postType) => {
-    const nQueries = Math.ceil(
-      (nodeCounts?.[postType]?.pageInfo?.offsetPagination?.total ?? 0) / 100,
-    );
+	const nodesPromises: Promise<any>[] = [];
+	POST_TYPES.forEach((postType) => {
+		const nQueries = Math.ceil(
+			(nodeCounts?.[postType]?.pageInfo?.offsetPagination?.total ?? 0) /
+				100
+		);
 
-    for (let i = 0; i < nQueries; i++) {
-      const query_name = `AllURIs_${postType}_${i + 1}_${nQueries}`;
+		for (let i = 0; i < nQueries; i++) {
+			const query_name = `AllURIs_${postType}_${i + 1}_${nQueries}`;
 
-      nodesPromises.push(
-        fetchAPI(
-          `query ${query_name} {
+			nodesPromises.push(
+				fetchAPI(
+					`query ${query_name} {
 					${postType}(where: {offsetPagination: {offset: ${i * 100}, size: 100}}) {
 						nodes {
 							uri
 							isRedirected
 						}
 					}
-				}`,
-        ),
-      );
-    }
-  });
+				}`
+				)
+			);
+		}
+	});
 
-  // TODO: improve to handle more than 100 terms in each taxonomy
-  TAXONOMIES.forEach((taxName) => {
-    nodesPromises.push(
-      fetchAPI(
-        `query AllURIs_${taxName} {
+	// TODO: improve to handle more than 100 terms in each taxonomy
+	TAXONOMIES.forEach((taxName) => {
+		nodesPromises.push(
+			fetchAPI(
+				`query AllURIs_${taxName} {
 				${taxName}(first: 100) {
 					nodes {
 						uri
 						isRedirected
 					}
 				}
-			}`,
-      ),
-    );
-  });
+			}`
+			)
+		);
+	});
 
-  const nodesQueries = await Promise.allSettled(nodesPromises);
+	const nodesQueries = await Promise.allSettled(nodesPromises);
 
-  const nodes = nodesQueries.reduce<PromiseSettledResult<any>[]>(
-    (nodes, query) =>
-      query.status !== 'fulfilled'
-        ? nodes
-        : [
-            ...nodes,
-            // @ts-ignore
-            ...(Object.values(query.value)[0]?.nodes || []),
-          ],
-    [],
-  );
+	const nodes = nodesQueries.reduce<PromiseSettledResult<any>[]>(
+		(nodes, query) =>
+			query.status !== 'fulfilled'
+				? nodes
+				: [
+						...nodes,
+						// @ts-ignore
+						...(Object.values(query.value)[0]?.nodes || []),
+					],
+		[]
+	);
 
-  /**
-   * Multilang :: Remove lang from URI to return URI + LANG seperately
-   */
-  //   const mapForMultilang = (node: {
-  //     uri: string;
-  //     language: { code: string };
-  //   }) => ({
-  //     params: {
-  //       uri: node.uri
-  //         .split('/')
-  //         .filter((path: string) => path != '') // remove empty paths
-  //         .slice(1), // + remove 1st element = lang
-  //       lang: node.language
-  //         ? node.language.code.toLowerCase()
-  //         : nodeCounts.defaultLanguage.slug,
-  //     },
-  //   });
+	/**
+	 * Multilang :: Remove lang from URI to return URI + LANG seperately
+	 */
+	//   const mapForMultilang = (node: {
+	//     uri: string;
+	//     language: { code: string };
+	//   }) => ({
+	//     params: {
+	//       uri: node.uri
+	//         .split('/')
+	//         .filter((path: string) => path != '') // remove empty paths
+	//         .slice(1), // + remove 1st element = lang
+	//       lang: node.language
+	//         ? node.language.code.toLowerCase()
+	//         : nodeCounts.defaultLanguage.slug,
+	//     },
+	//   });
 
-  const mapForSingleLang = (node: { uri: string }) => ({
-    uri: node.uri.split('/').filter((path: string) => path != ''), // remove empty paths
-  });
+	const mapForSingleLang = (node: { uri: string }) => ({
+		uri: node.uri.split('/').filter((path: string) => path != ''), // remove empty paths
+	});
 
-  const callback: (node: any) => {} = mapForSingleLang;
+	const callback: (node: any) => {} = mapForSingleLang;
 
-  return nodes.filter((node: any) => !node.isRedirected).map(callback);
+	return nodes.filter((node: any) => !node.isRedirected).map(callback);
 }

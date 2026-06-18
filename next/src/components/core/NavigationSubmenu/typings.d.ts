@@ -1,7 +1,7 @@
 interface NavigationSubmenuAttributes extends BlockAttributes {
-  children: React.ReactNode;
-  label: string;
-  url: string;
+	children: React.ReactNode;
+	label: string;
+	url: string;
 }
 
 interface NavigationSubmenuProps extends NavigationSubmenuAttributes {}

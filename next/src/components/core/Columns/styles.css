@@ -1,47 +1,47 @@
 @import '@resources/index.css';
 
 .wp-block-columns {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: initial;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: initial;
 
-  @media (min-width: $breakpoint-sm) {
-    flex-wrap: nowrap;
-  }
+	@media (min-width: $breakpoint-sm) {
+		flex-wrap: nowrap;
+	}
 
-  &.is-not-stacked-on-mobile {
-    flex-wrap: nowrap;
-  }
+	&.is-not-stacked-on-mobile {
+		flex-wrap: nowrap;
+	}
 
-  &:where(.is-layout-flex) {
-    gap: $grid-gap;
-  }
+	&:where(.is-layout-flex) {
+		gap: $grid-gap;
+	}
 
-  &:not(.is-not-stacked-on-mobile) {
-    > .wp-block-column {
-      @media (max-width: calc($breakpoint-sm - 1px)) {
-        flex-basis: 100%;
-      }
+	&:not(.is-not-stacked-on-mobile) {
+		> .wp-block-column {
+			@media (max-width: calc($breakpoint-sm - 1px)) {
+				flex-basis: 100%;
+			}
 
-      @media (min-width: $breakpoint-sm) {
-        flex-basis: 0;
-        flex-grow: 1;
+			@media (min-width: $breakpoint-sm) {
+				flex-basis: 0;
+				flex-grow: 1;
 
-        &[style*='flex-basis'] {
-          flex-grow: 0;
-        }
-      }
-    }
-  }
+				&[style*='flex-basis'] {
+					flex-grow: 0;
+				}
+			}
+		}
+	}
 
-  &.is-not-stacked-on-mobile {
-    > .wp-block-column {
-      flex-basis: 0;
-      flex-grow: 1;
+	&.is-not-stacked-on-mobile {
+		> .wp-block-column {
+			flex-basis: 0;
+			flex-grow: 1;
 
-      &[style*='flex-basis'] {
-        flex-grow: 0;
-      }
-    }
-  }
+			&[style*='flex-basis'] {
+				flex-grow: 0;
+			}
+		}
+	}
 }

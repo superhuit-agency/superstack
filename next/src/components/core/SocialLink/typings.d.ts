@@ -1,6 +1,6 @@
 interface SocialLinkAttributes extends BlockAttributes {
-  service: string;
-  url: string;
+	service: string;
+	url: string;
 }
 
 interface SocialLinkProps extends SocialLinkAttributes {}

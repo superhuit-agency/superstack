@@ -1,14 +1,7 @@
 import React from 'react';
 import { Meta, StoryObj } from '@storybook/react';
 
-import {
-	H1Icon,
-	H2Icon,
-	H3Icon,
-	H4Icon,
-	H5Icon,
-	H6Icon,
-} from './index';
+import { H1Icon, H2Icon, H3Icon, H4Icon, H5Icon, H6Icon } from './index';
 import './styles.css';
 
 const Icons = () => (

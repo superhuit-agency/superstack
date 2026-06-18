@@ -1,22 +1,22 @@
 .wp-block-separator {
-    &.is-style-wide {
-        width: 100%;
-    }
-    &.is-style-dots {
-        background: none !important;
-        border: none !important;
+	&.is-style-wide {
+		width: 100%;
+	}
+	&.is-style-dots {
+		background: none !important;
+		border: none !important;
 
-        height: auto;
-        line-height: 1;
-        text-align: center;
-        
-        &::before {
-            color: currentColor;
-            content: "···";
-            font-family: serif;
-            font-size: 1.5em;
-            letter-spacing: 2em;
-            padding-left: 2em;
-        }
-    }
+		height: auto;
+		line-height: 1;
+		text-align: center;
+
+		&::before {
+			color: currentColor;
+			content: '···';
+			font-family: serif;
+			font-size: 1.5em;
+			letter-spacing: 2em;
+			padding-left: 2em;
+		}
+	}
 }

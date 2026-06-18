@@ -1,5 +1,5 @@
 interface AccordionAttributes extends BlockAttributes {
-  autoclose?: boolean;
+	autoclose?: boolean;
 }
 interface AccordionProps
-  extends AccordionAttributes, React.HTMLProps<HTMLDivElement> {}
+	extends AccordionAttributes, React.HTMLProps<HTMLDivElement> {}

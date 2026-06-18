@@ -5,14 +5,14 @@ import './styles.css';
 import block from './block.json';
 
 function Paragraph({ content, className }: ParagraphProps) {
-  if (!content) return null;
+	if (!content) return null;
 
-  return (
-    <p
-      className={cx('supt-paragraph', className)}
-      dangerouslySetInnerHTML={{ __html: content }}
-    />
-  );
+	return (
+		<p
+			className={cx('supt-paragraph', className)}
+			dangerouslySetInnerHTML={{ __html: content }}
+		/>
+	);
 }
 
 Paragraph.slug = block.slug;

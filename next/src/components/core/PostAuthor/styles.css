@@ -1,16 +1,16 @@
 .wp-block-post-author {
-  display: flex;
-  align-items: center;
-  gap: var(--wp--preset--spacing--20, 10px);
+	display: flex;
+	align-items: center;
+	gap: var(--wp--preset--spacing--20, 10px);
 
-  &__avatar {
-    border-radius: 50%;
-    overflow: hidden;
-  }
+	&__avatar {
+		border-radius: 50%;
+		overflow: hidden;
+	}
 
-  &__content {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
+	&__content {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+	}
 }

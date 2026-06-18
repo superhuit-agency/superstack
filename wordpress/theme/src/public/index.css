@@ -1,8 +1,8 @@
 /* Write CSS for the public-facing side of the site */
 
 /* Global */
-@import "../shared/header.css";
-@import "../shared/footer.css";
+@import '../shared/header.css';
+@import '../shared/footer.css';
 
 /* Core blocks */
 
@@ -13,9 +13,9 @@
 /* Sections */
 
 /* Templates */
-@import "../shared/templates/archive.css";
-@import "../shared/templates/single.css";
-@import "../shared/templates/404.css";
+@import '../shared/templates/archive.css';
+@import '../shared/templates/single.css';
+@import '../shared/templates/404.css';
 
 /* Pages */
 

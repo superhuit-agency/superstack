@@ -1,6 +1,6 @@
 .wp-block-spacer {
-  &.-fill-width {
-    width: 100%;
-    min-height: 1px;
-  }
+	&.-fill-width {
+		width: 100%;
+		min-height: 1px;
+	}
 }

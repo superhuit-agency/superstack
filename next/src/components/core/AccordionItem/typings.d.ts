@@ -1,6 +1,6 @@
 interface AccordionItemAttributes extends BlockAttributes {
-  openByDefault?: boolean;
+	openByDefault?: boolean;
 }
 interface AccordionItemProps extends AccordionItemAttributes {
-  children: React.ReactNode;
+	children: React.ReactNode;
 }

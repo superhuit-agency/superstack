@@ -26,8 +26,7 @@ type SinglePageFormatterArgs = GraphQLSinglePageFields & {
 };
 
 interface GraphQLSinglePostFields
-	extends GraphQLNodeFields,
-		GraphQLContentNodeFields {
+	extends GraphQLNodeFields, GraphQLContentNodeFields {
 	featuredImage: {
 		node: GraphQLImageFields;
 	};

@@ -1,11 +1,11 @@
 .wp-block-video {
-    video {
-        display: block;
-        height: auto;
-        width: 100%;
-        aspect-ratio: 16/9;
-    }
-    [poster] {
-        object-fit: cover;
-    }
+	video {
+		display: block;
+		height: auto;
+		width: 100%;
+		aspect-ratio: 16/9;
+	}
+	[poster] {
+		object-fit: cover;
+	}
 }

@@ -1,6 +1,5 @@
 interface ListAttributes
-	extends React.HTMLProps<HTMLUListElement>,
-		BlockAttributes {
+	extends React.HTMLProps<HTMLUListElement>, BlockAttributes {
 	ordered: boolean;
 	reversed?: boolean;
 	start?: number;

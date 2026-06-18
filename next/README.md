@@ -23,16 +23,16 @@ npm run dev
 
 ## Available npm Scripts
 
-| Command | Description |
-| --- | --- |
-| `dev` | Start the Next.js dev server |
-| `predev` | Fetch FSE templates/parts data before `dev` |
-| `build` | Build Next.js for production |
-| `prebuild` | Fetch FSE templates/parts data before `build` |
-| `start` | Run the production server (`next start`) |
-| `lint` | Run ESLint |
-| `storybook` | Start Storybook on port 6006 |
-| `build-storybook` | Build Storybook static output |
+| Command           | Description                                   |
+| ----------------- | --------------------------------------------- |
+| `dev`             | Start the Next.js dev server                  |
+| `predev`          | Fetch FSE templates/parts data before `dev`   |
+| `build`           | Build Next.js for production                  |
+| `prebuild`        | Fetch FSE templates/parts data before `build` |
+| `start`           | Run the production server (`next start`)      |
+| `lint`            | Run ESLint                                    |
+| `storybook`       | Start Storybook on port 6006                  |
+| `build-storybook` | Build Storybook static output                 |
 
 ## Pages FSE Templates
 

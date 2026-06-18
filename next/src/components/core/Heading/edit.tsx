@@ -23,21 +23,21 @@ import './styles.edit.css';
  * Add custom `postTypes` to core/heading block
  */
 const withCustomPostTypesSetting = (
-  settings: WpBlockType<any>['settings'],
-  name: string,
+	settings: WpBlockType<any>['settings'],
+	name: string
 ) => {
-  if (name !== block.slug) {
-    return settings;
-  }
+	if (name !== block.slug) {
+		return settings;
+	}
 
-  settings['postTypes'] = ['post'];
+	settings['postTypes'] = ['post'];
 
-  return settings;
+	return settings;
 };
 export const HeadingEditBlockSettings: WpFilterType = {
-  hook: 'blocks.registerBlockType',
-  namespace: 'supt/heading-edit-setting',
-  callback: withCustomPostTypesSetting,
+	hook: 'blocks.registerBlockType',
+	namespace: 'supt/heading-edit-setting',
+	callback: withCustomPostTypesSetting,
 };
 
 /**
@@ -47,101 +47,106 @@ export const HeadingEditBlockSettings: WpFilterType = {
 const HEADING_LEVELS = [1, 2, 3, 4, 5, 6];
 
 const HEADING_ICONS = {
-  1: H1Icon,
-  2: H2Icon,
-  3: H3Icon,
-  4: H4Icon,
-  5: H5Icon,
-  6: H6Icon,
+	1: H1Icon,
+	2: H2Icon,
+	3: H3Icon,
+	4: H4Icon,
+	5: H5Icon,
+	6: H6Icon,
 };
 
 const editHeadingBlockEdit = createHigherOrderComponent(
-  (BlockEdit: ComponentType<any>) => {
-    const EnhancedComponent = (props: BlockEditProps<any>) => {
-      const [allowedLevels, setAllowedLevels] = useState(HEADING_LEVELS);
+	(BlockEdit: ComponentType<any>) => {
+		const EnhancedComponent = (props: BlockEditProps<any>) => {
+			const [allowedLevels, setAllowedLevels] = useState(HEADING_LEVELS);
 
-      useLayoutEffect(() => {
-        if ((props as any).name !== 'core/heading' || !props.isSelected) return;
+			useLayoutEffect(() => {
+				if ((props as any).name !== 'core/heading' || !props.isSelected)
+					return;
 
-        // Check if the block has parent
-        // @ts-ignore
-        const parentBlock = select('core/block-editor').getBlockParents(
-          props.clientId,
-        );
+				// Check if the block has parent
+				// @ts-ignore
+				const parentBlock = select('core/block-editor').getBlockParents(
+					props.clientId
+				);
 
-        if (!parentBlock || parentBlock.length === 0) return;
+				if (!parentBlock || parentBlock.length === 0) return;
 
-        const firstParentBlock = select('core/block-editor').getBlock(
-          parentBlock[0],
-        );
+				const firstParentBlock = select('core/block-editor').getBlock(
+					parentBlock[0]
+				);
 
-        if (!firstParentBlock) return;
+				if (!firstParentBlock) return;
 
-        // Get the template value in the parent for the heading
-        const blockType = getBlockType(firstParentBlock?.name) as any;
+				// Get the template value in the parent for the heading
+				const blockType = getBlockType(firstParentBlock?.name) as any;
 
-        const level = blockType?.innerBlocksHeadingAvailableLevels[0];
+				const level = blockType?.innerBlocksHeadingAvailableLevels[0];
 
-        const availableLevels =
-          blockType?.innerBlocksHeadingAvailableLevels?.map(
-            (currLevel: number) => currLevel,
-          ) || HEADING_LEVELS;
+				const availableLevels =
+					blockType?.innerBlocksHeadingAvailableLevels?.map(
+						(currLevel: number) => currLevel
+					) || HEADING_LEVELS;
 
-        setAllowedLevels(availableLevels.sort((a: number, b: number) => a - b));
+				setAllowedLevels(
+					availableLevels.sort((a: number, b: number) => a - b)
+				);
 
-        if (
-          (level || availableLevels.length > 0) &&
-          !availableLevels.includes(props.attributes.level)
-        ) {
-          props.setAttributes({
-            level: level || availableLevels[0],
-          });
-        }
-      }, [props]);
+				if (
+					(level || availableLevels.length > 0) &&
+					!availableLevels.includes(props.attributes.level)
+				) {
+					props.setAttributes({
+						level: level || availableLevels[0],
+					});
+				}
+			}, [props]);
 
-      if ((props as any).name !== block.slug) return <BlockEdit {...props} />;
+			if ((props as any).name !== block.slug)
+				return <BlockEdit {...props} />;
 
-      return (
-        <>
-          {allowedLevels.length !== HEADING_LEVELS.length && (
-            <BlockControls group="block">
-              <ToolbarDropdownMenu
-                className="supt-heading-level-dropdown"
-                icon={
-                  HEADING_ICONS[
-                    props.attributes
-                      .level as unknown as keyof typeof HEADING_ICONS
-                  ]
-                }
-                label="Change Heading Level"
-                controls={allowedLevels.map((level) => ({
-                  icon: HEADING_ICONS[
-                    level as unknown as keyof typeof HEADING_ICONS
-                  ],
-                  ariaLabel: `Heading ${level}`,
-                  title: `Heading ${level}`,
-                  isActive: props.attributes.level === level,
-                  onClick: () => props.setAttributes({ level }),
-                }))}
-              />
-            </BlockControls>
-          )}
-          <BlockEdit key="edit" {...props} />
-        </>
-      );
-    };
+			return (
+				<>
+					{allowedLevels.length !== HEADING_LEVELS.length && (
+						<BlockControls group="block">
+							<ToolbarDropdownMenu
+								className="supt-heading-level-dropdown"
+								icon={
+									HEADING_ICONS[
+										props.attributes
+											.level as unknown as keyof typeof HEADING_ICONS
+									]
+								}
+								label="Change Heading Level"
+								controls={allowedLevels.map((level) => ({
+									icon: HEADING_ICONS[
+										level as unknown as keyof typeof HEADING_ICONS
+									],
+									ariaLabel: `Heading ${level}`,
+									title: `Heading ${level}`,
+									isActive: props.attributes.level === level,
+									onClick: () =>
+										props.setAttributes({ level }),
+								}))}
+							/>
+						</BlockControls>
+					)}
+					<BlockEdit key="edit" {...props} />
+				</>
+			);
+		};
 
-    return EnhancedComponent;
-  },
-  'editHeadingBlockEdit',
+		return EnhancedComponent;
+	},
+	'editHeadingBlockEdit'
 );
 
 export const HeadingEditBlock: WpFilterType = {
-  hook: 'editor.BlockEdit',
-  namespace: 'supt/heading-with-custom-edit',
-  callback: editHeadingBlockEdit,
+	hook: 'editor.BlockEdit',
+	namespace: 'supt/heading-with-custom-edit',
+	callback: editHeadingBlockEdit,
 };
 
 export const HeadingBlock = {
-  slug: block.slug,
+	slug: block.slug,
 };
