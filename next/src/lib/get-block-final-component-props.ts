@@ -18,6 +18,13 @@ import fetchAPI from '@/lib/fetch-api';
 /**
  * Get a lightweight version of a block's data.
  * Used to reduce the amount of data served to the frontend.
+ *
+ * A block's `data.ts` may export `getData(fetcher, attrs)` which returns
+ * `{ ...extraAttrs, innerBlocks? }`. When `innerBlocks` is present in that
+ * return value, it overrides the static `innerBlocks` from the JSON snapshot
+ * — used by blocks whose children change independently of the template
+ * (e.g. `core/navigation` menu items). See docs/fse-templating.md.
+ *
  * @param block A block object coming from Wp GraphQl's blocksJSON
  * @returns the same block, with only necessary data
  */
