@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { Link } from '@/components/custom/atoms/Link';
 import cx from 'classnames';
 
 export default function NavigationLink(props: NavigationLinkProps) {

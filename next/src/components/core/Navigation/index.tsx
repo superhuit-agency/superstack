@@ -1,5 +1,6 @@
 import './styles.css';
 
+// TODO :: Add Navigation Context to pass submenuVisibility to submenus
 export default function Navigation(props: NavigationProps) {
 	return (
 		<nav className="wp-block-navigation">

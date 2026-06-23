@@ -34,18 +34,60 @@ Request time (getNodeByURI)
   └─ injects page blocks into the template's core/post-content block
 ```
 
+### Visual Schema
+
+```mermaid
+flowchart TB
+    subgraph BuildTime["⚙️ Build Time — fetch-fse-templates-and-parts.ts"]
+        direction TB
+        B1["Templates + Template Parts<br/>(via WPGraphQL)"]
+        B2["✅ block name<br/>✅ static attributes<br/>✅ static innerBlocks structure<br/>❌ no getData (skipGetData: true)<br/>❌ no core/navigation children"]
+        JSON[("fse-templates-and-parts.json")]
+        B1 --> B2 --> JSON
+    end
+
+    subgraph RequestTime["🌐 Request Time — getNodeByURI"]
+        direction TB
+        R1["Read JSON snapshot<br/>+ page's own blocksJSON"]
+        R2["✅ dynamic attributes (getData)<br/>✅ dynamic innerBlocks (getData)<br/>   e.g. navigation menu items<br/>✅ page blocks injected into<br/>   core/post-content"]
+        OUT["Final block tree → rendered page"]
+        R1 --> R2 --> OUT
+    end
+
+    JSON -.loaded by.-> R1
+
+    classDef build fill:#5a3a1e,stroke:#e2a04a,color:#fff
+    classDef request fill:#1e5a3a,stroke:#4ae290,color:#fff
+    classDef data fill:#3a1e5a,stroke:#a04ae2,color:#fff
+    class B1,B2 build
+    class R1,R2,OUT request
+    class JSON data
+```
+
+**Rule of thumb:**
+
+| What | Where it's resolved |
+| --- | --- |
+| Template/part **structure** (which blocks, in what order) | Build time → JSON |
+| Block **static attributes** (set in the editor) | Build time → JSON |
+| Block **dynamic attributes** (from `getData`) | Request time |
+| `innerBlocks` of `core/navigation` (menu items) | Request time (always) |
+| `innerBlocks` of any block returning them from `getData` | Request time (overrides JSON) |
+| Page's own content blocks | Request time (injected into `core/post-content`) |
+
 ---
 
 ## Key Files
 
-| File | Role |
-|---|---|
-| `next/scripts/fetch-fse-templates-and-parts.ts` | Build-time script |
-| `next/src/lib/fse/fse-templates-and-parts.json` | Output: static template snapshot |
-| `next/src/lib/format-blocks-json.ts` | Parses & normalises a `blocksJSON` string |
-| `next/src/lib/get-block-final-component-props.ts` | Enriches one block (calls `getData`, recurses into `innerBlocks`) |
-| `next/src/lib/get-node-by-uri.ts` | Request-time orchestration; calls `enrichTemplateBlocks` |
-| `wordpress/theme/lib/graphql/register-fse-templates.php` | Exposes templates + parts via WPGraphQL |
+| File                                                           | Role                                                                  |
+| -------------------------------------------------------------- | --------------------------------------------------------------------- |
+| `next/scripts/fetch-fse-templates-and-parts.ts`                | Build-time script                                                     |
+| `next/src/lib/fse/fse-templates-and-parts.json`                | Output: static template snapshot                                      |
+| `next/src/lib/format-blocks-json.ts`                           | Parses & normalises a `blocksJSON` string                             |
+| `next/src/lib/get-block-final-component-props.ts`              | Enriches one block (calls `getData`, recurses into `innerBlocks`)     |
+| `next/src/lib/get-node-by-uri.ts`                              | Request-time orchestration; calls `enrichTemplateBlocks`              |
+| `wordpress/theme/includes/graphql/register-fse-templates.php`  | Exposes templates + parts via WPGraphQL                               |
+| `wordpress/theme/includes/graphql/navigation-inner-blocks.php` | Exposes `wp_navigation` as `NavigationMenu` with a `blocksJSON` field |
 
 ---
 
@@ -69,6 +111,8 @@ cd next && npx tsx scripts/fetch-fse-templates-and-parts.ts
 
 > **Important:** `skipGetData: true` means dynamic data (navigation links, site logo, etc.) is **not** stored in the JSON. This is intentional — those values are fetched fresh at request time.
 
+> **`core/navigation` specifics:** the WP side does not inline the children of a `core/navigation` block into the template's `blocksJSON`. The build snapshot only contains the `core/navigation` block with its `ref` attribute. The actual menu items are fetched at request time by `Navigation/data.ts`. This avoids stale navigation contents after a menu edit.
+
 ---
 
 ## Request-time Flow
@@ -77,10 +121,10 @@ Inside `getNodeByURI`, after the WP node is fetched, three async operations run 
 
 ```typescript
 const { blocksJSON, templateData, templateBlocks } = await Promise.allSettled([
-  formatBlocksJSON(node?.blocksJSON ?? ''), // page's own blocks
-  getTemplateData(node),                    // template-level extra data
-  enrichTemplateBlocks(getTemplateBlocks(node?.fseTemplate?.slug)), // FSE template
-])
+	formatBlocksJSON(node?.blocksJSON ?? ''), // page's own blocks
+	getTemplateData(node), // template-level extra data
+	enrichTemplateBlocks(getTemplateBlocks(node?.fseTemplate?.slug)), // FSE template
+]);
 ```
 
 `enrichTemplateBlocks` loads blocks from the JSON snapshot, then runs `getBlockFinalComponentProps` (with `getData`) on every top-level block. This is where dynamic data (navigation menus, logos, ...) is fetched.
@@ -97,30 +141,33 @@ template: [Header, core/post-content { innerBlocks: [...page blocks...] }, Foote
 
 ## getData Pattern and Dynamic innerBlocks
 
-Each block can export a `getData` function from its `data.ts` file. Normally `getData` returns extra attributes to merge into the block's `attributes`. It can also return an `innerBlocks` array, which **replaces** the static `innerBlocks` from the JSON.
+Each block can export a `getData` function from its `data.ts` file. Normally `getData` returns extra attributes to merge into the block's `attributes`. It can also return an `innerBlocks` array, which **replaces** the static (or empty) `innerBlocks` from the JSON.
 
-This pattern is used for `core/navigation`:
+As an example, this pattern is used for `core/navigation`:
 
 ```typescript
 // Navigation/data.ts
 export const getData = async (fetcher, attrs) => {
-  if (typeof attrs?.ref === 'number' && attrs.ref > 0) {
-    // Block-based navigation: fetch links from the wp_navigation post
-    const data = await fetcher(navigationBlocksQuery, { variables: { ref: attrs.ref } });
-    const innerBlocks = JSON.parse(data?.navigationBlocksJSON ?? '[]');
-    return { innerBlocks }; // innerBlocks overrides the static snapshot
-  }
-  // Classic menu fallback …
+	// Fetch the wp_navigation post by DATABASE_ID and parse its blocks
+	const data = await fetcher(navigationMenuQuery, {
+		variables: { id: String(attrs.ref) },
+	});
+	const innerBlocks = data?.navigationMenu?.blocksJSON
+		? JSON.parse(data.navigationMenu.blocksJSON)
+		: [];
+	return { innerBlocks }; // innerBlocks overrides the static snapshot
 };
 ```
+
+> The `wp_navigation` post type is exposed in WPGraphQL as `NavigationMenu` via `navigation-inner-blocks.php`, which also registers the `blocksJSON` field (parsed + normalised to the `{ name, attributes, innerBlocks }` shape expected by the frontend).
 
 `get-block-final-component-props.ts` handles this by checking whether `getData` returned `innerBlocks`:
 
 ```typescript
 if (dataInnerBlocks !== undefined) {
-  props.innerBlocks = dataInnerBlocks; // fresh from getData
+	props.innerBlocks = dataInnerBlocks; // fresh from getData
 } else if (blksResult.status === 'fulfilled') {
-  props.innerBlocks = blksResult.value; // static from JSON
+	props.innerBlocks = blksResult.value; // static from JSON
 }
 ```
 
@@ -138,7 +185,7 @@ Re-run the build script whenever:
 
 You do **not** need to re-run it when:
 
-- Navigation menu links change (fetched at request time via `navigationBlocksJSON`).
+- Navigation menu links change (fetched at request time via `navigationMenu { blocksJSON }`).
 - Any other block that implements `getData`-returned `innerBlocks` changes.
 
 ---
