@@ -1,5 +1,8 @@
 /* Write CSS for the block editor content */
 
+/* Font */
+@import './assets/css/_fonts.css';
+
 /* Global */
 
 /* Core blocks */

@@ -13,11 +13,11 @@ Next.js has introduced `next/font`, a new way to optimize font loading.<br />
 
 ### Step 1: Import Custom Fonts
 
-If you're using custom fonts that are not hosted by a third-party service (like Google Fonts), you'll need to add them to `src/fonts` directory.
+If you're using custom fonts that are not hosted by a third-party service (like Google Fonts), you'll need to add them to `next/src/fonts` directory.
 
 ### Step 2: Define Your Fonts using next/font
 
-You can define your fonts in the `layout.tsx` file located at `src/app/[[...uri]]/`. Define your fonts as follows:
+You can define your fonts in the `layout.tsx` file located at `next/src/app/`. Define your fonts as follows:
 
 ```tsx
 import { Inter } from 'next/font/google';
@@ -30,7 +30,7 @@ const inter = Inter({
 });
 
 const myCustomFont = localFont({
-	src: '../../fonts/my-custom-font.woff2',
+	src: '../fonts/my-custom-font.woff2',
 	variable: '--font-secondary',
 	display: 'swap',
 });
@@ -48,18 +48,16 @@ export default function Layout() {
 
 ### Step 1: Import Custom Fonts
 
-If you're using custom fonts that are not hosted by a third-party service (like Google Fonts), you'll need to add them to `src/fonts` directory if not already added previously.
+If you're using custom fonts that are not hosted by a third-party service (like Google Fonts), you'll need to add them to `next/src/fonts` directory if not already added previously.
 
 ### Step 2: Define Your Fonts in CSS
 
-In `_fonts.css` file located in `wordpress/theme/lib/editor/assets/css/`. Add your font-face declarations as follows:
+In `_fonts.css` file located in `wordpress/theme/src/editor-content/assets/css/`. Add your font-face declarations as follows:
 
 ```css
 @font-face {
 	font-family: 'My custom font';
-	src:
-		url('../../../../src/fonts/my-custom-font.woff2') format('woff2'),
-		url('../../../../src/fonts/my-custom-font.woff') format('woff');
+	src: url('../../../../next/src/fonts/my-custom-font.woff2') format('woff2');
 	font-weight: 400;
 	font-style: normal;
 	font-display: swap;
