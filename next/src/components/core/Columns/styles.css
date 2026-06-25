@@ -14,7 +14,7 @@
 	}
 
 	&:where(.is-layout-flex) {
-		gap: $grid-gap;
+		@extend %grid-column-gap;
 	}
 
 	&:not(.is-not-stacked-on-mobile) {
