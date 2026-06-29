@@ -50,21 +50,49 @@ export default function Layout() {
 
 If you're using custom fonts that are not hosted by a third-party service (like Google Fonts), you'll need to add them to `next/src/fonts` directory if not already added previously.
 
-### Step 2: Define Your Fonts in CSS
+### Step 2: Define Your Fonts in `theme.json`
 
-In `_fonts.css` file located in `wordpress/theme/src/editor-content/assets/css/`. Add your font-face declarations as follows:
+Fonts must be registered in `wordpress/theme/theme.json`. This is the WordPress-native way to declare font families and exposes them as presets to the block editor.
 
-```css
-@font-face {
-	font-family: 'My custom font';
-	src: url('../../../../next/src/fonts/my-custom-font.woff2') format('woff2');
-	font-weight: 400;
-	font-style: normal;
-	font-display: swap;
+Add your font under `settings.typography.fontFamilies`, declaring one `fontFace` entry per weight/style. Paths are relative to the theme root:
+
+```json
+{
+	"settings": {
+		"typography": {
+			"fontFamilies": [
+				{
+					"name": "My custom font",
+					"slug": "my-custom-font",
+					"fontFamily": "My custom font, sans-serif",
+					"fontFace": [
+						{
+							"src": [
+								"file:../../next/src/fonts/my-custom-font.woff2"
+							],
+							"fontWeight": "400",
+							"fontStyle": "normal",
+							"fontFamily": "My custom font"
+						}
+					]
+				}
+			]
+		}
+	}
 }
+```
 
-:root {
-	--font-primary: 'My custom font', sans-serif;
+### Step 3: Set the Default Font
+
+To use the new font as the default across the editor, set it on `styles.typography.fontFamily` using the generated preset variable (`--wp--preset--font-family--<slug>`):
+
+```json
+{
+	"styles": {
+		"typography": {
+			"fontFamily": "var(--wp--preset--font-family--my-custom-font)"
+		}
+	}
 }
 ```
 
