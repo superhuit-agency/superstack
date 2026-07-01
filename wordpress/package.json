@@ -11,6 +11,7 @@
     "generate:theme-css": "sh ./scripts/theme-css.sh",
     "test": "echo \"Error: no test specified\" && exit 1",
     "clear-cache": "wp @local transient delete --all && wp @local db query \"DELETE FROM wp_options where option_name LIKE '%wp_theme_files_patterns%'\"",
+    "predev": "THEME_CSS_SOFT=1 WPCLI=\"${WPCLI:-wp @local}\" npm run generate:theme-css",
     "dev": "npm --prefix ./theme run dev",
     "build": "npm --prefix ./theme run build",
     "setup-composer-auth": "sh ./scripts/setup-composer-auth.sh"

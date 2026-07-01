@@ -19,10 +19,14 @@ if [ -z "${WPCLI}" ]; then
 	fi
 fi
 
-# Stop if WordPress is not reachable.
+# Stop if WordPress is not reachable (or skip in soft mode).
 if ! $WPCLI core is-installed --quiet >/dev/null 2>&1; then
 	echo 'WordPress is not installed/reachable for the selected WPCLI target.' >&2
 	echo 'Set WPCLI (or WORDPRESS_PATH) to match your environment.' >&2
+	if [ "${THEME_CSS_SOFT:-}" = "1" ]; then
+		echo 'Skipping theme CSS generation (THEME_CSS_SOFT=1).' >&2
+		exit 0
+	fi
 	exit 1
 fi
 
