@@ -1,5 +1,5 @@
 {
-	"isMultilang": true,
+	"isMultilang": false,
 	"staticLang": "fr",
 	"hasCurrentLocaleInLangSwitcher": true
 }

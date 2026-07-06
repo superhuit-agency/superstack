@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import configs from '@/configs.json';
 
 // Keep in sync with the languages configured in Polylang (WP admin)
-const locales = ['fr', 'en'];
+const locales = ['fr'];
 const defaultLocale = configs.staticLang;
 
 function getLocale(request: NextRequest) {

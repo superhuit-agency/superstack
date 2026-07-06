@@ -80,11 +80,26 @@ export function MyClientComponent() {
 }
 ```
 
+## Switching between multilang and single language
+
+A migration script handles the structural changes in both directions (moves `[[...uri]]` in/out of the `[lang]` segment, swaps the layouts, updates `configs.json`, `proxy.ts`, `typings.d.ts`, `locale-context.tsx` and the `IS_MULTILANG` default in `wordpress/scripts/provision.sh`):
+
+```bash
+# interactive
+npm run generate:language-migration
+
+# non-interactive (first locale = default locale)
+node generators/lang-migration.js to-multilang fr en
+node generators/lang-migration.js to-singlelang fr
+```
+
+After migrating, restart WordPress (`cd wordpress && npm run start`) so `provision.sh` activates/deactivates the multilang plugins. The plugins stay in `composer.json` in both modes.
+
 ## Disabling multilang
 
-Set `isMultilang: false` in `src/configs.json`. The app will behave as a single-language site using `staticLang`. No other changes are needed — the `languageFields` and `translationsFields` GraphQL fragments become empty strings, and `get-all-uris.ts` / `get-node-by-uri.ts` fall back to their single-lang paths.
+Run the migration script above, or manually: set `isMultilang: false` in `src/configs.json`. The app will behave as a single-language site using `staticLang`. No other changes are needed — the `languageFields` and `translationsFields` GraphQL fragments become empty strings, and `get-all-uris.ts` / `get-node-by-uri.ts` fall back to their single-lang paths.
 
-Note: the `[lang]` segment in the URL will still be present in the route. To remove it entirely, move the route back to `src/app/[[...uri]]/page.tsx`.
+Note: with the manual approach, the `[lang]` segment in the URL will still be present in the route. To remove it entirely, move the route back to `src/app/[[...uri]]/page.tsx` (the script does this for you).
 
 ## To go further
 

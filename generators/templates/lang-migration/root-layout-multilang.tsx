@@ -1,8 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 
-import { LocaleProvider } from '@/contexts/locale-context';
-import { getDictionary } from '@/i18n/dictionaries';
 import { getLocales } from '@/i18n/get-locales';
 
 import '@/css/base/index.css';
@@ -38,7 +36,6 @@ export default async function RootLayout({
 	children: React.ReactNode;
 }>) {
 	const { defaultLocale } = await getLocales();
-	const dictionary = await getDictionary(defaultLocale);
 
 	return (
 		<html
@@ -48,11 +45,7 @@ export default async function RootLayout({
 			<head>
 				<link rel="stylesheet" href="/css/theme-generated.css" />
 			</head>
-			<body>
-				<LocaleProvider locale={defaultLocale} dictionary={dictionary}>
-					{children}
-				</LocaleProvider>
-			</body>
+			<body>{children}</body>
 		</html>
 	);
 }

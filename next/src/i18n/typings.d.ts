@@ -1,4 +1,4 @@
-type Locale = 'fr' | 'en';
+type Locale = 'fr';
 type Dictionary = Record<string, any>;
 
 interface Translation {
