@@ -1,0 +1,31 @@
+.lang-switcher {
+	display: flex;
+	flex-direction: row;
+	gap: 8px;
+
+	list-style: none;
+	padding: 0;
+	margin: 0;
+
+	&__link {
+		min-height: 32px;
+		padding: 8px 12px;
+		border-radius: 4px;
+		background-color: #f3f4f6;
+		color: #111111;
+		font-size: 14px;
+		font-weight: 500;
+		line-height: 1.5;
+		text-decoration: none;
+		transition: background-color 0.3s ease;
+
+		&:hover {
+			background-color: #e5e7eb;
+		}
+
+		&.is-active {
+			background-color: #000;
+			color: #ffffff;
+		}
+	}
+}

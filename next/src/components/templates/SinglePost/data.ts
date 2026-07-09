@@ -1,4 +1,8 @@
-import { seoPostTypeFragment } from '@/lib/fragments';
+import {
+	seoPostTypeFragment,
+	languageFields,
+	translationsFields,
+} from '@/lib/fragments';
 import { gql } from '@/utils';
 
 export const slug = 'single-post';
@@ -50,8 +54,17 @@ export const fragment = gql`
     seo {
       ...seoPostTypeFragment
     }
-  }
-  ${seoPostTypeFragment}
+    ${languageFields}
+    ${translationsFields}
+
+		# relatedPosts {
+		#   size: perPage
+		#   categoryIn
+		#   tagIn
+		#   notIn
+		# }
+	}
+	${seoPostTypeFragment}
 `;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

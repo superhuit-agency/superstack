@@ -1,3 +1,4 @@
+import configs from '@/configs.json';
 import { gql } from '@/utils';
 
 const ORDER_ENUMS = new Set(['ASC', 'DESC']);
@@ -51,6 +52,7 @@ const queryContentNodes = gql`
     $notIn: [ID]
     $search: String
     $contentTypes: [ContentTypeEnum]
+    ${configs.isMultilang ? '$language: LanguageCodeFilterEnum' : ''}
   ) {
     contentNodes(
       first: $first
@@ -61,6 +63,7 @@ const queryContentNodes = gql`
         search: $search
         stati: PUBLISH
         contentTypes: $contentTypes
+        ${configs.isMultilang ? 'language: $language' : ''}
       }
     ) {
       pageInfo {
@@ -108,13 +111,14 @@ const queryContentNodes = gql`
 
 export const getData = async (
 	fetcher: FetchApiFuncType,
-	attrs: QueryAttributes | null = null
+	attrs: QueryAttributes | null = null,
+	lang: string | null = null
 ) => {
-  const perPageRaw = attrs?.query?.perPage;
-  const perPage = Math.min(100, Math.max(1, toPositiveInt(perPageRaw) ?? 10));
+	const perPageRaw = attrs?.query?.perPage;
+	const perPage = Math.min(100, Math.max(1, toPositiveInt(perPageRaw) ?? 10));
 
-  const offsetRaw = attrs?.query?.offset;
-  const offset = Math.max(0, toPositiveInt(offsetRaw) ?? 0);
+	const offsetRaw = attrs?.query?.offset;
+	const offset = Math.max(0, toPositiveInt(offsetRaw) ?? 0);
 
 	const order = toOrderEnum(attrs?.query?.order);
 	const orderby = toOrderByEnum(attrs?.query?.orderBy);
@@ -124,51 +128,57 @@ export const getData = async (
 			? attrs.query.search.trim()
 			: null;
 
-  const notIn = normalizeIdList(attrs?.query?.exclude);
+	const notIn = normalizeIdList(attrs?.query?.exclude);
 
-  const postType = attrs?.query?.postType;
-  const contentTypes = postType ? [postType.toUpperCase()] : null;
+	const postType = attrs?.query?.postType;
+	const contentTypes = postType ? [postType.toUpperCase()] : null;
 
-  const variables = {
-    first: perPage,
-    offset,
-    order,
-    orderby,
-    notIn,
-    search,
-    contentTypes,
-  };
+	const variables = {
+		first: perPage,
+		offset,
+		order,
+		orderby,
+		notIn,
+		search,
+		contentTypes,
+		...(configs.isMultilang
+			? { language: lang ? lang.toUpperCase() : 'ALL' }
+			: {}),
+	};
 
-  const data = await fetcher(queryContentNodes, { variables });
+	const data = await fetcher(queryContentNodes, { variables });
 
-  const total =
-    typeof data?.contentNodes?.pageInfo?.offsetPagination?.total === 'number'
-      ? data.contentNodes.pageInfo.offsetPagination.total
-      : null;
-  const totalPages =
-    typeof total === 'number' && total >= 0 ? Math.ceil(total / perPage) : null;
-  const currentPage = Math.floor(offset / perPage) + 1;
+	const total =
+		typeof data?.contentNodes?.pageInfo?.offsetPagination?.total ===
+		'number'
+			? data.contentNodes.pageInfo.offsetPagination.total
+			: null;
+	const totalPages =
+		typeof total === 'number' && total >= 0
+			? Math.ceil(total / perPage)
+			: null;
+	const currentPage = Math.floor(offset / perPage) + 1;
 
-  const nodes = (data?.contentNodes?.nodes ?? []).map((node: unknown) => ({
-    excerpt: '',
-    content: null,
-    author: null,
-    featuredImage: null,
-    ...(node as Record<string, unknown>),
-  }));
+	const nodes = (data?.contentNodes?.nodes ?? []).map((node: unknown) => ({
+		excerpt: '',
+		content: null,
+		author: null,
+		featuredImage: null,
+		...(node as Record<string, unknown>),
+	}));
 
-  return {
-    data: {
-      posts: {
-        nodes,
-      },
-    },
-    pagination: {
-      perPage,
-      offset,
-      currentPage,
-      total,
-      totalPages,
-    },
-  };
+	return {
+		data: {
+			posts: {
+				nodes,
+			},
+		},
+		pagination: {
+			perPage,
+			offset,
+			currentPage,
+			total,
+			totalPages,
+		},
+	};
 };

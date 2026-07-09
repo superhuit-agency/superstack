@@ -10,7 +10,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepare": "husky",
     "format": "prettier --write \"next/**/*.{js,jsx,ts,tsx,json,css,md,yml,yaml}\" \"wordpress/theme/**/*.{js,jsx,ts,tsx,json,css,scss,md,yml,yaml}\"",
-    "format:check": "prettier --check \"next/**/*.{js,jsx,ts,tsx,json,css,md,yml,yaml}\" \"wordpress/theme/**/*.{js,jsx,ts,tsx,json,css,scss,md,yml,yaml}\""
+    "format:check": "prettier --check \"next/**/*.{js,jsx,ts,tsx,json,css,md,yml,yaml}\" \"wordpress/theme/**/*.{js,jsx,ts,tsx,json,css,scss,md,yml,yaml}\"",
+    "generate:language-migration": "node generators/lang-migration.js"
   },
   "lint-staged": {
     "next/**/*.{js,jsx,ts,tsx,json,css,md,yml,yaml}": [

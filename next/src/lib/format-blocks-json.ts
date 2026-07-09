@@ -4,7 +4,7 @@ import getBlockFinalComponentProps from '@/lib/get-block-final-component-props';
 
 export default async function formatBlocksJSON(
 	blocksJSON: string,
-	options?: { skipGetData?: boolean }
+	options?: { skipGetData?: boolean; lang?: string | null }
 ) {
 	/**
 	 * Replace ocurrences of WP upload URIs with relative url

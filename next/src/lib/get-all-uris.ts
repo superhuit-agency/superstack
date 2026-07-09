@@ -1,8 +1,16 @@
+import configs from '@/configs.json';
 import { fetchAPI } from '.';
 
 const POST_TYPES: string[] = ['pages'];
 const ARCHIVES: string[] = ['contentTypes']; // contentTypes are for archives but have no where arg — use first: 100
 const TAXONOMIES: string[] = [];
+
+type UriNode = {
+	uri?: string;
+	isRedirected?: boolean;
+	language?: { code: string };
+	translations?: Array<{ uri?: string; language?: { code: string } }>;
+};
 
 export default async function getAllURIs() {
 	const nodeCounts = await fetchAPI(
@@ -17,6 +25,15 @@ export default async function getAllURIs() {
 					}
 				}`
 			)}
+			${
+				configs.isMultilang
+					? `
+				defaultLanguage {
+					slug
+				}
+			`
+					: ''
+			}
 		}`
 	);
 
@@ -37,6 +54,13 @@ export default async function getAllURIs() {
 						nodes {
 							uri
 							isRedirected
+							${
+								configs.isMultilang
+									? `language {
+								code
+							}`
+									: ''
+							}
 						}
 					}
 				}`
@@ -45,30 +69,47 @@ export default async function getAllURIs() {
 		}
 	});
 
-  ARCHIVES.forEach((postType) => {
-    nodesPromises.push(
-      fetchAPI(
-        `query AllURIs_${postType} {
+	ARCHIVES.forEach((postType) => {
+		nodesPromises.push(
+			fetchAPI(
+				`query AllURIs_${postType} {
 				${postType}(first: 100) {
 					nodes {
 						uri
 						isRedirected
+						${
+							configs.isMultilang
+								? `translations {
+							uri
+							language {
+								code
+							}
+						}`
+								: ''
+						}
 					}
 				}
-			}`,
-      ),
-    );
-  });
+			}`
+			)
+		);
+	});
 
-  // TODO: improve to handle more than 100 terms in each taxonomy
-  TAXONOMIES.forEach((taxName) => {
-    nodesPromises.push(
-      fetchAPI(
-        `query AllURIs_${taxName} {
+	// TODO: improve to handle more than 100 terms in each taxonomy
+	TAXONOMIES.forEach((taxName) => {
+		nodesPromises.push(
+			fetchAPI(
+				`query AllURIs_${taxName} {
 				${taxName}(first: 100) {
 					nodes {
 						uri
 						isRedirected
+						${
+							configs.isMultilang
+								? `language {
+							code
+						}`
+								: ''
+						}
 					}
 				}
 			}`
@@ -78,7 +119,7 @@ export default async function getAllURIs() {
 
 	const nodesQueries = await Promise.allSettled(nodesPromises);
 
-	const nodes = nodesQueries.reduce<PromiseSettledResult<any>[]>(
+	const nodes = nodesQueries.reduce<UriNode[]>(
 		(nodes, query) =>
 			query.status !== 'fulfilled'
 				? nodes
@@ -90,29 +131,44 @@ export default async function getAllURIs() {
 		[]
 	);
 
-	/**
-	 * Multilang :: Remove lang from URI to return URI + LANG seperately
-	 */
-	//   const mapForMultilang = (node: {
-	//     uri: string;
-	//     language: { code: string };
-	//   }) => ({
-	//     params: {
-	//       uri: node.uri
-	//         .split('/')
-	//         .filter((path: string) => path != '') // remove empty paths
-	//         .slice(1), // + remove 1st element = lang
-	//       lang: node.language
-	//         ? node.language.code.toLowerCase()
-	//         : nodeCounts.defaultLanguage.slug,
-	//     },
-	//   });
-
-	const mapForSingleLang = (node: { uri: string }) => ({
-		uri: node.uri.split('/').filter((path: string) => path != ''), // remove empty paths
+	const mapForMultilang = (node: {
+		uri: string;
+		language: { code: string };
+	}) => ({
+		uri: node.uri
+			.split('/')
+			.filter((path: string) => path !== '')
+			.slice(1), // remove first segment = lang prefix
+		lang: node.language
+			? node.language.code.toLowerCase()
+			: nodeCounts.defaultLanguage.slug,
 	});
 
-	const callback: (node: any) => {} = mapForSingleLang;
+	const mapForSingleLang = (node: { uri: string }) => ({
+		uri: node.uri.split('/').filter((path: string) => path !== ''),
+	});
 
-  return nodes.filter((node: any) => node.uri && !node.isRedirected).map(callback);
+	const callback: (node: any) => {} = configs.isMultilang
+		? mapForMultilang
+		: mapForSingleLang;
+
+	// Archives (ContentType) have no language of their own: expand their
+	// per-language `translations` (lang-prefixed URIs) into one node per language.
+	const expandedNodes = configs.isMultilang
+		? nodes.flatMap((node) =>
+				!node.language && Array.isArray(node.translations)
+					? node.translations
+							.filter((t) => t?.uri)
+							.map((t) => ({
+								uri: t.uri,
+								isRedirected: node.isRedirected,
+								language: t.language,
+							}))
+					: [node]
+			)
+		: nodes;
+
+	return expandedNodes
+		.filter((node: any) => node.uri && !node.isRedirected)
+		.map(callback);
 }

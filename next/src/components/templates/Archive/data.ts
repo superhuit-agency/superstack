@@ -1,6 +1,8 @@
-import { gql } from "@/utils";
+import { gql } from '@/utils';
 
-export const slug = "archive";
+import { translationsFields } from '@/lib/fragments';
+
+export const slug = 'archive';
 
 export const fragment = gql`
   fragment archiveFragment on ContentType {
@@ -11,5 +13,6 @@ export const fragment = gql`
     fseTemplate {
       slug
     }
+    ${translationsFields}
   }
 `;

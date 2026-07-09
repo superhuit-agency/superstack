@@ -1,4 +1,5 @@
 import * as _templatesData from '@/components/templates/data';
+import configs from '@/configs.json';
 import { fetchAPI, formatBlocksJSON } from '@/lib';
 import getBlockFinalComponentProps from '@/lib/get-block-final-component-props';
 
@@ -15,9 +16,11 @@ const { archiveData, singlePageData, singlePostData } = templatesData;
  *
  * @param {string}      uri
  * @param {boolean}     preview
- * @param {object}      auth
- * @param {null|string} lang
+ * @param {object}      auth
+ * @param {string|null} lang - The language code
+ * @param {boolean}     previewDraft
  * @param {boolean}     blockEnrichment - Whether to enrich the node with blocksJSON and templateData
+ * @param {number}      routePage
  *
  * @returns
  */
@@ -27,9 +30,13 @@ export default async function getNodeByURI(
 	auth: AuthType,
 	previewDraft: boolean,
 	blockEnrichment = true,
-	routePage = 1
+	routePage = 1,
+	lang: string | null = null
 ) {
-	// uri = getUriWithoutPagination(uri); // Removes '/page/...' from uri if needed
+	// Ensure URI includes language prefix if multilang is enabled
+	if (configs.isMultilang && lang && !uri.startsWith(`/${lang}/`)) {
+		uri = `/${lang}${uri.startsWith('/') ? '' : '/'}${uri}`;
+	}
 
 	// The slug may be the id of an unpublished post
 	const [match, id] = uri.match(/^(?:\/?\w{2})?\/(\d+)\/?/) || [];
@@ -48,7 +55,7 @@ export default async function getNodeByURI(
 	if (isId) variables.id = Number.parseInt(id);
 	else variables.uri = uri;
 
-	const query = isId ? nodeByIdQuery() : nodeByUriQuery();
+	const query = isId ? nodeByIdQuery(lang) : nodeByUriQuery(lang);
 
 	const response = await fetchAPI(query, {
 		variables,
@@ -58,26 +65,66 @@ export default async function getNodeByURI(
 		},
 	});
 
-	const { node, seo, generalSettings } = response;
+	const { node: rawNode, seo, generalSettings } = response;
 
-	if (!node) return null;
+	if (!rawNode) return null;
 
-	node.fullUri = uri; // Needed for the archive pagination
+	let node = rawNode;
 
-	/**
-	 * Enrich & format node blocksJSON prop + archive
-	 */
+	if (configs.isMultilang) {
+		if (node.translation) {
+			const { __typename } = node;
+			node = { __typename, ...node.translation };
+		} else if (lang && Array.isArray(node.translations)) {
+			// Non-translatable nodes (ContentType archives) have no `language`
+			// of their own — derive it from the requested lang so the rest of
+			// the multilang handling (lang switcher, hreflang) works unchanged.
+			const current = node.translations.find(
+				(t: { language?: { code?: string } }) =>
+					t.language?.code?.toLowerCase() === lang.toLowerCase()
+			);
+
+			if (current) {
+				node = {
+					...node,
+					uri: current.uri,
+					language: current.language,
+					translations: node.translations.filter(
+						(t: unknown) => t !== current
+					),
+				};
+			}
+		}
+
+		if (configs.hasCurrentLocaleInLangSwitcher) {
+			if (!node.translations) node.translations = [];
+			if (!node.language?.locale || !node.language?.code) return null;
+
+			node.translations.unshift({
+				uri: node.uri,
+				language: {
+					locale: node.language.locale,
+					code: node.language.code,
+				},
+			});
+		}
+	}
+
+	node.fullUri = uri;
+
 	if (blockEnrichment) {
 		const { blocksJSON, templateData, templateBlocks } =
 			await Promise.allSettled([
 				formatBlocksJSON(
 					previewDraft
 						? (node.preview?.node?.blocksJSON ?? '')
-						: (node?.blocksJSON ?? '')
+						: (node?.blocksJSON ?? ''),
+					{ lang }
 				),
 				getTemplateData(node),
 				enrichTemplateBlocks(
-					getTemplateBlocks(node?.fseTemplate?.slug)
+					getTemplateBlocks(node?.fseTemplate?.slug),
+					lang
 				),
 			])
 				.then(([bProm, tProm, tbProm]) => ({
@@ -107,7 +154,6 @@ export default async function getNodeByURI(
 
 		return {
 			...node,
-			// blocksJSON,
 			blocks,
 			...templateData,
 			siteSEO: seo,
@@ -147,24 +193,29 @@ const commonFields = `
 `;
 
 const types = [
-  {
-    type: "ContentType",
-    fragment: archiveData.fragment,
-    fields: "archiveFragment",
-  },
-  {
-    type: "Page",
-    fragment: singlePageData.fragment,
-    fields: "singlePageFragment",
-  },
-  {
-    type: "Post",
-    fragment: singlePostData.fragment,
-    fields: "singlePostFragment",
-  },
+	{
+		type: 'ContentType',
+		fragment: archiveData.fragment,
+		fields: 'archiveFragment',
+		// ContentType has no Polylang `translation` field — archives expose
+		// per-language URIs via the custom `translations` field instead.
+		translatable: false,
+	},
+	{
+		type: 'Page',
+		fragment: singlePageData.fragment,
+		fields: 'singlePageFragment',
+		translatable: true,
+	},
+	{
+		type: 'Post',
+		fragment: singlePostData.fragment,
+		fields: 'singlePostFragment',
+		translatable: true,
+	},
 ];
 
-const nodeByUriQuery = () => `
+const nodeByUriQuery = (lang: string | null) => `
 	query nodeByUriQuery(
 		$uri: String!
 		$isPreview: Boolean = false
@@ -172,7 +223,17 @@ const nodeByUriQuery = () => `
 	) {
 		node: nodeByUri(uri: $uri) {
 			__typename
-			${types.map(({ fields }) => `...${fields}`).join('\n')}
+			${types
+				.map(({ type, fields, translatable }) =>
+					configs.isMultilang && lang && translatable
+						? `...on ${type} {
+					translation(language: ${lang.toUpperCase()}) {
+						...${fields}
+					}
+				}`
+						: `...${fields}`
+				)
+				.join('\n')}
 		}
 		${commonFields}
 	}
@@ -180,7 +241,7 @@ const nodeByUriQuery = () => `
 	${types.map(({ fragment }) => fragment).join('\n')}
 `;
 
-const nodeByIdQuery = () => `
+const nodeByIdQuery = (lang: string | null) => `
 	query nodeByIdQuery(
 		$id: ID!
 		$isPreview: Boolean = false
@@ -188,7 +249,17 @@ const nodeByIdQuery = () => `
 	) {
 		node(id: $id, idType: DATABASE_ID) {
 			__typename
-			${types.map(({ fields }) => `...${fields}`).join('\n')}
+			${types
+				.map(({ type, fields, translatable }) =>
+					configs.isMultilang && lang && translatable
+						? `...on ${type} {
+					translation(language: ${lang.toUpperCase()}) {
+						...${fields}
+					}
+				}`
+						: `...${fields}`
+				)
+				.join('\n')}
 		}
 		${commonFields}
 	}
@@ -208,7 +279,7 @@ for (const key in templatesData) {
 }
 
 const getTemplateData = async (node: any) => {
-  const type = `single-${node.__typename}`.toLowerCase();
+	const type = `single-${node.__typename}`.toLowerCase();
 
 	const { getData } = templatesDataList?.[type] ?? {};
 
@@ -267,12 +338,15 @@ const getTemplateBlocks = (templateSlug: string): BlockPropsType[] => {
  * (navigation, site logo, etc.) is always fresh and not baked in at build time.
  */
 const enrichTemplateBlocks = (
-	blocks: BlockPropsType[]
+	blocks: BlockPropsType[],
+	lang: string | null = null
 ): Promise<BlockPropsType[]> =>
 	blocks.length === 0
 		? Promise.resolve([])
 		: Promise.allSettled(
-				blocks.map((block) => getBlockFinalComponentProps(block))
+				blocks.map((block) =>
+					getBlockFinalComponentProps(block, { lang })
+				)
 			).then(
 				(results) =>
 					results
