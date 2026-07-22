@@ -61,6 +61,11 @@ class ResolveUris {
 		$site_url = preg_replace('/https?:\/\//', '', get_site_url());
 		$next_url = preg_replace('/https?:\/\//', '', get_next_url());
 
+		// Escape the hosts: they can contain slashes (e.g. sub-path installs like
+		// "localhost/subsite"), which would otherwise be read as the regex delimiter.
+		$site_url = preg_quote($site_url, '/');
+		$next_url = preg_quote($next_url, '/');
+
 		// Do not continue if the result is not a BE nor a FE url
 		if (! preg_match("/^https?:\/\/($site_url|$next_url)/i", $result)) return $result;
 
