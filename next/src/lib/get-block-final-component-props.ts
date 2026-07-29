@@ -43,6 +43,7 @@ export default function getBlockFinalComponentProps(
 		lang?: string | null;
 		page?: number;
 		baseUri?: string;
+		term?: BlockDataContext['term'];
 	}
 ): Promise<BlockPropsType> {
 	return new Promise(async (res) => {
@@ -105,6 +106,7 @@ const getAttributes = (
 		lang?: string | null;
 		page?: number;
 		baseUri?: string;
+		term?: BlockDataContext['term'];
 	}
 ) =>
 	new Promise(async (res) => {
@@ -135,6 +137,7 @@ const getAttributes = (
 			getData(fetchAPI, attributes, options?.lang ?? null, {
 				page: options?.page,
 				baseUri: options?.baseUri,
+				term: options?.term,
 				innerBlocks,
 			}).then(
 				(data = {}) => {
@@ -157,6 +160,7 @@ const getInnerBlocks = (
 		lang?: string | null;
 		page?: number;
 		baseUri?: string;
+		term?: BlockDataContext['term'];
 	}
 ) =>
 	new Promise((res, rej) => {

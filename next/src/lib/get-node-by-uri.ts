@@ -9,7 +9,8 @@ import injectBreadcrumbs from '@/lib/inject-breadcrumbs';
 
 const templatesData: any = _templatesData;
 
-const { archiveData, singlePageData, singlePostData } = templatesData;
+const { archiveData, categoryData, singlePageData, singlePostData, tagData } =
+	templatesData;
 
 /**
  * NOTE: in preview, the `uri` could be in fact the ID (i.e. a draft doesn't have a slug/uri yet)
@@ -109,6 +110,10 @@ export default async function getNodeByURI(
 
 	node.fullUri = uri;
 
+	// On a term archive (Tag/Category), expose the current term so query loops
+	// inside the archive template scope their posts to it at request time.
+	const term = getTermContext(node);
+
 	if (blockEnrichment) {
 		const { blocksJSON, templateData, templateBlocks } =
 			await Promise.allSettled([
@@ -116,14 +121,15 @@ export default async function getNodeByURI(
 					previewDraft
 						? (node.preview?.node?.blocksJSON ?? '')
 						: (node?.blocksJSON ?? ''),
-					{ lang, page: routePage, baseUri: uri }
+					{ lang, page: routePage, baseUri: uri, term }
 				),
 				getTemplateData(node),
 				enrichTemplateBlocks(
 					getTemplateBlocks(node?.fseTemplate?.slug, lang),
 					lang,
 					routePage,
-					uri
+					uri,
+					term
 				),
 			])
 				.then(([bProm, tProm, tbProm]) => ({
@@ -212,6 +218,18 @@ const types = [
 		translatable: true,
 	},
 	{
+		type: 'Category',
+		fragment: categoryData.fragment,
+		fields: 'categoryFragment',
+		translatable: true,
+	},
+	{
+		type: 'Tag',
+		fragment: tagData.fragment,
+		fields: 'tagFragment',
+		translatable: true,
+	},
+	{
 		type: 'Post',
 		fragment: singlePostData.fragment,
 		fields: 'singlePostFragment',
@@ -281,6 +299,26 @@ for (const key in templatesData) {
 		templatesDataList[element.slug] = element;
 	}
 }
+
+// Maps a resolved node's `__typename` to its WPGraphQL taxonomy handle. Only
+// term archives (Tag/Category) qualify — single posts/pages and ContentType
+// (post-type) archives have no current term to scope a query loop by.
+const TERM_TAXONOMIES: Record<string, string> = {
+	Tag: 'tag',
+	Category: 'category',
+};
+
+const getTermContext = (node: any): BlockDataContext['term'] | undefined => {
+	const taxonomy = TERM_TAXONOMIES[node?.__typename];
+	if (!taxonomy) return undefined;
+
+	// The term fragments alias `id: databaseId`, so `node.id` is the WP DB id.
+	const databaseId =
+		typeof node?.id === 'number' ? node.id : Number.parseInt(node?.id, 10);
+	if (!Number.isFinite(databaseId)) return undefined;
+
+	return { taxonomy, databaseId };
+};
 
 const getTemplateData = async (node: any) => {
 	const type = `single-${node.__typename}`.toLowerCase();

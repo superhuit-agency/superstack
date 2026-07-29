@@ -52,6 +52,8 @@ const queryContentNodes = gql`
     $notIn: [ID]
     $search: String
     $contentTypes: [ContentTypeEnum]
+    $categoryIn: [ID]
+    $tagIn: [ID]
     ${configs.isMultilang ? '$language: LanguageCodeFilterEnum' : ''}
   ) {
     contentNodes(
@@ -63,6 +65,8 @@ const queryContentNodes = gql`
         search: $search
         stati: PUBLISH
         contentTypes: $contentTypes
+        categoryIn: $categoryIn
+        tagIn: $tagIn
         ${configs.isMultilang ? 'language: $language' : ''}
       }
     ) {
@@ -224,6 +228,12 @@ export const getData = async (
 	const postType = attrs?.query?.postType;
 	const contentTypes = postType ? [postType.toUpperCase()] : null;
 
+	// Scope the loop to the current term archive (Tag/Category page) when one is
+	// in context, so the query returns only that term's posts.
+	const term = context?.term ?? null;
+	const categoryIn = term?.taxonomy === 'category' ? [term.databaseId] : null;
+	const tagIn = term?.taxonomy === 'tag' ? [term.databaseId] : null;
+
 	const variables = {
 		first: perPage,
 		offset,
@@ -232,6 +242,8 @@ export const getData = async (
 		notIn,
 		search,
 		contentTypes,
+		categoryIn,
+		tagIn,
 		...(configs.isMultilang
 			? { language: lang ? lang.toUpperCase() : 'ALL' }
 			: {}),
