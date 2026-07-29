@@ -37,6 +37,16 @@ type BlockDataContext = {
 	baseUri?: string;
 	/** The block's own `innerBlocks`, so `getData` can enrich/override children. */
 	innerBlocks?: Array<BlockPropsType>;
+	/**
+	 * The taxonomy term being viewed on a term archive (Tag/Category), so query
+	 * loops can scope their posts to the current term without a rebuild.
+	 */
+	term?: {
+		/** WPGraphQL taxonomy handle, e.g. "tag" | "category". */
+		taxonomy: string;
+		/** The term's WordPress database ID. */
+		databaseId: number;
+	};
 };
 
 type FseTemplateEntry = {
