@@ -50,6 +50,8 @@ const blocksList: Record<string, () => Promise<BlockModule>> = {
 	'core/query': () => import('../core/Query'),
 	'core/query-pagination': () => import('../core/QueryPagination'),
 	'core/query-pagination-next': () => import('../core/QueryPaginationNext'),
+	'core/query-pagination-numbers': () =>
+		import('../core/QueryPaginationNumbers'),
 	'core/query-pagination-previous': () =>
 		import('../core/QueryPaginationPrevious'),
 	'core/query-title': () => import('../core/QueryTitle'),
