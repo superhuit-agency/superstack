@@ -25,6 +25,20 @@ type BlockPropsType = {
 	innerBlocks: Array<any>;
 };
 
+/**
+ * Request-time context threaded into a block's `getData(fetcher, attrs, lang, context)`.
+ * Populated per request from the resolved node (see get-node-by-uri.ts) so blocks
+ * like `core/query` can resolve pagination without a rebuild.
+ */
+type BlockDataContext = {
+	/** Current query-loop page from the `/page/{n}` route (1-based). */
+	page?: number;
+	/** Base uri of the resolved node (e.g. "/blog/"), used to build page links. */
+	baseUri?: string;
+	/** The block's own `innerBlocks`, so `getData` can enrich/override children. */
+	innerBlocks?: Array<BlockPropsType>;
+};
+
 type FseTemplateEntry = {
 	slug: string;
 	blocks: Array<BlockPropsType | null>;

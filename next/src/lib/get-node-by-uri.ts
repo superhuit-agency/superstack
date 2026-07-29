@@ -60,9 +60,6 @@ export default async function getNodeByURI(
 	const response = await fetchAPI(query, {
 		variables,
 		auth,
-		headers: {
-			'X-Query-Page': String(routePage && routePage > 0 ? routePage : 1),
-		},
 	});
 
 	const { node: rawNode, seo, generalSettings } = response;
@@ -119,12 +116,14 @@ export default async function getNodeByURI(
 					previewDraft
 						? (node.preview?.node?.blocksJSON ?? '')
 						: (node?.blocksJSON ?? ''),
-					{ lang }
+					{ lang, page: routePage, baseUri: uri }
 				),
 				getTemplateData(node),
 				enrichTemplateBlocks(
 					getTemplateBlocks(node?.fseTemplate?.slug),
-					lang
+					lang,
+					routePage,
+					uri
 				),
 			])
 				.then(([bProm, tProm, tbProm]) => ({
@@ -339,13 +338,15 @@ const getTemplateBlocks = (templateSlug: string): BlockPropsType[] => {
  */
 const enrichTemplateBlocks = (
 	blocks: BlockPropsType[],
-	lang: string | null = null
+	lang: string | null = null,
+	page = 1,
+	baseUri: string | undefined = undefined
 ): Promise<BlockPropsType[]> =>
 	blocks.length === 0
 		? Promise.resolve([])
 		: Promise.allSettled(
 				blocks.map((block) =>
-					getBlockFinalComponentProps(block, { lang })
+					getBlockFinalComponentProps(block, { lang, page, baseUri })
 				)
 			).then(
 				(results) =>

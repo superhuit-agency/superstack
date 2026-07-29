@@ -38,7 +38,12 @@ export default function getBlockFinalComponentProps(
 		attributes: object;
 		innerBlocks: Array<BlockPropsType>;
 	},
-	options?: { skipGetData?: boolean; lang?: string | null }
+	options?: {
+		skipGetData?: boolean;
+		lang?: string | null;
+		page?: number;
+		baseUri?: string;
+	}
 ): Promise<BlockPropsType> {
 	return new Promise(async (res) => {
 		const props: BlockPropsType = {
@@ -48,9 +53,9 @@ export default function getBlockFinalComponentProps(
 		};
 
 		Promise.allSettled([
-			getAttributes(name, attributes, options),
+			getAttributes(name, attributes, innerBlocks, options),
 			getInnerBlocks(innerBlocks, options),
-		]).then(([attrsResult, blksResult]) => {
+		]).then(async ([attrsResult, blksResult]) => {
 			if (attrsResult.status === 'fulfilled') {
 				const { attrs, innerBlocks: dataInnerBlocks } =
 					attrsResult.value as {
@@ -59,10 +64,16 @@ export default function getBlockFinalComponentProps(
 					};
 				props.attributes = attrs ?? {};
 
-				// If getData returned innerBlocks, use those (fresh) and skip the static ones.
-				// (this is a fix made for core/navigation for example, which has links as innerBlocks, but we want them to be always up to date, even if it's part of the FSE template)
+				// If getData returned innerBlocks, use those (fresh) instead of the
+				// static ones — but still run them back through this same enrichment
+				// pipeline, so any dynamic block nested inside (e.g. a `core/navigation`
+				// nested inside a submenu, or a pagination block inside a `core/query`)
+				// gets its own getData resolved too.
 				if (dataInnerBlocks !== undefined) {
-					props.innerBlocks = dataInnerBlocks;
+					props.innerBlocks = (await getInnerBlocks(
+						dataInnerBlocks,
+						options
+					).catch(() => [])) as BlockPropsType['innerBlocks'];
 				} else if (blksResult.status === 'fulfilled') {
 					props.innerBlocks =
 						(blksResult.value as BlockPropsType['innerBlocks']) ??
@@ -88,7 +99,13 @@ export default function getBlockFinalComponentProps(
 const getAttributes = (
 	name: string,
 	attributes: object,
-	options?: { skipGetData?: boolean; lang?: string | null }
+	innerBlocks: Array<BlockPropsType>,
+	options?: {
+		skipGetData?: boolean;
+		lang?: string | null;
+		page?: number;
+		baseUri?: string;
+	}
 ) =>
 	new Promise(async (res) => {
 		if (
@@ -104,7 +121,8 @@ const getAttributes = (
 					getData?: (
 						fetcher: FetchApiFuncType,
 						attrs: object,
-						lang?: string | null
+						lang?: string | null,
+						context?: BlockDataContext
 					) => Promise<object>;
 				}
 			).getData;
@@ -114,7 +132,11 @@ const getAttributes = (
 				return;
 			}
 
-			getData(fetchAPI, attributes, options?.lang ?? null).then(
+			getData(fetchAPI, attributes, options?.lang ?? null, {
+				page: options?.page,
+				baseUri: options?.baseUri,
+				innerBlocks,
+			}).then(
 				(data = {}) => {
 					const { innerBlocks, ...restData } = data as {
 						innerBlocks?: BlockPropsType[];
@@ -130,7 +152,12 @@ const getAttributes = (
 
 const getInnerBlocks = (
 	blocks: Array<BlockPropsType>,
-	options?: { skipGetData?: boolean; lang?: string | null }
+	options?: {
+		skipGetData?: boolean;
+		lang?: string | null;
+		page?: number;
+		baseUri?: string;
+	}
 ) =>
 	new Promise((res, rej) => {
 		if (!(blocks?.length > 0)) rej([]);
