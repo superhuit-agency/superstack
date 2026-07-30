@@ -1,0 +1,165 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import SearchBar from '../../components/SearchBar.astro';
+import CategoryCard from '../../components/CategoryCard.astro';
+import { categories } from '../../content/categories';
+
+export async function getStaticPaths() {
+  return categories.map((category) => ({
+    params: { category: category.slug },
+    props: { category },
+  }));
+}
+
+const { category } = Astro.props;
+
+const allDocs = await getCollection('docs');
+const docs = allDocs
+  .filter((doc) => doc.data.category === category.slug)
+  .sort((a, b) => a.data.order - b.data.order);
+
+const subcategories = (category.subcategories ?? []).filter((subcategory) =>
+  docs.some((doc) => doc.data.subcategory === subcategory)
+);
+
+const categoryIndex = categories.findIndex((c) => c.slug === category.slug);
+---
+
+<BaseLayout title={category.label}>
+  <div class="wrapper category-page">
+    <Breadcrumb items={[{ label: 'Accueil', href: '/' }, { label: category.label }]} />
+
+    <header class="category-page__header">
+      <h1 class="t-title-lg">{category.label}</h1>
+      <p>{category.description}</p>
+      <SearchBar />
+    </header>
+
+    {
+      subcategories.length > 0 && (
+        <div class="category-page__pills" role="group" aria-label="Filtrer par catégorie">
+          <button type="button" class="category-page__pill is-active" data-filter="">
+            Tous
+          </button>
+          {subcategories.map((subcategory) => (
+            <button type="button" class="category-page__pill" data-filter={subcategory}>
+              {subcategory}
+            </button>
+          ))}
+        </div>
+      )
+    }
+
+    {
+      docs.length > 0 ? (
+        <div class="category-page__grid">
+          {docs.map((doc) => (
+            <div class="category-page__item" data-subcategory={doc.data.subcategory ?? ''}>
+              <CategoryCard
+                href={`/${category.slug}/${doc.id.split('/').pop()}/`}
+                label={doc.data.title}
+                description={doc.data.summary}
+                image={doc.data.previewImage}
+                icon={doc.data.previewImage ? undefined : (doc.data.icon ?? category.icon)}
+                colorIndex={categoryIndex}
+              />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p class="category-page__empty">Aucune page pour cette catégorie pour le moment.</p>
+      )
+    }
+  </div>
+</BaseLayout>
+
+{
+  subcategories.length > 0 && (
+    <script>
+      const pills = document.querySelectorAll<HTMLButtonElement>('.category-page__pill');
+      const items = document.querySelectorAll<HTMLElement>('.category-page__item');
+
+      pills.forEach((pill) => {
+        pill.addEventListener('click', () => {
+          const filter = pill.dataset.filter ?? '';
+
+          pills.forEach((p) => p.classList.toggle('is-active', p === pill));
+          items.forEach((item) => {
+            const match = filter === '' || item.dataset.subcategory === filter;
+            item.style.display = match ? '' : 'none';
+          });
+        });
+      });
+    </script>
+  )
+}
+
+<style>
+  .category-page {
+    padding-block: 2rem 4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .category-page__header p {
+    color: var(--color-text-muted);
+    margin-bottom: 1rem;
+  }
+
+  .category-page__pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+
+  .category-page__pill {
+    font-family: var(--font-primary);
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 0.5rem 1.1rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text);
+    cursor: pointer;
+    transition: 0.2s ease;
+  }
+
+  .category-page__pill:hover {
+    border-color: var(--color-accent);
+  }
+
+  .category-page__pill.is-active {
+    background: var(--color-text);
+    border-color: var(--color-text);
+    color: var(--color-neutral-000);
+  }
+
+  .category-page__grid {
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: 1fr;
+    align-items: stretch;
+    
+    @media (min-width: 768px) {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  .category-page__item {
+    display: flex;
+  }
+
+  .category-page__grid :global(.category-card) {
+    aspect-ratio: auto;
+    min-height: 140px;
+    width: 100%;
+  }
+
+  .category-page__empty {
+    color: var(--color-text-muted);
+  }
+</style>

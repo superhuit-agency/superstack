@@ -1,0 +1,44 @@
+---
+import Search from 'astro-pagefind/components/Search.astro';
+---
+
+<div class="search-bar">
+  <Search
+    className="search-bar__input"
+    searchboxOptions={{
+      placeholder: 'Rechercher dans la documentation…',
+      showImages: false,
+      excerptLength: 20,
+    }}
+  />
+</div>
+
+<style>
+  .search-bar {
+    
+    @media (min-width: 768px) {
+      min-width: 500px;
+      width: max-content;
+    }
+  }
+
+  .search-bar :global(.pagefind-ui) {
+    --pagefind-ui-scale: 0.95;
+    --pagefind-ui-primary: var(--color-accent);
+    --pagefind-ui-text: var(--color-text);
+    --pagefind-ui-background: var(--color-surface);
+    --pagefind-ui-border: var(--color-border);
+    --pagefind-ui-border-width: 1px;
+    --pagefind-ui-font: inherit;
+    width: 100%;
+  }
+
+  .search-bar :global(.pagefind-ui__form) {
+    width: 100%;
+  }
+
+  .search-bar :global(.pagefind-ui__search-input) {
+    border-radius: 999px;
+    padding: 0.85rem 1.25rem;
+  }
+</style>

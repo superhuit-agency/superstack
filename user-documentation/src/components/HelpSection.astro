@@ -1,0 +1,72 @@
+---
+---
+
+<section class="help">
+  <div class="help__text">
+    <h2 class="t-title-md">Besoin d'aide ?</h2>
+    <p>Notre équipe reste disponible si cette documentation ne répond pas à votre question.</p>
+    <div class="help__contacts">
+      <a class="help__contact" href="mailto:charlotte@superhuit.ch">📧 hello@superhuit.ch</a>
+      <a class="help__contact" href="tel:+41216521818">📞 +41 21 652 18 18</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .help {
+    margin-top: 3rem;
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    text-align: center;
+  }
+
+  .help__illustration {
+    width: 96px;
+    height: 96px;
+    flex-shrink: 0;
+  }
+
+  .help__text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .help h2 {
+    margin-top: 0;
+  }
+
+  .help__contacts {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .help__contact {
+    padding: 0.6rem 1.1rem;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    text-decoration: none;
+    color: var(--color-text);
+    font-weight: 500;
+    transition: 0.3s ease;
+  }
+
+  .help__contact:hover {
+    border-color: var(--color-accent);
+  }
+
+  @media (max-width: 560px) {
+    .help {
+      flex-direction: column;
+    }
+  }
+</style>

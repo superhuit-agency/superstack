@@ -1,0 +1,102 @@
+/*
+ * Brand tokens mirrored from next/src/css/resources/variables (colors, fonts, type scale).
+ * Values are copied, not imported — this site stays fully decoupled from next/'s build
+ * pipeline (postcss-simple-vars, mixins, etc.). Keep these in sync by hand if the brand changes.
+ */
+
+/* @font-face {
+	font-family: 'Neue Rational';
+	src: url('/fonts/....woff2') format('woff2');
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+} */
+
+:root {
+	/* Font */
+	--font-primary:
+		-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+	/* Neutrals */
+	--color-neutral-000: #ffffff;
+	--color-neutral-50: #fafafa;
+	--color-neutral-100: #f5f5f5;
+	--color-neutral-100: #f5f5f5;
+	--color-neutral-200: #e6e6e6;
+	--color-neutral-300: #d6d6d6;
+	--color-neutral-400: #a5a5a5;
+	--color-neutral-500: #767676;
+	--color-neutral-600: #575757;
+	--color-neutral-700: #434343;
+	--color-neutral-800: #292929;
+	--color-neutral-900: #1a1a1a;
+	--color-neutral-black: #000000;
+
+	--color-brand-purple: purple;
+
+	--color-error: #c53c24;
+
+	/* Site-level aliases */
+	--color-bg: var(--color-neutral-100);
+	--color-surface: var(--color-neutral-000);
+	--color-border: var(--color-neutral-200);
+	--color-border-hover: var(--color-neutral-400);
+	--color-text: var(--color-neutral-black);
+	--color-text-muted: var(--color-neutral-600);
+	--color-accent: var(--color-brand-purple);
+	--radius: 0px;
+}
+
+/* Type scale — simplified, fixed-size subset of next's fluid t-title/t-body/t-label/t-caption
+   scale (the originals use a JS clamp() mixin tied to next's postcss pipeline). */
+.t-title-xl {
+	font-family: var(--font-primary);
+	font-size: clamp(2rem, 1.6rem + 2vw, 3rem);
+	font-weight: 600;
+	line-height: 1.1;
+	letter-spacing: -0.03em;
+}
+
+.t-title-lg {
+	font-family: var(--font-primary);
+	font-size: clamp(1.75rem, 1.5rem + 1.2vw, 2.25rem);
+	font-weight: 600;
+	line-height: 1.1;
+	letter-spacing: -0.02em;
+}
+
+.t-title-md {
+	font-family: var(--font-primary);
+	font-size: 1.5rem;
+	font-weight: 700;
+	line-height: 1.2;
+}
+
+.t-title-sm {
+	font-family: var(--font-primary);
+	font-size: 1.25rem;
+	font-weight: 700;
+	line-height: 1.2;
+}
+
+.t-body-md {
+	font-family: var(--font-primary);
+	font-size: 1rem;
+	font-weight: 400;
+	line-height: 1.5;
+}
+
+.t-label-md {
+	font-family: var(--font-primary);
+	font-size: 1rem;
+	font-weight: 600;
+	letter-spacing: 0.02em;
+}
+
+.t-caption-sm {
+	font-family: var(--font-primary);
+	font-size: 0.875rem;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.035em;
+}

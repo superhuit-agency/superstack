@@ -1,0 +1,32 @@
+---
+import { getCollection, render } from 'astro:content';
+import DocLayout from '../../layouts/DocLayout.astro';
+import { getCategory } from '../../content/categories';
+
+export async function getStaticPaths() {
+  const docs = await getCollection('docs');
+  return docs.map((doc) => {
+    const [category, slug] = doc.id.split('/');
+    return {
+      params: { category, slug },
+      props: { doc },
+    };
+  });
+}
+
+const { doc } = Astro.props;
+const { Content, headings } = await render(doc);
+const category = getCategory(doc.data.category)!;
+---
+
+<DocLayout
+  title={doc.data.title}
+  categoryLabel={category.label}
+  categoryHref={`/${category.slug}/`}
+  wordpressName={doc.data.wordpressName}
+  figmaLink={doc.data.figmaLink}
+  image={doc.data.image ? { src: doc.data.image, alt: doc.data.imageAlt ?? doc.data.title } : undefined}
+  headings={headings}
+>
+  <Content />
+</DocLayout>

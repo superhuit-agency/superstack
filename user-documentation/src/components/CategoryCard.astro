@@ -1,0 +1,111 @@
+---
+interface Props {
+  href: string;
+  label: string;
+  description: string;
+  colorIndex?: number;
+  image?: string;
+}
+
+const { href, label, description, colorIndex = 0, image } = Astro.props;
+---
+
+<a class="category-card" href={href}>
+  {
+    image && (
+      <span class="category-card__preview">
+        <img src={image} alt="" loading="lazy" />
+      </span>
+    )
+  }
+  <span class="category-card__body">
+    <span class="category-card__text">
+      <span class="category-card__label t-title-sm">{label}</span>
+      <span class="category-card__description">{description}</span>
+    </span>
+  </span>
+</a>
+
+<style>
+  .category-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    aspect-ratio: 1;
+    overflow: hidden;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    text-decoration: none;
+    color: var(--color-text);
+    transition:
+      transform 0.15s ease,
+      border-color 0.15s ease;
+  }
+
+  .category-card:hover {
+    border-color: var(--color-border-hover);
+    transform: translateY(-2px);
+  }
+
+  .category-card__preview {
+    display: block;
+    width: 100%;
+    flex-shrink: 0;
+    background: var(--color-bg);
+  }
+
+  .category-card__preview img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    object-position: top;
+    display: block;
+  }
+
+  .category-card__body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 0.75rem;
+    min-height: 0;
+    padding: 1.5rem;
+  }
+
+  .category-card__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 999px;
+    flex-shrink: 0;
+  }
+
+  .category-card__icon :global(svg) {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .category-card__text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-height: 0;
+  }
+
+  .category-card__label {
+    font-size: 1.15rem;
+  }
+
+  .category-card__description {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>

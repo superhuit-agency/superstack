@@ -1,0 +1,16 @@
+{
+	"name": "superstack-user-documentation",
+	"version": "1.0.0",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"dev": "astro dev",
+		"build": "astro build",
+		"preview": "astro preview",
+		"astro": "astro"
+	},
+	"dependencies": {
+		"astro": "^7.1.5",
+		"astro-pagefind": "^2.0.1"
+	}
+}

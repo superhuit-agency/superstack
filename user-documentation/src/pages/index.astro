@@ -1,0 +1,93 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SearchBar from '../components/SearchBar.astro';
+import CategoryCard from '../components/CategoryCard.astro';
+import HelpSection from '../components/HelpSection.astro';
+import { categories } from '../content/categories';
+---
+
+<BaseLayout title="Documentation">
+  <div class="wrapper home">
+    <header class="home__header">
+      <h1 class="t-title-xl">Manuel d'utilisation</h1>
+      <p class="t-body-md">Guides pas à pas pour éditer le contenu du site tipee.ch dans WordPress.</p>
+      <SearchBar />
+    </header>
+
+    <div class="home__grid">
+      {
+        categories.map((category, index) => (
+          <CategoryCard
+            href={`/${category.slug}/`}
+            label={category.label}
+            description={category.description}
+            colorIndex={index}
+          />
+        ))
+      }
+    </div>
+
+    <HelpSection />
+  </div>
+</BaseLayout>
+
+<style>
+  .home {
+    padding: 16px;
+    
+    @media (min-widt: 768px) {
+      padding-block: 3rem 4rem;
+    }
+  }
+
+  .home__header {
+    margin: 0 auto 16px;
+
+    text-align: center;
+    
+    background-color: #fff;
+    border: 1px solid var(--color-border);
+    padding: 32px;
+    border-radius: var(--radius);
+    
+    @media (min-width: 768px) {
+      border-radius: var(--radius);
+      padding: 80px 56px;  
+      margin: 0 auto 2.5rem;
+    }
+  }
+
+  .home__header h1 {
+    margin: 0;
+  }
+
+  .home__header p {
+    color: var(--color-text);
+    margin-bottom: 1.5rem;
+  }
+
+  .home__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+
+    @media (min-width: 768px) {
+      gap: 1.25rem;
+
+    }
+  }
+
+  @media (max-width: 760px) {
+    .home__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 460px) {
+    .home__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .home :global(.search-bar) { margin: 0 auto; }
+</style>

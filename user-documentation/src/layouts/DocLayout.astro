@@ -1,0 +1,158 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Breadcrumb from '../components/Breadcrumb.astro';
+import SearchBar from '../components/SearchBar.astro';
+import StickyToc from '../components/StickyToc.astro';
+
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface Props {
+  title: string;
+  categoryLabel: string;
+  categoryHref: string;
+  wordpressName?: string;
+  figmaLink?: string;
+  image?: { src: string; alt: string };
+  headings: Heading[];
+}
+
+const { title, categoryLabel, categoryHref, wordpressName, figmaLink, image, headings } = Astro.props;
+---
+
+<BaseLayout title={title}>
+  <div class="wrapper doc-page">
+    <Breadcrumb items={[{ label: 'Accueil', href: '/' }, { label: categoryLabel, href: categoryHref }, { label: title }]} />
+
+    <div class="doc-page__search">
+      <SearchBar />
+    </div>
+
+    <header class="doc-page__header">
+      <h1 class="t-title-lg">{title}</h1>
+      <div class="doc-page__meta">
+        {wordpressName && (
+          <span class="doc-page__meta-item">
+            Sur WordPress : <code>{wordpressName}</code>
+          </span>
+        )}
+        {figmaLink && (
+          <a class="doc-page__meta-item" href={figmaLink} target="_blank" rel="noreferrer">
+            Voir sur Figma ↗
+          </a>
+        )}
+      </div>
+    </header>
+
+    {image && <img class="doc-page__visual" src={image.src} alt={image.alt} />}
+
+    <div class="doc-page__body">
+      <StickyToc headings={headings} />
+      <div class="doc-page__content">
+        <slot />
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .doc-page {
+    padding-block: 2rem 4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .doc-page__header h1 {
+    margin-bottom: 0.5rem;
+  }
+
+  .doc-page__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+  }
+
+  .doc-page__meta a {
+    color: var(--color-accent);
+  }
+
+  .doc-page__visual {
+    width: 100%;
+    border-radius: var(--radius);
+    border: 1px solid var(--color-border);
+  }
+
+  .doc-page__body {
+    display: grid;
+    grid-template-columns: 200px minmax(0, 1fr);
+    gap: 2.5rem;
+    align-items: start;
+  }
+
+  .doc-page__content :global(h2) {
+    margin-top: 2.25rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .doc-page__content :global(h2:first-child) {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+  }
+
+  .doc-page__content :global(ol),
+  .doc-page__content :global(ul) {
+    padding-left: 1.25rem;
+  }
+
+  .doc-page__content :global(li) {
+    margin-bottom: 0.5rem;
+  }
+
+  .doc-page__content :global(img) {
+    max-width: 100%;
+    border-radius: var(--radius);
+    border: 1px solid var(--color-border);
+    margin-block: 0.5rem;
+  }
+
+  .doc-page__content :global(code) {
+    color: var(--color-accent);
+  }
+
+  .doc-page__content :global(pre) {
+    background-color: var(--color-neutral-800) !important;
+    padding: 1rem;
+    border-radius: var(--radius);
+  }
+
+  .doc-page__content :global(table) {
+    border-collapse: collapse;
+  }
+  .doc-page__content :global(th),
+  .doc-page__content :global(td) {
+    border: 1px solid var(--color-border-hover);
+    padding: 4px;
+    text-align: left;
+    vertical-align: top;
+  }
+
+
+
+  @media (max-width: 760px) {
+    .doc-page__body {
+      grid-template-columns: 1fr;
+    }
+
+    .doc-page__body :global(.toc) {
+      position: static;
+    }
+  }
+</style>

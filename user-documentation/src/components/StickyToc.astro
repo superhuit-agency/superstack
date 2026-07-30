@@ -1,0 +1,72 @@
+---
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface Props {
+  headings: Heading[];
+}
+
+const { headings } = Astro.props;
+const items = headings.filter((heading) => heading.depth <= 3);
+---
+
+{
+  items.length > 0 && (
+    <nav class="toc" aria-label="Sommaire">
+      <p class="toc__title">Sommaire</p>
+      <ul>
+        {items.map((heading) => (
+          <li class={`toc__item toc__item--depth-${heading.depth}`}>
+            <a href={`#${heading.slug}`}>{heading.text}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )
+}
+
+<style>
+  .toc {
+    position: sticky;
+    top: 1.5rem;
+    align-self: start;
+  }
+
+  .toc__title {
+    margin: 0 0 0.5rem;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-text-muted);
+  }
+
+  .toc ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    border-left: 2px solid var(--color-border);
+  }
+
+  .toc__item a {
+    display: block;
+    padding: 0.15rem 0 0.15rem 0.85rem;
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    text-decoration: none;
+  }
+
+  .toc__item a:hover {
+    color: var(--color-accent);
+  }
+
+  .toc__item--depth-3 a {
+    padding-left: 1.5rem;
+    font-size: 0.85rem;
+  }
+</style>
