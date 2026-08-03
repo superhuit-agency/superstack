@@ -173,12 +173,39 @@ class RegisterFseTemplates {
 	 * invisible to the standard `templateParts` WPGraphQL connection.
 	 */
 	function register_all_template_parts_field() {
+		register_graphql_object_type('FseTemplatePartLanguage', [
+			'description' => "A template part's base slug and language code, parsed from Polylang Pro's FSE naming convention (`<slug>___<lang>`).",
+			'fields'      => [
+				'baseSlug' => ['type' => 'String', 'description' => 'The part\'s slug without its language suffix, e.g. "footer" for "footer___de".'],
+				'code'     => ['type' => 'String', 'description' => 'The language slug parsed from the suffix, e.g. "de". Empty string when the slug has no language suffix (the default-language part).'],
+			],
+		]);
+
 		register_graphql_object_type('FseTemplatePart', [
 			'description' => 'FSE template part data (DB or theme-file based)',
 			'fields'      => [
 				'slug'       => ['type' => 'String'],
 				'area'       => ['type' => 'String'],
 				'blocksJSON' => ['type' => 'String'],
+				'language'   => [
+					'type'        => 'FseTemplatePartLanguage',
+					'description' => 'Parsed via Polylang Pro\'s PLL_FSE_Template_Slug, so this stays in sync with however Polylang identifies translated template parts.',
+					'resolve'     => function ($source) {
+						$slug = is_array($source) ? ($source['slug'] ?? '') : ($source->slug ?? '');
+
+						if (! $slug || ! class_exists('PLL_FSE_Template_Slug') || ! function_exists('pll_languages_list')) {
+							return ['baseSlug' => $slug, 'code' => ''];
+						}
+
+						$lang_slugs = pll_languages_list(['fields' => 'slug']);
+						$parsed     = new \PLL_FSE_Template_Slug($slug, is_array($lang_slugs) ? $lang_slugs : []);
+
+						return [
+							'baseSlug' => $parsed->get_template_slug(),
+							'code'     => $parsed->get_language(),
+						];
+					},
+				],
 			],
 		]);
 

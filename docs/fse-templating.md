@@ -190,6 +190,41 @@ You do **not** need to re-run it when:
 
 ---
 
+## Multilang Template Parts
+
+Template parts (header, footer, ...) can have per-language variants, translated directly in the WordPress site editor via **Polylang Pro's FSE translation support**. Translating a template part creates a second `wp_template_part` post whose slug is suffixed `<slug>___<lang>` (e.g. `footer` → `footer___de`), following Polylang Pro's own naming convention (`PLL_FSE_Template_Slug`, separator `___`). The un-suffixed slug is always the default-language content.
+
+```
+footer            ← default language (e.g. fr)
+footer___de       ← German translation
+footer___it       ← Italian translation
+```
+
+**Backend (`register-fse-templates.php`):** the `FseTemplatePart` GraphQL type exposes a `language { baseSlug, code }` field, parsed server-side from the slug via Polylang Pro's own `PLL_FSE_Template_Slug` class — the frontend never re-implements the `___` parsing.
+
+**Build time (`fetch-fse-templates-and-parts.ts`):** for every `core/template-part` block, all parts sharing the same `language.baseSlug` are grouped together. The default-language part is inlined into `innerBlocks` exactly as before; every other language variant is attached alongside it as a `translations` map:
+
+```jsonc
+{
+	"name": "core/template-part",
+	"attributes": { "slug": "footer", "area": "footer" },
+	"innerBlocks": [ /* default-language blocks */ ],
+	"translations": {
+		"de": [ /* German blocks */ ]
+	}
+}
+```
+
+This works for any template part, not just the footer — translate any part in the site editor and it's picked up automatically on the next build-script run.
+
+**Request time (`get-node-by-uri.ts`):** `getTemplateBlocks(templateSlug, lang)` walks the loaded template blocks and swaps a `core/template-part` block's `innerBlocks` for `translations[lang]` when present, falling back to the default-language `innerBlocks` otherwise (matching what Polylang Pro itself falls back to when a translation is missing). This substitution happens *before* `enrichTemplateBlocks` runs, so dynamic content nested inside a translated part (e.g. a `core/navigation` block in the footer) still goes through the normal `getData` enrichment pass.
+
+> Re-run the build script after translating a template part in the site editor, same as any other structural template change.
+>
+> **Requires Polylang Pro.** With the free Polylang plugin (this starter's default — see [`multilang.md`](./setup/multilang.md)), `PLL_FSE_Template_Slug` doesn't exist, so `language.code` always resolves to an empty string and every template part is treated as default-language. Nothing breaks — the feature just stays dormant until a project installs Polylang Pro.
+
+---
+
 ## Adding Dynamic Data to a Template Block
 
 To make a block's data always fresh at request time:

@@ -18,6 +18,7 @@ type GraphQlNode = {
 	slug: string;
 	area?: string;
 	blocksJSON?: string;
+	language?: { baseSlug: string; code: string };
 };
 
 const WORDPRESS_URL = getWpDomain();
@@ -29,6 +30,10 @@ async function fetchAllTemplateParts() {
         area
         slug
         blocksJSON
+        language {
+          baseSlug
+          code
+        }
       }
     }
   `;
@@ -47,8 +52,8 @@ async function fetchAllTemplates() {
     }
   `;
 
-  const data = await fetchApi(query);
-  return data?.allTemplates ?? [];
+	const data = await fetchApi(query);
+	return data?.allTemplates ?? [];
 }
 
 const outDir = path.join(__dirname, '../src/lib/fse');
@@ -82,24 +87,85 @@ async function main() {
 						.map(async (block: BlockPropsType) => {
 							// For each block of type 'core/template-part', replace with the actual block from templateParts.
 							if (block?.name === 'core/template-part') {
-								const templatePart = templateParts.find(
+								const requestedSlug = block?.attributes?.slug;
+
+								// Group every part sharing this base slug (e.g. "footer" and
+								// "footer___de") — Polylang Pro's FSE naming convention,
+								// parsed server-side into `language.baseSlug` / `language.code`.
+								const matchingParts = templateParts.filter(
 									(part: GraphQlNode) =>
-										part.slug === block?.attributes?.slug
+										(part.language?.baseSlug ??
+											part.slug) === requestedSlug
 								);
+								const basePart =
+									matchingParts.find(
+										(part: GraphQlNode) =>
+											!part.language?.code
+									) ?? matchingParts[0];
+								const translationParts = matchingParts.filter(
+									(part: GraphQlNode) =>
+										part.language?.code && part !== basePart
+								);
+
 								const formattedTemplatePart =
 									await formatBlocksJSON(
-										templatePart?.blocksJSON ?? '',
+										basePart?.blocksJSON ?? '',
 										{ skipGetData: true }
 									);
+
+								const translationEntries: [
+									string,
+									Array<BlockPropsType | null>,
+								][] = translationParts.length
+									? (
+											await resolvePromises(
+												translationParts.map(
+													async (
+														part: GraphQlNode
+													): Promise<
+														[
+															string,
+															Array<BlockPropsType | null>,
+														]
+													> => [
+														part.language!.code,
+														await formatBlocksJSON(
+															part.blocksJSON ??
+																'',
+															{
+																skipGetData: true,
+															}
+														),
+													]
+												)
+											)
+										).filter(
+											(
+												entry
+											): entry is [
+												string,
+												Array<BlockPropsType | null>,
+											] => entry !== null
+										)
+									: [];
+
 								return {
 									...block,
 									attributes: {
 										...(block?.attributes ?? {}),
-										...(templatePart?.area
-											? { area: templatePart.area }
+										...(basePart?.area
+											? { area: basePart.area }
 											: {}),
 									},
 									innerBlocks: formattedTemplatePart,
+									...(translationEntries.length
+										? {
+												translations:
+													Object.fromEntries(
+														translationEntries
+													),
+											}
+										: {}),
 								};
 							}
 							return block;
