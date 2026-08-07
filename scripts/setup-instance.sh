@@ -22,15 +22,32 @@ esac
 
 find_free_port() {
 	p=$1
-	while lsof -nP -iTCP:"$p" -sTCP:LISTEN >/dev/null 2>&1; do
+	while is_port_taken "$p"; do
 		p=$((p + 1))
 	done
 	echo "$p"
 }
 
-# Walking up from a busy port can land on the slot another instance expects
-# (instance 1 taking 8082 = instance 2's port). Say so rather than silently
-# handing out a port that instance will later fail to bind.
+# A sibling instance that is configured but not currently running holds no
+# listening socket, so lsof alone would hand its port out a second time —
+# instances are normally set up first and booted later. Treat every port
+# already written to a sibling .env as taken too.
+CLAIMED=$(
+	for f in "$(dirname "$(pwd)")"/*/wordpress/.env; do
+		[ -f "$f" ] || continue
+		[ "$f" = "$(pwd)/wordpress/.env" ] && continue
+		sed -n -e 's/^WP_PORT=//p' -e 's/^DB_PORT=//p' -e 's/^NEXT_URL=.*:\([0-9][0-9]*\)$/\1/p' "$f"
+	done
+)
+
+is_port_taken() {
+	printf '%s\n' "$CLAIMED" | grep -qx "$1" && return 0
+	lsof -nP -iTCP:"$1" -sTCP:LISTEN >/dev/null 2>&1
+}
+
+# Walking up from a busy port pushes this instance onto the slot the next one
+# would have used, which then walks up in turn. Report it so the ports in use
+# are never a surprise — the generated .env is the source of truth.
 warn_if_shifted() {
 	[ "$1" = "$2" ] || echo "NOTE: $3 port $2 is busy — using $1 instead." >&2
 }
