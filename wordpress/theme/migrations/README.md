@@ -6,7 +6,7 @@ Migration scripts apply one-time database changes required by theme updates (e.g
 
 - Migrations are PHP files in this directory, each returning an array of WP-CLI commands (without the `wp` prefix).
 - A custom WP-CLI command (`wp spck migrate`) runs pending migrations in chronological order.
-- Completed migrations are tracked in the `spck_completed_migrations` wp_option — each migration runs only once.
+- Completed migrations are tracked in the `spck_completed_migrations` wp_option (not autoloaded) — each migration runs only once. Each entry keeps an audit trail: when it ran, how long it took, and its status.
 - During deployment, `provision.sh` checks for pending migrations, creates a DB backup if any exist, then runs them.
 
 ## Creating a migration
@@ -48,12 +48,12 @@ Migration scripts apply one-time database changes required by theme updates (e.g
 
 ## CLI usage
 
-| Command                           | Description                                         |
-| --------------------------------- | --------------------------------------------------- |
-| `wp spck migrate`                 | Run all pending migrations                          |
-| `wp spck migrate --dry-run`       | Preview pending migrations without executing        |
-| `wp spck migrate --status`        | Show table of all migrations and their state        |
-| `wp spck migrate --pending-count` | Output number of pending migrations (for scripting) |
+| Command                           | Description                                           |
+| --------------------------------- | ----------------------------------------------------- |
+| `wp spck migrate`                 | Run all pending migrations                            |
+| `wp spck migrate --dry-run`       | Preview pending migrations without executing          |
+| `wp spck migrate --status`        | Show all migrations with state, run date and duration |
+| `wp spck migrate --pending-count` | Output number of pending migrations (for scripting)   |
 
 Works with WP-CLI aliases: `wp @local spck migrate`, `wp @production spck migrate`.
 
