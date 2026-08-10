@@ -55,6 +55,27 @@ This pulls the CSS from your local WordPress instance and writes it to `next/pub
 - If the step fails with "wp: command not found", ensure WP-CLI is installed on the remote WordPress server
 - If the CSS file is empty, check that the `wp spck theme-css` command works on the remote server by testing it manually
 
+## 🗄 Database migrations during deployment
+
+Theme changes that require updating existing content in the database ship as migration files in `wordpress/theme/migrations/`. `provision.sh` runs them on every deployment, after the plugin/theme configuration and before the rewrite flush:
+
+1. Counts pending migrations with `wp spck migrate --pending-count`. If there are none, nothing else happens.
+2. Exports the database to `$BACKUP_PATH/db-backup-<YYYYMMDD_HHMMSS>.sql` (default `$WORDPRESS_PATH/db-backups`).
+3. Runs `wp spck migrate`.
+4. Prunes the backup directory down to the newest `$BACKUP_KEEP` dumps (default `10`).
+
+If a migration fails, the provision step **exits non-zero and the workflow goes red**. There is no automatic restore: the theme was already swapped in by the "Deploy Theme" step, so the new theme is live over un-migrated content. The error output prints the exact `wp db import` command to roll the database back.
+
+> ⚠️ **The default backup directory sits inside the webroot.** `provision.sh` writes a deny-all `.htaccess` next to the dumps, which covers Apache. **On nginx you must add the equivalent rule yourself**, otherwise the dumps are downloadable:
+>
+> ```nginx
+> location ^~ /db-backups/ {
+>    deny all;
+> }
+> ```
+>
+> Alternatively, set the `BACKUP_PATH` variable to a directory outside the webroot entirely.
+
 ## 🔐 Github Actions variables & secrets
 
 The workflows use GitHub [Environments](https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment) (`staging` and `production`) to scope their configuration. Each environment holds its own set of **variables** (non-sensitive, `vars.*`) and **secrets** (sensitive, `secrets.*`).
@@ -90,6 +111,8 @@ These are non-sensitive configuration values. Set them with `gh variable set`.
 | `NEXT_PATH`            | SSH deployment only            | Absolute path to the **live Next.js path** on the remote server (example: `/var/www/next/current`). This path becomes a [symlink to the current](#ssh-release-strategy-when-vercel_project_id-is-empty) release. |
 | `PM2_APP_NAME`         | SSH deployment only            | PM2 application name used by `.github/actions/next-pm2` to run `pm2 describe`, then either `pm2 restart <app>` or `pm2 start ecosystem.config.js --only <app>`.                                                  |
 | `KEEP_RELEASES`        | SSH deployment only (optional) | Number of most recent releases to keep on server. Default: `5`.                                                                                                                                                  |
+| `BACKUP_PATH`          | Optional                       | Directory where `provision.sh` writes the DB dump taken before running pending migrations. Default: `$WORDPRESS_PATH/db-backups`.                                                                                |
+| `BACKUP_KEEP`          | Optional                       | Number of most recent DB dumps to keep in `BACKUP_PATH`. Older ones are pruned after each backup. Default: `10`.                                                                                                 |
 | `VERCEL_ORG_ID`        | Vercel deployment only         | Your Vercel org/user ID. Found at vercel.com → Account settings → General (bottom of page).                                                                                                                      |
 | `VERCEL_PROJECT_ID`    | Vercel deployment only         | Your Vercel project ID. Found at vercel.com → Project → Settings → General (bottom of page). **If set, Vercel deployment is used; if empty, SSH deployment is used.**                                            |
 

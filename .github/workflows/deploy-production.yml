@@ -98,6 +98,8 @@ jobs:
                 WORDPRESS_TITLE=\"${{ vars.WORDPRESS_TITLE }}\" \
                 WORDPRESS_ADMIN_USER=\"${{ vars.WORDPRESS_ADMIN_USER }}\" \
                 WORDPRESS_ADMIN_EMAIL=\"${{ vars.WORDPRESS_ADMIN_EMAIL }}\" \
+                BACKUP_PATH=\"${{ vars.BACKUP_PATH }}\" \
+                BACKUP_KEEP=\"${{ vars.BACKUP_KEEP }}\" \
               /bin/bash -s " < ./wordpress/scripts/provision.sh
 
   deploy_frontend_vercel:

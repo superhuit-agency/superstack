@@ -277,6 +277,72 @@ if ! $WPCLI config get "WP_AUTO_UPDATE_CORE" --quiet > /dev/null 2>&1; then
 	echo "✔"
 fi
 
+echo
+echo "------------------------------------------------------------------"
+echo "                       Database migrations                        "
+echo "------------------------------------------------------------------"
+echo
+
+# Backups live in a directory we own, never directly in $WORDPRESS_PATH:
+# WordPress owns $WORDPRESS_PATH/.htaccess (permalink rules) and we must not
+# clobber it. Override with BACKUP_PATH to store dumps outside the webroot.
+BACKUP_PATH=${BACKUP_PATH:=$WORDPRESS_PATH/db-backups}
+BACKUP_KEEP=${BACKUP_KEEP:=10}
+
+PENDING=$($WPCLI spck migrate --pending-count 2> /dev/null)
+case "$PENDING" in
+	'' | *[!0-9]*)
+		echo "⚠ Could not determine the number of pending migrations, skipping." 1>&2
+		PENDING=0
+		;;
+esac
+
+if [ "$PENDING" -gt 0 ]; then
+	mkdir -p "$BACKUP_PATH"
+
+	# Apache: keep the dumps unreachable over HTTP while they sit in the webroot.
+	# nginx needs the equivalent rule in the server block, see docs/setup/deployment.md:
+	#   location ^~ /db-backups/ { deny all; }
+	if [ ! -f "$BACKUP_PATH/.htaccess" ]; then
+		{
+			echo "# Database dumps written by provision.sh - never serve these over HTTP."
+			echo "<IfModule mod_authz_core.c>"
+			echo "	Require all denied"
+			echo "</IfModule>"
+			echo "<IfModule !mod_authz_core.c>"
+			echo "	Order allow,deny"
+			echo "	Deny from all"
+			echo "</IfModule>"
+		} > "$BACKUP_PATH/.htaccess"
+	fi
+
+	BACKUP_FILE="$BACKUP_PATH/db-backup-$(date +%Y%m%d_%H%M%S).sql"
+	echo $en "- $PENDING pending migration(s), backing up database $ec"
+	$WPCLI db export "$BACKUP_FILE" --quiet
+	echo "✔ ($BACKUP_FILE)"
+	echo
+
+	$WPCLI spck migrate
+	MIGRATE_STATUS=$?
+
+	# Prune old dumps, newest $BACKUP_KEEP kept (the one just taken included).
+	ls -1t "$BACKUP_PATH"/db-backup-*.sql 2> /dev/null | tail -n +$((BACKUP_KEEP + 1)) | while read -r OLD_BACKUP; do
+		rm -f "$OLD_BACKUP"
+	done
+
+	if [ "$MIGRATE_STATUS" -ne 0 ]; then
+		echo 1>&2
+		echo "ERROR: database migrations failed (exit $MIGRATE_STATUS)." 1>&2
+		echo "       The new theme is already live over un-migrated content." 1>&2
+		echo "       No automatic restore was attempted. To roll the database back:" 1>&2
+		echo "         wp db import \"$BACKUP_FILE\"" 1>&2
+		exit 1
+	fi
+else
+	echo "- No pending migrations"
+fi
+
+echo
 echo $en "- Flushing rewrite rules $ec"
 $WPCLI rewrite flush --hard --quiet &> /dev/null
 echo "✔"

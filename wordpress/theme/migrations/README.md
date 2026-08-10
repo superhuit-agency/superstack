@@ -61,4 +61,5 @@ Works with WP-CLI aliases: `wp @local spck migrate`, `wp @production spck migrat
 
 - **Order matters**: when doing multiple search-replace operations, put the most specific (longest) patterns first to avoid partial matches (e.g. `text-link` before `text`).
 - **Idempotent by design**: each migration runs only once, tracked by filename in the database.
-- **Automatic backup**: `provision.sh` exports the database before running pending migrations. The backup is saved as `db-backup-YYYYMMDD_HHMMSS.sql` in the WordPress root.
+- **Automatic backup**: `provision.sh` exports the database before running pending migrations. The backup is saved as `db-backup-YYYYMMDD_HHMMSS.sql` in `$BACKUP_PATH` (default `$WORDPRESS_PATH/db-backups`), and only the newest `$BACKUP_KEEP` dumps are kept (default 10).
+- **Failures are fatal**: if a migration fails, the deployment step exits non-zero and the workflow goes red. Nothing is restored automatically — the error output prints the `wp db import` command for the backup taken just before the run. See [`docs/setup/deployment.md`](../../../docs/setup/deployment.md) for the full deployment behaviour, including the nginx rule needed to keep the dumps unreachable.
