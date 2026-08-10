@@ -262,13 +262,6 @@ if [ -z "${GRAPHQL_JWT_AUTH_SECRET_KEY}" ]; then
 	echo "✔"
 fi
 
-# Add Next.js frontend URL
-if [ ! -z "${NEXT_URL}" ]; then
-	echo $en "- Adding Next.js url to WP options $ec"
-	$WPCLI option update next_url "$NEXT_URL" --quiet &> /dev/null
-	echo "✔"
-fi
-
 
 # Disable major updates
 if ! $WPCLI config get "WP_AUTO_UPDATE_CORE" --quiet > /dev/null 2>&1; then

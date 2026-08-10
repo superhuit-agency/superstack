@@ -21,14 +21,14 @@ add_action('init', function () {
 			'number'  => 1,
 			'orderby' => 'ID',
 			'order'   => 'ASC',
+			'fields'  => 'ID',
 		]);
 
 		if (empty($admins)) {
 			return;
 		}
 
-		wp_set_current_user($admins[0]->ID);
-		wp_set_auth_cookie($admins[0]->ID);
+		wp_set_auth_cookie($admins[0]);
 	}
 
 	wp_safe_redirect(admin_url());

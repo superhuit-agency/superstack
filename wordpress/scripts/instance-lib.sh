@@ -1,10 +1,8 @@
 #!/bin/sh
 
-# Shared helpers for the per-instance database scripts.
+# Shared helpers for the per-instance scripts.
 # Callers must have cd'ed to the wordpress/ directory first.
 
-# Load wordpress/.env (written by scripts/setup-instance.sh) so PROJECT_CODE
-# and WORDPRESS_URL point at this checkout's instance.
 load_instance_env() {
 	if [ -f ./.env ]; then
 		set -a
@@ -14,21 +12,29 @@ load_instance_env() {
 	PROJECT_CODE=${PROJECT_CODE:="spck"}
 }
 
-# PROJECT_CODE falls back to "spck", which every other superstack-derived
-# project on this machine also uses by default. Refuse to export or overwrite
-# the database of a container that belongs to a different checkout.
-assert_own_container() {
+# PROJECT_CODE falls back to "spck", which every superstack-derived project on
+# this machine also uses by default. Two checkouts sharing it also share their
+# compose project identity, so `docker compose up` in the second would recreate
+# the first's running containers rather than clash with them. Refuse to act on
+# a container owned by another checkout — including an unlabelled one, since
+# there is no way to tell whose it is.
+#
+# Usage: assert_container_dir <container> <wordpress/ dir, from pwd -P> [require]
+#        "require" also refuses when the container is not running at all.
+assert_container_dir() {
 	if ! docker inspect "$1" >/dev/null 2>&1; then
-		echo "ERROR: container '$1' is not running — run 'npm start' in wordpress/ first." >&2
+		[ "${3:-}" = require ] || return 0
+		echo "ERROR: container '$1' is not running — run 'npm start' in its wordpress/ first." >&2
 		exit 1
 	fi
 
+	# Docker stores the symlink-resolved path, hence pwd -P in the caller.
 	owner=$(docker inspect "$1" --format '{{index .Config.Labels "com.docker.compose.project.working_dir"}}')
-	if [ -n "$owner" ] && [ "$owner" != "$(pwd)" ]; then
-		echo "ERROR: container '$1' belongs to another checkout:" >&2
-		echo "         $owner" >&2
-		echo "       Run 'sh scripts/setup-instance.sh <n>' from the repo root to give this" >&2
-		echo "       checkout its own PROJECT_CODE, then start it." >&2
-		exit 1
-	fi
+	[ "$owner" = "$2" ] && return 0
+
+	echo "ERROR: container '$1' belongs to another checkout:" >&2
+	echo "         ${owner:-<no compose ownership label>}" >&2
+	echo "       Run 'sh scripts/setup-instance.sh <n>' there to give it its own" >&2
+	echo "       PROJECT_CODE, then start it." >&2
+	exit 1
 }
