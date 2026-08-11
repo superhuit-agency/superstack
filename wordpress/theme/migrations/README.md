@@ -12,7 +12,15 @@ Migration scripts apply one-time database changes required by theme updates (e.g
 
 ## Creating a migration
 
-1. Create a new PHP file with the naming convention:
+1. Scaffold the file from the repository root:
+
+    ```sh
+    npm run generate:migration "fix section cards"
+    ```
+
+    This writes `wordpress/theme/migrations/<YYYYMMDD_HHMMSS>_fix_section_cards.php` from a template holding the docblock, the `ABSPATH` guard and both return forms. Run it without an argument to be prompted for the description.
+
+    The naming convention, if you write the file by hand instead:
 
     ```
     YYYYMMDD_HHMMSS_short_description.php
@@ -20,7 +28,7 @@ Migration scripts apply one-time database changes required by theme updates (e.g
 
     The timestamp prefix ensures migrations run in the correct order.
 
-2. The file must return an array of WP-CLI commands (without `wp` prefix)…
+2. Keep one of the two return forms. Either an array of WP-CLI commands (without `wp` prefix)…
 
     ```php
     <?php
