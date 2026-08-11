@@ -12,6 +12,8 @@ Migration scripts apply one-time database changes required by theme updates (e.g
 
 ## Creating a migration
 
+Deciding whether a change actually needs a migration, choosing between the two return forms, and making the file safe to re-run are covered by the `add-db-migration` skill ([`.claude/skills/add-db-migration/SKILL.md`](../../../.claude/skills/add-db-migration/SKILL.md)).
+
 1. Scaffold the file from the repository root:
 
     ```sh

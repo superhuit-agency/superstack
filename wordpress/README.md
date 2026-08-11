@@ -44,7 +44,7 @@ wp @local spck migrate --dry-run   # preview without executing
 wp @local spck migrate --status    # show all migrations and their state
 ```
 
-See [`wordpress/theme/migrations/README.md`](wordpress/theme/migrations/README.md) for details on creating and managing migrations.
+See [`wordpress/theme/migrations/README.md`](theme/migrations/README.md) for details on creating and managing migrations.
 
 ## Theme CSS Generation
 
