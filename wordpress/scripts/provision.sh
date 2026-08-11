@@ -81,6 +81,7 @@ if ! $WPCLI core is-installed --quiet &> /dev/null; then
 	if [ ! -z "${WORDPRESS_ENV}" ] && [ "${WORDPRESS_ENV}" = "dev" ]; then # we are on local dev environment (in docker)
 		echo $en "- Installing WordPress $ec"
 		$WPCLI core install --url="http://localhost" --title="superstack" --admin_user="superstack" --admin_password="superstack" --admin_email="tech+superstack@superhuit.ch" --quiet &> /dev/null
+		FIRSTTIME_INSTALL=true
 		echo "✔"
 	elif [ ! -f "$WORDPRESS_PATH/p.txt" ]; then
 		echo "ERROR: WordPress does not seem to be installed. Add a file 'p.txt' containing the database password if you want this script to automatically install WordPress for you." 1>&2
@@ -102,6 +103,7 @@ if ! $WPCLI core is-installed --quiet &> /dev/null; then
 		$WPCLI config create --dbhost="$WORDPRESS_DB_HOST" --dbname="$WORDPRESS_DB_NAME" --dbuser="$WORDPRESS_DB_USER" --prompt=dbpass < $WORDPRESS_PATH/p.txt  --quiet &> /dev/null
 		$WPCLI core install --url="$WORDPRESS_URL" --title="$WORDPRESS_TITLE" --admin_user="$WORDPRESS_ADMIN_USER" --admin_email="$WORDPRESS_ADMIN_EMAIL"  --quiet &> /dev/null
 		rm $WORDPRESS_PATH/p.txt
+		FIRSTTIME_INSTALL=true
 		echo "✔"
 	fi
 fi
@@ -297,7 +299,14 @@ case "$PENDING" in
 		;;
 esac
 
-if [ "$PENDING" -gt 0 ]; then
+if [ "$FIRSTTIME_INSTALL" = true ]; then
+	# A database created by this version of the theme has nothing to migrate:
+	# every existing migration would be a no-op at best. Record them as done
+	# instead of executing them (the `schema:load` model).
+	echo $en "- Fresh install, baselining $PENDING migration(s) $ec"
+	$WPCLI spck migrate --mark-complete --quiet &> /dev/null
+	echo "✔"
+elif [ "$PENDING" -gt 0 ]; then
 	mkdir -p "$BACKUP_PATH"
 
 	# Apache: keep the dumps unreachable over HTTP while they sit in the webroot.
