@@ -20,7 +20,7 @@ Deciding whether a change actually needs a migration, choosing between the two r
     npm run generate:migration "fix section cards"
     ```
 
-    This writes `wordpress/theme/migrations/<YYYYMMDD_HHMMSS>_fix_section_cards.php` from a template holding the docblock, the `ABSPATH` guard and both return forms. Run it without an argument to be prompted for the description.
+    This writes `wordpress/theme/migrations/<YYYYMMDD_HHMMSS>_fix_section_cards.php` from a template holding the docblock, the `ABSPATH` guard and both return forms, commented out — uncomment the one you want. A scaffolded file left untouched returns nothing and is skipped by the runner rather than executing a placeholder. Run the command without an argument to be prompted for the description.
 
     The naming convention, if you write the file by hand instead:
 

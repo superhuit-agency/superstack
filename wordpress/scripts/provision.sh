@@ -32,6 +32,13 @@
 IS_MULTILANG=${IS_MULTILANG:=false}
 HTTP_HOST=${WORDPRESS_URL}
 
+# Database dumps taken before running pending migrations.
+# Backups live in a directory we own, never directly in $WORDPRESS_PATH:
+# WordPress owns $WORDPRESS_PATH/.htaccess (permalink rules) and we must not
+# clobber it. Override with BACKUP_PATH to store dumps outside the webroot.
+BACKUP_PATH=${BACKUP_PATH:=$WORDPRESS_PATH/db-backups}
+BACKUP_KEEP=${BACKUP_KEEP:=10}
+
 # #===========================================
 # # /!\ STOP to edit here /!\
 # #===========================================
@@ -285,17 +292,10 @@ echo "                       Database migrations                        "
 echo "------------------------------------------------------------------"
 echo
 
-# Backups live in a directory we own, never directly in $WORDPRESS_PATH:
-# WordPress owns $WORDPRESS_PATH/.htaccess (permalink rules) and we must not
-# clobber it. Override with BACKUP_PATH to store dumps outside the webroot.
-BACKUP_PATH=${BACKUP_PATH:=$WORDPRESS_PATH/db-backups}
-BACKUP_KEEP=${BACKUP_KEEP:=10}
-
 PENDING=$($WPCLI spck migrate --pending-count 2> /dev/null)
 case "$PENDING" in
 	'' | *[!0-9]*)
-		echo "⚠ Could not determine the number of pending migrations, skipping." 1>&2
-		PENDING=0
+		PENDING=unknown
 		;;
 esac
 
@@ -303,9 +303,11 @@ if [ "$FIRSTTIME_INSTALL" = true ]; then
 	# A database created by this version of the theme has nothing to migrate:
 	# every existing migration would be a no-op at best. Record them as done
 	# instead of executing them (the `schema:load` model).
-	echo $en "- Fresh install, baselining $PENDING migration(s) $ec"
+	echo $en "- Fresh install, baselining existing migrations $ec"
 	$WPCLI spck migrate --mark-complete --quiet &> /dev/null
 	echo "✔"
+elif [ "$PENDING" = unknown ]; then
+	echo "⚠ Could not determine the number of pending migrations, skipping." 1>&2
 elif [ "$PENDING" -gt 0 ]; then
 	mkdir -p "$BACKUP_PATH"
 

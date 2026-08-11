@@ -21,18 +21,14 @@
 
 const fs = require('fs');
 const path = require('path');
-const readline = require('readline/promises');
+const { rootDir, log, warn, withPrompt, run } = require('./lib');
 
-const rootDir = path.resolve(__dirname, '..');
 const templatesDir = path.join(__dirname, 'templates', 'migration');
 
 const paths = {
 	template: path.join(templatesDir, 'migration.php'),
 	migrationsDir: path.join(rootDir, 'wordpress/theme/migrations'),
 };
-
-const log = (message) => console.log(`✔ ${message}`);
-const warn = (message) => console.warn(`⚠ ${message}`);
 
 const slugify = (description) =>
 	description
@@ -60,12 +56,7 @@ async function prompt() {
 
 	if (description) return description;
 
-	const rl = readline.createInterface({
-		input: process.stdin,
-		output: process.stdout,
-	});
-
-	try {
+	return withPrompt(async (rl) => {
 		let answer;
 		while (!answer) {
 			answer = (
@@ -83,9 +74,7 @@ async function prompt() {
 		}
 
 		return answer;
-	} finally {
-		rl.close();
-	}
+	});
 }
 
 function writeMigration(description) {
@@ -140,7 +129,4 @@ Next steps:
 `);
 }
 
-main().catch((error) => {
-	console.error(error);
-	process.exit(1);
-});
+run(main);

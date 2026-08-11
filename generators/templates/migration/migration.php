@@ -15,12 +15,15 @@ if (! defined('ABSPATH')) {
 	exit;
 }
 
-// Keep one of the two forms below and delete the other.
+// Uncomment one of the two forms below and delete the other. Until one is
+// uncommented this file returns nothing, so the runner skips it rather than
+// running the placeholder against a live database.
 
 // Either an array of WP-CLI commands, without the `wp` prefix…
-return [
-	'search-replace "old-value" "new-value" --report-changed-only',
-];
+//
+// return [
+// 	'search-replace "old-value" "new-value" --report-changed-only',
+// ];
 
 // …or a callable, which runs with WordPress fully loaded. Prefer this form as
 // soon as the migration needs the table prefix — hardcoding `wp_` in a

@@ -22,13 +22,13 @@ A migration rewrites content that is **already saved in the database** so it mat
 npm run generate:migration "fix section cards"
 ```
 
-Writes `wordpress/theme/migrations/<YYYYMMDD_HHMMSS>_fix_section_cards.php` with the docblock, the `ABSPATH` guard and both return forms. Never rename it afterwards — the timestamp prefix is the run order, and the filename is the key the completed-migrations option is stored under.
+Writes `wordpress/theme/migrations/<YYYYMMDD_HHMMSS>_fix_section_cards.php` with the docblock, the `ABSPATH` guard and both return forms commented out. Never rename it afterwards — the timestamp prefix is the run order, and the filename is the key the completed-migrations option is stored under.
 
 Fill in the docblock: what the migration does, why, and the commit hash of the accompanying theme change.
 
 ## Step 2 — Choose the return form
 
-Keep one of the two forms the template offers and delete the other.
+Uncomment one of the two forms the template offers and delete the other. A file that returns neither is skipped by the runner with a warning and stays pending forever, so this step is not optional.
 
 **A callable** is the default choice. It runs with WordPress fully loaded, so `$wpdb`, `WP_Query` and `WP_CLI::runcommand` are all available:
 

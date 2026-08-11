@@ -43,6 +43,9 @@ class Migrations {
 
 	const OPTION_NAME = 'spck_completed_migrations';
 
+	const STATUS_COMPLETED = 'completed';
+	const STATUS_FAILED    = 'failed';
+
 	/**
 	 * Register the WP-CLI command.
 	 *
@@ -176,21 +179,13 @@ class Migrations {
 			} catch (\Throwable $error) {
 				// Record the failure before bailing: the entry is still counted
 				// as pending, so the next run retries this migration.
-				$completed[$name] = [
-					'ran_at'   => gmdate('Y-m-d H:i:s'),
-					'duration' => round(microtime(true) - $started, 3),
-					'status'   => 'failed',
-				];
+				$completed[$name] = self::entry(self::STATUS_FAILED, microtime(true) - $started);
 				self::save_completed($completed);
 
 				\WP_CLI::error("Failed: $name — " . $error->getMessage());
 			}
 
-			$completed[$name] = [
-				'ran_at'   => gmdate('Y-m-d H:i:s'),
-				'duration' => round(microtime(true) - $started, 3),
-				'status'   => 'completed',
-			];
+			$completed[$name] = self::entry(self::STATUS_COMPLETED, microtime(true) - $started);
 			self::save_completed($completed);
 
 			\WP_CLI::success("Completed: $name");
@@ -295,11 +290,7 @@ class Migrations {
 			}
 
 			// No duration: nothing was executed.
-			$completed[$name] = [
-				'ran_at'   => gmdate('Y-m-d H:i:s'),
-				'duration' => null,
-				'status'   => 'completed',
-			];
+			$completed[$name] = self::entry(self::STATUS_COMPLETED);
 			\WP_CLI::log("Marked as completed without running: $name");
 		}
 
@@ -309,6 +300,24 @@ class Migrations {
 
 		self::save_completed($completed);
 		\WP_CLI::success(sprintf('%d migration(s) marked as completed.', count($files)));
+	}
+
+	/**
+	 * Build an audit-trail entry for the completed-migrations option.
+	 *
+	 * @access private
+	 *
+	 * @param string     $status  One of the STATUS_* constants.
+	 * @param float|null $elapsed Seconds the migration took, or null when
+	 *                            nothing was executed.
+	 * @return array
+	 */
+	private static function entry($status, $elapsed = null) {
+		return [
+			'ran_at'   => gmdate('Y-m-d H:i:s'),
+			'duration' => null === $elapsed ? null : round($elapsed, 3),
+			'status'   => $status,
+		];
 	}
 
 	/**
@@ -324,7 +333,7 @@ class Migrations {
 	 * @return bool
 	 */
 	private static function is_pending($name, $completed) {
-		return ! isset($completed[$name]) || 'completed' !== $completed[$name]['status'];
+		return ! isset($completed[$name]) || self::STATUS_COMPLETED !== $completed[$name]['status'];
 	}
 
 	/**
@@ -349,10 +358,12 @@ class Migrations {
 		foreach ($stored as $key => $value) {
 			// Legacy flat format: a plain list of filenames.
 			if (is_int($key)) {
+				// Provenance is unknown, so this is not an entry(): the run date
+				// was never recorded by the format being shimmed.
 				$completed[$value] = [
 					'ran_at'   => null,
 					'duration' => null,
-					'status'   => 'completed',
+					'status'   => self::STATUS_COMPLETED,
 				];
 				continue;
 			}
@@ -361,7 +372,7 @@ class Migrations {
 			$completed[$key] = [
 				'ran_at'   => isset($value['ran_at']) ? $value['ran_at'] : null,
 				'duration' => isset($value['duration']) ? $value['duration'] : null,
-				'status'   => isset($value['status']) ? $value['status'] : 'completed',
+				'status'   => isset($value['status']) ? $value['status'] : self::STATUS_COMPLETED,
 			];
 		}
 
