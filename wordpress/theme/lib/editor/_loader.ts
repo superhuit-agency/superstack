@@ -23,6 +23,7 @@ import './_loader.css';
  * Loads custom Post Type plugins
  */
 import './blocks-whitelist';
+import './pattern-slash-inserter';
 
 /**
  * Import custom blocks & filters
