@@ -11,9 +11,13 @@ const WP_GRAPHQL_URL = getWpGraphqlUrl();
  * dumped verbatim in the error block below, so credentials passed to mutations
  * (`login`, `registerUser`, `resetUserPassword`, `refreshJwtAuthToken`) would
  * otherwise sit in cleartext in the server logs on every failed attempt.
+ *
+ * Matched as substrings on purpose, so compounds like `apiKey`, `resetKey` or
+ * `privateKey` are caught too. Over-matching (`monkey`, `keyword`) only costs
+ * us a little log detail; under-matching leaks a credential.
  */
 const SENSITIVE_VARIABLE_PATTERN =
-	/pass|pwd|secret|token|\bkey\b|credential|otp|nonce/i;
+	/pass|pwd|secret|token|key|credential|otp|nonce/i;
 
 const REDACTED = '[redacted]';
 
