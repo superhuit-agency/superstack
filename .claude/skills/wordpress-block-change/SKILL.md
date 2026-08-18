@@ -32,9 +32,13 @@ Deliver block-related changes with minimal scope, no duplication, and full compa
 
 1. Keep edits minimal and focused to requested block behavior only.
 2. Do not introduce duplicate block registrations or duplicate data mappers.
-3. Preserve existing naming conventions and folder structure.
-4. Do not add/remove code comments unless explicitly requested.
-5. If a change impacts both WP and Next, update both sides in the same task.
+3. Never remove or rename an existing block registration unless that is the
+   explicit request. Registration is what keeps already-published content
+   renderable — dropping it breaks live pages, not just new ones. See
+   [Removing or renaming a block](../../../docs/blocks/create-block.md#removing-or-renaming-a-block).
+4. Preserve existing naming conventions and folder structure.
+5. Do not add/remove code comments unless explicitly requested.
+6. If a change impacts both WP and Next, update both sides in the same task.
 
 ## Safety Rules
 
