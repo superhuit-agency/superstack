@@ -6,6 +6,39 @@ const WP_GRAPHQL_URL = getWpGraphqlUrl();
 // // Debug performances
 // export const fetchAPITester = PerfsTester();
 
+/**
+ * Variable names whose values must never reach the logs. GraphQL variables are
+ * dumped verbatim in the error block below, so credentials passed to mutations
+ * (`login`, `registerUser`, `resetUserPassword`, `refreshJwtAuthToken`) would
+ * otherwise sit in cleartext in the server logs on every failed attempt.
+ */
+const SENSITIVE_VARIABLE_PATTERN =
+	/pass|pwd|secret|token|\bkey\b|credential|otp|nonce/i;
+
+const REDACTED = '[redacted]';
+
+/** Recursively replace the values of sensitive-looking keys with a placeholder. */
+function redactVariables(value: unknown): unknown {
+	if (Array.isArray(value)) {
+		return value.map(redactVariables);
+	}
+
+	if (value && typeof value === 'object') {
+		return Object.fromEntries(
+			Object.entries(value as Record<string, unknown>).map(
+				([key, val]) => [
+					key,
+					SENSITIVE_VARIABLE_PATTERN.test(key)
+						? REDACTED
+						: redactVariables(val),
+				]
+			)
+		);
+	}
+
+	return value;
+}
+
 const fetchAPI: FetchApiFuncType = async (query, options) => {
 	const {
 		variables,
@@ -72,7 +105,7 @@ const fetchAPI: FetchApiFuncType = async (query, options) => {
 	} catch (errors) {
 		const limit = '=================';
 		const sep = '-----------------';
-		const vars = JSON.stringify(variables);
+		const vars = JSON.stringify(redactVariables(variables));
 
 		(Array.isArray(errors) ? errors : [errors]).map((err) =>
 			console.error(`
