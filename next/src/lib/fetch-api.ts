@@ -10,11 +10,15 @@ const fetchAPI: FetchApiFuncType = async (query, options) => {
 	const {
 		variables,
 		auth,
-		headers = {},
+		headers: callerHeaders,
 		endpoint = WP_GRAPHQL_URL,
 	} = options ?? {};
 
-	headers['Content-Type'] = 'application/json';
+	// Copied, not mutated: callers pass headers they may reuse across calls.
+	const headers: Record<string, string> = {
+		...callerHeaders,
+		'Content-Type': 'application/json',
+	};
 
 	if (auth?.authToken) {
 		headers['Authorization'] = `Bearer ${auth?.authToken}`;
