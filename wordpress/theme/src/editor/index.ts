@@ -10,6 +10,8 @@ import {
 
 import * as filters from '@/components/filters';
 
+import './pattern-slash-inserter';
+
 import './index.css';
 
 // Edit core blocks filters for WP editor
