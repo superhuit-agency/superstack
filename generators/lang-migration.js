@@ -28,9 +28,8 @@
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
-const readline = require('readline/promises');
+const { rootDir, log, warn, withPrompt, run } = require('./lib');
 
-const rootDir = path.resolve(__dirname, '..');
 const templatesDir = path.join(__dirname, 'templates', 'lang-migration');
 
 const paths = {
@@ -47,9 +46,6 @@ const paths = {
 	localeContext: path.join(rootDir, 'next/src/contexts/locale-context.tsx'),
 	provisionSh: path.join(rootDir, 'wordpress/scripts/provision.sh'),
 };
-
-const log = (message) => console.log(`✔ ${message}`);
-const warn = (message) => console.warn(`⚠ ${message}`);
 
 const isValidLocale = (value) => /^[a-z]{2}(-[a-z]{2})?$/.test(value);
 
@@ -83,12 +79,7 @@ async function prompt() {
 		};
 	}
 
-	const rl = readline.createInterface({
-		input: process.stdin,
-		output: process.stdout,
-	});
-
-	try {
+	return withPrompt(async (rl) => {
 		let migrationType;
 		while (!migrationType) {
 			const answer = (
@@ -140,9 +131,7 @@ async function prompt() {
 		}
 
 		return { migrationType, defaultLocale, additionalLocales };
-	} finally {
-		rl.close();
-	}
+	});
 }
 
 function readConfigs() {
@@ -357,7 +346,4 @@ async function main() {
 	}
 }
 
-main().catch((error) => {
-	console.error(error);
-	process.exit(1);
-});
+run(main);
