@@ -34,7 +34,9 @@ Made with ❤️ by [superhuit.ch](https://superhuit.ch)
 
 When theme changes require updating existing content in the database (e.g. renaming CSS classes in block markup), migration scripts handle it.
 
-Migrations run automatically during deployment via `provision.sh` (with a DB backup beforehand). They can also be run manually:
+Migrations run automatically during deployment via `provision.sh`, which backs the database up to `$BACKUP_PATH` (default `$WORDPRESS_PATH/db-backups`) beforehand and fails the deployment if a migration errors. See [Database migrations during deployment](../docs/setup/deployment.md#-database-migrations-during-deployment) — on nginx you need one extra rule to keep the dumps unreachable.
+
+They can also be run manually:
 
 ```sh
 wp @local spck migrate            # run pending migrations
@@ -42,7 +44,7 @@ wp @local spck migrate --dry-run   # preview without executing
 wp @local spck migrate --status    # show all migrations and their state
 ```
 
-See [`wordpress/theme/migrations/README.md`](wordpress/theme/migrations/README.md) for details on creating and managing migrations.
+See [`wordpress/theme/migrations/README.md`](theme/migrations/README.md) for details on creating and managing migrations.
 
 ## Theme CSS Generation
 
