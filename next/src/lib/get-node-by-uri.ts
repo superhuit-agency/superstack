@@ -1,6 +1,10 @@
+import { cacheLife, cacheTag } from 'next/cache';
+
 import * as _templatesData from '@/components/templates/data';
 import configs from '@/configs.json';
+import { baseUriContext } from '@/hooks/use-base-uri';
 import { fetchAPI, formatBlocksJSON } from '@/lib';
+import { cacheTags } from '@/lib/cache-tags';
 import getBlockFinalComponentProps from '@/lib/get-block-final-component-props';
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -12,24 +16,89 @@ const templatesData: any = _templatesData;
 const { archiveData, singlePageData, singlePostData } = templatesData;
 
 /**
+ * Public read of a node, cached until one of its tags is revalidated.
+ * Shared by page rendering and metadata generation.
+ *
+ * Takes plain arguments only: they make up the cache key, so no auth token
+ * or preview flag may ever be passed here (see `getPreviewNodeByURI`).
+ *
+ * @param {string}      uri
+ * @param {string|null} lang - The language code
+ * @param {number}      routePage
+ *
+ * @returns
+ */
+export async function getPublicNodeByURI(
+	uri: string,
+	lang: string | null = null,
+	routePage = 1
+) {
+	'use cache';
+	cacheLife('max');
+	cacheTag(cacheTags.nodes());
+
+	// The request-scoped Base URI doesn't cross into a cached scope,
+	// so set it again for the blocks enriched below.
+	baseUriContext(uri);
+
+	const node = await getNodeByURI(uri, false, {}, false, routePage, lang);
+
+	if (!node) {
+		// Cached 404, cleared when a post change moves a URI
+		cacheTag(cacheTags.uris());
+		return null;
+	}
+
+	cacheTag(
+		node.__typename === 'ContentType'
+			? cacheTags.type(node.name)
+			: cacheTags.node(node.id),
+		cacheTags.settings() // The same query returns site SEO and general settings
+	);
+
+	return node;
+}
+
+/**
+ * Preview read of a node, never cached: it carries the user's auth token.
+ *
+ * NOTE: the `uri` could be in fact the ID (i.e. a draft doesn't have a slug/uri yet)
+ *
+ * @param {string}      uri
+ * @param {object}      auth
+ * @param {boolean}     previewDraft
+ * @param {number}      routePage
+ * @param {string|null} lang - The language code
+ *
+ * @returns
+ */
+export async function getPreviewNodeByURI(
+	uri: string,
+	auth: AuthType,
+	previewDraft: boolean,
+	routePage = 1,
+	lang: string | null = null
+) {
+	return getNodeByURI(uri, true, auth, previewDraft, routePage, lang);
+}
+
+/**
  * NOTE: in preview, the `uri` could be in fact the ID (i.e. a draft doesn't have a slug/uri yet)
  *
  * @param {string}      uri
  * @param {boolean}     preview
  * @param {object}      auth
- * @param {string|null} lang - The language code
  * @param {boolean}     previewDraft
- * @param {boolean}     blockEnrichment - Whether to enrich the node with blocksJSON and templateData
  * @param {number}      routePage
+ * @param {string|null} lang - The language code
  *
  * @returns
  */
-export default async function getNodeByURI(
+async function getNodeByURI(
 	uri: string,
 	preview: boolean,
 	auth: AuthType,
 	previewDraft: boolean,
-	blockEnrichment = true,
 	routePage = 1,
 	lang: string | null = null
 ) {
@@ -66,6 +135,12 @@ export default async function getNodeByURI(
 	});
 
 	const { node: rawNode, seo, generalSettings } = response;
+
+	// `node` is `null` when WordPress has no content at this URI, but missing
+	// when the request failed: don't let a failure pass (and be cached) as a 404.
+	if (rawNode === undefined) {
+		throw new Error(`Could not read the node at "${uri}" from WordPress`);
+	}
 
 	if (!rawNode) return null;
 
@@ -112,57 +187,48 @@ export default async function getNodeByURI(
 
 	node.fullUri = uri;
 
-	if (blockEnrichment) {
-		const { blocksJSON, templateData, templateBlocks } =
-			await Promise.allSettled([
-				formatBlocksJSON(
-					previewDraft
-						? (node.preview?.node?.blocksJSON ?? '')
-						: (node?.blocksJSON ?? ''),
-					{ lang }
-				),
-				getTemplateData(node),
-				enrichTemplateBlocks(
-					getTemplateBlocks(node?.fseTemplate?.slug, lang),
-					lang
-				),
-			])
-				.then(([bProm, tProm, tbProm]) => ({
-					blocksJSON: bProm.status === 'fulfilled' ? bProm.value : [],
-					templateData:
-						tProm.status === 'fulfilled' ? tProm.value : {},
-					templateBlocks:
-						tbProm.status === 'fulfilled' ? tbProm.value : [],
-				}))
-				.catch(() => {
-					console.error(
-						'Error while enriching & formatting blocksJSON and templateData'
-					);
-					return {
-						blocksJSON: [],
-						templateData: {},
-						templateBlocks: [],
-					};
-				});
+	const { blocksJSON, templateData, templateBlocks } =
+		await Promise.allSettled([
+			formatBlocksJSON(
+				previewDraft
+					? (node.preview?.node?.blocksJSON ?? '')
+					: (node?.blocksJSON ?? ''),
+				{ lang }
+			),
+			getTemplateData(node),
+			enrichTemplateBlocks(
+				getTemplateBlocks(node?.fseTemplate?.slug, lang),
+				lang
+			),
+		])
+			.then(([bProm, tProm, tbProm]) => ({
+				blocksJSON: bProm.status === 'fulfilled' ? bProm.value : [],
+				templateData: tProm.status === 'fulfilled' ? tProm.value : {},
+				templateBlocks:
+					tbProm.status === 'fulfilled' ? tbProm.value : [],
+			}))
+			.catch(() => {
+				console.error(
+					'Error while enriching & formatting blocksJSON and templateData'
+				);
+				return {
+					blocksJSON: [],
+					templateData: {},
+					templateBlocks: [],
+				};
+			});
 
-		const blocks =
-			templateBlocks.length > 0
-				? injectPostContentBlocks(templateBlocks, blocksJSON)
-				: blocksJSON;
+	const blocks =
+		templateBlocks.length > 0
+			? injectPostContentBlocks(templateBlocks, blocksJSON)
+			: blocksJSON;
 
-		if (node.preview) delete node.preview;
-
-		return {
-			...node,
-			blocks,
-			...templateData,
-			siteSEO: seo,
-			siteSettings: generalSettings,
-		};
-	}
+	if (node.preview) delete node.preview;
 
 	return {
 		...node,
+		blocks,
+		...templateData,
 		siteSEO: seo,
 		siteSettings: generalSettings,
 	};
