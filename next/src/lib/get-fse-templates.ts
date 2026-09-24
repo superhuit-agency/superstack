@@ -6,10 +6,13 @@ import { cacheTags } from '@/lib/cache-tags';
 import { gql } from '@/utils';
 import { resolvePromises } from '@/utils/resolve-promises';
 
-type FseGraphQlNode = {
+type FseTemplateNode = {
 	slug: string;
-	area?: string;
 	blocksJSON?: string;
+};
+
+type FseTemplatePartNode = FseTemplateNode & {
+	area?: string;
 	language?: { baseSlug: string; code: string };
 };
 
@@ -49,15 +52,15 @@ export default async function getFseTemplates(): Promise<FseTemplateEntry[]> {
 		throw new Error('Could not read the FSE templates from WordPress');
 	}
 
-	const templateParts: FseGraphQlNode[] = allTemplateParts.filter(Boolean);
+	const templateParts: FseTemplatePartNode[] = allTemplateParts.filter(Boolean);
 
 	// Settled one by one, so a template that fails to parse is dropped
 	// instead of failing every page
 	const templates = await resolvePromises(
-		allTemplates.filter(Boolean).map(async (template: FseGraphQlNode) => ({
+		allTemplates.filter(Boolean).map(async (template: FseTemplateNode) => ({
 			slug: template.slug,
 			blocks: await resolvePromises(
-				(await formatStructure(template))
+				(await parseBlocksWithoutData(template))
 					.filter((block): block is BlockPropsType => !!block)
 					.map((block: BlockPropsType) =>
 						block.name === 'core/template-part'
@@ -77,7 +80,7 @@ export default async function getFseTemplates(): Promise<FseTemplateEntry[]> {
  */
 async function inlineTemplatePart(
 	block: BlockPropsType,
-	templateParts: FseGraphQlNode[]
+	templateParts: FseTemplatePartNode[]
 ): Promise<BlockPropsType> {
 	const requestedSlug = block.attributes?.slug;
 
@@ -94,14 +97,14 @@ async function inlineTemplatePart(
 	);
 
 	const [innerBlocks, translationEntries] = await Promise.all([
-		formatStructure(basePart),
+		parseBlocksWithoutData(basePart),
 		resolvePromises(
 			translationParts.map(
 				async (
 					part
 				): Promise<[string, Array<BlockPropsType | null>]> => [
 					part.language!.code,
-					await formatStructure(part),
+					await parseBlocksWithoutData(part),
 				]
 			)
 		).then((entries) => entries.filter((entry) => entry !== null)),
@@ -121,6 +124,6 @@ async function inlineTemplatePart(
 }
 
 /** Parses a template's or part's blocks, without fetching any block data. */
-function formatStructure(node?: FseGraphQlNode) {
+function parseBlocksWithoutData(node?: FseTemplateNode) {
 	return formatBlocksJSON(node?.blocksJSON ?? '', { skipGetData: true });
 }
