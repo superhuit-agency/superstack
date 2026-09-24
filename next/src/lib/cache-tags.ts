@@ -8,6 +8,11 @@
 export const cacheTags = {
 	/** A single post, page… by its WordPress database ID. */
 	node: (databaseId: number | string) => `node:${databaseId}`,
+	/**
+	 * Every single post, page… of one content type. Only cleared by a "Purge
+	 * all" of that type: editing one post clears its `node:` tag alone.
+	 */
+	nodesOfType: (contentType: string) => `nodes:${contentType}`,
 	/** Listings, archives, feeds of one content type (e.g. `post`). */
 	type: (contentType: string) => `type:${contentType}`,
 	/** Listings with no type filter. Cleared by every post change. */

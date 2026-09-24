@@ -50,9 +50,12 @@ export async function getPublicNodeByURI(
 	}
 
 	cacheTag(
-		node.__typename === 'ContentType'
-			? cacheTags.type(node.name)
-			: cacheTags.node(node.id),
+		...(node.__typename === 'ContentType'
+			? [cacheTags.type(node.name)]
+			: [
+					cacheTags.node(node.id),
+					cacheTags.nodesOfType(node.contentTypeName),
+				]),
 		cacheTags.settings() // The same query returns site SEO and general settings
 	);
 
@@ -148,8 +151,8 @@ async function getNodeByURI(
 
 	if (configs.isMultilang) {
 		if (node.translation) {
-			const { __typename } = node;
-			node = { __typename, ...node.translation };
+			const { __typename, contentTypeName } = node;
+			node = { __typename, contentTypeName, ...node.translation };
 		} else if (lang && Array.isArray(node.translations)) {
 			// Non-translatable nodes (ContentType archives) have no `language`
 			// of their own — derive it from the requested lang so the rest of
@@ -289,6 +292,9 @@ const nodeByUriQuery = (lang: string | null) => `
 	) {
 		node: nodeByUri(uri: $uri) {
 			__typename
+			...on ContentNode {
+				contentTypeName
+			}
 			${types
 				.map(({ type, fields, translatable }) =>
 					configs.isMultilang && lang && translatable
@@ -315,6 +321,9 @@ const nodeByIdQuery = (lang: string | null) => `
 	) {
 		node(id: $id, idType: DATABASE_ID) {
 			__typename
+			...on ContentNode {
+				contentTypeName
+			}
 			${types
 				.map(({ type, fields, translatable }) =>
 					configs.isMultilang && lang && translatable
