@@ -1,7 +1,14 @@
+import { cacheLife, cacheTag } from 'next/cache';
+
 import configs from '@/configs.json';
 import { fetchAPI } from '@/lib';
+import { cacheTags } from '@/lib/cache-tags';
 
 export const getLocales = async () => {
+	'use cache';
+	cacheLife('max');
+	cacheTag(cacheTags.settings(), cacheTags.nodes());
+
 	if (!configs.isMultilang) {
 		return {
 			locales: [configs.staticLang as Locale],

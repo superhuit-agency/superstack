@@ -4,6 +4,7 @@ import path from 'path';
 const getWpUrl = () => process.env.WORDPRESS_URL ?? 'http://localhost';
 
 const nextConfig: NextConfig = {
+	cacheComponents: true,
 	turbopack: {
 		root: path.join(__dirname, '.'),
 	},

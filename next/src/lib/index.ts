@@ -6,7 +6,7 @@ import getAllURIs from './get-all-uris';
 import getAuthToken from './get-auth-token';
 
 import getFunkyWpUploadsURI from './get-funky-wp-uploads-uri';
-import getNodeByURI from './get-node-by-uri';
+import { getPreviewNodeByURI, getPublicNodeByURI } from './get-node-by-uri';
 import getWpUriFromNextPath from './get-wp-uri-from-next-path';
 
 import getPreviewNode from './get-preview-node';
@@ -23,8 +23,9 @@ export {
 	getAuthToken,
 	getBlockFinalComponentProps,
 	getFunkyWpUploadsURI,
-	getNodeByURI,
 	getPreviewNode,
+	getPreviewNodeByURI,
+	getPublicNodeByURI,
 	getSitemapData,
 	getRedirection,
 	getWpUriFromNextPath,
