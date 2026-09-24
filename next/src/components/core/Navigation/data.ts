@@ -18,7 +18,7 @@ const navigationMenuQuery = gql`
 `;
 
 // Returns `innerBlocks` so menu items are fetched fresh at request time
-// instead of being baked into the FSE JSON snapshot. See docs/fse-templating.md.
+// instead of being baked into the cached FSE templates. See docs/fse-templating.md.
 export const getData = async (
 	fetcher: FetchApiFuncType,
 	attrs: NavigationAttributes | null = null

@@ -3,9 +3,7 @@
 	"version": "0.1.0",
 	"private": true,
 	"scripts": {
-		"predev": "npx tsx scripts/fetch-fse-templates-and-parts.ts",
 		"dev": "next dev",
-		"prebuild": "npx tsx scripts/fetch-fse-templates-and-parts.ts",
 		"build": "next build",
 		"start": "next start",
 		"lint": "eslint",
@@ -16,7 +14,6 @@
 	"dependencies": {
 		"@formatjs/intl-localematcher": "^0.6.0",
 		"classnames": "^2.5.1",
-		"dotenv": "^17.4.2",
 		"js-cookie": "^3.0.5",
 		"lodash": "^4.18.1",
 		"negotiator": "^1.0.0",
@@ -47,7 +44,6 @@
 		"postcss-preset-env": "^11.2.1",
 		"postcss-simple-vars": "^7.0.1",
 		"storybook": "^10.3.5",
-		"tsx": "^4.21.0",
 		"typescript": "^5",
 		"vite": "^8.0.8",
 		"vitest": "^4.1.11"

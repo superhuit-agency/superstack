@@ -25,8 +25,9 @@ type BlockPropsType = {
 	innerBlocks: Array<any>;
 	/**
 	 * Per-language `innerBlocks` overrides for `core/template-part` blocks,
-	 * keyed by Polylang language slug (e.g. "de"). Populated at build time from
-	 * translated template parts (`<slug>___<lang>`). See getTemplateBlocks in
+	 * keyed by Polylang language slug (e.g. "de"). Populated by the FSE
+	 * templates read (get-fse-templates.ts) from translated template parts
+	 * (`<slug>___<lang>`). See getTemplateBlocks in
 	 * get-node-by-uri.ts for how these are swapped in at request time.
 	 */
 	translations?: Record<string, Array<BlockPropsType | null>>;
@@ -35,11 +36,6 @@ type BlockPropsType = {
 type FseTemplateEntry = {
 	slug: string;
 	blocks: Array<BlockPropsType | null>;
-};
-
-type FseTemplatesData = {
-	generatedAt: string;
-	templates: Array<FseTemplateEntry>;
 };
 
 type WpFilterType = {

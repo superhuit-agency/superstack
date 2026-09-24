@@ -21,7 +21,7 @@ import fetchAPI from '@/lib/fetch-api';
  *
  * A block's `data.ts` may export `getData(fetcher, attrs)` which returns
  * `{ ...extraAttrs, innerBlocks? }`. When `innerBlocks` is present in that
- * return value, it overrides the static `innerBlocks` from the JSON snapshot
+ * return value, it overrides the static `innerBlocks` from the FSE templates
  * — used by blocks whose children change independently of the template
  * (e.g. `core/navigation` menu items). See docs/fse-templating.md.
  *
