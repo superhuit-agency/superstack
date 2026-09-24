@@ -114,8 +114,8 @@ function postTags({ id, type, before, after }: Record<string, unknown>) {
 
 /**
  * The manual "Purge all" lever. Without a `type`, everything for the whole
- * site; with one, only that type's listings and the term listings of its
- * taxonomies.
+ * site; with one, that type's single pages and listings, and the term listings
+ * of its taxonomies.
  */
 function allTags({ type, taxonomies }: Record<string, unknown>) {
 	if (typeof type !== 'string') {
@@ -128,6 +128,7 @@ function allTags({ type, taxonomies }: Record<string, unknown>) {
 	}
 
 	return [
+		cacheTags.nodesOfType(type),
 		cacheTags.type(type),
 		...(Array.isArray(taxonomies) ? taxonomies : [])
 			.filter((taxonomy) => typeof taxonomy === 'string')

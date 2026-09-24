@@ -174,7 +174,7 @@ describe('POST /api/revalidate', () => {
 			]);
 		});
 
-		it('clears the type and its taxonomies for one post type', async () => {
+		it('clears the single pages, the type and its taxonomies for one post type', async () => {
 			await send([
 				{
 					subject: 'all',
@@ -184,16 +184,17 @@ describe('POST /api/revalidate', () => {
 			]);
 
 			expect(tagsMarkedStale()).toEqual([
+				'nodes:post',
 				'taxonomy:category',
 				'taxonomy:post_tag',
 				'type:post',
 			]);
 		});
 
-		it('clears the type for one post type with no taxonomies', async () => {
+		it('clears the single pages and the type for one post type with no taxonomies', async () => {
 			await send([{ subject: 'all', type: 'event', taxonomies: [] }]);
 
-			expect(tagsMarkedStale()).toEqual(['type:event']);
+			expect(tagsMarkedStale()).toEqual(['nodes:event', 'type:event']);
 		});
 	});
 
