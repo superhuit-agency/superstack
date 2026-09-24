@@ -27,12 +27,14 @@ export async function generateStaticParams() {
 	return allURIs;
 }
 
+type PageProps = {
+	params: Promise<{ uri: string[]; lang: Locale }>;
+};
+
 // Generate page metadata
 export async function generateMetadata({
 	params,
-}: {
-	params: Promise<{ uri: string[]; lang: Locale }>;
-}): Promise<Metadata> {
+}: PageProps): Promise<Metadata> {
 	const { uri: uriSegments, lang } = await params;
 	const { uri, routePage } = parseRouteSegments(uriSegments);
 
@@ -161,11 +163,7 @@ const PreviewToolbar = dynamic(
 	() => import('@/components/admin/PreviewToolbar')
 );
 
-export default async function Page({
-	params,
-}: {
-	params: Promise<{ uri: string[]; lang: Locale }>;
-}) {
+export default async function Page({ params }: PageProps) {
 	const { uri: uriSegments, lang } = await params;
 	const { isEnabled: isDraftModeEnable } = await draftMode();
 
