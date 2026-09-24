@@ -4,8 +4,9 @@ import fetchAPI from '@/lib/fetch-api';
 import formatBlocksJSON from '@/lib/format-blocks-json';
 import { cacheTags } from '@/lib/cache-tags';
 import { gql } from '@/utils';
+import { resolvePromises } from '@/utils/resolve-promises';
 
-type GraphQlNode = {
+type FseGraphQlNode = {
 	slug: string;
 	area?: string;
 	blocksJSON?: string;
@@ -42,38 +43,32 @@ export default async function getFseTemplates(): Promise<FseTemplateEntry[]> {
 		}
 	`);
 
-	// Missing when the request failed: don't let a failure be cached as "no template"
-	if (allTemplates === undefined || allTemplateParts === undefined) {
+	// Both fields always resolve to a list: anything else is a failed request,
+	// which must not be cached as "no template"
+	if (!Array.isArray(allTemplates) || !Array.isArray(allTemplateParts)) {
 		throw new Error('Could not read the FSE templates from WordPress');
 	}
 
-	const templateParts: GraphQlNode[] = (allTemplateParts ?? []).filter(
-		Boolean
+	const templateParts: FseGraphQlNode[] = allTemplateParts.filter(Boolean);
+
+	// Settled one by one, so a template that fails to parse is dropped
+	// instead of failing every page
+	const templates = await resolvePromises(
+		allTemplates.filter(Boolean).map(async (template: FseGraphQlNode) => ({
+			slug: template.slug,
+			blocks: await resolvePromises(
+				(await formatStructure(template))
+					.filter((block): block is BlockPropsType => !!block)
+					.map((block: BlockPropsType) =>
+						block.name === 'core/template-part'
+							? inlineTemplatePart(block, templateParts)
+							: Promise.resolve(block)
+					)
+			),
+		}))
 	);
 
-	return Promise.all(
-		(allTemplates ?? [])
-			.filter((template: GraphQlNode | null) => !!template)
-			.map(async (template: GraphQlNode) => {
-				const blocks = await formatBlocksJSON(
-					template.blocksJSON ?? '',
-					{ skipGetData: true }
-				);
-
-				return {
-					slug: template.slug,
-					blocks: await Promise.all(
-						blocks
-							.filter((b: BlockPropsType | null) => !!b)
-							.map((block: BlockPropsType) =>
-								block.name === 'core/template-part'
-									? inlineTemplatePart(block, templateParts)
-									: block
-							)
-					),
-				};
-			})
-	);
+	return templates.filter(Boolean) as FseTemplateEntry[];
 }
 
 /**
@@ -82,7 +77,7 @@ export default async function getFseTemplates(): Promise<FseTemplateEntry[]> {
  */
 async function inlineTemplatePart(
 	block: BlockPropsType,
-	templateParts: GraphQlNode[]
+	templateParts: FseGraphQlNode[]
 ): Promise<BlockPropsType> {
 	const requestedSlug = block.attributes?.slug;
 
@@ -99,19 +94,17 @@ async function inlineTemplatePart(
 	);
 
 	const [innerBlocks, translationEntries] = await Promise.all([
-		formatBlocksJSON(basePart?.blocksJSON ?? '', { skipGetData: true }),
-		Promise.all(
+		formatStructure(basePart),
+		resolvePromises(
 			translationParts.map(
 				async (
 					part
 				): Promise<[string, Array<BlockPropsType | null>]> => [
 					part.language!.code,
-					await formatBlocksJSON(part.blocksJSON ?? '', {
-						skipGetData: true,
-					}),
+					await formatStructure(part),
 				]
 			)
-		),
+		).then((entries) => entries.filter((entry) => entry !== null)),
 	]);
 
 	return {
@@ -125,4 +118,9 @@ async function inlineTemplatePart(
 			? { translations: Object.fromEntries(translationEntries) }
 			: {}),
 	};
+}
+
+/** Parses a template's or part's blocks, without fetching any block data. */
+function formatStructure(node?: FseGraphQlNode) {
+	return formatBlocksJSON(node?.blocksJSON ?? '', { skipGetData: true });
 }

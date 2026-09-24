@@ -104,7 +104,7 @@ flowchart TB
 
 > **Important:** `skipGetData: true` means dynamic data (navigation links, site logo, etc.) is **not** part of the template read. This is intentional — those values are fetched when each page is rendered.
 
-> **Failures aren't cached.** When WordPress doesn't answer, the read throws instead of returning no templates, and the page render fails with it: a page is never cached without its header and footer.
+> **Failures aren't cached.** When WordPress doesn't answer, the read throws instead of returning no templates, and the page render fails with it: a page is never cached without its header and footer. A single template or part whose blocks can't be parsed is skipped, and the others are still served.
 
 > **`core/navigation` specifics:** the WP side does not inline the children of a `core/navigation` block into the template's `blocksJSON`. The template read only contains the `core/navigation` block with its `ref` attribute. The actual menu items are fetched at request time by `Navigation/data.ts`. This avoids stale navigation contents after a menu edit.
 
