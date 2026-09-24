@@ -1,7 +1,7 @@
 import { revalidatePath, revalidateTag } from 'next/cache';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import * as route from './route';
+import * as route from '@/app/api/revalidate/route';
 
 vi.mock('next/cache', () => ({
 	revalidatePath: vi.fn(),
@@ -249,6 +249,7 @@ describe('POST /api/revalidate', () => {
 		it.each([
 			['a missing secret', null],
 			['a wrong secret', 'Bearer wrong-secret'],
+			['a wrong secret of the same length', 'Bearer test-secreT'],
 			['the secret without the Bearer scheme', SECRET],
 		])('%s with a 401', async (_, authorization) => {
 			const response = await route.POST(

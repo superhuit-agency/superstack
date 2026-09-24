@@ -1,4 +1,4 @@
-import { timingSafeEqual } from 'node:crypto';
+import { createHash, timingSafeEqual } from 'node:crypto';
 import { revalidatePath, revalidateTag } from 'next/cache';
 
 import { cacheTags } from '@/lib/cache-tags';
@@ -113,8 +113,9 @@ function postTags({ id, type, before, after }: Record<string, unknown>) {
 }
 
 /**
- * Everything for the whole site: the manual "Purge all" lever. Scoped to one
- * post type, its listings and the term listings of its taxonomies.
+ * The manual "Purge all" lever. Without a `type`, everything for the whole
+ * site; with one, only that type's listings and the term listings of its
+ * taxonomies.
  */
 function allTags({ type, taxonomies }: Record<string, unknown>) {
 	if (typeof type !== 'string') {
@@ -147,10 +148,13 @@ function isAuthorized(header: string | null): boolean {
 	const secret = process.env.REVALIDATE_SECRET;
 	if (!secret || header === null) return false;
 
-	const given = Buffer.from(header);
-	const expected = Buffer.from(`Bearer ${secret}`);
+	// Hashed first: `timingSafeEqual` needs equal lengths, and checking them
+	// would leak the secret's
+	return timingSafeEqual(sha256(header), sha256(`Bearer ${secret}`));
+}
 
-	return given.length === expected.length && timingSafeEqual(given, expected);
+function sha256(value: string): Buffer {
+	return createHash('sha256').update(value).digest();
 }
 
 function isId(value: unknown): value is number {
