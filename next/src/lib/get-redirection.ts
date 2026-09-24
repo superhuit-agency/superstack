@@ -30,9 +30,14 @@ export default async function getRedirection(uri: string) {
 		}
 	);
 
-	return redirections === null ||
-		redirections === undefined ||
-		!redirections[0]
+	// Missing when the request failed: don't let a failure be cached as "no redirect"
+	if (redirections === undefined) {
+		throw new Error(
+			`Could not read the redirections of "${uri}" from WordPress`
+		);
+	}
+
+	return redirections === null || !redirections[0]
 		? null
 		: {
 				destination: redirections[0].target,

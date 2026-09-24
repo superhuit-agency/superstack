@@ -65,19 +65,19 @@ export async function getPublicNodeByURI(
  * NOTE: the `uri` could be in fact the ID (i.e. a draft doesn't have a slug/uri yet)
  *
  * @param {string}      uri
+ * @param {string|null} lang - The language code
+ * @param {number}      routePage
  * @param {object}      auth
  * @param {boolean}     previewDraft
- * @param {number}      routePage
- * @param {string|null} lang - The language code
  *
  * @returns
  */
 export async function getPreviewNodeByURI(
 	uri: string,
+	lang: string | null,
+	routePage: number,
 	auth: AuthType,
-	previewDraft: boolean,
-	routePage = 1,
-	lang: string | null = null
+	previewDraft: boolean
 ) {
 	return getNodeByURI(uri, true, auth, previewDraft, routePage, lang);
 }
