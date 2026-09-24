@@ -6,10 +6,7 @@ import { baseUriContext } from '@/hooks/use-base-uri';
 import { fetchAPI, formatBlocksJSON } from '@/lib';
 import { cacheTags } from '@/lib/cache-tags';
 import getBlockFinalComponentProps from '@/lib/get-block-final-component-props';
-
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore — file is gitignored and generated at dev/build time via predev/prebuild
-import fseTemplatesData from '@/lib/fse/fse-templates-and-parts.json';
+import getFseTemplates from '@/lib/get-fse-templates';
 
 const templatesData: any = _templatesData;
 
@@ -187,8 +184,13 @@ async function getNodeByURI(
 
 	node.fullUri = uri;
 
-	const { blocksJSON, templateData, templateBlocks } =
-		await Promise.allSettled([
+	const [templateBlocks, { blocksJSON, templateData }] = await Promise.all([
+		// Not settled with the rest: a failed template read must fail the page,
+		// not be cached as a page without its header and footer.
+		getTemplateBlocks(node?.fseTemplate?.slug, lang).then((blocks) =>
+			enrichTemplateBlocks(blocks, lang)
+		),
+		Promise.allSettled([
 			formatBlocksJSON(
 				previewDraft
 					? (node.preview?.node?.blocksJSON ?? '')
@@ -196,16 +198,10 @@ async function getNodeByURI(
 				{ lang }
 			),
 			getTemplateData(node),
-			enrichTemplateBlocks(
-				getTemplateBlocks(node?.fseTemplate?.slug, lang),
-				lang
-			),
 		])
-			.then(([bProm, tProm, tbProm]) => ({
+			.then(([bProm, tProm]) => ({
 				blocksJSON: bProm.status === 'fulfilled' ? bProm.value : [],
 				templateData: tProm.status === 'fulfilled' ? tProm.value : {},
-				templateBlocks:
-					tbProm.status === 'fulfilled' ? tbProm.value : [],
 			}))
 			.catch(() => {
 				console.error(
@@ -214,9 +210,9 @@ async function getNodeByURI(
 				return {
 					blocksJSON: [],
 					templateData: {},
-					templateBlocks: [],
 				};
-			});
+			}),
+	]);
 
 	const blocks =
 		templateBlocks.length > 0
@@ -382,23 +378,22 @@ const injectPostContentBlocks = (
 	});
 
 /**
- * Gets the blocks of the template from the FSE templates and parts data,
+ * Gets the blocks of the template from the cached FSE templates read,
  * swapping in the `lang`-specific variant of any translated template part
  * (e.g. footer, header) before request-time enrichment runs.
  * @param templateSlug - The slug of the template
  * @param lang - The requested language code, if any
  * @returns
  */
-const getTemplateBlocks = (
+const getTemplateBlocks = async (
 	templateSlug: string,
 	lang: string | null = null
-): BlockPropsType[] => {
+): Promise<BlockPropsType[]> => {
 	if (!templateSlug) return [];
 
 	const fseTemplate: FseTemplateEntry | null =
-		(fseTemplatesData as FseTemplatesData)?.templates?.find(
-			(tpl) => tpl?.slug === templateSlug
-		) ?? null;
+		(await getFseTemplates()).find((tpl) => tpl?.slug === templateSlug) ??
+		null;
 
 	if (!fseTemplate?.blocks?.length) return [];
 
@@ -410,7 +405,7 @@ const getTemplateBlocks = (
 
 /**
  * Recursively swaps a `core/template-part` block's `innerBlocks` for its
- * `translations[lang]` variant, when one was baked into the JSON snapshot.
+ * `translations[lang]` variant, when the template read found one.
  * Falls back to the default (base-language) `innerBlocks` otherwise.
  */
 const applyTemplatePartTranslations = (
@@ -434,7 +429,8 @@ const applyTemplatePartTranslations = (
 
 /**
  * Runs getData enrichment on template blocks at request time so dynamic data
- * (navigation, site logo, etc.) is always fresh and not baked in at build time.
+ * (navigation, site logo, etc.) is fetched per page, not baked into the cached
+ * FSE templates.
  */
 const enrichTemplateBlocks = (
 	blocks: BlockPropsType[],
