@@ -19,19 +19,17 @@ export async function POST(request: Request) {
 		return Response.json({ message: 'Invalid JSON body' }, { status: 400 });
 	}
 
-	if (!isObject(body) || !Array.isArray(body.changes)) {
-		return Response.json({ message: 'Missing changes' }, { status: 400 });
-	}
-
 	// A version this route doesn't know is a breaking change: answer with a
 	// 4xx so the plugin reports a failure instead of expiring the wrong tags
-	if (body.version !== CONTRACT_VERSION) {
+	if (!isObject(body) || body.version !== CONTRACT_VERSION) {
 		return Response.json(
-			{
-				message: `Unsupported contract version: ${String(body.version)}`,
-			},
+			{ message: 'Unsupported contract version' },
 			{ status: 400 }
 		);
+	}
+
+	if (!Array.isArray(body.changes)) {
+		return Response.json({ message: 'Missing changes' }, { status: 400 });
 	}
 
 	const tags = new Set<string>();
@@ -39,14 +37,9 @@ export async function POST(request: Request) {
 	for (const change of body.changes) {
 		if (!isObject(change)) continue;
 
-		// this should be the actual path not a rewritten path
-		// e.g. for "/blog/[slug]" this should be "/blog/post-1"
-		if (change.subject === 'path') {
-			if (typeof change.uri === 'string') paths.add(change.uri);
-			continue;
-		}
-
-		for (const tag of tagsFor(change)) tags.add(tag);
+		const invalidation = invalidationOf(change);
+		invalidation.tags?.forEach((tag) => tags.add(tag));
+		if (invalidation.path) paths.add(invalidation.path);
 	}
 
 	// Marked stale only: the next visitor gets the stale entry while a fresh
@@ -59,35 +52,44 @@ export async function POST(request: Request) {
 }
 
 /**
- * The tags one change clears. A subject or a field this route doesn't know
- * is ignored, so a minor plugin release never breaks the site.
+ * What one change clears: cache tags, or a path. A subject or a field this
+ * route doesn't know is ignored, so a minor plugin release never breaks the
+ * site.
  */
-function tagsFor(change: Record<string, unknown>): string[] {
+function invalidationOf(change: Record<string, unknown>): {
+	tags?: string[];
+	path?: string;
+} {
 	switch (change.subject) {
 		case 'post':
-			return postTags(change);
+			return { tags: postTags(change) };
 
 		// Normalised by the helper, the same way as the redirect lookup's tag
 		case 'redirect':
 			return typeof change.uri === 'string'
-				? [cacheTags.redirect(change.uri)]
-				: [];
+				? { tags: [cacheTags.redirect(change.uri)] }
+				: {};
+
+		// this should be the actual path not a rewritten path
+		// e.g. for "/blog/[slug]" this should be "/blog/post-1"
+		case 'path':
+			return typeof change.uri === 'string' ? { path: change.uri } : {};
 
 		// Menus are read by ID, never by location: `locations` is ignored
 		case 'menu':
-			return isId(change.id) ? [cacheTags.menu(change.id)] : [];
+			return isId(change.id) ? { tags: [cacheTags.menu(change.id)] } : {};
 
 		case 'templates':
-			return [cacheTags.templates()];
+			return { tags: [cacheTags.templates()] };
 
 		case 'settings':
-			return [cacheTags.settings()];
+			return { tags: [cacheTags.settings()] };
 
 		case 'all':
-			return allTags(change);
+			return { tags: allTags(change) };
 
 		default:
-			return [];
+			return {};
 	}
 }
 

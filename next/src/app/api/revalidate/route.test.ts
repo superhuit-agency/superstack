@@ -26,12 +26,19 @@ function request(
 	});
 }
 
-function send(changes: unknown[]) {
-	return route.POST(request({ version: 2, changes }));
+function body(changes: unknown[]) {
+	return { version: 2, changes };
 }
 
-/** The tags cleared, sorted: the order they're cleared in doesn't matter. */
-function clearedTags() {
+function send(changes: unknown[]) {
+	return route.POST(request(body(changes)));
+}
+
+/**
+ * The tags marked stale (asserting they're all cleared with the `max`
+ * profile), sorted: the order they're cleared in doesn't matter.
+ */
+function tagsMarkedStale() {
 	return vi
 		.mocked(revalidateTag)
 		.mock.calls.map(([tag, profile]) => {
@@ -55,7 +62,7 @@ describe('POST /api/revalidate', () => {
 		const response = await send([{ subject: 'templates' }]);
 
 		expect(response.status).toBe(200);
-		expect(clearedTags()).toEqual(['templates']);
+		expect(tagsMarkedStale()).toEqual(['templates']);
 	});
 
 	describe('a post change', () => {
@@ -71,7 +78,11 @@ describe('POST /api/revalidate', () => {
 			]);
 
 			expect(response.status).toBe(200);
-			expect(clearedTags()).toEqual(['content', 'node:42', 'type:post']);
+			expect(tagsMarkedStale()).toEqual([
+				'content',
+				'node:42',
+				'type:post',
+			]);
 		});
 
 		it.each([
@@ -83,7 +94,7 @@ describe('POST /api/revalidate', () => {
 				{ subject: 'post', id: 42, type: 'event', before, after },
 			]);
 
-			expect(clearedTags()).toEqual([
+			expect(tagsMarkedStale()).toEqual([
 				'content',
 				'node:42',
 				'type:event',
@@ -109,7 +120,7 @@ describe('POST /api/revalidate', () => {
 				},
 			]);
 
-			expect(clearedTags()).toEqual([
+			expect(tagsMarkedStale()).toEqual([
 				'content',
 				'node:1',
 				'node:2',
@@ -131,7 +142,7 @@ describe('POST /api/revalidate', () => {
 			async (uri) => {
 				await send([{ subject: 'redirect', uri }]);
 
-				expect(clearedTags()).toEqual(['redirect:/old-path/']);
+				expect(tagsMarkedStale()).toEqual(['redirect:/old-path/']);
 			}
 		);
 	});
@@ -142,20 +153,20 @@ describe('POST /api/revalidate', () => {
 	])('clears the menu of a menu change %s', async (_, locations) => {
 		await send([{ subject: 'menu', id: 7, locations }]);
 
-		expect(clearedTags()).toEqual(['menu:7']);
+		expect(tagsMarkedStale()).toEqual(['menu:7']);
 	});
 
 	it('clears the settings for a settings change', async () => {
 		await send([{ subject: 'settings' }]);
 
-		expect(clearedTags()).toEqual(['settings']);
+		expect(tagsMarkedStale()).toEqual(['settings']);
 	});
 
 	describe('an all change', () => {
 		it('clears everything for the whole site', async () => {
 			await send([{ subject: 'all' }]);
 
-			expect(clearedTags()).toEqual([
+			expect(tagsMarkedStale()).toEqual([
 				'nodes',
 				'settings',
 				'templates',
@@ -172,7 +183,7 @@ describe('POST /api/revalidate', () => {
 				},
 			]);
 
-			expect(clearedTags()).toEqual([
+			expect(tagsMarkedStale()).toEqual([
 				'taxonomy:category',
 				'taxonomy:post_tag',
 				'type:post',
@@ -182,7 +193,7 @@ describe('POST /api/revalidate', () => {
 		it('clears the type for one post type with no taxonomies', async () => {
 			await send([{ subject: 'all', type: 'event', taxonomies: [] }]);
 
-			expect(clearedTags()).toEqual(['type:event']);
+			expect(tagsMarkedStale()).toEqual(['type:event']);
 		});
 	});
 
@@ -206,7 +217,7 @@ describe('POST /api/revalidate', () => {
 			]);
 
 			expect(response.status).toBe(200);
-			expect(clearedTags()).toEqual(['templates']);
+			expect(tagsMarkedStale()).toEqual(['templates']);
 		});
 
 		it('an unknown field on a known subject', async () => {
@@ -220,7 +231,7 @@ describe('POST /api/revalidate', () => {
 			]);
 
 			expect(response.status).toBe(200);
-			expect(clearedTags()).toEqual(['menu:7']);
+			expect(tagsMarkedStale()).toEqual(['menu:7']);
 		});
 
 		// Mapped once the plugin reports term changes (nextjs-revalidate#55)
@@ -241,10 +252,7 @@ describe('POST /api/revalidate', () => {
 			['the secret without the Bearer scheme', SECRET],
 		])('%s with a 401', async (_, authorization) => {
 			const response = await route.POST(
-				request(
-					{ version: 2, changes: [{ subject: 'templates' }] },
-					{ authorization }
-				)
+				request(body([{ subject: 'templates' }]), { authorization })
 			);
 
 			expect(response.status).toBe(401);
@@ -255,10 +263,9 @@ describe('POST /api/revalidate', () => {
 			vi.stubEnv('REVALIDATE_SECRET', '');
 
 			const response = await route.POST(
-				request(
-					{ version: 2, changes: [{ subject: 'templates' }] },
-					{ authorization: 'Bearer ' }
-				)
+				request(body([{ subject: 'templates' }]), {
+					authorization: 'Bearer ',
+				})
 			);
 
 			expect(response.status).toBe(401);
@@ -273,8 +280,8 @@ describe('POST /api/revalidate', () => {
 			['a v1 request', { path: '/hello-world/' }],
 			['a body without changes', { version: 2 }],
 			['a body that is not JSON', 'path=/hello-world/'],
-		])('%s with a 400', async (_, body) => {
-			const response = await route.POST(request(body));
+		])('%s with a 400', async (_, payload) => {
+			const response = await route.POST(request(payload));
 
 			expect(response.status).toBe(400);
 			expect(revalidateTag).not.toHaveBeenCalled();
