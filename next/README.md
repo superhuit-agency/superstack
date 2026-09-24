@@ -31,6 +31,7 @@ npm run dev
 | `prebuild`        | Fetch FSE templates/parts data before `build` |
 | `start`           | Run the production server (`next start`)      |
 | `lint`            | Run ESLint                                    |
+| `test`            | Run the Vitest suite once                     |
 | `storybook`       | Start Storybook on port 6006                  |
 | `build-storybook` | Build Storybook static output                 |
 
