@@ -2,6 +2,7 @@ import { getWpUrl } from '@/utils/node-utils';
 import getFunkyWpUploadsURI from '@/lib/get-funky-wp-uploads-uri';
 import getBlockFinalComponentProps from '@/lib/get-block-final-component-props';
 import { throwIfBaseUriNotDeclared } from '@/hooks/use-base-uri';
+import { throwIfWordPressReadFailed } from '@/lib/wordpress-read-error';
 
 export default async function formatBlocksJSON(
 	blocksJSON: string,
@@ -35,6 +36,7 @@ export default async function formatBlocksJSON(
 		)
 	);
 	throwIfBaseUriNotDeclared(results);
+	throwIfWordPressReadFailed(results);
 
 	return results.map((p: PromiseSettledResult<BlockPropsType>) =>
 		p.status === 'fulfilled' ? p.value : null
