@@ -1,29 +1,20 @@
-.app {
-	/* &.-is-loading {
-		visibility: hidden;
-		pointer-events: none;
-	} */
+sub,
+sup {
+	font-size: smaller;
+}
+sub {
+	vertical-align: sub;
+}
+sup {
+	vertical-align: super;
+}
 
-	sub,
-	sup {
-		font-size: smaller;
-	}
-	sub {
-		vertical-align: sub;
-	}
-	sup {
-		vertical-align: super;
-	}
-
-	/***** LINKS *****/
-	.supt-introduction,
-	.supt-paragraph,
-	.supt-list,
-	.supt-section__introduction,
-	.supt-table {
-		a {
-			@extend %link-underline;
-		}
+/***** LINKS *****/
+.wp-block-paragraph,
+.wp-block-list,
+.wp-block-table {
+	a {
+		@extend %link-underline;
 	}
 }
 

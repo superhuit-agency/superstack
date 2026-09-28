@@ -3,6 +3,9 @@
 /* Global */
 
 /* Core blocks */
+@import '@components/core/Button/styles.css';
+@import '@components/core/Image/styles.css';
+@import '@components/core/Paragraph/styles.css';
 
 /* Cards */
 
@@ -29,4 +32,14 @@
 			@extend %single-content-layout;
 		}
 	}
+}
+
+* {
+	box-sizing: border-box;
+}
+
+/* Flatten editor wrappers */
+.block-editor-inner-blocks,
+.block-editor-inner-blocks > .block-editor-block-list__layout {
+	display: contents;
 }

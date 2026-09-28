@@ -123,8 +123,89 @@ class RegisterFseTemplates {
 				$post_type_name = $source->name;
 				if (! $post_type_name) return null;
 
-				$hierarchy = ["archive-{$post_type_name}", 'archive'];
-				$resolved  = resolve_block_template('archive', $hierarchy, '');
+				// The blog posts index (`post` archive with a static posts page) is rendered
+				// by the `home` template, not `archive`, mirroring WordPress core.
+				if ('post' === $post_type_name && (int) get_option('page_for_posts')) {
+					$template_type = 'home';
+					$hierarchy     = ['home'];
+				} else {
+					$template_type = 'archive';
+					$hierarchy     = ["archive-{$post_type_name}", 'archive'];
+				}
+
+				$resolved = resolve_block_template($template_type, $hierarchy, '');
+
+				if (! $resolved) return null;
+
+				return ['slug' => $resolved->slug];
+			},
+		]);
+
+		register_graphql_field('Tag', 'fseTemplate', [
+			'type'        => 'FseTemplateInfo',
+			'description' => _x('The FSE template used for this tag archive.', 'GraphQL field desc', 'supt'),
+			'resolve'     => function ($source) {
+				$term = get_term($source->databaseId, 'post_tag');
+
+				if (! $term || is_wp_error($term)) {
+					return null;
+				}
+
+				$hierarchy = ["tag-{$term->slug}", "tag-{$term->term_id}", 'tag', 'archive'];
+
+				$resolved = resolve_block_template('tag', $hierarchy, '');
+
+				if (! $resolved) return null;
+
+				return ['slug' => $resolved->slug];
+			},
+		]);
+
+		register_graphql_field('Category', 'fseTemplate', [
+			'type'        => 'FseTemplateInfo',
+			'description' => _x('The FSE template used for this category archive.', 'GraphQL field desc', 'supt'),
+			'resolve'     => function ($source) {
+				$term = get_term($source->databaseId, 'category');
+
+				if (! $term || is_wp_error($term)) {
+					return null;
+				}
+
+				$hierarchy = ["category-{$term->slug}", "category-{$term->term_id}", 'category', 'archive'];
+
+				$resolved = resolve_block_template('category', $hierarchy, '');
+
+				if (! $resolved) return null;
+
+				return ['slug' => $resolved->slug];
+			},
+		]);
+
+		register_graphql_field('Tag', 'fseTemplate', [
+			'type'        => 'FseTemplateInfo',
+			'description' => _x('The FSE template used for this tag archive.', 'GraphQL field desc', 'supt'),
+			'resolve'     => function ($source) {
+				$term = get_term($source->databaseId, 'post_tag');
+				if (! $term || is_wp_error($term)) return null;
+
+				$hierarchy = ["tag-{$term->slug}", "tag-{$term->term_id}", 'tag', 'archive'];
+				$resolved  = resolve_block_template('tag', $hierarchy, '');
+
+				if (! $resolved) return null;
+
+				return ['slug' => $resolved->slug];
+			},
+		]);
+
+		register_graphql_field('Category', 'fseTemplate', [
+			'type'        => 'FseTemplateInfo',
+			'description' => _x('The FSE template used for this category archive.', 'GraphQL field desc', 'supt'),
+			'resolve'     => function ($source) {
+				$term = get_term($source->databaseId, 'category');
+				if (! $term || is_wp_error($term)) return null;
+
+				$hierarchy = ["category-{$term->slug}", "category-{$term->term_id}", 'category', 'archive'];
+				$resolved  = resolve_block_template('category', $hierarchy, '');
 
 				if (! $resolved) return null;
 

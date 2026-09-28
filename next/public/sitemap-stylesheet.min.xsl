@@ -190,7 +190,7 @@ a:hover{color:#0056b3;text-decoration:underline}table{border-collapse:collapse}t
                 <xsl:if test="sitemap:url/sitemap:changefreq">
                   <th class="border-0 text-left text-truncate" scope="col">frequently</th>
                 </xsl:if>
-                                <th class="border-0 text-left text-truncate">images</th>
+                    <th class="border-0 text-left text-truncate">images</th>
                 <xsl:if test="sitemap:url/sitemap:lastmod">
                   <th class="border-0 text-left text-truncate" scope="col">modified</th>
                 </xsl:if>
@@ -234,22 +234,22 @@ a:hover{color:#0056b3;text-decoration:underline}table{border-collapse:collapse}t
                       </div>
                     </xsl:if>
                   </td>
-                                    <xsl:if test="sitemap:changefreq">
-                                        <td>
-                                            <xsl:value-of select="$url_freq"/>
-                                        </td>
-                                    </xsl:if>
-                                    <td>
-                                        <xsl:value-of select="count(image:image)"/>
-                                    </td>
+                    <xsl:if test="sitemap:changefreq">
+                        <td>
+                            <xsl:value-of select="$url_freq"/>
+                        </td>
+                    </xsl:if>
+                    <td>
+                        <xsl:value-of select="count(image:image)"/>
+                    </td>
                   <td>
                     <xsl:value-of select="concat(substring($url_mod,0,11),concat(' ',substring($url_mod,12,5)),concat(' ',substring($url_mod,20,6)))"/>
                   </td>
-                                    <xsl:if test="sitemap:priority">
-                                        <td>
-                                            <xsl:value-of select="$url_prio"/>
-                                        </td>
-                                    </xsl:if>
+                    <xsl:if test="sitemap:priority">
+                        <td>
+                            <xsl:value-of select="$url_prio"/>
+                        </td>
+                    </xsl:if>
                 </tr>
               </xsl:for-each>
             </tbody>

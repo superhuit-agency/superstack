@@ -1,15 +1,16 @@
 import * as _templatesData from '@/components/templates/data';
 import configs from '@/configs.json';
 import { fetchAPI, formatBlocksJSON } from '@/lib';
-import getBlockFinalComponentProps from '@/lib/get-block-final-component-props';
-
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore — file is gitignored and generated at dev/build time via predev/prebuild
-import fseTemplatesData from '@/lib/fse/fse-templates-and-parts.json';
+import {
+	enrichTemplateBlocks,
+	getTemplateBlocks,
+} from '@/lib/get-fse-template-blocks';
+import injectBreadcrumbs from '@/lib/inject-breadcrumbs';
 
 const templatesData: any = _templatesData;
 
-const { archiveData, singlePageData, singlePostData } = templatesData;
+const { archiveData, categoryData, singlePageData, singlePostData, tagData } =
+	templatesData;
 
 /**
  * NOTE: in preview, the `uri` could be in fact the ID (i.e. a draft doesn't have a slug/uri yet)
@@ -60,9 +61,6 @@ export default async function getNodeByURI(
 	const response = await fetchAPI(query, {
 		variables,
 		auth,
-		headers: {
-			'X-Query-Page': String(routePage && routePage > 0 ? routePage : 1),
-		},
 	});
 
 	const { node: rawNode, seo, generalSettings } = response;
@@ -112,6 +110,14 @@ export default async function getNodeByURI(
 
 	node.fullUri = uri;
 
+	// On a term archive (Tag/Category), expose the current term so query loops
+	// inside the archive template scope their posts to it at request time.
+	const term = getTermContext(node);
+
+	// On a post type archive, expose the post type so query loops inheriting the
+	// template query list that type instead of falling back to plain posts.
+	const archive = getArchiveContext(node);
+
 	if (blockEnrichment) {
 		const { blocksJSON, templateData, templateBlocks } =
 			await Promise.allSettled([
@@ -119,12 +125,16 @@ export default async function getNodeByURI(
 					previewDraft
 						? (node.preview?.node?.blocksJSON ?? '')
 						: (node?.blocksJSON ?? ''),
-					{ lang }
+					{ lang, page: routePage, baseUri: uri, term, archive }
 				),
 				getTemplateData(node),
 				enrichTemplateBlocks(
 					getTemplateBlocks(node?.fseTemplate?.slug, lang),
-					lang
+					lang,
+					routePage,
+					uri,
+					term,
+					archive
 				),
 			])
 				.then(([bProm, tProm, tbProm]) => ({
@@ -145,10 +155,15 @@ export default async function getNodeByURI(
 					};
 				});
 
-		const blocks =
+		const blocksWithContent =
 			templateBlocks.length > 0
 				? injectPostContentBlocks(templateBlocks, blocksJSON)
 				: blocksJSON;
+
+		const blocks = injectBreadcrumbs(
+			blocksWithContent,
+			node.seo?.breadcrumbs ?? []
+		);
 
 		if (node.preview) delete node.preview;
 
@@ -205,6 +220,18 @@ const types = [
 		type: 'Page',
 		fragment: singlePageData.fragment,
 		fields: 'singlePageFragment',
+		translatable: true,
+	},
+	{
+		type: 'Category',
+		fragment: categoryData.fragment,
+		fields: 'categoryFragment',
+		translatable: true,
+	},
+	{
+		type: 'Tag',
+		fragment: tagData.fragment,
+		fields: 'tagFragment',
 		translatable: true,
 	},
 	{
@@ -278,6 +305,46 @@ for (const key in templatesData) {
 	}
 }
 
+// Maps a resolved node's `__typename` to its WPGraphQL taxonomy handle. Only
+// term archives qualify — single posts/pages and ContentType (post-type)
+// archives have no current term to scope a query loop by. `postType` is set for
+// taxonomies attached to a custom post type, whose term archives render that
+// post type's own archive template (see below).
+const TERM_TAXONOMIES: Record<string, { taxonomy: string; postType?: string }> =
+	{
+		Tag: { taxonomy: 'tag' },
+		Category: { taxonomy: 'category' },
+	};
+
+const getTermContext = (node: any): BlockDataContext['term'] | undefined => {
+	const { taxonomy } = TERM_TAXONOMIES[node?.__typename] ?? {};
+	if (!taxonomy) return undefined;
+
+	// The term fragments alias `id: databaseId`, so `node.id` is the WP DB id.
+	const databaseId =
+		typeof node?.id === 'number' ? node.id : Number.parseInt(node?.id, 10);
+	if (!Number.isFinite(databaseId)) return undefined;
+
+	return { taxonomy, databaseId };
+};
+
+const getArchiveContext = (
+	node: any
+): BlockDataContext['archive'] | undefined => {
+	// A term archive of a custom taxonomy renders its post type's archive
+	// template, so the query loops it holds inherit that post type too.
+	const termPostType = TERM_TAXONOMIES[node?.__typename]?.postType;
+	if (termPostType) return { postType: termPostType };
+
+	if (node?.__typename !== 'ContentType') return undefined;
+
+	// `archiveFragment` exposes the post type slug as `name` (e.g. "post").
+	const postType = typeof node?.name === 'string' ? node.name : null;
+	if (!postType) return undefined;
+
+	return { postType };
+};
+
 const getTemplateData = async (node: any) => {
 	const type = `single-${node.__typename}`.toLowerCase();
 
@@ -314,75 +381,3 @@ const injectPostContentBlocks = (
 			),
 		};
 	});
-
-/**
- * Gets the blocks of the template from the FSE templates and parts data,
- * swapping in the `lang`-specific variant of any translated template part
- * (e.g. footer, header) before request-time enrichment runs.
- * @param templateSlug - The slug of the template
- * @param lang - The requested language code, if any
- * @returns
- */
-const getTemplateBlocks = (
-	templateSlug: string,
-	lang: string | null = null
-): BlockPropsType[] => {
-	if (!templateSlug) return [];
-
-	const fseTemplate: FseTemplateEntry | null =
-		(fseTemplatesData as FseTemplatesData)?.templates?.find(
-			(tpl) => tpl?.slug === templateSlug
-		) ?? null;
-
-	if (!fseTemplate?.blocks?.length) return [];
-
-	return applyTemplatePartTranslations(
-		fseTemplate.blocks.filter(Boolean) as BlockPropsType[],
-		lang
-	);
-};
-
-/**
- * Recursively swaps a `core/template-part` block's `innerBlocks` for its
- * `translations[lang]` variant, when one was baked into the JSON snapshot.
- * Falls back to the default (base-language) `innerBlocks` otherwise.
- */
-const applyTemplatePartTranslations = (
-	blocks: BlockPropsType[],
-	lang: string | null
-): BlockPropsType[] =>
-	blocks.map((block) => {
-		const translatedInnerBlocks =
-			lang && block.name === 'core/template-part'
-				? block.translations?.[lang]
-				: undefined;
-
-		return {
-			...block,
-			innerBlocks: applyTemplatePartTranslations(
-				translatedInnerBlocks ?? block.innerBlocks ?? [],
-				lang
-			),
-		};
-	});
-
-/**
- * Runs getData enrichment on template blocks at request time so dynamic data
- * (navigation, site logo, etc.) is always fresh and not baked in at build time.
- */
-const enrichTemplateBlocks = (
-	blocks: BlockPropsType[],
-	lang: string | null = null
-): Promise<BlockPropsType[]> =>
-	blocks.length === 0
-		? Promise.resolve([])
-		: Promise.allSettled(
-				blocks.map((block) =>
-					getBlockFinalComponentProps(block, { lang })
-				)
-			).then(
-				(results) =>
-					results
-						.map((r) => (r.status === 'fulfilled' ? r.value : null))
-						.filter(Boolean) as BlockPropsType[]
-			);

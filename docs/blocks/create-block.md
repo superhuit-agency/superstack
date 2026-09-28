@@ -58,6 +58,61 @@ Use this when you need a dedicated block in the inserter
 
 Custom blocks are **dynamic** in this stack: the WordPress editor stores attributes in block JSON, and Next.js handles all frontend rendering.
 
+### Rule: prefer core blocks as inner blocks
+
+**Always favour native WordPress blocks as inner blocks over custom attributes.** A custom attribute (`RichText`, `MediaUpload`, …) should be the exception, not the default.
+
+Before adding an attribute, ask: is there a core block that already does this?
+
+| Content            | Do this                      | Not this                     |
+| ------------------ | ---------------------------- | ---------------------------- |
+| Title              | `core/heading` inner block   | `RichText` on a `title` attr |
+| Text / description | `core/paragraph` inner block | `RichText` on a `text` attr  |
+| Image              | `core/image` inner block     | `MediaUpload` + `image` attr |
+| Button / link      | `core/buttons` inner block   | custom `url` + `label` attrs |
+| List               | `core/list` inner block      | repeater attribute           |
+
+Why: editors keep the native toolbars, typography, colors and block styles; the markup stays standard; Next.js already renders every core block via `<Blocks />`, so there is nothing extra to build on the frontend.
+
+Keep attributes only for structured data that has no core equivalent (a layout variant, an icon name, a post-type filter, a boolean toggle…).
+
+**Locking the structure with a template**
+
+Declare the expected inner blocks with `InnerBlocks` `template` + `templateLock`, so the block always ships with the right children:
+
+```tsx
+import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
+
+const TEMPLATE: any[] = [
+	['core/heading', { level: 3, placeholder: 'Titre' }],
+	['core/paragraph', { placeholder: 'Description' }],
+];
+
+export default function Edit() {
+	return (
+		<div {...useBlockProps()}>
+			<InnerBlocks
+				template={TEMPLATE}
+				templateLock="all"
+				allowedBlocks={['core/heading', 'core/paragraph']}
+			/>
+		</div>
+	);
+}
+```
+
+- `templateLock="all"` — fixed structure, no add/remove/move (use for a title + text block).
+- `templateLock="insert"` — children can be reordered but not added/removed.
+- `templateLock={false}` — the template is only a starting point; combine with `allowedBlocks` to constrain what editors may insert.
+
+On the Next.js side, inner blocks arrive as `children` — render them inside your wrapper:
+
+```tsx
+export default function MyBlock({ children }: MyBlockProps) {
+	return <div className="my-block">{children}</div>;
+}
+```
+
 ### Architecture
 
 ```
@@ -90,8 +145,8 @@ Under `next/src/components/custom/<level>/<Name>/`, create a folder with:
 
 ```json
 {
-  "slug": "superstack/tag",
-  "title": "Tag"
+	"slug": "superstack/tag",
+	"title": "Tag"
 }
 ```
 
@@ -109,7 +164,7 @@ Without this entry, the block saves in WordPress but Next.js will log a dev warn
 
 ### Step 3: Register the block in the WordPress editor
 
-Create files under `wordpress/theme/src/blocks/custom/<level>/<Name>/` (the `blocks/` folder does not exist in the starter — the first block creates it):
+Create files under `wordpress/theme/src/blocks/custom/<level>/<Name>/` (the `custom/` folder does not exist in the starter — the first block creates it):
 
 | File              | Purpose                                                         |
 | ----------------- | --------------------------------------------------------------- |
@@ -127,34 +182,28 @@ import block from '@/components/custom/atoms/Tag/block.json';
 import Edit from './edit';
 
 registerBlockType(block.slug, {
-  title: block.title,
-  category: 'superstack',
-  icon: 'tag',
-  attributes: {
-    label: { type: 'string', default: '' },
-  },
-  supports: { anchor: false, multiple: true },
-  edit: Edit,
-  save: () => null,
+	title: block.title,
+	category: 'superstack',
+	icon: 'tag',
+	attributes: {
+		label: { type: 'string', default: '' },
+	},
+	supports: { anchor: false, multiple: true },
+	edit: Edit,
+	save: () => null,
 });
 ```
 
 `category: 'superstack'` is registered in [`register-block-categories.php`](../../wordpress/theme/includes/admin/editor/register-block-categories.php). Keep `save: () => null` for attribute-only blocks; blocks with inner blocks return `<InnerBlocks.Content />` instead.
 
-**`edit.tsx`** — build the Gutenberg UI with `@wordpress/block-editor` components (`RichText`, `useBlockProps`, `InnerBlocks`, etc.). Import the frontend styles from Next (`import '@/components/custom/atoms/Tag/styles.css';`) so the editor preview matches the site.
+**`edit.tsx`** — build the Gutenberg UI with `@wordpress/block-editor` components (`useBlockProps`, `InnerBlocks`, `RichText`, etc.). Start from `InnerBlocks` + a template of core blocks (see [Rule: prefer core blocks as inner blocks](#rule-prefer-core-blocks-as-inner-blocks)); reach for `RichText` only for data no core block covers. Import the frontend styles from Next (`import '@/components/custom/atoms/Tag/styles.css';`) so the editor preview matches the site.
 
 ### Step 4: Wire the block into the editor bundle
 
-Add an import to the barrel `wordpress/theme/src/blocks/index.ts` (create it with the first block):
+Add an import to the barrel [`wordpress/theme/src/blocks/index.ts`](../../wordpress/theme/src/blocks/index.ts), which [`editor/index.ts`](../../wordpress/theme/src/editor/index.ts) already loads:
 
 ```ts
 import './custom/atoms/Tag/register';
-```
-
-When creating the barrel, load it from [`wordpress/theme/src/editor/index.ts`](../../wordpress/theme/src/editor/index.ts), next to the filters import:
-
-```ts
-import '../blocks';
 ```
 
 ### Step 5: Build theme assets
@@ -198,7 +247,7 @@ cd next && npx tsc --noEmit
 
 ## Extending core blocks (filters)
 
-To tweak an existing core block (e.g. limit heading levels, restrict post types), add an `edit.tsx` filter under `next/src/components/core/<Block>/` and export it from [`next/src/components/filters.ts`](../../next/src/components/filters.ts). This is different from registering a new custom block — see [`core/Image/edit.tsx`](../../next/src/components/core/Image/edit.tsx) for an example.
+To tweak an existing core block (e.g. limit heading levels, restrict post types), add a `register.tsx` filter under `wordpress/theme/src/blocks/core/<Block>/` and import it from the [`blocks/index.ts`](../../wordpress/theme/src/blocks/index.ts) barrel. This is different from registering a new custom block — see [`core/Image/register.tsx`](../../wordpress/theme/src/blocks/core/Image/register.tsx) for an example.
 
 ## Removing or renaming a block
 

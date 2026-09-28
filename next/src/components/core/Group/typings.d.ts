@@ -9,8 +9,15 @@ type GroupTagName =
 
 type GroupLayoutType = 'constrained' | 'flow' | 'flex' | 'grid';
 
+interface BoxSpacing {
+	top?: string;
+	right?: string;
+	bottom?: string;
+	left?: string;
+}
 interface GroupAttributes {
 	tagName?: GroupTagName;
+	anchor?: string;
 	layout?: {
 		type?: GroupLayoutType;
 		orientation?: 'horizontal' | 'vertical';
@@ -21,9 +28,20 @@ interface GroupAttributes {
 			| 'right'
 			| 'space-between'
 			| 'stretch';
+		verticalAlignment?: 'top' | 'center' | 'bottom';
 		columnCount?: number;
 		minimumColumnWidth?: string;
 	};
+	style?: {
+		layout?: {
+			columnStart?: number;
+			columnSpan?: number;
+		}
+		spacing?: {
+			padding?: BoxSpacing;
+			margin?: BoxSpacing;
+		};
+	}
 }
 
-interface GroupProps extends React.HTMLProps<HTMLDivElement>, GroupAttributes {}
+interface GroupProps extends Omit<React.HTMLProps<HTMLDivElement>, 'style'>, GroupAttributes {}
