@@ -34,6 +34,8 @@ Page render (getNodeByURI)
   └─ injects page blocks into the template's core/post-content block
 ```
 
+The `fseTemplate` field follows the WordPress template hierarchy. A post type archive resolves `archive-{postType}` → `archive`. A category archive resolves `category-{slug}` → `category-{id}` → `category` → `archive`, and a tag archive `tag-{slug}` → `tag-{id}` → `tag` → `archive`.
+
 ### Visual Schema
 
 ```mermaid
@@ -194,13 +196,13 @@ Outside preview, `getData` runs inside `getCachedBlockData`, in a cache entry of
   | The data renders… | Tags |
   | --- | --- |
   | the post at the Base URI | `nodeAtUriTags(databaseId)`: `node:{id}`, or `uris` when no post was found. Never `type:` |
-  | a listing, a query, latest posts, next/previous links | `type:{contentType}`, or `content` with no type filter |
+  | a listing, a query, latest posts, next/previous links | `type:{contentType}`, or `content` with no type filter. A `core/query` loop always has a type: it defaults to `post` |
   | terms | `termTags(terms)`: `term:{databaseId}` for each, so query their `databaseId` |
   | a term listing | `taxonomy:{taxonomy}` and its terms' tags, plus `content` when it shows post counts or hides empty terms |
   | a block menu | `menu:{id}` |
   | the site title, tagline, logo or date format | `settings` |
 
-  The public node read tags the post's own `categories` and `tags`.
+  The public node read tags the post's own `categories` and `tags`. On a term archive, it's tagged `term:{databaseId}` and the `type:` of the post type the archive lists, not `node:`.
 - **Failed reads.** `fetchAPI` never throws: when WordPress doesn't answer, it logs the error and returns `{}`. A `getData` that returned its empty result then would have it cached until its tags are revalidated. Tell "nothing there" (the field is `null`) apart from "the read failed" (the field is missing), and throw a `WordPressReadError` (`next/src/lib/wordpress-read-error.ts`) on a failure. It isn't settled into the block's fallback like other `getData` errors: it fails the public page render, so the stale page keeps being served, or the request errors, and nothing wrong is cached. In preview, where nothing is cached, the block renders with its own attributes instead.
 
   Only `core/navigation` does this for now, since it sits on every page. Any other block with data can opt in the same way.
@@ -214,6 +216,7 @@ Outside preview, `getData` runs inside `getCachedBlockData`, in a cache entry of
   - `superstack/no-unused-uses-base-uri` (**warning**): the module declares `usesBaseUri` but never imports `baseUriContext`.
 
   ESLint only sees imports in `data.ts` itself. The build-time guard above stays the backstop for a Base URI read through a helper module. A block that reads it that way and declares `usesBaseUri` gets a false warning: disable `superstack/no-unused-uses-base-uri` on that line.
+- **`usesArchiveContext`.** A block whose data changes with the archive being viewed declares `export const usesArchiveContext = true;`. Its `getData` then gets a fourth argument, the `BlockDataContext`: the archive's `term` (`{ taxonomy, databaseId }`) on a term archive, and the post type it lists (`archive.postType`) on a term or post type archive. The context is added to the block's cache key. Other blocks get no context, so they keep one entry per site. `usesArchiveContext` can also be a function of the block's attributes, when only some of them depend on the archive. `core/query` uses it that way: only a loop with `inherit: true` gets the context, and it lists the archive's post type and, on a term archive, only that term's posts. A custom loop keeps one entry per site.
 
 ---
 

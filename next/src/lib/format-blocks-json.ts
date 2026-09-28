@@ -6,7 +6,12 @@ import { throwIfWordPressReadFailed } from '@/lib/wordpress-read-error';
 
 export default async function formatBlocksJSON(
 	blocksJSON: string,
-	options?: { skipGetData?: boolean; lang?: string | null; preview?: boolean }
+	options?: {
+		skipGetData?: boolean;
+		lang?: string | null;
+		preview?: boolean;
+		context?: BlockDataContext;
+	}
 ) {
 	/**
 	 * Replace ocurrences of WP upload URIs with relative url

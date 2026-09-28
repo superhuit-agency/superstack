@@ -33,6 +33,33 @@ type BlockPropsType = {
 	translations?: Record<string, Array<BlockPropsType | null>>;
 };
 
+/**
+ * The archive being viewed, threaded into `getData(fetcher, attrs, lang, context)`
+ * of blocks declaring `usesArchiveContext`. Populated from the resolved node
+ * (see get-node-by-uri.ts), and part of their block data's cache key.
+ */
+type BlockDataContext = {
+	/**
+	 * The taxonomy term being viewed on a term archive (Tag/Category), so query
+	 * loops can scope their posts to the current term.
+	 */
+	term?: {
+		/** WPGraphQL taxonomy handle, e.g. "tag" | "category". */
+		taxonomy: string;
+		/** The term's WordPress database ID. */
+		databaseId: number;
+	};
+	/**
+	 * The post type the archive lists (a ContentType node, or a term archive),
+	 * so query loops inheriting the template query resolve the right post type:
+	 * WordPress leaves `query.postType` at its default when `query.inherit` is true.
+	 */
+	archive?: {
+		/** The WordPress post type slug, e.g. "post". */
+		postType: string;
+	};
+};
+
 type FseTemplateEntry = {
 	slug: string;
 	blocks: Array<BlockPropsType | null>;

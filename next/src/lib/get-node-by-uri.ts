@@ -18,7 +18,8 @@ import {
 
 const templatesData: any = _templatesData;
 
-const { archiveData, singlePageData, singlePostData } = templatesData;
+const { archiveData, categoryData, singlePageData, singlePostData, tagData } =
+	templatesData;
 
 /**
  * Public read of a node, cached until one of its tags is revalidated.
@@ -55,12 +56,7 @@ export async function getPublicNodeByURI(
 	}
 
 	cacheTag(
-		...(node.__typename === 'ContentType'
-			? [cacheTags.type(node.name)]
-			: [
-					cacheTags.node(node.id),
-					cacheTags.nodesOfType(node.contentTypeName),
-				]),
+		...nodeTags(node),
 		cacheTags.settings(), // The same query returns site SEO and general settings
 		...termTags(node.categories?.nodes),
 		...termTags(node.tags?.nodes)
@@ -68,6 +64,26 @@ export async function getPublicNodeByURI(
 
 	return node;
 }
+
+/**
+ * Tags of what a node read renders itself: the post or page, or what an
+ * archive lists.
+ */
+const nodeTags = (node: ResolvedNode): string[] => {
+	const { term, archive } = getBlockDataContext(node);
+
+	if (archive) {
+		return [
+			...(term ? [cacheTags.term(term.databaseId)] : []),
+			cacheTags.type(archive.postType),
+		];
+	}
+
+	return [
+		cacheTags.node(String(node.id)),
+		cacheTags.nodesOfType(String(node.contentTypeName)),
+	];
+};
 
 /**
  * Preview read of a node, never cached: it carries the user's auth token.
@@ -201,18 +217,22 @@ async function getNodeByURI(
 
 	node.fullUri = uri;
 
+	// On an archive, expose the term and post type it lists, so query loops
+	// inheriting the template query scope their posts to it.
+	const context = getBlockDataContext(node);
+
 	const [templateBlocks, { blocksJSON, templateData }] = await Promise.all([
 		// Not settled with the rest: a failed template read must fail the page,
 		// not be cached as a page without its header and footer.
 		getTemplateBlocks(node?.fseTemplate?.slug, lang).then((blocks) =>
-			enrichTemplateBlocks(blocks, lang, preview)
+			enrichTemplateBlocks(blocks, lang, preview, context)
 		),
 		Promise.allSettled([
 			formatBlocksJSON(
 				previewDraft
 					? (node.preview?.node?.blocksJSON ?? '')
 					: (node?.blocksJSON ?? ''),
-				{ lang, preview }
+				{ lang, preview, context }
 			),
 			getTemplateData(node),
 		])
@@ -300,6 +320,18 @@ const types = [
 		translatable: true,
 	},
 	{
+		type: 'Category',
+		fragment: categoryData.fragment,
+		fields: 'categoryFragment',
+		translatable: true,
+	},
+	{
+		type: 'Tag',
+		fragment: tagData.fragment,
+		fields: 'tagFragment',
+		translatable: true,
+	},
+	{
 		type: 'Post',
 		fragment: singlePostData.fragment,
 		fields: 'singlePostFragment',
@@ -375,6 +407,68 @@ for (const key in templatesData) {
 		templatesDataList[element.slug] = element;
 	}
 }
+
+// Maps a resolved node's `__typename` to its WPGraphQL taxonomy handle, and
+// the post type its term archive lists. Only term archives qualify: single
+// posts/pages and ContentType (post-type) archives have no current term.
+const TERM_TAXONOMIES: Record<string, { taxonomy: string; postType: string }> =
+	{
+		Tag: { taxonomy: 'tag', postType: 'post' },
+		Category: { taxonomy: 'category', postType: 'post' },
+	};
+
+/** The fields of a resolved node that tell what it renders. */
+type ResolvedNode = {
+	__typename?: string;
+	id?: unknown;
+	name?: unknown;
+	contentTypeName?: unknown;
+};
+
+const getTermContext = (
+	node: ResolvedNode
+): BlockDataContext['term'] | undefined => {
+	const { taxonomy } = TERM_TAXONOMIES[node?.__typename ?? ''] ?? {};
+	if (!taxonomy) return undefined;
+
+	// The term fragments alias `id: databaseId`, so `node.id` is the WP DB id.
+	const databaseId =
+		typeof node?.id === 'number'
+			? node.id
+			: Number.parseInt(String(node?.id), 10);
+	if (!Number.isFinite(databaseId)) return undefined;
+
+	return { taxonomy, databaseId };
+};
+
+const getArchiveContext = (
+	node: ResolvedNode
+): BlockDataContext['archive'] | undefined => {
+	const termPostType = TERM_TAXONOMIES[node?.__typename ?? '']?.postType;
+	if (termPostType) return { postType: termPostType };
+
+	if (node?.__typename !== 'ContentType') return undefined;
+
+	// `archiveFragment` exposes the post type slug as `name` (e.g. "post").
+	const postType = typeof node?.name === 'string' ? node.name : null;
+	if (!postType) return undefined;
+
+	return { postType };
+};
+
+/**
+ * The block data context of a node: only the keys it has, since the context
+ * is part of the block data's cache key.
+ */
+const getBlockDataContext = (node: ResolvedNode): BlockDataContext => {
+	const term = getTermContext(node);
+	const archive = getArchiveContext(node);
+
+	return {
+		...(term ? { term } : {}),
+		...(archive ? { archive } : {}),
+	};
+};
 
 const getTemplateData = async (node: any) => {
 	const type = `single-${node.__typename}`.toLowerCase();
@@ -471,13 +565,18 @@ const applyTemplatePartTranslations = (
 const enrichTemplateBlocks = (
 	blocks: BlockPropsType[],
 	lang: string | null = null,
-	preview = false
+	preview = false,
+	context: BlockDataContext = {}
 ): Promise<BlockPropsType[]> =>
 	blocks.length === 0
 		? Promise.resolve([])
 		: Promise.allSettled(
 				blocks.map((block) =>
-					getBlockFinalComponentProps(block, { lang, preview })
+					getBlockFinalComponentProps(block, {
+						lang,
+						preview,
+						context,
+					})
 				)
 			).then((results) => {
 				throwIfBaseUriNotDeclared(results);
