@@ -11,7 +11,8 @@
     "prepare": "husky",
     "format": "prettier --write \"next/**/*.{js,jsx,ts,tsx,json,css,md,yml,yaml}\" \"wordpress/theme/**/*.{js,jsx,ts,tsx,json,css,scss,md,yml,yaml}\"",
     "format:check": "prettier --check \"next/**/*.{js,jsx,ts,tsx,json,css,md,yml,yaml}\" \"wordpress/theme/**/*.{js,jsx,ts,tsx,json,css,scss,md,yml,yaml}\"",
-    "generate:language-migration": "node generators/lang-migration.js"
+    "generate:language-migration": "node generators/lang-migration.js",
+    "generate:migration": "node generators/migration.js"
   },
   "lint-staged": {
     "next/**/*.{js,jsx,ts,tsx,json,css,md,yml,yaml}": [
