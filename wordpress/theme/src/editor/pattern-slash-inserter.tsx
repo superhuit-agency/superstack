@@ -16,6 +16,7 @@ import { symbol } from '@wordpress/icons';
 
 type Pattern = {
 	name: string;
+	type?: string;
 	title: string;
 	description?: string;
 	keywords?: string[];
@@ -98,6 +99,8 @@ function usePatternOptions(filterValue: string): CompleterOption[] {
 			return allowed
 				.filter(
 					(pattern) =>
+						// User patterns (`wp_block`) are already listed by core.
+						pattern.type !== 'user' &&
 						!pattern.blockTypes?.includes(EXCLUDED_BLOCK_TYPE)
 				)
 				.filter((pattern) => matchesTerms(pattern, terms))
