@@ -9,6 +9,8 @@ export default async function formatBlocksJSON(
 		lang?: string | null;
 		page?: number;
 		baseUri?: string;
+		term?: BlockDataContext['term'];
+		archive?: BlockDataContext['archive'];
 	}
 ) {
 	/**

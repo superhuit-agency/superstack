@@ -9,7 +9,8 @@ import injectBreadcrumbs from '@/lib/inject-breadcrumbs';
 
 const templatesData: any = _templatesData;
 
-const { archiveData, singlePageData, singlePostData } = templatesData;
+const { archiveData, categoryData, singlePageData, singlePostData, tagData } =
+	templatesData;
 
 /**
  * NOTE: in preview, the `uri` could be in fact the ID (i.e. a draft doesn't have a slug/uri yet)
@@ -109,6 +110,14 @@ export default async function getNodeByURI(
 
 	node.fullUri = uri;
 
+	// On a term archive (Tag/Category), expose the current term so query loops
+	// inside the archive template scope their posts to it at request time.
+	const term = getTermContext(node);
+
+	// On a post type archive, expose the post type so query loops inheriting the
+	// template query list that type instead of falling back to plain posts.
+	const archive = getArchiveContext(node);
+
 	if (blockEnrichment) {
 		const { blocksJSON, templateData, templateBlocks } =
 			await Promise.allSettled([
@@ -116,14 +125,16 @@ export default async function getNodeByURI(
 					previewDraft
 						? (node.preview?.node?.blocksJSON ?? '')
 						: (node?.blocksJSON ?? ''),
-					{ lang, page: routePage, baseUri: uri }
+					{ lang, page: routePage, baseUri: uri, term, archive }
 				),
 				getTemplateData(node),
 				enrichTemplateBlocks(
 					getTemplateBlocks(node?.fseTemplate?.slug, lang),
 					lang,
 					routePage,
-					uri
+					uri,
+					term,
+					archive
 				),
 			])
 				.then(([bProm, tProm, tbProm]) => ({
@@ -212,6 +223,18 @@ const types = [
 		translatable: true,
 	},
 	{
+		type: 'Category',
+		fragment: categoryData.fragment,
+		fields: 'categoryFragment',
+		translatable: true,
+	},
+	{
+		type: 'Tag',
+		fragment: tagData.fragment,
+		fields: 'tagFragment',
+		translatable: true,
+	},
+	{
 		type: 'Post',
 		fragment: singlePostData.fragment,
 		fields: 'singlePostFragment',
@@ -281,6 +304,46 @@ for (const key in templatesData) {
 		templatesDataList[element.slug] = element;
 	}
 }
+
+// Maps a resolved node's `__typename` to its WPGraphQL taxonomy handle. Only
+// term archives qualify — single posts/pages and ContentType (post-type)
+// archives have no current term to scope a query loop by. `postType` is set for
+// taxonomies attached to a custom post type, whose term archives render that
+// post type's own archive template (see below).
+const TERM_TAXONOMIES: Record<string, { taxonomy: string; postType?: string }> =
+	{
+		Tag: { taxonomy: 'tag' },
+		Category: { taxonomy: 'category' },
+	};
+
+const getTermContext = (node: any): BlockDataContext['term'] | undefined => {
+	const { taxonomy } = TERM_TAXONOMIES[node?.__typename] ?? {};
+	if (!taxonomy) return undefined;
+
+	// The term fragments alias `id: databaseId`, so `node.id` is the WP DB id.
+	const databaseId =
+		typeof node?.id === 'number' ? node.id : Number.parseInt(node?.id, 10);
+	if (!Number.isFinite(databaseId)) return undefined;
+
+	return { taxonomy, databaseId };
+};
+
+const getArchiveContext = (
+	node: any
+): BlockDataContext['archive'] | undefined => {
+	// A term archive of a custom taxonomy renders its post type's archive
+	// template, so the query loops it holds inherit that post type too.
+	const termPostType = TERM_TAXONOMIES[node?.__typename]?.postType;
+	if (termPostType) return { postType: termPostType };
+
+	if (node?.__typename !== 'ContentType') return undefined;
+
+	// `archiveFragment` exposes the post type slug as `name` (e.g. "post").
+	const postType = typeof node?.name === 'string' ? node.name : null;
+	if (!postType) return undefined;
+
+	return { postType };
+};
 
 const getTemplateData = async (node: any) => {
 	const type = `single-${node.__typename}`.toLowerCase();

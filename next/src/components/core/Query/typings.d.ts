@@ -12,6 +12,7 @@ type QueryType = {
 	postType?: string;
 	search?: string;
 	sticky?: boolean | string;
+	taxQuery?: Record<string, Array<number | string>>;
 };
 
 interface QueryAttributes extends BlockAttributes {
