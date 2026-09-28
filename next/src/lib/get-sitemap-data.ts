@@ -1,4 +1,7 @@
+import { cacheLife, cacheTag } from 'next/cache';
+
 import { fetchAPI } from '@/lib';
+import { cacheTags } from '@/lib/cache-tags';
 import { getWpUrl } from '@/utils/node-utils';
 
 const GRAPHQL_MAX_SIZE = 100;
@@ -61,12 +64,34 @@ export default async function getSitemapData(
 	page = 1,
 	size = 1000
 ) {
+	try {
+		return await getCachedSitemapData(type, page, size);
+	} catch (error) {
+		console.error(`Can't fetch sitemap ${type} data`);
+		console.error(error);
+		return null;
+	}
+}
+
+/**
+ * Cached per `(type, page)` until one of its tags is revalidated.
+ * A failed request throws, so it is never cached as an empty sitemap.
+ */
+async function getCachedSitemapData(type: string, page: number, size: number) {
+	'use cache';
+	cacheLife('max');
+	// The post types set to noindex come from the SEO plugin's settings
+	cacheTag(cacheTags.settings(), cacheTags.nodes());
+
 	return await (type === 'all'
 		? getIndexSitemapData()
 		: getSitemapTypeUrls(type, page, size));
 }
 
 async function getIndexSitemapData() {
+	// Lists each type's last-modified date
+	cacheTag(cacheTags.content());
+
 	const data = await fetchAPI(
 		`query ContentTypes {
 			contentTypes {
@@ -86,18 +111,11 @@ async function getIndexSitemapData() {
 				}
 			}
 		}`
-	).catch((error) => {
-		console.error("Can't fetch sitemap content types");
-		console.error(error);
-	});
+	);
 
-	if (
-		!data ||
-		typeof data !== 'object' ||
-		!('contentTypes' in data) ||
-		!data?.contentTypes
-	)
-		return null;
+	if (!data?.contentTypes) {
+		throw new Error("Can't fetch sitemap content types");
+	}
 
 	const contentTypes = data.contentTypes as { nodes: ContentType[] };
 	const indexableTypes = contentTypes.nodes.filter(
@@ -118,10 +136,7 @@ async function getIndexSitemapData() {
         }
 			}
 		}`
-	).catch((error) => {
-		console.error("Can't fetch sitemap noindex types");
-		console.error(error);
-	})) as
+	)) as
 		| {
 				seo: {
 					contentTypes: {
@@ -131,7 +146,9 @@ async function getIndexSitemapData() {
 		  }
 		| undefined;
 
-	if (!typesNoIndex?.seo?.contentTypes) return null;
+	if (!typesNoIndex?.seo?.contentTypes) {
+		throw new Error("Can't fetch sitemap noindex types");
+	}
 
 	return indexableTypes.reduce((postTypes: PostType[], type: ContentType) => {
 		if (type.contentNodes.pageInfo.offsetPagination.total > 0) {
@@ -155,10 +172,28 @@ async function getIndexSitemapData() {
 async function getSitemapTypeUrls(type = 'posts', page = 1, size = 1000) {
 	// TODO find how to get all images inside content (not only the feature image)
 	let nodes: any[] = [];
-	const featuredImageField = await getFeaturedImageField(type);
+	const contentType = await getContentType(type);
+
+	// Not a public content type: nothing to list, and nothing to query
+	if (!contentType) {
+		cacheTag(cacheTags.content());
+		return [];
+	}
+
+	cacheTag(cacheTags.type(contentType.name));
+
+	const featuredImageField = contentType.supportsFeaturedImage
+		? `featuredImage {
+				node {
+					sourceUrl
+					title
+				}
+			}`
+		: '';
+
 	if (size > GRAPHQL_MAX_SIZE) {
 		(
-			await Promise.allSettled(
+			await Promise.all(
 				new Array(Math.ceil(size / GRAPHQL_MAX_SIZE))
 					.fill(0)
 					.map((v, i) =>
@@ -190,17 +225,13 @@ async function getSitemapTypeUrls(type = 'posts', page = 1, size = 1000) {
 					)
 			)
 		).forEach((result, i) => {
-			if (result.status === 'fulfilled') {
-				const edges = result.value?.[type]?.edges;
-				if (edges?.length) {
-					nodes = [...nodes, ...edges];
-				}
-			} else {
-				console.error(
+			const edges = result?.[type]?.edges;
+			if (!Array.isArray(edges)) {
+				throw new Error(
 					`Can't fetch ${i * 100}-${(i + 1) * 100} sitemap ${type} urls`
 				);
-				console.error(result.reason);
 			}
+			nodes = [...nodes, ...edges];
 		});
 	} else {
 		const data = await fetchAPI(
@@ -225,12 +256,13 @@ async function getSitemapTypeUrls(type = 'posts', page = 1, size = 1000) {
 				}
 			}
 		}`
-		).catch((error) => {
-			console.error(`Can't fetch sitemap ${type} urls`);
-			console.error(error);
-		});
+		);
 
-		nodes = data?.[type]?.edges ?? [];
+		if (!Array.isArray(data?.[type]?.edges)) {
+			throw new Error(`Can't fetch sitemap ${type} urls`);
+		}
+
+		nodes = data[type].edges;
 	}
 
 	return nodes.reduce((urls, { node }) => {
@@ -243,10 +275,14 @@ async function getSitemapTypeUrls(type = 'posts', page = 1, size = 1000) {
 }
 
 /**
- * Not every content type supports thumbnails, and querying `featuredImage`
- * on a type that doesn't implement `NodeWithFeaturedImage` fails the whole query.
+ * The public content type behind a sitemap's plural name: its post type name (for the
+ * `type:` cache tag) and whether it supports thumbnails, since querying
+ * `featuredImage` on a type that doesn't implement `NodeWithFeaturedImage`
+ * fails the whole query.
  */
-async function getFeaturedImageField(pluralName: string) {
+async function getContentType(
+	pluralName: string
+): Promise<{ name: string; supportsFeaturedImage: boolean } | null> {
 	const data = await fetchAPI(
 		`query SitemapFeaturedImageSupport {
 			__type(name: "NodeWithFeaturedImage") {
@@ -256,37 +292,34 @@ async function getFeaturedImageField(pluralName: string) {
 			}
 			contentTypes {
 				nodes {
+					name
 					graphqlSingleName
 					graphqlPluralName
 				}
 			}
 		}`
-	).catch((error) => {
-		console.error("Can't fetch sitemap featured image support");
-		console.error(error);
-	});
+	);
 
-	const singularName = data?.contentTypes?.nodes?.find(
-		(type: { graphqlPluralName: string }) =>
-			type.graphqlPluralName === pluralName
-	)?.graphqlSingleName;
+	if (!data?.contentTypes?.nodes) {
+		throw new Error("Can't fetch sitemap featured image support");
+	}
 
-	if (!singularName) return '';
+	const contentType = data.contentTypes.nodes.find(
+		(type: { graphqlSingleName: string; graphqlPluralName: string }) =>
+			type.graphqlPluralName === pluralName &&
+			!EXCLUDED_CONTENT_TYPES.includes(type.graphqlSingleName)
+	);
 
+	if (!contentType) return null;
+
+	const singularName: string = contentType.graphqlSingleName;
 	const typeName =
 		singularName.charAt(0).toUpperCase() + singularName.slice(1);
-	const supported = data?.__type?.possibleTypes?.some(
+	const supportsFeaturedImage = !!data.__type?.possibleTypes?.some(
 		({ name }: { name: string }) => name === typeName
 	);
 
-	return supported
-		? `featuredImage {
-				node {
-					sourceUrl
-					title
-				}
-			}`
-		: '';
+	return { name: contentType.name, supportsFeaturedImage };
 }
 
 /**
