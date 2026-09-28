@@ -1,6 +1,19 @@
 // import * as blocksData from '@/components/data';
-import { blocksDataList } from '@/components/global/blockRegistry';
+import {
+	baseUriContext,
+	throwIfBaseUriNotDeclared,
+} from '@/hooks/use-base-uri';
 import fetchAPI from '@/lib/fetch-api';
+import getCachedBlockData, {
+	type BlockData,
+	getBlockDataModule,
+} from '@/lib/get-cached-block-data';
+
+type BlockPropsOptions = {
+	skipGetData?: boolean;
+	lang?: string | null;
+	preview?: boolean;
+};
 
 // const blocksDataList: { [key: string]: any } = {};
 // for (const key in blocksData) {
@@ -25,10 +38,13 @@ import fetchAPI from '@/lib/fetch-api';
  * — used by blocks whose children change independently of the template
  * (e.g. `core/navigation` menu items). See docs/fse-templating.md.
  *
+ * Outside preview, `getData` runs in its own cache entry, tagged with the
+ * `cacheTags` it returns next to its data (see `getCachedBlockData`).
+ *
  * @param block A block object coming from Wp GraphQl's blocksJSON
  * @returns the same block, with only necessary data
  */
-export default function getBlockFinalComponentProps(
+export default async function getBlockFinalComponentProps(
 	{
 		name,
 		attributes,
@@ -38,44 +54,40 @@ export default function getBlockFinalComponentProps(
 		attributes: object;
 		innerBlocks: Array<BlockPropsType>;
 	},
-	options?: { skipGetData?: boolean; lang?: string | null }
+	options?: BlockPropsOptions
 ): Promise<BlockPropsType> {
-	return new Promise(async (res) => {
-		const props: BlockPropsType = {
-			name,
-			attributes: {},
-			innerBlocks: [],
-		};
+	const props: BlockPropsType = {
+		name,
+		attributes: {},
+		innerBlocks: [],
+	};
 
-		Promise.allSettled([
-			getAttributes(name, attributes, options),
-			getInnerBlocks(innerBlocks, options),
-		]).then(([attrsResult, blksResult]) => {
-			if (attrsResult.status === 'fulfilled') {
-				const { attrs, innerBlocks: dataInnerBlocks } =
-					attrsResult.value as {
-						attrs: Record<string, unknown>;
-						innerBlocks?: BlockPropsType[];
-					};
-				props.attributes = attrs ?? {};
+	const results = await Promise.allSettled([
+		getAttributes(name, attributes, options),
+		getInnerBlocks(innerBlocks, options),
+	]);
+	throwIfBaseUriNotDeclared(results);
 
-				// If getData returned innerBlocks, use those (fresh) and skip the static ones.
-				// (this is a fix made for core/navigation for example, which has links as innerBlocks, but we want them to be always up to date, even if it's part of the FSE template)
-				if (dataInnerBlocks !== undefined) {
-					props.innerBlocks = dataInnerBlocks;
-				} else if (blksResult.status === 'fulfilled') {
-					props.innerBlocks =
-						(blksResult.value as BlockPropsType['innerBlocks']) ??
-						[];
-				}
-			} else if (blksResult.status === 'fulfilled') {
-				props.innerBlocks =
-					(blksResult.value as BlockPropsType['innerBlocks']) ?? [];
-			}
+	const [attrsResult, blksResult] = results;
 
-			res(props);
-		});
-	});
+	if (attrsResult.status === 'fulfilled') {
+		const { attrs, innerBlocks: dataInnerBlocks } = attrsResult.value;
+		props.attributes = attrs ?? {};
+
+		// If getData returned innerBlocks, use those (fresh) and skip the static ones.
+		// (this is a fix made for core/navigation for example, which has links as innerBlocks, but we want them to be always up to date, even if it's part of the FSE template)
+		if (dataInnerBlocks !== undefined) {
+			props.innerBlocks = dataInnerBlocks;
+		} else if (blksResult.status === 'fulfilled') {
+			props.innerBlocks =
+				(blksResult.value as BlockPropsType['innerBlocks']) ?? [];
+		}
+	} else if (blksResult.status === 'fulfilled') {
+		props.innerBlocks =
+			(blksResult.value as BlockPropsType['innerBlocks']) ?? [];
+	}
+
+	return props;
 }
 
 /**
@@ -85,62 +97,64 @@ export default function getBlockFinalComponentProps(
  * @param   {any}    attributes Initial block's attributes. Will be returned as it or enriched and/or formatted.
  * @returns {any}
  */
-const getAttributes = (
+const getAttributes = async (
 	name: string,
 	attributes: object,
-	options?: { skipGetData?: boolean; lang?: string | null }
-) =>
-	new Promise(async (res) => {
-		if (
-			options?.skipGetData ||
-			!blocksDataList[name as keyof typeof blocksDataList]
-		)
-			res({ attrs: attributes });
-		else {
-			const blockModule =
-				await blocksDataList[name as keyof typeof blocksDataList]?.();
-			const getData = (
-				blockModule as {
-					getData?: (
-						fetcher: FetchApiFuncType,
-						attrs: object,
-						lang?: string | null
-					) => Promise<object>;
-				}
-			).getData;
+	options?: BlockPropsOptions
+): Promise<{
+	attrs: Record<string, unknown>;
+	innerBlocks?: BlockPropsType[];
+}> => {
+	const attrs = attributes as Record<string, unknown>;
 
-			if (!getData) {
-				res({ attrs: attributes });
-				return;
-			}
+	if (options?.skipGetData) return { attrs };
 
-			getData(fetchAPI, attributes, options?.lang ?? null).then(
-				(data = {}) => {
-					const { innerBlocks, ...restData } = data as {
-						innerBlocks?: BlockPropsType[];
-					} & Record<string, unknown>;
-					res({
-						attrs: { ...attributes, ...restData },
-						...(innerBlocks !== undefined ? { innerBlocks } : {}),
-					});
-				}
-			);
-		}
-	});
+	const blockModule = await getBlockDataModule(name);
 
-const getInnerBlocks = (
+	if (!blockModule?.getData) return { attrs };
+
+	const lang = options?.lang ?? null;
+
+	let data: Record<string, unknown>;
+	if (options?.preview) {
+		const liveData: BlockData = {
+			...(await blockModule.getData(fetchAPI, attributes, lang)),
+		};
+		delete liveData.cacheTags;
+		data = liveData;
+	} else {
+		data = await getCachedBlockData(
+			name,
+			attributes,
+			lang,
+			blockModule.usesBaseUri
+				? ((baseUriContext() as string | undefined) ?? null)
+				: null
+		);
+	}
+
+	const { innerBlocks, ...restData } = data as {
+		innerBlocks?: BlockPropsType[];
+	} & Record<string, unknown>;
+
+	return {
+		attrs: { ...attrs, ...restData },
+		...(innerBlocks !== undefined ? { innerBlocks } : {}),
+	};
+};
+
+const getInnerBlocks = async (
 	blocks: Array<BlockPropsType>,
-	options?: { skipGetData?: boolean; lang?: string | null }
-) =>
-	new Promise((res, rej) => {
-		if (!(blocks?.length > 0)) rej([]);
-		else {
-			Promise.allSettled(
-				blocks.map((block) =>
-					getBlockFinalComponentProps({ ...block }, options)
-				)
-			).then((rs) =>
-				res(rs.map((r) => (r.status === 'fulfilled' ? r.value : null)))
-			);
-		}
-	});
+	options?: BlockPropsOptions
+) => {
+	if (!(blocks?.length > 0)) return [];
+
+	const rs = await Promise.allSettled(
+		blocks.map((block) =>
+			getBlockFinalComponentProps({ ...block }, options)
+		)
+	);
+	throwIfBaseUriNotDeclared(rs);
+
+	return rs.map((r) => (r.status === 'fulfilled' ? r.value : null));
+};

@@ -180,6 +180,8 @@ const normalizeReadingSpeed = (value: unknown): number => {
 	return Math.floor(n);
 };
 
+export const usesBaseUri = true;
+
 export const getData = async (
 	fetcher: FetchApiFuncType,
 	attrs: PostTimeToReadAttributes | null = null

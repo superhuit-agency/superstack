@@ -2,7 +2,11 @@ import { cacheLife, cacheTag } from 'next/cache';
 
 import * as _templatesData from '@/components/templates/data';
 import configs from '@/configs.json';
-import { baseUriContext } from '@/hooks/use-base-uri';
+import {
+	baseUriContext,
+	isBaseUriNotDeclaredError,
+	throwIfBaseUriNotDeclared,
+} from '@/hooks/use-base-uri';
 import { fetchAPI, formatBlocksJSON } from '@/lib';
 import { cacheTags } from '@/lib/cache-tags';
 import getBlockFinalComponentProps from '@/lib/get-block-final-component-props';
@@ -191,22 +195,30 @@ async function getNodeByURI(
 		// Not settled with the rest: a failed template read must fail the page,
 		// not be cached as a page without its header and footer.
 		getTemplateBlocks(node?.fseTemplate?.slug, lang).then((blocks) =>
-			enrichTemplateBlocks(blocks, lang)
+			enrichTemplateBlocks(blocks, lang, preview)
 		),
 		Promise.allSettled([
 			formatBlocksJSON(
 				previewDraft
 					? (node.preview?.node?.blocksJSON ?? '')
 					: (node?.blocksJSON ?? ''),
-				{ lang }
+				{ lang, preview }
 			),
 			getTemplateData(node),
 		])
-			.then(([bProm, tProm]) => ({
-				blocksJSON: bProm.status === 'fulfilled' ? bProm.value : [],
-				templateData: tProm.status === 'fulfilled' ? tProm.value : {},
-			}))
-			.catch(() => {
+			.then((results) => {
+				throwIfBaseUriNotDeclared(results);
+
+				const [bProm, tProm] = results;
+				return {
+					blocksJSON: bProm.status === 'fulfilled' ? bProm.value : [],
+					templateData:
+						tProm.status === 'fulfilled' ? tProm.value : {},
+				};
+			})
+			.catch((error) => {
+				if (isBaseUriNotDeclaredError(error)) throw error;
+
 				console.error(
 					'Error while enriching & formatting blocksJSON and templateData'
 				);
@@ -443,17 +455,19 @@ const applyTemplatePartTranslations = (
  */
 const enrichTemplateBlocks = (
 	blocks: BlockPropsType[],
-	lang: string | null = null
+	lang: string | null = null,
+	preview = false
 ): Promise<BlockPropsType[]> =>
 	blocks.length === 0
 		? Promise.resolve([])
 		: Promise.allSettled(
 				blocks.map((block) =>
-					getBlockFinalComponentProps(block, { lang })
+					getBlockFinalComponentProps(block, { lang, preview })
 				)
-			).then(
-				(results) =>
-					results
-						.map((r) => (r.status === 'fulfilled' ? r.value : null))
-						.filter(Boolean) as BlockPropsType[]
-			);
+			).then((results) => {
+				throwIfBaseUriNotDeclared(results);
+
+				return results
+					.map((r) => (r.status === 'fulfilled' ? r.value : null))
+					.filter(Boolean) as BlockPropsType[];
+			});

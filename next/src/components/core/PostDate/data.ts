@@ -82,6 +82,8 @@ const fetchGeneralSettings = async (fetcher: FetchApiFuncType) => {
 	};
 };
 
+export const usesBaseUri = true;
+
 export const getData = async (
 	fetcher: FetchApiFuncType,
 	attrs: PostDateAttributes | null = null

@@ -1,10 +1,11 @@
 import { getWpUrl } from '@/utils/node-utils';
 import getFunkyWpUploadsURI from '@/lib/get-funky-wp-uploads-uri';
 import getBlockFinalComponentProps from '@/lib/get-block-final-component-props';
+import { throwIfBaseUriNotDeclared } from '@/hooks/use-base-uri';
 
 export default async function formatBlocksJSON(
 	blocksJSON: string,
-	options?: { skipGetData?: boolean; lang?: string | null }
+	options?: { skipGetData?: boolean; lang?: string | null; preview?: boolean }
 ) {
 	/**
 	 * Replace ocurrences of WP upload URIs with relative url
@@ -26,15 +27,16 @@ export default async function formatBlocksJSON(
 		);
 	}
 
-	return blocksJSON
-		? (
-				await Promise.allSettled(
-					JSON.parse(blocksJSON).map((block: any) =>
-						getBlockFinalComponentProps(block, options)
-					)
-				)
-			).map((p: PromiseSettledResult<BlockPropsType>) =>
-				p.status === 'fulfilled' ? p.value : null
-			)
-		: [];
+	if (!blocksJSON) return [];
+
+	const results = await Promise.allSettled(
+		JSON.parse(blocksJSON).map((block: any) =>
+			getBlockFinalComponentProps(block, options)
+		)
+	);
+	throwIfBaseUriNotDeclared(results);
+
+	return results.map((p: PromiseSettledResult<BlockPropsType>) =>
+		p.status === 'fulfilled' ? p.value : null
+	);
 }
