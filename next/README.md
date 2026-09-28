@@ -39,6 +39,11 @@ npm run dev
 - The read is cached until the `templates` cache tag is revalidated, so template edits reach the site without a deploy.
 - See [docs/fse-templating.md](/docs/fse-templating.md) for a full explanation of the FSE templating architecture.
 
+## Caching
+
+- Content read from WordPress is cached indefinitely and refreshed by tag when the nextjs-revalidate plugin reports a change.
+- See [docs/caching.md](/docs/caching.md) for the tag scheme, the revalidate route, sizing the cache and the known risks.
+
 ## Custom Post Types
 
 Adding a new CPT requires changes on both the WordPress and Next.js sides:
