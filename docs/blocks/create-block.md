@@ -166,11 +166,11 @@ Without this entry, the block saves in WordPress but Next.js will log a dev warn
 
 Create files under `wordpress/theme/src/blocks/custom/<level>/<Name>/` (the `custom/` folder does not exist in the starter — the first block creates it):
 
-| File              | Purpose                                                         |
-| ----------------- | --------------------------------------------------------------- |
-| `register.ts`     | Calls `registerBlockType` (use `.tsx` if `save` returns JSX)    |
-| `edit.tsx`        | Gutenberg edit UI                                               |
-| `styles.edit.css` | Editor-only preview styles (optional)                           |
+| File              | Purpose                                                      |
+| ----------------- | ------------------------------------------------------------ |
+| `register.ts`     | Calls `registerBlockType` (use `.tsx` if `save` returns JSX) |
+| `edit.tsx`        | Gutenberg edit UI                                            |
+| `styles.edit.css` | Editor-only preview styles (optional)                        |
 
 **`register.ts`** — import `block.json` from Next via the `@/` webpack alias (`@` → `next/src`):
 
@@ -244,10 +244,6 @@ cd next && npx tsc --noEmit
 ```
 
 ---
-
-## Extending core blocks (filters)
-
-To tweak an existing core block (e.g. limit heading levels, restrict post types), add a `register.tsx` filter under `wordpress/theme/src/blocks/core/<Block>/` and import it from the [`blocks/index.ts`](../../wordpress/theme/src/blocks/index.ts) barrel. This is different from registering a new custom block — see [`core/Image/register.tsx`](../../wordpress/theme/src/blocks/core/Image/register.tsx) for an example.
 
 ## Removing or renaming a block
 
