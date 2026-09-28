@@ -43,74 +43,139 @@ const normalizeIdList = (value?: Array<string> | string[]) => {
 	return ids.length ? ids : null;
 };
 
+const postNodeFields = `
+	id
+	databaseId
+	uri
+	date
+	title(format: RENDERED)
+	excerpt(format: RENDERED)
+	content(format: RENDERED)
+	author {
+		node {
+			name
+		}
+	}
+	featuredImage {
+		node {
+			sourceUrl
+			altText
+			mediaDetails {
+				width
+				height
+			}
+		}
+	}
+	categories {
+		nodes {
+			slug
+		}
+	}
+`;
+
+const queryPosts = gql`
+	query QueryPosts(
+		$first: Int!
+		$offset: Int!
+		$order: OrderEnum!
+		$orderby: PostObjectsConnectionOrderbyEnum!
+		$notIn: [ID]
+		$search: String
+		$categoryIn: [ID]
+		$tagIn: [ID]
+   		${configs.isMultilang ? '$language: LanguageCodeFilterEnum' : ''}
+	) {
+		posts(
+			first: $first
+			where: {
+				offsetPagination: { offset: $offset, size: $first }
+				orderby: { field: $orderby, order: $order }
+				notIn: $notIn
+				search: $search
+				stati: PUBLISH
+				categoryIn: $categoryIn
+				tagIn: $tagIn
+        		${configs.isMultilang ? 'language: $language' : ''}
+			}
+		) {
+			pageInfo {
+				offsetPagination {
+					total
+				}
+			}
+			nodes {
+				${postNodeFields}
+			}
+		}
+	}
+`;
+
 const queryContentNodes = gql`
-  query QueryContentNodes(
-    $first: Int!
-    $offset: Int!
-    $order: OrderEnum!
-    $orderby: PostObjectsConnectionOrderbyEnum!
-    $notIn: [ID]
-    $search: String
-    $contentTypes: [ContentTypeEnum]
-    $categoryIn: [ID]
-    $tagIn: [ID]
-    ${configs.isMultilang ? '$language: LanguageCodeFilterEnum' : ''}
-  ) {
-    contentNodes(
-      first: $first
-      where: {
-        offsetPagination: { offset: $offset, size: $first }
-        orderby: { field: $orderby, order: $order }
-        notIn: $notIn
-        search: $search
-        stati: PUBLISH
-        contentTypes: $contentTypes
-        categoryIn: $categoryIn
-        tagIn: $tagIn
+	query QueryContentNodes(
+		$first: Int!
+		$offset: Int!
+		$order: OrderEnum!
+		$orderby: PostObjectsConnectionOrderbyEnum!
+		$notIn: [ID]
+		$search: String
+		$contentTypes: [ContentTypeEnum]
+		$taxTermIn: [ID]
+   		${configs.isMultilang ? '$language: LanguageCodeFilterEnum' : ''}
+	) {
+		contentNodes(
+			first: $first
+			where: {
+				offsetPagination: { offset: $offset, size: $first }
+				orderby: { field: $orderby, order: $order }
+				notIn: $notIn
+				search: $search
+				stati: PUBLISH
+				contentTypes: $contentTypes
+				taxTermIn: $taxTermIn
         ${configs.isMultilang ? 'language: $language' : ''}
-      }
-    ) {
-      pageInfo {
-        offsetPagination {
-          total
-        }
-      }
-      nodes {
-        id
-        databaseId
-        uri
-        date
-        ... on NodeWithTitle {
-          title(format: RENDERED)
-        }
-        ... on NodeWithExcerpt {
-          excerpt(format: RENDERED)
-        }
-        ... on NodeWithContentEditor {
-          content(format: RENDERED)
-        }
-        ... on NodeWithAuthor {
-          author {
-            node {
-              name
-            }
-          }
-        }
-        ... on NodeWithFeaturedImage {
-          featuredImage {
-            node {
-              sourceUrl
-              altText
-              mediaDetails {
-                width
-                height
-              }
-            }
-          }
-        }
-      }
-    }
-  }
+			}
+		) {
+			pageInfo {
+				offsetPagination {
+					total
+				}
+			}
+			nodes {
+				id
+				databaseId
+				uri
+				date
+				... on NodeWithTitle {
+					title(format: RENDERED)
+				}
+				... on NodeWithExcerpt {
+					excerpt(format: RENDERED)
+				}
+				... on NodeWithContentEditor {
+					content(format: RENDERED)
+				}
+				... on NodeWithAuthor {
+					author {
+						node {
+							name
+						}
+					}
+				}
+				... on NodeWithFeaturedImage {
+					featuredImage {
+						node {
+							sourceUrl
+							altText
+							mediaDetails {
+								width
+								height
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 `;
 
 const PAGINATION_BLOCKS = new Set([
@@ -158,7 +223,7 @@ const paginationChildAttrs = (
 		enabled = true;
 	}
 
-	return { href, label, isDisabled: !enabled };
+	return { href, label, isDisabled: !enabled, totalPages };
 };
 
 /**
@@ -209,52 +274,86 @@ export const getData = async (
 	lang: string | null = null,
 	context: BlockDataContext = {}
 ) => {
-	const perPageRaw = attrs?.query?.perPage;
-	const perPage = Math.min(100, Math.max(1, toPositiveInt(perPageRaw) ?? 10));
+	// `inherit: true` means "take your parameters from the WordPress main
+	// query", so everything standing in for that main query — post type,
+	// current term, current page — is gated on it.
+	const inherit = attrs?.query?.inherit === true;
 
-	const page = context?.page && context.page > 0 ? context.page : 1;
+	const perPage = Math.min(
+		100,
+		Math.max(1, toPositiveInt(attrs?.query?.perPage) ?? 10)
+	);
+	// Only the loop inheriting the main query follows the `/page/{n}` route; a
+	// custom loop paginates on its own `queryId` in WordPress, which this
+	// implementation does not read, so it stays on its first page.
+	const page = inherit && context?.page && context.page > 0 ? context.page : 1;
 	const offset = (page - 1) * perPage;
-
 	const order = toOrderEnum(attrs?.query?.order);
 	const orderby = toOrderByEnum(attrs?.query?.orderBy);
-
 	const search =
 		typeof attrs?.query?.search === 'string' && attrs.query.search.trim()
 			? attrs.query.search.trim()
 			: null;
+	// In "default" query mode (`inherit: true`) WordPress never persists the post
+	// type — it leaves `query.postType` at the block default ("post") and resolves
+	// the type from the template's main query at render time. Mirror that here by
+	// reading the post type archive in context.
+	const postType = inherit
+		? (context?.archive?.postType ?? 'post')
+		: (attrs?.query?.postType ?? 'post');
+
+	// Scope the loop to the current term archive (Tag/Category page) when one is
+	// in context, on top of any taxonomy filters set on the block itself. A
+	// custom loop keeps its own taxonomy filters instead: it is not the archive
+	// listing, even when it sits on an archive page.
+	const term = inherit ? (context?.term ?? null) : null;
+	const termCategoryId = term?.taxonomy === 'category' ? term.databaseId : null;
+	const tagIn = term?.taxonomy === 'tag' ? [term.databaseId] : null;
+	// Custom taxonomies have no dedicated where arg in WPGraphQL: they go
+	// through the theme's `taxTermIn` filter on the content node connection.
+	const taxTermIn =
+		term && !termCategoryId && !tagIn ? [term.databaseId] : null;
 
 	const notIn = normalizeIdList(attrs?.query?.exclude);
 
-	const postType = attrs?.query?.postType;
-	const contentTypes = postType ? [postType.toUpperCase()] : null;
+	const attrCategoryIn =
+		normalizeIdList(
+			attrs?.query?.taxQuery?.category as Array<string> | undefined
+		) ?? [];
+	const mergedCategoryIn = [
+		...attrCategoryIn,
+		...(termCategoryId ? [termCategoryId] : []),
+	];
+	const categoryIn = mergedCategoryIn.length ? mergedCategoryIn : null;
 
-	// Scope the loop to the current term archive (Tag/Category page) when one is
-	// in context, so the query returns only that term's posts.
-	const term = context?.term ?? null;
-	const categoryIn = term?.taxonomy === 'category' ? [term.databaseId] : null;
-	const tagIn = term?.taxonomy === 'tag' ? [term.databaseId] : null;
+	const usePostsQuery = postType === 'post';
 
-	const variables = {
+	const query = usePostsQuery ? queryPosts : queryContentNodes;
+	const variables: Record<string, unknown> = {
 		first: perPage,
 		offset,
 		order,
 		orderby,
 		notIn,
 		search,
-		contentTypes,
-		categoryIn,
-		tagIn,
 		...(configs.isMultilang
 			? { language: lang ? lang.toUpperCase() : 'ALL' }
 			: {}),
 	};
+	if (usePostsQuery) {
+		variables.categoryIn = categoryIn;
+		variables.tagIn = tagIn;
+	} else {
+		variables.contentTypes = [postType.toUpperCase()];
+		variables.taxTermIn = taxTermIn;
+	}
 
-	const data = await fetcher(queryContentNodes, { variables });
+	const data = await fetcher(query, { variables });
 
+	const connection = usePostsQuery ? data?.posts : data?.contentNodes;
 	const total =
-		typeof data?.contentNodes?.pageInfo?.offsetPagination?.total ===
-		'number'
-			? data.contentNodes.pageInfo.offsetPagination.total
+		typeof connection?.pageInfo?.offsetPagination?.total === 'number'
+			? connection.pageInfo.offsetPagination.total
 			: null;
 	const totalPages =
 		typeof total === 'number' && total >= 0
@@ -262,11 +361,12 @@ export const getData = async (
 			: null;
 	const currentPage = page;
 
-	const nodes = (data?.contentNodes?.nodes ?? []).map((node: unknown) => ({
+	const nodes = (connection?.nodes ?? []).map((node: unknown) => ({
 		excerpt: '',
 		content: null,
 		author: null,
 		featuredImage: null,
+		categories: null,
 		...(node as Record<string, unknown>),
 	}));
 

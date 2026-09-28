@@ -10,6 +10,7 @@ export default async function formatBlocksJSON(
 		page?: number;
 		baseUri?: string;
 		term?: BlockDataContext['term'];
+		archive?: BlockDataContext['archive'];
 	}
 ) {
 	/**

@@ -54,6 +54,15 @@ type BlockDataContext = {
 		/** The term's WordPress database ID. */
 		databaseId: number;
 	};
+	/**
+	 * The post type archive being viewed (ContentType node), so query loops
+	 * inheriting the template query resolve the right post type — WordPress
+	 * leaves `query.postType` at its default when `query.inherit` is true.
+	 */
+	archive?: {
+		/** The WordPress post type slug, e.g. "post". */
+		postType: string;
+	};
 };
 
 type FseTemplateEntry = {
