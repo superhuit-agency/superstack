@@ -58,8 +58,6 @@ export const getData = async (
 	const data = await fetcher(query, { variables: { uri } });
 	const node = data?.nodeByUri;
 
-	// Only a term's name is reported as a change: a post type's label comes
-	// from code, and no change is reported for users
 	const tags = !node
 		? [cacheTags.uris()]
 		: typeof node.databaseId === 'number'

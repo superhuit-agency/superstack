@@ -59,10 +59,8 @@ export async function getPublicNodeByURI(
 				]),
 		cacheTags.settings(), // The same query returns site SEO and general settings
 		...termTags(node.categories?.nodes),
-		...termTags(node.tags?.nodes),
-		...(node.cacheTags ?? []) // Returned by the template's `getData`
+		...termTags(node.tags?.nodes)
 	);
-	delete node.cacheTags;
 
 	return node;
 }
@@ -87,17 +85,7 @@ export async function getPreviewNodeByURI(
 	auth: AuthType,
 	previewDraft: boolean
 ) {
-	const node = await getNodeByURI(
-		uri,
-		true,
-		auth,
-		previewDraft,
-		routePage,
-		lang
-	);
-	delete node?.cacheTags;
-
-	return node;
+	return getNodeByURI(uri, true, auth, previewDraft, routePage, lang);
 }
 
 /**

@@ -27,7 +27,6 @@ export const getData = async (
 			url: data?.user?.avatar?.url,
 			alt: data?.user?.username,
 		},
-		// No change is reported for users: only "Purge all" refreshes it
 		cacheTags: [],
 	};
 };

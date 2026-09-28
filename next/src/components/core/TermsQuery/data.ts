@@ -122,7 +122,6 @@ export const getData = async (
 	const includeIds = normalizeIncludeIds(termQuery.include ?? []);
 	const hasInclude = includeIds.length > 0;
 
-	let taxonomy: string;
 	let taxonomies: string[] = [];
 	let parent: number | undefined;
 	let childOf: number | undefined;
@@ -134,7 +133,6 @@ export const getData = async (
 	if (archiveContext) {
 		const ctx = archiveContext;
 		const taxSlug = ctx.taxonomyName.toLowerCase();
-		taxonomy = taxSlug;
 		taxonomies = [taxonomyToGraphqlEnum(taxSlug)];
 
 		if (isTaxonomyHierarchical(taxSlug)) {
@@ -145,7 +143,6 @@ export const getData = async (
 			}
 		}
 	} else {
-		taxonomy = termQuery.taxonomy;
 		taxonomies = [taxonomyToGraphqlEnum(termQuery.taxonomy)];
 
 		if (hasInclude) {
@@ -236,12 +233,15 @@ export const getData = async (
 			},
 		},
 		cacheTags: [
-			cacheTags.taxonomy(taxonomy),
+			cacheTags.taxonomy(
+				archiveContext
+					? archiveContext.taxonomyName.toLowerCase()
+					: termQuery.taxonomy
+			),
 			...termTags(nodes),
 			...(archiveContext
 				? [cacheTags.term(archiveContext.databaseId)]
 				: []),
-			// Post counts, and so which terms are empty, change with posts
 			cacheTags.content(),
 		],
 	};

@@ -157,7 +157,6 @@ export const getData = async (
 		};
 	}
 
-	// The adjacent post is any post of the type: a change to one may move it
 	const tags = [
 		cacheTags.node(currentNode.databaseId),
 		cacheTags.type(currentNode.__typename === 'Post' ? 'post' : 'page'),

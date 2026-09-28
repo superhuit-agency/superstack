@@ -52,7 +52,6 @@ export const getData = async (
 		cacheTags: [
 			cacheTags.taxonomy(taxonomy),
 			...termTags(data?.terms?.nodes),
-			// Post counts, and so which terms are empty, change with posts
 			...(!attrs?.showEmpty || attrs?.showPostCounts
 				? [cacheTags.content()]
 				: []),

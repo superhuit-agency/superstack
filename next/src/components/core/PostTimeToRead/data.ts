@@ -245,12 +245,7 @@ export const getData = async (
 		wordCountType
 	);
 
-	const base: Pick<
-		PostTimeToReadAttributes,
-		'wordCountType' | 'totalUnits'
-	> & {
-		cacheTags: string[];
-	} = {
+	const base = {
 		wordCountType,
 		totalUnits,
 		cacheTags: nodeAtUriTags(bundle?.databaseId),

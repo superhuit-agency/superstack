@@ -36,14 +36,15 @@ const queryPostDate = gql`
 		}
 		nodeByUri(uri: $uri) {
 			__typename
-			... on Post {
+			... on ContentNode {
 				databaseId
+			}
+			... on Post {
 				date
 				modified
 				uri
 			}
 			... on Page {
-				databaseId
 				date
 				modified
 				uri

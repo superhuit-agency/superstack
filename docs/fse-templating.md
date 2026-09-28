@@ -186,11 +186,11 @@ Outside preview, `getData` runs inside `getCachedBlockData`, in a cache entry of
   | the post at the Base URI | `nodeAtUriTags(databaseId)`: `node:{id}`, or `uris` when no post was found. Never `type:` |
   | a listing, a query, latest posts, next/previous links | `type:{contentType}`, or `content` with no type filter |
   | terms | `termTags(terms)`: `term:{databaseId}` for each, so query their `databaseId` |
-  | a term listing | `taxonomy:{taxonomy}` and its terms' tags, plus `content` when post counts show or empty terms are hidden |
+  | a term listing | `taxonomy:{taxonomy}` and its terms' tags, plus `content` when it shows post counts or hides empty terms |
   | a block menu | `menu:{id}` |
   | the site title, tagline, logo or date format | `settings` |
 
-  A template's `getData` returns `cacheTags` too: the public node read applies them to its own entry. The node read already tags the post's own `categories` and `tags`.
+  The public node read tags the post's own `categories` and `tags`.
 - **`usesBaseUri`.** A Page-dependent block, one that reads `baseUriContext()`, must declare `export const usesBaseUri = true;` in its `data.ts`. The Base URI is then added to its cache key. Any other block gets one entry per site, and reading the Base URI throws a `BaseUriNotDeclaredError`, which fails `next build`.
 
 ---
