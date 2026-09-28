@@ -48,7 +48,7 @@ The `fseTemplate` GraphQL field is registered globally for all CPTs with `show_i
 
 Create `next/src/components/templates/Single[TypeName]/data.ts`.
 
-Model on `SinglePage/data.ts` for simple CPTs, or `SinglePost/data.ts` if the CPT needs `getData`.
+Model on `SinglePage/data.ts`, or `SinglePost/data.ts` if the CPT displays terms (query their `databaseId`: the public node read tags them).
 
 Minimum required shape:
 

@@ -8,7 +8,7 @@ import {
 	throwIfBaseUriNotDeclared,
 } from '@/hooks/use-base-uri';
 import { fetchAPI, formatBlocksJSON } from '@/lib';
-import { cacheTags } from '@/lib/cache-tags';
+import { cacheTags, termTags } from '@/lib/cache-tags';
 import getBlockFinalComponentProps from '@/lib/get-block-final-component-props';
 import getFseTemplates from '@/lib/get-fse-templates';
 
@@ -57,7 +57,9 @@ export async function getPublicNodeByURI(
 					cacheTags.node(node.id),
 					cacheTags.nodesOfType(node.contentTypeName),
 				]),
-		cacheTags.settings() // The same query returns site SEO and general settings
+		cacheTags.settings(), // The same query returns site SEO and general settings
+		...termTags(node.categories?.nodes),
+		...termTags(node.tags?.nodes)
 	);
 
 	return node;

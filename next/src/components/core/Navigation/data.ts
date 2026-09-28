@@ -1,3 +1,4 @@
+import { cacheTags } from '@/lib/cache-tags';
 import { gql } from '@/utils';
 
 const getSubmenuVisibility = (attrs: NavigationAttributes | null) => {
@@ -26,8 +27,10 @@ export const getData = async (
 	const submenuVisibility = getSubmenuVisibility(attrs);
 
 	if (typeof attrs?.ref !== 'number' || attrs.ref <= 0) {
-		return { submenuVisibility, innerBlocks: [] };
+		return { submenuVisibility, innerBlocks: [], cacheTags: [] };
 	}
+
+	const tags = [cacheTags.menu(attrs.ref)];
 
 	try {
 		const data = await fetcher(navigationMenuQuery, {
@@ -37,8 +40,8 @@ export const getData = async (
 		const innerBlocks: BlockPropsType[] = blocksJSON
 			? JSON.parse(blocksJSON)
 			: [];
-		return { submenuVisibility, innerBlocks };
+		return { submenuVisibility, innerBlocks, cacheTags: tags };
 	} catch {
-		return { submenuVisibility, innerBlocks: [] };
+		return { submenuVisibility, innerBlocks: [], cacheTags: tags };
 	}
 };

@@ -1,4 +1,5 @@
 import configs from '@/configs.json';
+import { cacheTags } from '@/lib/cache-tags';
 import { gql } from '@/utils';
 
 const ORDER_ENUMS = new Set(['ASC', 'DESC']);
@@ -180,5 +181,6 @@ export const getData = async (
 			total,
 			totalPages,
 		},
+		cacheTags: [postType ? cacheTags.type(postType) : cacheTags.content()],
 	};
 };

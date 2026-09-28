@@ -1,3 +1,4 @@
+import { cacheTags } from '@/lib/cache-tags';
 import { gql } from '@/utils';
 
 export const getData = async (
@@ -19,5 +20,6 @@ export const getData = async (
 
 	return {
 		content: typeof tagline === 'string' ? tagline : '',
+		cacheTags: [cacheTags.settings()],
 	};
 };

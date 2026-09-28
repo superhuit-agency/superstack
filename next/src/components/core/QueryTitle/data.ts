@@ -1,4 +1,5 @@
 import { baseUriContext } from '@/hooks/use-base-uri';
+import { cacheTags } from '@/lib/cache-tags';
 import { gql } from '@/utils';
 
 const archivePrefix = (type: string): string => {
@@ -32,6 +33,7 @@ export const getData = async (
 				showSearchTerm && searchTerm
 					? `Search results for: "${searchTerm}"`
 					: 'Search results',
+			cacheTags: [],
 		};
 	}
 
@@ -40,6 +42,7 @@ export const getData = async (
 			nodeByUri(uri: $uri) {
 				__typename
 				... on TermNode {
+					databaseId
 					name
 				}
 				... on ContentType {
@@ -54,6 +57,13 @@ export const getData = async (
 
 	const data = await fetcher(query, { variables: { uri } });
 	const node = data?.nodeByUri;
+
+	const tags = !node
+		? [cacheTags.uris()]
+		: typeof node.databaseId === 'number'
+			? [cacheTags.term(node.databaseId)]
+			: [];
+
 	const name: string =
 		typeof node?.label === 'string'
 			? node.label
@@ -61,12 +71,15 @@ export const getData = async (
 				? node.name
 				: '';
 
-	if (!name) return { content: '' };
+	if (!name) return { content: '', cacheTags: tags };
 
 	if (showPrefix) {
 		const prefix = archivePrefix(type);
-		return { content: prefix ? `${prefix}: ${name}` : name };
+		return {
+			content: prefix ? `${prefix}: ${name}` : name,
+			cacheTags: tags,
+		};
 	}
 
-	return { content: name };
+	return { content: name, cacheTags: tags };
 };

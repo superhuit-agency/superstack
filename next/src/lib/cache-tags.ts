@@ -36,6 +36,30 @@ export const cacheTags = {
 };
 
 /**
+ * Tags of a read of the node at a URI (e.g. the Base URI): the node it found,
+ * or `uris` when it found none, since a post may later move to that URI.
+ *
+ * @param databaseId The database ID of the node found, if any
+ */
+export const nodeAtUriTags = (databaseId: unknown): string[] =>
+	typeof databaseId === 'number'
+		? [cacheTags.node(databaseId)]
+		: [cacheTags.uris()];
+
+/**
+ * `term:` tags of the terms an entry displays.
+ *
+ * @param terms Terms carrying their `databaseId`
+ */
+export const termTags = (
+	terms: Array<{ databaseId?: unknown } | null> | null | undefined
+): string[] =>
+	(terms ?? [])
+		.map((term) => term?.databaseId)
+		.filter((id): id is number => typeof id === 'number')
+		.map(cacheTags.term);
+
+/**
  * Normalise a URI so the redirect lookup and an incoming `redirect` change
  * agree on the tag: path only (no query or hash), decoded, lowercased, with a
  * leading and a trailing slash.

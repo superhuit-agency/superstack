@@ -27,5 +27,6 @@ export const getData = async (
 			url: data?.user?.avatar?.url,
 			alt: data?.user?.username,
 		},
+		cacheTags: [],
 	};
 };

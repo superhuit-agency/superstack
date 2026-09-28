@@ -1,5 +1,6 @@
 import configs from '@/configs.json';
 import { baseUriContext } from '@/hooks/use-base-uri';
+import { cacheTags, termTags } from '@/lib/cache-tags';
 import { gql } from '@/utils';
 
 import { taxonomyToGraphqlEnum } from '@/components/core/TaxonomyList/helper';
@@ -231,5 +232,17 @@ export const getData = async (
 				nodes,
 			},
 		},
+		cacheTags: [
+			cacheTags.taxonomy(
+				archiveContext
+					? archiveContext.taxonomyName.toLowerCase()
+					: termQuery.taxonomy
+			),
+			...termTags(nodes),
+			...(archiveContext
+				? [cacheTags.term(archiveContext.databaseId)]
+				: []),
+			cacheTags.content(),
+		],
 	};
 };

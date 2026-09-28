@@ -59,8 +59,9 @@ export default async function getCachedBlockData(
 	const { cacheTags: tags, ...data } =
 		(await blockModule?.getData?.(fetchAPI, attributes, lang)) ?? {};
 
-	if (tags?.length) {
-		cacheTag(...tags);
+	// An empty list declares no dependency: only "Purge all" refreshes it
+	if (tags) {
+		if (tags.length) cacheTag(...tags);
 	} else {
 		// Covers what untagged blocks may read: posts and site settings
 		cacheTag(cacheTags.content(), cacheTags.settings());
