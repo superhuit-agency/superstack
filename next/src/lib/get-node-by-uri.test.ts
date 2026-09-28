@@ -32,7 +32,7 @@ function wordpressReturns(node: unknown) {
 }
 
 /** Every tag the cached read was given, sorted. */
-function tags() {
+function cacheTagsGiven() {
 	return vi.mocked(cacheTag).mock.calls.flat().sort();
 }
 
@@ -54,7 +54,7 @@ describe('getPublicNodeByURI', () => {
 		const node = await getPublicNodeByURI('/hello/');
 
 		expect(node?.uri).toBe('/hello/');
-		expect(tags()).toEqual([
+		expect(cacheTagsGiven()).toEqual([
 			'node:42',
 			'nodes',
 			'nodes:post',
@@ -68,13 +68,13 @@ describe('getPublicNodeByURI', () => {
 		wordpressReturns(null);
 
 		expect(await getPublicNodeByURI('/nothing/')).toBeNull();
-		expect(tags()).toEqual(['nodes', 'uris']);
+		expect(cacheTagsGiven()).toEqual(['nodes', 'uris']);
 	});
 
 	it('caches a term archive, not rendered yet, as a 404 tagged `uris`', async () => {
 		wordpressReturns({ __typename: 'Category' });
 
 		expect(await getPublicNodeByURI('/category/news/')).toBeNull();
-		expect(tags()).toEqual(['nodes', 'uris']);
+		expect(cacheTagsGiven()).toEqual(['nodes', 'uris']);
 	});
 });
