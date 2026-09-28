@@ -56,7 +56,6 @@ require_once __DIR__ . '/graphql/graphql-endpoint-script.php';
 require_once __DIR__ . '/graphql/navigation-inner-blocks.php';
 require_once __DIR__ . '/graphql/node-idtype.php';
 require_once __DIR__ . '/graphql/post-edit-link.php';
-require_once __DIR__ . '/graphql/query-pagination-offset.php';
 require_once __DIR__ . '/graphql/register-content-type-translations.php';
 require_once __DIR__ . '/graphql/register-fse-templates.php';
 require_once __DIR__ . '/graphql/register-logo.php';

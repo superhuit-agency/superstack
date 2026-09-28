@@ -60,9 +60,6 @@ export default async function getNodeByURI(
 	const response = await fetchAPI(query, {
 		variables,
 		auth,
-		headers: {
-			'X-Query-Page': String(routePage && routePage > 0 ? routePage : 1),
-		},
 	});
 
 	const { node: rawNode, seo, generalSettings } = response;
@@ -119,12 +116,14 @@ export default async function getNodeByURI(
 					previewDraft
 						? (node.preview?.node?.blocksJSON ?? '')
 						: (node?.blocksJSON ?? ''),
-					{ lang }
+					{ lang, page: routePage, baseUri: uri }
 				),
 				getTemplateData(node),
 				enrichTemplateBlocks(
 					getTemplateBlocks(node?.fseTemplate?.slug, lang),
-					lang
+					lang,
+					routePage,
+					uri
 				),
 			])
 				.then(([bProm, tProm, tbProm]) => ({
