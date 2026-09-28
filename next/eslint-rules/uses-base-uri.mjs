@@ -1,15 +1,14 @@
 /**
  * Block data modules (`data.ts`) that read the Base URI must declare
  * `export const usesBaseUri = true;`, so the cached block-data wrapper adds
- * the Base URI to their cache key. Without it, the page that fills the cache
- * leaks its content into every other page (and `next build` fails on the
- * `BaseUriNotDeclaredError` guard). Declaring it without reading the Base URI
- * caches one entry per page for nothing, and asks WordPress again for each.
+ * the Base URI to their cache key. See `docs/fse-templating.md`, "Caching
+ * block data".
  */
 
 const BASE_URI_MODULE = /(^|\/)use-base-uri$/;
 
 const importsBaseUriContext = (node) =>
+	node.type === 'ImportDeclaration' &&
 	BASE_URI_MODULE.test(node.source.value) &&
 	node.specifiers.some(
 		(specifier) =>
@@ -18,56 +17,39 @@ const importsBaseUriContext = (node) =>
 				specifier.imported.name === 'baseUriContext')
 	);
 
-const isFalse = (node) => node?.type === 'Literal' && node.value === false;
+const declaresUsesBaseUri = (node) =>
+	node.type === 'ExportNamedDeclaration' &&
+	node.declaration?.type === 'VariableDeclaration' &&
+	node.declaration.declarations.some(
+		(declarator) =>
+			declarator.id.type === 'Identifier' &&
+			declarator.id.name === 'usesBaseUri' &&
+			declarator.init?.type === 'Literal' &&
+			declarator.init.value === true
+	);
 
-/** The `usesBaseUri` export, `null` when missing or set to `false`. */
-const findUsesBaseUriExport = (program) => {
-	const localInits = new Map();
+/**
+ * A rule reporting the first `reportOn` node of a module that has no
+ * `unlessAlso` node.
+ *
+ * @returns {import('eslint').Rule.RuleModule}
+ */
+const createRule = ({ meta, messageId, reportOn, unlessAlso }) => ({
+	meta: { ...meta, schema: [] },
+	create(context) {
+		return {
+			Program(program) {
+				const node = program.body.find(reportOn);
 
-	for (const node of program.body) {
-		const declaration =
-			node.type === 'ExportNamedDeclaration' ? node.declaration : node;
-		if (declaration?.type !== 'VariableDeclaration') continue;
-
-		for (const declarator of declaration.declarations) {
-			if (declarator.id.type === 'Identifier') {
-				localInits.set(declarator.id.name, declarator.init);
-			}
-		}
-	}
-
-	for (const node of program.body) {
-		if (node.type !== 'ExportNamedDeclaration') continue;
-
-		if (node.declaration?.type === 'VariableDeclaration') {
-			const declarator = node.declaration.declarations.find(
-				(d) => d.id.type === 'Identifier' && d.id.name === 'usesBaseUri'
-			);
-			if (declarator) return isFalse(declarator.init) ? null : node;
-		}
-
-		const specifier = node.specifiers.find(
-			(s) => s.exported.name === 'usesBaseUri'
-		);
-		if (specifier) {
-			return isFalse(localInits.get(specifier.local.name)) ? null : node;
-		}
-	}
-
-	return null;
-};
-
-const analyze = (program) => ({
-	contextImport:
-		program.body.find(
-			(node) =>
-				node.type === 'ImportDeclaration' && importsBaseUriContext(node)
-		) ?? null,
-	usesBaseUriExport: findUsesBaseUriExport(program),
+				if (node && !program.body.some(unlessAlso)) {
+					context.report({ node, messageId });
+				}
+			},
+		};
+	},
 });
 
-/** @type {import('eslint').Rule.RuleModule} */
-export const requireUsesBaseUri = {
+export const requireUsesBaseUri = createRule({
 	meta: {
 		type: 'problem',
 		docs: {
@@ -80,26 +62,13 @@ export const requireUsesBaseUri = {
 				'Its data is otherwise cached once per site, so the page that fills ' +
 				'the cache would leak its content into every other page.',
 		},
-		schema: [],
 	},
-	create(context) {
-		return {
-			Program(program) {
-				const { contextImport, usesBaseUriExport } = analyze(program);
+	messageId: 'missing',
+	reportOn: importsBaseUriContext,
+	unlessAlso: declaresUsesBaseUri,
+});
 
-				if (contextImport && !usesBaseUriExport) {
-					context.report({
-						node: contextImport,
-						messageId: 'missing',
-					});
-				}
-			},
-		};
-	},
-};
-
-/** @type {import('eslint').Rule.RuleModule} */
-export const noUnusedUsesBaseUri = {
+export const noUnusedUsesBaseUri = createRule({
 	meta: {
 		type: 'suggestion',
 		docs: {
@@ -111,30 +80,8 @@ export const noUnusedUsesBaseUri = {
 				'This block data never reads the Base URI: remove `usesBaseUri`. ' +
 				'It caches one entry per page for nothing, each fetched from WordPress.',
 		},
-		schema: [],
 	},
-	create(context) {
-		return {
-			Program(program) {
-				const { contextImport, usesBaseUriExport } = analyze(program);
-
-				if (usesBaseUriExport && !contextImport) {
-					context.report({
-						node: usesBaseUriExport,
-						messageId: 'unused',
-					});
-				}
-			},
-		};
-	},
-};
-
-const plugin = {
-	meta: { name: 'superstack' },
-	rules: {
-		'require-uses-base-uri': requireUsesBaseUri,
-		'no-unused-uses-base-uri': noUnusedUsesBaseUri,
-	},
-};
-
-export default plugin;
+	messageId: 'unused',
+	reportOn: declaresUsesBaseUri,
+	unlessAlso: importsBaseUriContext,
+});

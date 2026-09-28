@@ -10,26 +10,20 @@ RuleTester.itOnly = it.only;
 const ruleTester = new RuleTester();
 
 const importsContext = `import { baseUriContext } from '@/hooks/use-base-uri';`;
-const declares = `export const usesBaseUri = true;`;
+const optIn = `export const usesBaseUri = true;`;
 const getData = `export const getData = async () => ({ content: '' });`;
 
-const validModule = [importsContext, declares, getData].join('\n');
+const validModule = [importsContext, optIn, getData].join('\n');
 const missingOptIn = [importsContext, getData].join('\n');
-const optInWithoutImport = [declares, getData].join('\n');
-const neither = getData;
+const optInWithoutImport = [optIn, getData].join('\n');
+const neitherImportsNorOptsIn = getData;
 
 describe('uses-base-uri', () => {
 	ruleTester.run('require-uses-base-uri', requireUsesBaseUri, {
 		valid: [
 			validModule,
 			optInWithoutImport,
-			neither,
-			[
-				importsContext,
-				'const usesBaseUri = true;',
-				'export { usesBaseUri };',
-				getData,
-			].join('\n'),
+			neitherImportsNorOptsIn,
 			`import { guardBaseUri } from '@/hooks/use-base-uri';\n${getData}`,
 		],
 		invalid: [
@@ -57,7 +51,7 @@ describe('uses-base-uri', () => {
 	});
 
 	ruleTester.run('no-unused-uses-base-uri', noUnusedUsesBaseUri, {
-		valid: [validModule, missingOptIn, neither],
+		valid: [validModule, missingOptIn, neitherImportsNorOptsIn],
 		invalid: [
 			{
 				code: optInWithoutImport,

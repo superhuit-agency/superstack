@@ -182,12 +182,12 @@ Outside preview, `getData` runs inside `getCachedBlockData`, in a cache entry of
 
   The opt-in exists for two reasons. Without it, the page that fills a Page-dependent block's cache entry leaks its content into every other page. With it on a block that doesn't need it, the block gets one entry per page instead of one per site, each fetched again from WordPress.
 
-  ESLint checks it as the block is written, on every `data.ts` under `next/src/components/{core,custom}` (rules in `next/eslint-rules/uses-base-uri.mjs`):
+  ESLint checks it as the block is written, on every `data.ts` under `next/src/components/{core,custom}` (rules in `next/eslint-rules/`):
 
   - `superstack/require-uses-base-uri` (**error**): the module imports `baseUriContext` but doesn't declare `usesBaseUri`.
   - `superstack/no-unused-uses-base-uri` (**warning**): the module declares `usesBaseUri` but never imports `baseUriContext`.
 
-  The build-time guard above stays the backstop for a Base URI read ESLint can't see, e.g. through a helper module.
+  ESLint only sees imports in `data.ts` itself. The build-time guard above stays the backstop for a Base URI read through a helper module. A block that reads it that way and declares `usesBaseUri` gets a false warning: disable `superstack/no-unused-uses-base-uri` on that line.
 
 ---
 
