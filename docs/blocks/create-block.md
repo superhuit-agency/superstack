@@ -198,10 +198,11 @@ To tweak an existing core block (e.g. limit heading levels, restrict post types)
 
 Registration is not just wiring for new content — it is what keeps **already-published** content renderable. Removing a block's registration, or renaming its slug, breaks every page that already uses it:
 
-- **Drop the slug from `blocksList`** in [`next/src/components/global/Blocks.tsx`](../../next/src/components/global/Blocks.tsx) and the frontend renders nothing for that block, logging `The following block does not exist: <slug>`.
-- **Drop the WordPress-side registration** and Gutenberg no longer recognises the saved markup, so the editor shows the block as invalid content.
+- **Drop the slug from `blocksList`** in [`next/src/components/global/Blocks.tsx`](../../next/src/components/global/Blocks.tsx) and the frontend silently renders nothing for that block. Only in development does it log `The following block does not exist: <slug>`; in production the block just disappears.
+- **Drop the WordPress-side registration** and Gutenberg no longer recognises the block, so the editor shows it as unsupported ("Your site doesn't include support for the … block").
+- **Add a core block to `excludedBlocks`** in [`wordpress/theme/src/editor/index.ts`](../../wordpress/theme/src/editor/index.ts) and it is unregistered from the editor — existing content using it is affected the same way.
 
-Because the slug is the link between saved content and code, a rename is a removal plus an addition — old content still references the old slug.
+Because the slug is the link between saved content and code, a rename is a removal plus an addition — old content still references the old slug. Changing a block's `save()` output without a deprecation has a related effect: existing content no longer matches, and Gutenberg flags it as invalid content.
 
 So:
 
