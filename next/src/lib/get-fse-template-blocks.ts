@@ -5,6 +5,32 @@ import getBlockFinalComponentProps from '@/lib/get-block-final-component-props';
 import fseTemplatesData from '@/lib/fse/fse-templates-and-parts.json';
 
 /**
+ * Recursively swaps a `core/template-part` block's `innerBlocks` for its
+ * `translations[lang]` variant, when one was baked into the JSON snapshot.
+ * Falls back to the default (base-language) `innerBlocks` otherwise.
+ */
+const applyTemplatePartTranslations = (
+	blocks: BlockPropsType[],
+	lang: string | null
+): BlockPropsType[] =>
+	blocks.map((block) => {
+		const translatedInnerBlocks =
+			lang && block.name === 'core/template-part'
+				? block.translations?.[lang]
+				: undefined;
+
+		return {
+			...block,
+			innerBlocks: applyTemplatePartTranslations(
+				(translatedInnerBlocks ?? block.innerBlocks ?? []).filter(
+					Boolean
+				) as BlockPropsType[],
+				lang
+			),
+		};
+	});
+
+/**
  * Gets the blocks of the template from the FSE templates and parts data,
  * swapping in the `lang`-specific variant of any translated template part
  * (e.g. footer, header) before request-time enrichment runs.
@@ -30,32 +56,6 @@ export const getTemplateBlocks = (
 		lang
 	);
 };
-
-/**
- * Recursively swaps a `core/template-part` block's `innerBlocks` for its
- * `translations[lang]` variant, when one was baked into the JSON snapshot.
- * Falls back to the default (base-language) `innerBlocks` otherwise.
- */
-const applyTemplatePartTranslations = (
-	blocks: BlockPropsType[],
-	lang: string | null
-): BlockPropsType[] =>
-	blocks.map((block) => {
-		const translatedInnerBlocks =
-			lang && block.name === 'core/template-part'
-				? block.translations?.[lang]
-				: undefined;
-
-		return {
-			...block,
-			innerBlocks: applyTemplatePartTranslations(
-				(translatedInnerBlocks ?? block.innerBlocks ?? []).filter(
-					Boolean
-				) as BlockPropsType[],
-				lang
-			),
-		};
-	});
 
 /**
  * Runs getData enrichment on template blocks at request time so dynamic data
