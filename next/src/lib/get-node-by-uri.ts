@@ -130,11 +130,7 @@ export default async function getNodeByURI(
 				getTemplateData(node),
 				enrichTemplateBlocks(
 					getTemplateBlocks(node?.fseTemplate?.slug, lang),
-					lang,
-					routePage,
-					uri,
-					term,
-					archive
+					{ lang, page: routePage, baseUri: uri, term, archive }
 				),
 			])
 				.then(([bProm, tProm, tbProm]) => ({
