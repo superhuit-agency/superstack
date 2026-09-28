@@ -41,7 +41,7 @@ During each deployment workflow:
 Theme changes that require updating existing content in the database ship as migration files in `wordpress/theme/migrations/`. `provision.sh` runs them on every deployment, after the plugin/theme configuration and before the rewrite flush:
 
 1. Counts pending migrations with `wp spck migrate --pending-count`. If there are none, nothing else happens.
-2. Exports the database to `$BACKUP_PATH/db-backup-<YYYYMMDD_HHMMSS>.sql` (default `$WORDPRESS_PATH/db-backups`).
+2. Exports the database to `$BACKUP_PATH/db-backup-<YYYYMMDD_HHMMSS>.sql` (default `$WORDPRESS_PATH/db-backups`). If the export fails, the step exits non-zero without running any migration.
 3. Runs `wp spck migrate`.
 4. Prunes the backup directory down to the newest `$BACKUP_KEEP` dumps (default `10`).
 

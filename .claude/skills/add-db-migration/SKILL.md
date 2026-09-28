@@ -28,7 +28,7 @@ Fill in the docblock: what the migration does, why, and the commit hash of the a
 
 ## Step 2 — Choose the return form
 
-Uncomment one of the two forms the template offers and delete the other. A file that returns neither is skipped by the runner with a warning and stays pending forever, so this step is not optional.
+Uncomment one of the two forms the template offers and delete the other. A file that returns neither is skipped by the runner with a warning, never recorded, and shown as `empty` by `--status` — it will not run until you do this step.
 
 **A callable** is the default choice. It runs with WordPress fully loaded, so `$wpdb`, `WP_Query` and `WP_CLI::runcommand` are all available:
 

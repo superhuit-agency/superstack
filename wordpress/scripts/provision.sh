@@ -329,7 +329,13 @@ elif [ "$PENDING" -gt 0 ]; then
 
 	BACKUP_FILE="$BACKUP_PATH/db-backup-$(date +%Y%m%d_%H%M%S).sql"
 	echo $en "- $PENDING pending migration(s), backing up database $ec"
-	$WPCLI db export "$BACKUP_FILE" --quiet
+	if ! $WPCLI db export "$BACKUP_FILE" --quiet || [ ! -s "$BACKUP_FILE" ]; then
+		rm -f "$BACKUP_FILE"
+		echo 1>&2
+		echo "ERROR: database backup to $BACKUP_FILE failed, migrations were not run." 1>&2
+		echo "       The new theme is already live over un-migrated content." 1>&2
+		exit 1
+	fi
 	echo "✔ ($BACKUP_FILE)"
 	echo
 
@@ -337,6 +343,12 @@ elif [ "$PENDING" -gt 0 ]; then
 	MIGRATE_STATUS=$?
 
 	# Prune old dumps, newest $BACKUP_KEEP kept (the one just taken included).
+	case "$BACKUP_KEEP" in
+		'' | *[!0-9]* | 0)
+			echo "⚠ BACKUP_KEEP=\"$BACKUP_KEEP\" is not a positive integer, keeping the 10 newest dumps." 1>&2
+			BACKUP_KEEP=10
+			;;
+	esac
 	ls -1t "$BACKUP_PATH"/db-backup-*.sql 2> /dev/null | tail -n +$((BACKUP_KEEP + 1)) | while read -r OLD_BACKUP; do
 		rm -f "$OLD_BACKUP"
 	done

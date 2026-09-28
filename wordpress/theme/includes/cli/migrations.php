@@ -126,11 +126,21 @@ class Migrations {
 			return;
 		}
 
+		// A file that returns neither form (e.g. an unedited scaffold) is not
+		// pending: counting it would take a DB backup on every deployment.
 		$pending = [];
 		foreach ($files as $file) {
-			if (self::is_pending(basename($file), $completed)) {
-				$pending[] = $file;
+			$name = basename($file);
+			if (! self::is_pending($name, $completed)) {
+				continue;
 			}
+			if (! self::is_runnable(self::load($file))) {
+				if (! $pending_count) {
+					\WP_CLI::warning("Migration $name did not return an array or a callable. Skipping.");
+				}
+				continue;
+			}
+			$pending[] = $file;
 		}
 
 		if ($pending_count) {
@@ -167,9 +177,9 @@ class Migrations {
 			\WP_CLI::log("Running: $name");
 
 			$started   = microtime(true);
-			$migration = require $file;
+			$migration = self::load($file);
 
-			if (! is_array($migration) && ! is_callable($migration)) {
+			if (! self::is_runnable($migration)) {
 				\WP_CLI::warning("Migration $name did not return an array or a callable. Skipping.");
 				continue;
 			}
@@ -195,6 +205,40 @@ class Migrations {
 			\WP_CLI::log('');
 			\WP_CLI::success('All migrations completed.');
 		}
+	}
+
+	/**
+	 * Load a migration file's return value, once per process.
+	 *
+	 * The file is required while listing pending migrations and again when it
+	 * runs; caching keeps a file that declares a named function from fataling
+	 * on the second require.
+	 *
+	 * @access private
+	 *
+	 * @param string $file Absolute path to the migration file.
+	 * @return mixed Value returned by the migration file.
+	 */
+	private static function load($file) {
+		static $loaded = [];
+
+		if (! array_key_exists($file, $loaded)) {
+			$loaded[$file] = require $file;
+		}
+
+		return $loaded[$file];
+	}
+
+	/**
+	 * Whether a migration file returned something the runner can execute.
+	 *
+	 * @access private
+	 *
+	 * @param mixed $migration Value returned by the migration file.
+	 * @return bool
+	 */
+	private static function is_runnable($migration) {
+		return is_array($migration) || is_callable($migration);
 	}
 
 	/**
@@ -418,7 +462,7 @@ class Migrations {
 			$entry   = isset($completed[$name]) ? $completed[$name] : null;
 			$items[] = [
 				'migration' => $name,
-				'status'    => $entry ? $entry['status'] : 'pending',
+				'status'    => $entry ? $entry['status'] : (self::is_runnable(self::load($file)) ? 'pending' : 'empty'),
 				'ran_at'    => $entry && $entry['ran_at'] ? $entry['ran_at'] : '-',
 				'duration'  => $entry && null !== $entry['duration'] ? $entry['duration'] . 's' : '-',
 			];
