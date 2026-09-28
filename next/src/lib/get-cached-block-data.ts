@@ -62,13 +62,14 @@ export default async function getCachedBlockData(
 	if (tags?.length) {
 		cacheTag(...tags);
 	} else {
-		cacheTag(cacheTags.content());
+		// Covers what untagged blocks may read: posts and site settings
+		cacheTag(cacheTags.content(), cacheTags.settings());
 
 		if (process.env.NODE_ENV === 'development') {
 			console.warn(
 				`Block "${name}" returned no \`cacheTags\` from \`getData\`: ` +
-					`its data falls back to the \`content\` tag and is ` +
-					`fetched again after every post change.`
+					`its data falls back to the \`content\` and \`settings\` ` +
+					`tags and is fetched again after every post or settings change.`
 			);
 		}
 	}

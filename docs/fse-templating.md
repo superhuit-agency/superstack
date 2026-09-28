@@ -177,7 +177,7 @@ if (dataInnerBlocks !== undefined) {
 
 Outside preview, `getData` runs inside `getCachedBlockData`, in a cache entry of its own keyed by the block's name, attributes and language. `data.ts` itself never imports `next/cache`, since it's also bundled into the WordPress block editor.
 
-- **`cacheTags`.** Return the tags the data depends on next to it, built with `next/src/lib/cache-tags.ts` (e.g. `{ content, cacheTags: [cacheTags.settings()] }`). The wrapper applies them and strips the key. A block returning none falls back to `content` and logs a development warning.
+- **`cacheTags`.** Return the tags the data depends on next to it, built with `next/src/lib/cache-tags.ts` (e.g. `{ content, cacheTags: [cacheTags.settings()] }`). The wrapper applies them and strips the key. A block returning none falls back to `content` and `settings`, and logs a development warning.
 - **`usesBaseUri`.** A Page-dependent block, one that reads `baseUriContext()`, must declare `export const usesBaseUri = true;` in its `data.ts`. The Base URI is then added to its cache key. Any other block gets one entry per site, and reading the Base URI throws a `BaseUriNotDeclaredError`, which fails `next build`.
 
 ---
