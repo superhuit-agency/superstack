@@ -5,11 +5,43 @@ import getBlockFinalComponentProps from '@/lib/get-block-final-component-props';
 import fseTemplatesData from '@/lib/fse/fse-templates-and-parts.json';
 
 /**
- * Gets the blocks of the template from the FSE templates and parts data
+ * Recursively swaps a `core/template-part` block's `innerBlocks` for its
+ * `translations[lang]` variant, when one was baked into the JSON snapshot.
+ * Falls back to the default (base-language) `innerBlocks` otherwise.
+ */
+const applyTemplatePartTranslations = (
+	blocks: BlockPropsType[],
+	lang: string | null
+): BlockPropsType[] =>
+	blocks.map((block) => {
+		const translatedInnerBlocks =
+			lang && block.name === 'core/template-part'
+				? block.translations?.[lang]
+				: undefined;
+
+		return {
+			...block,
+			innerBlocks: applyTemplatePartTranslations(
+				(translatedInnerBlocks ?? block.innerBlocks ?? []).filter(
+					Boolean
+				) as BlockPropsType[],
+				lang
+			),
+		};
+	});
+
+/**
+ * Gets the blocks of the template from the FSE templates and parts data,
+ * swapping in the `lang`-specific variant of any translated template part
+ * (e.g. footer, header) before request-time enrichment runs.
  * @param templateSlug - The slug of the template
+ * @param lang - The requested language code, if any
  * @returns
  */
-export const getTemplateBlocks = (templateSlug: string): BlockPropsType[] => {
+export const getTemplateBlocks = (
+	templateSlug: string,
+	lang: string | null = null
+): BlockPropsType[] => {
 	if (!templateSlug) return [];
 
 	const fseTemplate: FseTemplateEntry | null =
@@ -19,7 +51,10 @@ export const getTemplateBlocks = (templateSlug: string): BlockPropsType[] => {
 
 	if (!fseTemplate?.blocks?.length) return [];
 
-	return fseTemplate.blocks.filter(Boolean) as BlockPropsType[];
+	return applyTemplatePartTranslations(
+		fseTemplate.blocks.filter(Boolean) as BlockPropsType[],
+		lang
+	);
 };
 
 /**
@@ -27,12 +62,15 @@ export const getTemplateBlocks = (templateSlug: string): BlockPropsType[] => {
  * (navigation, site logo, etc.) is always fresh and not baked in at build time.
  */
 export const enrichTemplateBlocks = (
-	blocks: BlockPropsType[]
+	blocks: BlockPropsType[],
+	options?: Parameters<typeof getBlockFinalComponentProps>[1]
 ): Promise<BlockPropsType[]> =>
 	blocks.length === 0
 		? Promise.resolve([])
 		: Promise.allSettled(
-				blocks.map((block) => getBlockFinalComponentProps(block))
+				blocks.map((block) =>
+					getBlockFinalComponentProps(block, options)
+				)
 			).then(
 				(results) =>
 					results
