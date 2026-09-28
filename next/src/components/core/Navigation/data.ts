@@ -1,4 +1,5 @@
 import { cacheTags } from '@/lib/cache-tags';
+import { WordPressReadError } from '@/lib/wordpress-read-error';
 import { gql } from '@/utils';
 
 const getSubmenuVisibility = (attrs: NavigationAttributes | null) => {
@@ -32,11 +33,18 @@ export const getData = async (
 
 	const tags = [cacheTags.menu(attrs.ref)];
 
+	const data = await fetcher(navigationMenuQuery, {
+		variables: { id: String(attrs.ref) },
+	});
+
+	// `navigationMenu` is `null` when the menu doesn't exist, but missing
+	// when the request failed: don't let a failure be cached as an empty menu.
+	if (data?.navigationMenu === undefined) {
+		throw new WordPressReadError(`the navigation menu ${attrs.ref}`);
+	}
+
 	try {
-		const data = await fetcher(navigationMenuQuery, {
-			variables: { id: String(attrs.ref) },
-		});
-		const blocksJSON = data?.navigationMenu?.blocksJSON;
+		const blocksJSON = data.navigationMenu?.blocksJSON;
 		const innerBlocks: BlockPropsType[] = blocksJSON
 			? JSON.parse(blocksJSON)
 			: [];

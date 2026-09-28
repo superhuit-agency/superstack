@@ -152,6 +152,10 @@ export const getData = async (fetcher, attrs) => {
 	const data = await fetcher(navigationMenuQuery, {
 		variables: { id: String(attrs.ref) },
 	});
+	// `null`: no such menu. Missing: the read failed, which mustn't be cached
+	if (data?.navigationMenu === undefined) {
+		throw new WordPressReadError(`the navigation menu ${attrs.ref}`);
+	}
 	const innerBlocks = data?.navigationMenu?.blocksJSON
 		? JSON.parse(data.navigationMenu.blocksJSON)
 		: [];
@@ -191,6 +195,9 @@ Outside preview, `getData` runs inside `getCachedBlockData`, in a cache entry of
   | the site title, tagline, logo or date format | `settings` |
 
   The public node read tags the post's own `categories` and `tags`.
+- **Failed reads.** `fetchAPI` never throws: when WordPress doesn't answer, it logs the error and returns `{}`. A `getData` that returned its empty result then would have it cached until its tags are revalidated. Tell "nothing there" (the field is `null`) apart from "the read failed" (the field is missing), and throw a `WordPressReadError` (`next/src/lib/wordpress-read-error.ts`) on a failure. It isn't settled into the block's fallback like other `getData` errors: it fails the public page render, so the stale page keeps being served, or the request errors, and nothing wrong is cached. In preview, where nothing is cached, the block renders with its own attributes instead.
+
+  Only `core/navigation` does this for now, since it sits on every page. Any other block with data can opt in the same way.
 - **`usesBaseUri`.** A Page-dependent block, one that reads `baseUriContext()`, must declare `export const usesBaseUri = true;` in its `data.ts`. The Base URI is then added to its cache key. Any other block gets one entry per site, and reading the Base URI throws a `BaseUriNotDeclaredError`, which fails `next build`.
 
   The opt-in exists for two reasons. Without it, the page that fills a Page-dependent block's cache entry leaks its content into every other page. With it on a block that doesn't need it, the block gets one entry per page instead of one per site, each fetched again from WordPress.
