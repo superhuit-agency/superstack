@@ -156,7 +156,7 @@ export const getData = async (fetcher, attrs) => {
 	if (data?.navigationMenu === undefined) {
 		throw new WordPressReadError(`the navigation menu ${attrs.ref}`);
 	}
-	const innerBlocks = data?.navigationMenu?.blocksJSON
+	const innerBlocks = data.navigationMenu?.blocksJSON
 		? JSON.parse(data.navigationMenu.blocksJSON)
 		: [];
 	return { innerBlocks }; // innerBlocks overrides the static template blocks
