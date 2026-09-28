@@ -45,7 +45,8 @@ A block's `data.ts` `getData` runs in a cache entry of its own (`next/src/lib/ge
 3. Don't declare `usesBaseUri` on a block that doesn't read the Base URI: it caches one entry per page for nothing, each fetched from WordPress.
 4. If `getData` needs the archive being viewed (its term or listed post type), declare `export const usesArchiveContext = true;` (or a function of the attributes, when only some depend on it, like `core/query`'s `inherit`) and read `getData`'s fourth argument, the `BlockDataContext`. It adds the context to the cache key; other blocks don't get it.
 5. Never import `next/cache` in `data.ts`: it's also bundled into the WordPress block editor.
-6. ESLint enforces 2 and 3 (`superstack/require-uses-base-uri`, `superstack/no-unused-uses-base-uri`): run `cd next && npx eslint <path/to/data.ts>`.
+6. `fetchAPI` returns `{}` when WordPress doesn't answer. To keep a failure from being cached as empty data, throw a `WordPressReadError` (`next/src/lib/wordpress-read-error.ts`) when the queried field is missing (`undefined`), and keep `null` for "nothing there". `core/navigation` does this.
+7. ESLint enforces 2 and 3 (`superstack/require-uses-base-uri`, `superstack/no-unused-uses-base-uri`): run `cd next && npx eslint <path/to/data.ts>`.
 
 ## Safety Rules
 

@@ -8,6 +8,7 @@ import getCachedBlockData, {
 	type BlockData,
 	getBlockDataModule,
 } from '@/lib/get-cached-block-data';
+import { throwIfWordPressReadFailed } from '@/lib/wordpress-read-error';
 
 type BlockPropsOptions = {
 	skipGetData?: boolean;
@@ -69,6 +70,8 @@ export default async function getBlockFinalComponentProps(
 		getInnerBlocks(innerBlocks, options),
 	]);
 	throwIfBaseUriNotDeclared(results);
+	// Nothing is cached in preview: the block falls back to its own attributes
+	if (!options?.preview) throwIfWordPressReadFailed(results);
 
 	const [attrsResult, blksResult] = results;
 
@@ -171,6 +174,7 @@ const getInnerBlocks = async (
 		)
 	);
 	throwIfBaseUriNotDeclared(rs);
+	throwIfWordPressReadFailed(rs);
 
 	return rs.map((r) => (r.status === 'fulfilled' ? r.value : null));
 };
