@@ -3,7 +3,7 @@ description: This workflow deploys the WordPress backend and Next.js frontend to
 on:
   push:
     branches:
-      - "future"
+      - 'future'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -118,17 +118,20 @@ jobs:
           VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
 
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
       - uses: BetaHuhn/deploy-to-vercel-action@v1
         with:
           GITHUB_TOKEN: ${{ github.token }}
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
-          PR_PREVIEW_DOMAIN: "{REPO}-{PR}.vercel.app"
+          PR_PREVIEW_DOMAIN: '{REPO}-{PR}.vercel.app'
           GITHUB_DEPLOYMENT_ENV: Production
           VERCEL_SCOPE: superhuit-ch
           PRODUCTION: true
-          ALIAS_DOMAINS: ""
+          ALIAS_DOMAINS: ''
 
   deploy_frontend_ssh:
     environment: future

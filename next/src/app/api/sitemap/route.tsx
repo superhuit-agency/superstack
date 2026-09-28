@@ -104,9 +104,15 @@ export async function GET(request: NextRequest) {
 	const [match, type = 'all', page = '1']: RegExpMatchArray | [] =
 		request.url.match(/sitemap-([^-]*)(?:-(\d+))?.xml/) || [];
 
-	const data = await getSitemapData(type, parseInt(page), MAX_NB_URLS);
+	const nextUrl = process.env.NEXT_URL;
 
-	const nextUrl = process.env.NEXT_URL || request.nextUrl.origin;
+	if (!nextUrl) {
+		console.error('Missing NEXT_URL env var, cannot generate sitemap');
+		return new Response('Missing NEXT_URL env var', { status: 500 });
+	}
+
+	const data =
+		(await getSitemapData(type, parseInt(page), MAX_NB_URLS)) ?? [];
 
 	return new Response(
 		match

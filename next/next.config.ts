@@ -11,7 +11,16 @@ const nextConfig: NextConfig = {
 		const wpUrl = getWpUrl();
 
 		return [
-			// Poxy for WP uploads to not expose the WP domain
+			// Sitemap
+			{
+				source: '/sitemap.xml',
+				destination: `/api/sitemap`,
+			},
+			{
+				source: '/sitemap-:type.xml',
+				destination: `/api/sitemap`,
+			},
+			// Proxy for WP uploads to not expose the WP domain
 			{
 				source: '/wp-content/uploads/:path*',
 				destination: `${wpUrl}/wp-content/uploads/:path*`,

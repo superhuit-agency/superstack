@@ -85,7 +85,7 @@ type FetchApiFuncType = (
 		variables?: any;
 		auth?: AuthType;
 		endpoint?: string;
-		headers?: any;
+		headers?: Record<string, string>;
 	}
 ) => Promise<any>;
 
