@@ -1,8 +1,15 @@
 import { cacheTag } from 'next/cache';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { fetchAPI } from '@/lib';
 import { getPublicNodeByURI } from '@/lib/get-node-by-uri';
+
+const configs = vi.hoisted(() => ({
+	isMultilang: false,
+	hasCurrentLocaleInLangSwitcher: false,
+}));
+
+vi.mock('@/configs.json', () => ({ default: configs }));
 
 vi.mock('next/cache', () => ({
 	cacheLife: vi.fn(),
@@ -35,6 +42,11 @@ function wordpressReturns(node: unknown) {
 function cacheTagsGiven() {
 	return vi.mocked(cacheTag).mock.calls.flat().sort();
 }
+
+beforeEach(() => {
+	configs.isMultilang = false;
+	configs.hasCurrentLocaleInLangSwitcher = false;
+});
 
 afterEach(() => {
 	vi.clearAllMocks();
@@ -75,6 +87,18 @@ describe('getPublicNodeByURI', () => {
 		wordpressReturns({ __typename: 'Category' });
 
 		expect(await getPublicNodeByURI('/category/news/')).toBeNull();
+		expect(cacheTagsGiven()).toEqual(['nodes', 'uris']);
+	});
+
+	it('caches a post with no translation in the language as a 404 tagged `uris`', async () => {
+		configs.isMultilang = true;
+		wordpressReturns({
+			__typename: 'Post',
+			contentTypeName: 'post',
+			translation: null,
+		});
+
+		expect(await getPublicNodeByURI('/en/hello/', 'en')).toBeNull();
 		expect(cacheTagsGiven()).toEqual(['nodes', 'uris']);
 	});
 });
