@@ -194,6 +194,24 @@ cd next && npx tsc --noEmit
 
 To tweak an existing core block (e.g. limit heading levels, restrict post types), add an `edit.tsx` filter under `next/src/components/core/<Block>/` and export it from [`next/src/components/filters.ts`](../../next/src/components/filters.ts). This is different from registering a new custom block — see [`Heading/README.md`](../../next/src/components/core/Heading/README.md).
 
+## Removing or renaming a block
+
+Registration is not just wiring for new content — it is what keeps **already-published** content renderable. Removing a block's registration, or renaming its slug, breaks every page that already uses it:
+
+- **Drop the slug from `blocksList`** in [`next/src/components/global/Blocks.tsx`](../../next/src/components/global/Blocks.tsx) and the frontend silently renders nothing for that block. Only in development does it log `The following block does not exist: <slug>`; in production the block just disappears.
+- **Drop the WordPress-side registration** and Gutenberg no longer recognises the block, so the editor shows it as unsupported ("Your site doesn't include support for the … block").
+- **Add a core block to `excludedBlocks`** in [`wordpress/theme/src/editor/index.ts`](../../wordpress/theme/src/editor/index.ts) and it is unregistered from the editor — existing content using it is affected the same way.
+
+Because the slug is the link between saved content and code, a rename is a removal plus an addition — old content still references the old slug. Changing a block's `save()` output without a deprecation has a related effect: existing content no longer matches, and Gutenberg flags it as invalid content.
+
+So:
+
+- Never remove or rename a registered block as a side effect of another change. Treat it as a deliberate decision that needs a content migration, not a cleanup.
+- Adding a block is safe; removing one is not.
+- If a block really must go, migrate or remove the content that uses it first.
+
+This applies to humans and coding agents alike.
+
 ## Checklist — custom block
 
 | Step                                           | Location                                |
