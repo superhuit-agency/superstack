@@ -55,7 +55,11 @@ describe('core/query getData', () => {
 		);
 
 		expect(gqlQuery).toContain('QueryPosts');
-		expect(variables).toMatchObject({ categoryIn: [7], tagIn: null });
+		expect(variables).toMatchObject({
+			categoryId: 7,
+			categoryIn: null,
+			tagIn: null,
+		});
 		expect(result.data.posts.nodes).toHaveLength(1);
 		expect(result.cacheTags).toEqual(['type:post']);
 	});
@@ -66,16 +70,55 @@ describe('core/query getData', () => {
 			tagArchive
 		);
 
-		expect(variables).toMatchObject({ categoryIn: null, tagIn: [9] });
+		expect(variables).toMatchObject({
+			categoryId: null,
+			categoryIn: null,
+			tagIn: [9],
+		});
 	});
 
-	it("adds the block's own category filter to the archive's", async () => {
+	it("ignores the block's own taxonomy filters in an inheriting loop", async () => {
 		const { variables } = await queryLoop(
-			{ inherit: true, taxQuery: { category: ['3'] } },
+			{ inherit: true, taxQuery: { category: ['3'], post_tag: ['4'] } },
 			categoryArchive
 		);
 
-		expect(variables).toMatchObject({ categoryIn: [3, 7] });
+		expect(variables).toMatchObject({
+			categoryId: 7,
+			categoryIn: null,
+			tagIn: null,
+		});
+	});
+
+	it("applies a custom loop's own category and tag filters", async () => {
+		const { variables } = await queryLoop(
+			{ inherit: false, taxQuery: { category: ['3'], post_tag: ['4'] } },
+			categoryArchive
+		);
+
+		expect(variables).toMatchObject({
+			categoryId: null,
+			categoryIn: [3],
+			tagIn: [4],
+		});
+	});
+
+	it('scopes an inheriting loop to a custom term archive of posts', async () => {
+		const { gqlQuery, variables, result } = await queryLoop(
+			{ inherit: true },
+			{
+				term: { taxonomy: 'genre', databaseId: 11 },
+				archive: { postType: 'post' },
+			},
+			'contentNodes'
+		);
+
+		expect(gqlQuery).toContain('QueryContentNodes');
+		expect(variables).toMatchObject({
+			contentTypes: ['POST'],
+			taxTermIn: [11],
+		});
+		expect(result.cacheTags).toEqual(['type:post']);
 	});
 
 	it('leaves a custom loop on a term archive unscoped', async () => {
@@ -84,7 +127,11 @@ describe('core/query getData', () => {
 			categoryArchive
 		);
 
-		expect(variables).toMatchObject({ categoryIn: null, tagIn: null });
+		expect(variables).toMatchObject({
+			categoryId: null,
+			categoryIn: null,
+			tagIn: null,
+		});
 	});
 
 	it('lists the post type archive in an inheriting loop', async () => {

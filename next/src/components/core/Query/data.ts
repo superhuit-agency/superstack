@@ -87,6 +87,7 @@ const queryPosts = gql`
     $orderby: PostObjectsConnectionOrderbyEnum!
     $notIn: [ID]
     $search: String
+    $categoryId: Int
     $categoryIn: [ID]
     $tagIn: [ID]
     ${configs.isMultilang ? '$language: LanguageCodeFilterEnum' : ''}
@@ -99,6 +100,7 @@ const queryPosts = gql`
         notIn: $notIn
         search: $search
         stati: PUBLISH
+        categoryId: $categoryId
         categoryIn: $categoryIn
         tagIn: $tagIn
         ${configs.isMultilang ? 'language: $language' : ''}
@@ -192,30 +194,32 @@ export const getData = async (
 		? (context?.archive?.postType ?? 'post')
 		: (attrs?.query?.postType ?? 'post');
 
-	// Scope the loop to the current term archive (Tag/Category page) when one is
-	// in context, on top of any taxonomy filters set on the block itself. A
-	// custom loop keeps its own taxonomy filters instead: it is not the archive
-	// listing, even when it sits on an archive page.
+	// An inheriting loop lists the current term archive (Tag/Category page)
+	// when one is in context, and ignores the block's own taxonomy filters, as
+	// WordPress does. A custom loop keeps its own taxonomy filters instead: it
+	// is not the archive listing, even when it sits on an archive page.
 	const term = inherit ? (context?.term ?? null) : null;
-	const termCategoryId =
-		term?.taxonomy === 'category' ? term.databaseId : null;
-	const tagIn = term?.taxonomy === 'tag' ? [term.databaseId] : null;
+	// `categoryId` maps to WP_Query's `cat`, which, like a category archive,
+	// includes the child categories' posts.
+	const categoryId = term?.taxonomy === 'category' ? term.databaseId : null;
+	const termTagIn = term?.taxonomy === 'tag' ? [term.databaseId] : null;
 	// Custom taxonomies have no dedicated where arg in WPGraphQL: they go
 	// through the theme's `taxTermIn` filter on the content node connection.
 	const taxTermIn =
-		term && !termCategoryId && !tagIn ? [term.databaseId] : null;
+		term && !categoryId && !termTagIn ? [term.databaseId] : null;
 
-	const attrCategoryIn =
-		normalizeIdList(
-			attrs?.query?.taxQuery?.category as Array<string> | undefined
-		) ?? [];
-	const mergedCategoryIn = [
-		...attrCategoryIn,
-		...(termCategoryId ? [termCategoryId] : []),
-	];
-	const categoryIn = mergedCategoryIn.length ? mergedCategoryIn : null;
+	const categoryIn = inherit
+		? null
+		: normalizeIdList(
+				attrs?.query?.taxQuery?.category as Array<string> | undefined
+			);
+	const tagIn = inherit
+		? termTagIn
+		: normalizeIdList(
+				attrs?.query?.taxQuery?.post_tag as Array<string> | undefined
+			);
 
-	const usePostsQuery = postType === 'post';
+	const usePostsQuery = postType === 'post' && !taxTermIn;
 
 	const variables: Record<string, unknown> = {
 		first: perPage,
@@ -229,6 +233,7 @@ export const getData = async (
 			: {}),
 	};
 	if (usePostsQuery) {
+		variables.categoryId = categoryId;
 		variables.categoryIn = categoryIn;
 		variables.tagIn = tagIn;
 	} else {
