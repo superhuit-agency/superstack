@@ -7,9 +7,16 @@ export const getData = async (
 ) => {
 	const taxonomyEnum = taxonomyToGraphqlEnum(attrs?.taxonomy ?? '');
 
+	// A block that has not been configured yet has no taxonomy. Querying
+	// `terms` without one is both invalid (an empty `TaxonomyEnum` value) and
+	// pointless: the list renders nothing without terms.
+	if (!taxonomyEnum) {
+		return { data: { terms: { nodes: [] } } };
+	}
+
 	const query = gql`
 		query TaxonomyListTerms(
-			$taxonomies: [TaxonomyEnum!]
+			$taxonomies: [TaxonomyEnum!]!
 			$hideEmpty: Boolean!
 		) {
 			terms(
