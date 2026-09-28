@@ -51,6 +51,9 @@ export const throwIfBaseUriNotDeclared = (
 /**
  * Makes reading the Base URI throw for the rest of the current scope.
  * Set by the cached block-data wrapper for blocks that don't opt in.
+ *
+ * Relies on each `use cache` call getting its own React `cache()` scope:
+ * called outside one, it would guard every later read in the request.
  */
 export const guardBaseUri = (blockName: string) => {
 	cachedContext().set('guardedBlock', blockName);

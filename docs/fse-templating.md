@@ -84,6 +84,7 @@ flowchart TB
 | `next/src/lib/get-fse-templates.ts`                            | Cached template read: fetches templates + parts, inlines the parts    |
 | `next/src/lib/format-blocks-json.ts`                           | Parses & normalises a `blocksJSON` string                             |
 | `next/src/lib/get-block-final-component-props.ts`              | Enriches one block (calls `getData`, recurses into `innerBlocks`)     |
+| `next/src/lib/get-cached-block-data.ts`                        | Cached block-data wrapper: runs `getData` in its own cache entry      |
 | `next/src/lib/get-node-by-uri.ts`                              | Page render orchestration; calls `enrichTemplateBlocks`               |
 | `wordpress/theme/includes/graphql/register-fse-templates.php`  | Exposes templates + parts via WPGraphQL                               |
 | `wordpress/theme/includes/graphql/navigation-inner-blocks.php` | Exposes `wp_navigation` as `NavigationMenu` with a `blocksJSON` field |
@@ -172,6 +173,13 @@ if (dataInnerBlocks !== undefined) {
 
 > Use this pattern for any block whose `innerBlocks` can change independently of template structure — i.e. content managed outside the template editor.
 
+### Caching block data
+
+Outside preview, `getData` runs inside `getCachedBlockData`, in a cache entry of its own keyed by the block's name, attributes and language. `data.ts` itself never imports `next/cache`, since it's also bundled into the WordPress block editor.
+
+- **`cacheTags`.** Return the tags the data depends on next to it, built with `next/src/lib/cache-tags.ts` (e.g. `{ content, cacheTags: [cacheTags.settings()] }`). The wrapper applies them and strips the key. A block returning none falls back to `content` and logs a development warning.
+- **`usesBaseUri`.** A Page-dependent block, one that reads `baseUriContext()`, must declare `export const usesBaseUri = true;` in its `data.ts`. The Base URI is then added to its cache key. Any other block gets one entry per site, and reading the Base URI throws a `BaseUriNotDeclaredError`, which fails `next build`.
+
 ---
 
 ## Refreshing Templates
@@ -228,3 +236,4 @@ To fetch a template block's data when each page is rendered:
 1. Create (or update) `src/components/<category>/<BlockName>/data.ts` and export a `getData` function.
 2. Register the block in `src/components/global/blockRegistry.ts` so `get-block-final-component-props.ts` can find it.
 3. If the dynamic data lives in `innerBlocks`, return `{ innerBlocks: [...] }` from `getData` — this overrides the static template blocks.
+4. Return the data's `cacheTags`, and declare `usesBaseUri` if the block reads the Base URI (see [Caching block data](#caching-block-data)).

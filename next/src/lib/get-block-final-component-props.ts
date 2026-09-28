@@ -82,9 +82,14 @@ export default async function getBlockFinalComponentProps(
 			props.innerBlocks =
 				(blksResult.value as BlockPropsType['innerBlocks']) ?? [];
 		}
-	} else if (blksResult.status === 'fulfilled') {
-		props.innerBlocks =
-			(blksResult.value as BlockPropsType['innerBlocks']) ?? [];
+	} else {
+		// getData failed: render the block with its own attributes
+		props.attributes = attributes as Record<string, unknown>;
+
+		if (blksResult.status === 'fulfilled') {
+			props.innerBlocks =
+				(blksResult.value as BlockPropsType['innerBlocks']) ?? [];
+		}
 	}
 
 	return props;
