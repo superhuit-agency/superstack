@@ -59,11 +59,13 @@ runs:
     - name: Install production dependencies in release
       shell: bash
       run: |
-        ssh ${{ inputs.SERVER }} "
-            cd '${{ env.RELEASE_PATH }}' &&
-            npm ci --omit=dev && 
-            ln -sfn '${{ env.SHARED_DIR }}/.env' .env
-          "
+        ssh ${{ inputs.SERVER }} "bash -lc '
+            export NVM_DIR=\"\$HOME/.nvm\";
+            [ -s \"\$NVM_DIR/nvm.sh\" ] && . \"\$NVM_DIR/nvm.sh\";
+            cd \"${{ env.RELEASE_PATH }}\" &&
+            npm ci --omit=dev &&
+            ln -sfn \"${{ env.SHARED_DIR }}/.env\" .env
+          '"
 
     - name: Switch current release atomically
       shell: bash
