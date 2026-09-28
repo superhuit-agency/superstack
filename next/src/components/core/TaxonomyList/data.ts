@@ -50,7 +50,7 @@ export const getData = async (
 	return {
 		data,
 		cacheTags: [
-			cacheTags.taxonomy(taxonomy),
+			...(taxonomy ? [cacheTags.taxonomy(taxonomy)] : []),
 			...termTags(data?.terms?.nodes),
 			...(!attrs?.showEmpty || attrs?.showPostCounts
 				? [cacheTags.content()]
