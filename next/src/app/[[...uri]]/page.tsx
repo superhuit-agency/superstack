@@ -13,6 +13,7 @@ import {
 	getWpUriFromNextPath,
 } from '@/lib';
 import { baseUriContext } from '@/hooks/use-base-uri';
+import configs from '@/configs.json';
 
 // see https://nextjs.org/docs/app/api-reference/file-conventions/route-segment-config
 export const revalidate = 3600;
@@ -187,15 +188,6 @@ export default async function Page({
 		}
 	}
 
-	const redirection = await getRedirection(uri);
-	if (redirection) {
-		if (redirection.isPermanent) {
-			permanentRedirect(redirection.destination);
-		} else {
-			redirect(redirection.destination);
-		}
-	}
-
 	const node = await getNodeByURI(
 		uri,
 		isDraftModeEnable,
@@ -207,6 +199,26 @@ export default async function Page({
 	);
 
 	if (!node || !node?.uri) {
+		// Only URIs WordPress cannot resolve can be redirections, so the query
+		// stays out of the hot path of every rendered page.
+		// It also prevents infinite redirection loops (ex: /my-url -> /fr/my-url)
+		// that happen when redirecting before fetching the page content.
+		// The Redirection plugin stores its sources as the full public path,
+		// language prefix included (ex: `/de/my-url/`), while `uri` holds the
+		// WordPress URI without it. Look the prefixed path up first and keep
+		// the bare one as a fallback for redirections saved without a language prefix.
+		const redirection =
+			(configs.isMultilang
+				? await getRedirection(`/${lang}${uri}`)
+				: null) ?? (await getRedirection(uri));
+		if (redirection) {
+			if (redirection.isPermanent) {
+				permanentRedirect(redirection.destination);
+			} else {
+				redirect(redirection.destination);
+			}
+		}
+
 		return notFound();
 	}
 
