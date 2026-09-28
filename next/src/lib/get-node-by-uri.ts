@@ -180,19 +180,23 @@ async function getNodeByURI(
 				};
 			}
 		}
+	}
 
-		if (configs.hasCurrentLocaleInLangSwitcher) {
-			if (!node.translations) node.translations = [];
-			if (!node.language?.locale || !node.language?.code) return null;
+	// A node type the query has no fragment for (e.g. a term archive) comes
+	// back as a bare `__typename`: it isn't rendered, so it's a 404.
+	if (!node.uri) return null;
 
-			node.translations.unshift({
-				uri: node.uri,
-				language: {
-					locale: node.language.locale,
-					code: node.language.code,
-				},
-			});
-		}
+	if (configs.isMultilang && configs.hasCurrentLocaleInLangSwitcher) {
+		if (!node.translations) node.translations = [];
+		if (!node.language?.locale || !node.language?.code) return null;
+
+		node.translations.unshift({
+			uri: node.uri,
+			language: {
+				locale: node.language.locale,
+				code: node.language.code,
+			},
+		});
 	}
 
 	node.fullUri = uri;
