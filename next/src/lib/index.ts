@@ -5,6 +5,10 @@ import getBlockFinalComponentProps from './get-block-final-component-props';
 import getAllURIs from './get-all-uris';
 import getAuthToken from './get-auth-token';
 
+import {
+	enrichTemplateBlocks,
+	getTemplateBlocks,
+} from './get-fse-template-blocks';
 import getFunkyWpUploadsURI from './get-funky-wp-uploads-uri';
 import getNodeByURI from './get-node-by-uri';
 import getNotFoundBreadcrumbs from './get-not-found-breadcrumbs';
@@ -24,6 +28,8 @@ export {
 	getAllURIs,
 	getAuthToken,
 	getBlockFinalComponentProps,
+	enrichTemplateBlocks,
+	getTemplateBlocks,
 	getFunkyWpUploadsURI,
 	getNodeByURI,
 	getNotFoundBreadcrumbs,

@@ -68,8 +68,8 @@ require_once __DIR__ . '/graphql/resolve-uris.php';
 require_once __DIR__ . '/admin/editor/index.php';
 require_once __DIR__ . '/admin/editor/remote-block-patterns.php';
 require_once __DIR__ . '/admin/editor/unregister-default-patterns.php';
-require_once __DIR__ . '/admin/editor/register-block-styles.php';
 require_once __DIR__ . '/admin/editor/register-block-categories.php';
+require_once __DIR__ . '/admin/editor/register-pattern-categories.php';
 
 /**
  * Load blocks classes.
