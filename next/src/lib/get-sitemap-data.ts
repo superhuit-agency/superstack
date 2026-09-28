@@ -80,7 +80,7 @@ export default async function getSitemapData(
 async function getCachedSitemapData(type: string, page: number, size: number) {
 	'use cache';
 	cacheLife('max');
-	// The post types set to noindex come from the SEO plugin's settings
+	// Which types and posts are noindex comes from the SEO plugin's settings
 	cacheTag(cacheTags.settings(), cacheTags.nodes());
 
 	return await (type === 'all'
@@ -284,7 +284,7 @@ async function getContentType(
 	pluralName: string
 ): Promise<{ name: string; supportsFeaturedImage: boolean } | null> {
 	const data = await fetchAPI(
-		`query SitemapFeaturedImageSupport {
+		`query SitemapContentType {
 			__type(name: "NodeWithFeaturedImage") {
 				possibleTypes {
 					name
@@ -301,7 +301,7 @@ async function getContentType(
 	);
 
 	if (!data?.contentTypes?.nodes) {
-		throw new Error("Can't fetch sitemap featured image support");
+		throw new Error("Can't fetch sitemap content type");
 	}
 
 	const contentType = data.contentTypes.nodes.find(
