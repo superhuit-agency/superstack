@@ -145,7 +145,7 @@ class RegisterFseTemplates {
 					return null;
 				}
 
-				$hierarchy = [...$this->term_template_slugs($term, 'tag'), 'tag', 'archive'];
+				$hierarchy = ["tag-{$term->slug}", "tag-{$term->term_id}", 'tag', 'archive'];
 
 				$resolved = resolve_block_template('tag', $hierarchy, '');
 
@@ -268,33 +268,6 @@ class RegisterFseTemplates {
 				},
 			]);
 		}
-	}
-
-	/**
-	 * The template slugs a term contributes to the hierarchy:
-	 * the term itself, then its default-language translation.
-	 *
-	 * Templates are theme files, so they carry no language: a translated category
-	 * has its own slug (`artikels`) and never matches `category-blog`. Falling back
-	 * to the default-language translation makes both languages render the same
-	 * template, while a language-specific theme file still wins when one exists.
-	 */
-	private function term_template_slugs(\WP_Term $term, string $prefix): array {
-		$slugs = ["{$prefix}-{$term->slug}", "{$prefix}-{$term->term_id}"];
-
-		if (! function_exists('pll_default_language') || ! function_exists('pll_get_term')) {
-			return $slugs;
-		}
-
-		$default_term_id = pll_get_term($term->term_id, pll_default_language());
-		$default_term    = $default_term_id ? get_term($default_term_id, $term->taxonomy) : null;
-
-		if ($default_term && ! is_wp_error($default_term) && $default_term->term_id !== $term->term_id) {
-			$slugs[] = "{$prefix}-{$default_term->slug}";
-			$slugs[] = "{$prefix}-{$default_term->term_id}";
-		}
-
-		return $slugs;
 	}
 
 	/**
