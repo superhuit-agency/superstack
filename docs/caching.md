@@ -17,8 +17,6 @@ The app uses Next.js 16 [Cache Components](https://nextjs.org/docs/app/api-refer
 >
 > An entry carries only the tags of the things it actually renders. The route never needs to know which pages show a post: it announces "post 42 changed", and every entry that declared `node:42` goes stale.
 
-The terms FSE template, Template part, Site settings, Base URI, Page-dependent block and Change are defined in [`CONTEXT.md`](../CONTEXT.md).
-
 ---
 
 ## Tags
@@ -29,12 +27,12 @@ Tag names are built by one helper module, `next/src/lib/cache-tags.ts`, used bot
 | --- | --- | --- |
 | `node:{databaseId}` | the public node read; block data rendering one post | a `post` change for that ID |
 | `nodes:{contentType}` | the public node read of a single post, page… of that type | a scoped `all` of that type. Editing one post clears only its `node:` tag |
-| `type:{contentType}` | listings, archives, feeds, related / next-previous rails, per-type sitemaps | a `post` change of that type |
+| `type:{contentType}` | listings (Query, Latest Posts), post type archives, next / previous post links, per-type sitemaps | a `post` change of that type |
 | `content` | listings with no type filter; the sitemap index; blocks that declare no tags | every `post` change |
 | `term:{databaseId}` | reads that display a term: post terms, the public node read, term archives | a term change (not mapped yet, see [Known gaps](#known-gaps-until-plugin-v21)) |
 | `taxonomy:{taxonomy}` | term listings | a scoped `all` of a type using that taxonomy; a term change once mapped |
 | `menu:{id}` | Navigation block data (block menu ID) | a `menu` change for that ID |
-| `settings` | the public node read (it also returns site SEO and general settings), site title / tagline / logo / date blocks, the locale list, sitemaps, blocks that declare no tags | a `settings` change, or `all` |
+| `settings` | the public node read (it also returns Site settings: SEO defaults, site title), site title / tagline / logo / date blocks, the locale list, sitemaps, blocks that declare no tags | a `settings` change, or `all` |
 | `templates` | the FSE template read | a `templates` change, or `all` |
 | `redirect:{uri}` | the redirect lookup for that URI, including a "no redirect" result | a `redirect` change for that URI |
 | `uris` | public node reads that found **no** node (cached 404s); Page-dependent blocks that found no post at the Base URI | a `post` change whose URI changed (publish, unpublish, trash, delete, slug change), or `all` |
@@ -46,7 +44,7 @@ Term tags use the term's database ID, not its slug, so a slug rename needs no ol
 
 | Read | File | Tags |
 | --- | --- | --- |
-| Public node read | `next/src/lib/get-node-by-uri.ts` (`getPublicNodeByURI`) | `node:{id}`, `nodes:{type}`, `settings`, the post's `term:` tags; a post type archive gets `type:{type}`; no node found → `uris` |
+| Public node read | `next/src/lib/get-node-by-uri.ts` (`getPublicNodeByURI`) | `node:{id}`, `nodes:{type}`, `settings`, the `term:` tags of its categories and tags; a post type archive gets `type:{type}`; no node found → `uris` |
 | Redirect lookup | `next/src/lib/get-redirection.ts` | `redirect:{uri}` |
 | Locale list | `next/src/i18n/get-locales.ts` | `settings` |
 | FSE templates | `next/src/lib/get-fse-templates.ts` | `templates` (see [FSE Templating](./fse-templating.md#refreshing-templates)) |
@@ -61,29 +59,14 @@ The public node read takes plain arguments only (URI, language, route page), sin
 
 ## Block data
 
-A block's `data.ts` is bundled into both the Next server and the WordPress block editor, so it never imports `next/cache`. Outside preview, its `getData` runs inside `getCachedBlockData`, a Next-only wrapper with one cache entry per block name, attributes and language.
+A block's `data.ts` is bundled into both the Next server and the WordPress block editor, so it never imports `next/cache`. Outside preview, its `getData` runs inside `getCachedBlockData` (`next/src/lib/get-cached-block-data.ts`), a Next-only wrapper with one cache entry per block name, attributes and language.
 
 A block declares two things in its `data.ts`:
 
-- **`cacheTags`**, returned next to the data from `getData` and built with `cache-tags.ts`:
+- **`cacheTags`**, returned next to the data and built with `cache-tags.ts`, e.g. `{ title, cacheTags: [cacheTags.settings()] }`. A block returning none falls back to `content` and `settings`, so it's fetched again after every post or settings change.
+- **`export const usesBaseUri = true;`**, for a Page-dependent block, one that reads the Base URI through `baseUriContext()`. It adds the Base URI to the block's cache key. Every other block gets one entry per site, not per page, which keeps WordPress load and cache memory down. Forgetting it is an ESLint error, and fails `next build` with a `BaseUriNotDeclaredError`.
 
-  ```ts
-  return { title, cacheTags: [cacheTags.settings()] };
-  ```
-
-  The wrapper applies them and strips the key; the editor ignores it. A block returning no `cacheTags` falls back to `content` and `settings`, is fetched again after every post or settings change, and logs a development warning. Return `cacheTags: []` when the data depends on nothing WordPress reports a change for: only "Purge all" refreshes it then.
-
-- **`usesBaseUri`**, for a Page-dependent block, one that reads the Base URI through `baseUriContext()`:
-
-  ```ts
-  export const usesBaseUri = true;
-  ```
-
-  The request-scoped Base URI doesn't cross into a cached scope and isn't part of the cache key. Declaring `usesBaseUri` adds it to the key and sets it again inside the scope. Every other block gets one entry per site, not per page, which keeps WordPress load and cache memory down.
-
-  Forgetting it would let the page that fills the entry leak its content into every other page, so it's enforced three times: an ESLint rule (`superstack/require-uses-base-uri`), a `BaseUriNotDeclaredError` that fails `next build`, and the `wordpress-block-change` project skill.
-
-Which tags to return for which data, and how the ESLint rules work, is detailed in [FSE Templating › Caching block data](./fse-templating.md#caching-block-data).
+Which tags to return for which data, and why the opt-in exists, is detailed in [FSE Templating › Caching block data](./fse-templating.md#caching-block-data).
 
 ---
 
@@ -141,15 +124,7 @@ Two kinds of edits don't reach the site on their own yet:
 
 The default in-memory cache handler is used. It's an LRU cache limited by `cacheMaxMemorySize` (50 MB by default). An entry that falls out of it isn't stale, it's gone: the next request is a **MISS** that waits for WordPress.
 
-To see whether the limit is too low:
-
-```bash
-cd next
-npm run build
-NEXT_PRIVATE_DEBUG_CACHE=1 npm run start
-```
-
-`NEXT_PRIVATE_DEBUG_CACHE=1` logs every cache read and write. Browse the site's most visited pages, then browse them again: pages that should still be cached but log a miss or a new write were evicted. Raise the limit in `next/next.config.ts`:
+To see whether the limit is too low, start a production build with the debug log (see [Verifying caching end to end](#verifying-caching-end-to-end)). `NEXT_PRIVATE_DEBUG_CACHE=1` logs every cache read and write. Browse the site's most visited pages, then browse them again: pages that should still be cached but log a miss or a new write were evicted. Raise the limit in `next/next.config.ts`:
 
 ```ts
 const nextConfig: NextConfig = {
@@ -161,7 +136,7 @@ const nextConfig: NextConfig = {
 
 The memory is taken from the Node process: leave room for it on the server.
 
-Never measure with `next dev`: it adds a hash to every cache key, so entries are never reused the way they are in production.
+Never measure with `next dev`: it adds a hash to cache keys, so entries aren't reused the way they are in production.
 
 ---
 
@@ -172,7 +147,7 @@ Never measure with `next dev`: it adds a hash to every cache key, so entries are
 - **Preview is slower.** Draft Mode re-runs every cached function and writes nothing, so every block's data is fetched from WordPress on every preview load. That's correct, but editors will notice.
 - **`<Activity>` ships with Cache Components.** Component state (dropdowns, dialogs, form inputs) now survives client-side navigation. This will likely be reported as a component bug: reset state on navigation where it matters.
 - **Floods of random URLs.** Each URL that finds no post is cached as a small 404, and the LRU doesn't count key overhead against its limit. A flood of random URLs (e.g. a bot scan) creates many small entries that use more memory than the 50 MB limit implies. It's still much better than each one reaching WordPress.
-- **Sizing.** Hot entries evicted by a too-small `cacheMaxMemorySize` show up as MISSes, not errors. See [Sizing the cache](#sizing-the-cache).
+- **Sizing.** Hot entries evicted by a too-small `cacheMaxMemorySize` show up as misses, not errors. See [Sizing the cache](#sizing-the-cache).
 
 ---
 
@@ -188,7 +163,9 @@ npm run build
 NEXT_PRIVATE_DEBUG_CACHE=1 npm run start
 ```
 
-Read the `x-nextjs-cache` response header (e.g. `curl -sI http://localhost:3000/hello/ | grep -i x-nextjs-cache`). After a change, a page should go **HIT → STALE → HIT**, with the new content on the last HIT. A **MISS** in between means something expired or was evicted instead of going stale.
+After a change, a page should go **HIT → STALE → HIT**, with the new content on the last HIT. A **MISS** in between means something expired or was evicted instead of going stale.
+
+Read it from the `x-nextjs-cache` response header (e.g. `curl -sI http://localhost:3000/hello/ | grep -i x-nextjs-cache`). Next doesn't set that header on a response that streams dynamic holes into the static shell, so when it's missing, follow the entries in the `NEXT_PRIVATE_DEBUG_CACHE` log instead.
 
 Check the sequence for each of these:
 
@@ -207,4 +184,4 @@ And:
 - [ ] A `path` change evicts that path's cached entries.
 - [ ] Preview shows the latest draft and bypasses the cache.
 - [ ] The WordPress editor bundle builds (`npm --prefix ./wordpress run build`) and blocks show live data in the editor.
-- [ ] `npm run build` still reports the catch-all page (`/[[...uri]]`) as a static shell (partial prerender).
+- [ ] `npm run build` still reports the catch-all page (`/[[...uri]]`) as a static shell (Partial Prerendering).
