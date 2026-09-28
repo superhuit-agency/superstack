@@ -15,6 +15,11 @@ if (! defined('ABSPATH')) {
 
 
 /**
+ * Load translations.
+ */
+require_once __DIR__ . '/i18n.php';
+
+/**
  * Load traits.
  */
 require_once __DIR__ . '/traits/singleton.php';

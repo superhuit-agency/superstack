@@ -28,6 +28,8 @@ Made with ❤️ by [superhuit.ch](https://superhuit.ch)
 | `dev`         | Start development theme assets build                                             |
 | `build`       | Build theme assets                                                               |
 | `clear-cache` | Clear patterns cache                                                             |
+| `generate:pot` | Extract theme strings into `theme/languages/superstack.pot`                     |
+| `generate:json` | Generate the editor JSON translations from the `.po` files                    |
 | `test`        | Placeholder test script                                                         |
 
 ## Database Migrations
@@ -49,6 +51,10 @@ See [`wordpress/theme/migrations/README.md`](theme/migrations/README.md) for det
 ## Theme CSS Generation
 
 See [`docs/setup/theme-css.md`](../docs/setup/theme-css.md).
+
+## Theme Translations
+
+See [`docs/setup/translations.md`](../docs/setup/translations.md).
 
 ## License
 
