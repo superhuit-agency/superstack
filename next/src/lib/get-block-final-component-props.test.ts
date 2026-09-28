@@ -57,7 +57,23 @@ describe('getBlockFinalComponentProps', () => {
 			{},
 			null,
 			null,
-			null
+			undefined
+		);
+	});
+
+	it("keeps the archive out of the key when the block's attributes don't use it", async () => {
+		const usesArchiveContext = vi.fn(() => false);
+		blockModuleIs({ getData: vi.fn(), usesArchiveContext });
+
+		await render();
+
+		expect(usesArchiveContext).toHaveBeenCalledWith({});
+		expect(vi.mocked(getCachedBlockData)).toHaveBeenCalledWith(
+			'core/query',
+			{},
+			null,
+			null,
+			undefined
 		);
 	});
 

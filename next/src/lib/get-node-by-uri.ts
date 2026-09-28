@@ -66,16 +66,12 @@ export async function getPublicNodeByURI(
  * archive lists.
  */
 const nodeTags = (node: ResolvedNode): string[] => {
-	if (node.__typename === 'ContentType')
-		return [cacheTags.type(String(node.name))];
+	const { term, archive } = getBlockDataContext(node);
 
-	const term = getTermContext(node);
-	if (term) {
-		const postType = getArchiveContext(node)?.postType;
-
+	if (archive) {
 		return [
-			cacheTags.term(term.databaseId),
-			postType ? cacheTags.type(postType) : cacheTags.content(),
+			...(term ? [cacheTags.term(term.databaseId)] : []),
+			cacheTags.type(archive.postType),
 		];
 	}
 

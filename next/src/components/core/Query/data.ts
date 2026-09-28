@@ -154,7 +154,8 @@ const queryContentNodes = gql`
 `;
 
 /** A loop inheriting the template query lists the archive being viewed. */
-export const usesArchiveContext = true;
+export const usesArchiveContext = (attrs: Pick<QueryAttributes, 'query'>) =>
+	attrs?.query?.inherit === true;
 
 export const getData = async (
 	fetcher: FetchApiFuncType,

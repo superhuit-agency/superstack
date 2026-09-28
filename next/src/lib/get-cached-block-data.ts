@@ -16,8 +16,11 @@ export type BlockDataModule = {
 	) => Promise<BlockData | undefined>;
 	/** Set by Page-dependent blocks: their data changes with the Base URI. */
 	usesBaseUri?: boolean;
-	/** Set by blocks whose data changes with the archive being viewed. */
-	usesArchiveContext?: boolean;
+	/**
+	 * Set by blocks whose data changes with the archive being viewed, or by
+	 * the attributes they do for.
+	 */
+	usesArchiveContext?: boolean | ((attrs: object) => boolean);
 };
 
 export const getBlockDataModule = async (
@@ -51,7 +54,7 @@ export default async function getCachedBlockData(
 	attributes: object,
 	lang: string | null,
 	baseUri: string | null,
-	context: BlockDataContext | null = null
+	context?: BlockDataContext
 ): Promise<Record<string, unknown>> {
 	'use cache';
 	cacheLife('max');
@@ -64,12 +67,8 @@ export default async function getCachedBlockData(
 	else if (baseUri) baseUriContext(baseUri);
 
 	const { cacheTags: tags, ...data } =
-		(await blockModule?.getData?.(
-			fetchAPI,
-			attributes,
-			lang,
-			context ?? undefined
-		)) ?? {};
+		(await blockModule?.getData?.(fetchAPI, attributes, lang, context)) ??
+		{};
 
 	// An empty list declares no dependency: only "Purge all" refreshes it
 	if (tags) {

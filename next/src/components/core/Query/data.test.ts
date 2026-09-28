@@ -42,8 +42,10 @@ async function queryLoop(
 }
 
 describe('core/query getData', () => {
-	it('declares that its data changes with the archive', () => {
-		expect(usesArchiveContext).toBe(true);
+	it('declares that only an inheriting loop changes with the archive', () => {
+		expect(usesArchiveContext({ query: { inherit: true } })).toBe(true);
+		expect(usesArchiveContext({ query: { inherit: false } })).toBe(false);
+		expect(usesArchiveContext({})).toBe(false);
 	});
 
 	it('scopes an inheriting loop to the category archive', async () => {

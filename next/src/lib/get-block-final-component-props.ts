@@ -121,19 +121,19 @@ const getAttributes = async (
 	if (!blockModule?.getData) return { attrs };
 
 	const lang = options?.lang ?? null;
-	const context = blockModule.usesArchiveContext
+	const { usesArchiveContext } = blockModule;
+	const context = (
+		typeof usesArchiveContext === 'function'
+			? usesArchiveContext(attributes)
+			: usesArchiveContext
+	)
 		? (options?.context ?? {})
-		: null;
+		: undefined;
 
 	let data: Record<string, unknown>;
 	if (options?.preview) {
 		const liveData: BlockData = {
-			...(await blockModule.getData(
-				fetchAPI,
-				attributes,
-				lang,
-				context ?? undefined
-			)),
+			...(await blockModule.getData(fetchAPI, attributes, lang, context)),
 		};
 		delete liveData.cacheTags;
 		data = liveData;

@@ -29,7 +29,7 @@ add_filter('graphql_map_input_fields_to_wp_query', __NAMESPACE__ . '\map_to_tax_
 function register_where_arg() {
 	register_graphql_field('RootQueryToContentNodeConnectionWhereArgs', WHERE_ARG, [
 		'type'        => ['list_of' => 'ID'],
-		'description' => _x('Filter the content nodes by term database IDs, in any taxonomy.', 'GraphQL where arg desc', 'superstack'),
+		'description' => _x('Filter the content nodes by term database IDs, in any taxonomy.', 'GraphQL where arg desc', 'supt'),
 	]);
 }
 
