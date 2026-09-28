@@ -5,7 +5,7 @@ import getBlockFinalComponentProps from '@/lib/get-block-final-component-props';
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore — file is gitignored and generated at dev/build time via predev/prebuild
-import fseTemplatesData from '@/lib/fse/fse-templates-and-parts.json';
+import injectBreadcrumbs from '@/lib/inject-breadcrumbs';
 
 const templatesData: any = _templatesData;
 
@@ -145,10 +145,15 @@ export default async function getNodeByURI(
 					};
 				});
 
-		const blocks =
+		const blocksWithContent =
 			templateBlocks.length > 0
 				? injectPostContentBlocks(templateBlocks, blocksJSON)
 				: blocksJSON;
+
+		const blocks = injectBreadcrumbs(
+			blocksWithContent,
+			node.seo?.breadcrumbs ?? []
+		);
 
 		if (node.preview) delete node.preview;
 

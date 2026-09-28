@@ -69,6 +69,7 @@ const blocksList: Record<string, () => Promise<BlockModule>> = {
 	'polylang/language-switcher': () => import('../atoms/LanguageSwitcher'),
 	'polylang/navigation-language-switcher': () =>
 		import('../atoms/NavigationLanguageSwitcher'),
+	'yoast-seo/breadcrumbs': () => import('../core/YoastBreadcrumbs'),
 };
 
 interface PostBodyBlocksProps {
