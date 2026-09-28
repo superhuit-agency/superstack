@@ -37,6 +37,7 @@ describe('Navigation getData', () => {
 		const error = await getData(fetcher, { ref: 12 }).catch((e) => e);
 
 		expect(isWordPressReadError(error)).toBe(true);
+		expect(error.digest).toBe('WORDPRESS_READ_FAILED:menu:12');
 	});
 
 	it('does not read WordPress without a menu reference', async () => {

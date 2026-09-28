@@ -62,7 +62,9 @@ describe('formatBlocksJSON', () => {
 	});
 
 	it('fails when a read from WordPress fails', async () => {
-		getData.mockRejectedValue(new WordPressReadError('the menu 1'));
+		getData.mockRejectedValue(
+			new WordPressReadError('the menu 1', 'menu:1')
+		);
 
 		const error = await formatBlocksJSON(blocksJSON([withData()])).catch(
 			(e) => e
@@ -72,7 +74,9 @@ describe('formatBlocksJSON', () => {
 	});
 
 	it('fails when a read from WordPress fails in a nested block', async () => {
-		getData.mockRejectedValue(new WordPressReadError('the menu 1'));
+		getData.mockRejectedValue(
+			new WordPressReadError('the menu 1', 'menu:1')
+		);
 
 		const error = await formatBlocksJSON(
 			blocksJSON([group([group([withData()])])])
@@ -82,7 +86,9 @@ describe('formatBlocksJSON', () => {
 	});
 
 	it('renders a block with its own attributes when a read from WordPress fails in preview', async () => {
-		getData.mockRejectedValue(new WordPressReadError('the menu 1'));
+		getData.mockRejectedValue(
+			new WordPressReadError('the menu 1', 'menu:1')
+		);
 
 		await expect(
 			formatBlocksJSON(blocksJSON([group([withData()])]), {

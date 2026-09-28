@@ -5,15 +5,17 @@ const WORDPRESS_READ_FAILED = 'WORDPRESS_READ_FAILED';
  * opposed to answering that there's nothing to show.
  *
  * Carries a `digest`, which Next keeps when the error crosses a `use cache`
- * boundary (the message and class don't survive it in production).
+ * boundary (the message and class don't survive it in production). Next also
+ * shows it on the public error page: `key` is a short identifier without
+ * spaces, e.g. the cache tag of what failed to read.
  */
 export class WordPressReadError extends Error {
 	digest: string;
 
-	constructor(what: string) {
+	constructor(what: string, key: string) {
 		super(`Could not read ${what} from WordPress`);
 		this.name = 'WordPressReadError';
-		this.digest = `${WORDPRESS_READ_FAILED}:${what}`;
+		this.digest = `${WORDPRESS_READ_FAILED}:${key}`;
 	}
 }
 

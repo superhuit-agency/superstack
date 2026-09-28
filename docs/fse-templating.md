@@ -147,6 +147,9 @@ As an example, this pattern is used for `core/navigation`:
 
 ```typescript
 // Navigation/data.ts
+import { cacheTags } from '@/lib/cache-tags';
+import { WordPressReadError } from '@/lib/wordpress-read-error';
+
 export const getData = async (fetcher, attrs) => {
 	// Fetch the wp_navigation post by DATABASE_ID and parse its blocks
 	const data = await fetcher(navigationMenuQuery, {
@@ -154,7 +157,10 @@ export const getData = async (fetcher, attrs) => {
 	});
 	// `null`: no such menu. Missing: the read failed, which mustn't be cached
 	if (data?.navigationMenu === undefined) {
-		throw new WordPressReadError(`the navigation menu ${attrs.ref}`);
+		throw new WordPressReadError(
+			`the navigation menu ${attrs.ref}`,
+			cacheTags.menu(attrs.ref)
+		);
 	}
 	const innerBlocks = data.navigationMenu?.blocksJSON
 		? JSON.parse(data.navigationMenu.blocksJSON)

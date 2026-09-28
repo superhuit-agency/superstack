@@ -40,7 +40,10 @@ export const getData = async (
 	// `navigationMenu` is `null` when the menu doesn't exist, but missing
 	// when the request failed: don't let a failure be cached as an empty menu.
 	if (data?.navigationMenu === undefined) {
-		throw new WordPressReadError(`the navigation menu ${attrs.ref}`);
+		throw new WordPressReadError(
+			`the navigation menu ${attrs.ref}`,
+			tags[0]
+		);
 	}
 
 	try {
