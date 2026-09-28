@@ -13,6 +13,8 @@ import {
  */
 import '../blocks';
 
+import './pattern-slash-inserter';
+
 import './index.css';
 
 /**
