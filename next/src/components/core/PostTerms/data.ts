@@ -1,6 +1,8 @@
 import { gql } from '@/utils';
 import { baseUriContext } from '@/hooks/use-base-uri';
 
+export const usesBaseUri = true;
+
 export const getData = async (
 	fetcher: FetchApiFuncType,
 	attrs: PostTermsAttributes | null = null

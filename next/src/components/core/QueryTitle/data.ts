@@ -2,64 +2,71 @@ import { baseUriContext } from '@/hooks/use-base-uri';
 import { gql } from '@/utils';
 
 const archivePrefix = (type: string): string => {
-  if (type === 'archive') return 'Archives';
-  if (type === 'post-type') return 'Post Type';
-  return '';
+	if (type === 'archive') return 'Archives';
+	if (type === 'post-type') return 'Post Type';
+	return '';
 };
 
+export const usesBaseUri = true;
+
 export const getData = async (
-  fetcher: FetchApiFuncType,
-  attrs: QueryTitleAttributes | null = null,
+	fetcher: FetchApiFuncType,
+	attrs: QueryTitleAttributes | null = null
 ) => {
-  const type = attrs?.type ?? 'archive';
-  const showPrefix = attrs?.showPrefix ?? true;
-  const showSearchTerm = attrs?.showSearchTerm ?? true;
+	const type = attrs?.type ?? 'archive';
+	const showPrefix = attrs?.showPrefix ?? true;
+	const showSearchTerm = attrs?.showSearchTerm ?? true;
 
-  const uri = baseUriContext();
+	const uri = baseUriContext();
 
-  if (type === 'search') {
-    let searchTerm;
+	if (type === 'search') {
+		let searchTerm;
 
-    if(uri && typeof uri === 'string') {
-      const url = new URL(uri);
-      searchTerm = url.searchParams.get('s') ?? '';
-    }
-    
-    return {
-      content:
-        showSearchTerm && searchTerm
-          ? `Search results for: "${searchTerm}"`
-          : 'Search results',
-    };
-}
+		if (uri && typeof uri === 'string') {
+			const url = new URL(uri);
+			searchTerm = url.searchParams.get('s') ?? '';
+		}
 
-  const query = gql`
-    query QueryTitleData($uri: String!) {
-      nodeByUri(uri: $uri) {
-        __typename
-        ... on TermNode {
-          name
-        }
-        ... on ContentType {
-          label
-        }
-        ... on User {
-          name
-        }
-      }
-    }
-  `;
+		return {
+			content:
+				showSearchTerm && searchTerm
+					? `Search results for: "${searchTerm}"`
+					: 'Search results',
+		};
+	}
 
-  const data = await fetcher(query, { variables: { uri } });
-  const node = data?.nodeByUri;
-  const name: string = typeof node?.label === 'string' ? node.label : typeof node?.name === 'string' ? node.name : '';
+	const query = gql`
+		query QueryTitleData($uri: String!) {
+			nodeByUri(uri: $uri) {
+				__typename
+				... on TermNode {
+					name
+				}
+				... on ContentType {
+					label
+				}
+				... on User {
+					name
+				}
+			}
+		}
+	`;
 
-  if (!name) return { content: '' };
+	const data = await fetcher(query, { variables: { uri } });
+	const node = data?.nodeByUri;
+	const name: string =
+		typeof node?.label === 'string'
+			? node.label
+			: typeof node?.name === 'string'
+				? node.name
+				: '';
 
-  if (showPrefix) {
-    const prefix = archivePrefix(type);
-    return { content: prefix ? `${prefix}: ${name}` : name };
-  }
+	if (!name) return { content: '' };
 
-  return { content: name };
+	if (showPrefix) {
+		const prefix = archivePrefix(type);
+		return { content: prefix ? `${prefix}: ${name}` : name };
+	}
+
+	return { content: name };
 };

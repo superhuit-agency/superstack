@@ -105,6 +105,8 @@ const fetchTermArchiveContext = async (
 	};
 };
 
+export const usesBaseUri = true;
+
 export const getData = async (
 	fetcher: FetchApiFuncType,
 	attrs: TermsQueryAttributes | null = null,

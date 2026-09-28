@@ -104,6 +104,8 @@ const getFallbackAdjacentNode = (
 	return null;
 };
 
+export const usesBaseUri = true;
+
 export const getData = async (
 	fetcher: FetchApiFuncType,
 	attrs: PostNavigationLinkAttributes | null = null
