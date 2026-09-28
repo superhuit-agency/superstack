@@ -42,7 +42,7 @@ module.exports = {
 		alias: {
 			...(defaultConfig.resolve?.alias || {}),
 			'@': path.resolve(__dirname, '../../next/src'),
-			'#': path.resolve(__dirname, './theme/lib/editor/'),
+			'#': path.resolve(__dirname, './src'),
 		},
 	},
 	output: {
