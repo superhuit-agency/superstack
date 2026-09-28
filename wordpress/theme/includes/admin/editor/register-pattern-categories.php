@@ -40,12 +40,12 @@ class Register_Pattern_Categories {
 	public function register_categories() {
 		$categories = [
 			'heros' => [
-				'label'       => _x('Heros', 'Block pattern category', SUPERSTACK_THEME_NAME),
-				'description' => __('Hero sections.', SUPERSTACK_THEME_NAME),
+				'label'       => _x('Heros', 'Block pattern category', 'superstack'),
+				'description' => __('Hero sections.', 'superstack'),
 			],
 			'cards' => [
-				'label'       => _x('Cards', 'Block pattern category', SUPERSTACK_THEME_NAME),
-				'description' => __('Card patterns.', SUPERSTACK_THEME_NAME),
+				'label'       => _x('Cards', 'Block pattern category', 'superstack'),
+				'description' => __('Card patterns.', 'superstack'),
 			],
 		];
 

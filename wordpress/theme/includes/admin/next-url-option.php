@@ -12,7 +12,7 @@ function register_next_url_setting() {
 		'next_url',
 		[
 			'type'              => 'string',
-			'description'       => __("Next.js' address of the website's front end.", 'supt'),
+			'description'       => __("Next.js' address of the website's front end.", 'superstack'),
 			'show_in_rest'      => true,
 			'sanitize_callback' => __NAMESPACE__ . '\sanitize_url',
 		]
@@ -20,7 +20,7 @@ function register_next_url_setting() {
 
 	add_settings_field(
 		'next_url',
-		__('Next.js URL', 'supt'),
+		__('Next.js URL', 'superstack'),
 		__NAMESPACE__ . '\render_field',
 		'general',
 		'default'
@@ -36,6 +36,6 @@ function render_field($args) {
 		'<input name="%1$s" type="url" id="%1$s" aria-describedby="%1$s-description" value="%2$s" class="regular-text code"/><p class="description" id="%1$s-description">%3$s</p>',
 		'next_url',
 		esc_attr(get_option('next_url')),
-		__("Next.js' address of the website's front end.", 'supt')
+		__("Next.js' address of the website's front end.", 'superstack')
 	);
 }

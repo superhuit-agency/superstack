@@ -34,7 +34,7 @@ export const RichTextWithLimit: FC<RichTextWithLimitProps> = ({
 			<p className="supt-rich-text-with-limit__counter">
 				<small>
 					({strippedValue?.length ?? 0}/{limit}{' '}
-					{_x('characters', 'RichText with limit', 'supt')})
+					{_x('characters', 'RichText with limit', 'superstack')})
 				</small>
 			</p>
 		</div>

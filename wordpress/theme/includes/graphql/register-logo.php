@@ -6,7 +6,7 @@
 add_action('graphql_register_types', function () {
 	register_graphql_field('RootQuery', 'siteLogo', [
 		'type' => 'MediaItem',
-		'description' => __('The logo set in the customizer', 'supt'),
+		'description' => __('The logo set in the customizer', 'superstack'),
 		'resolve' => function () {
 
 			$logo_id = get_theme_mod('custom_logo');
