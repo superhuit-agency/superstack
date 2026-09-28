@@ -48,13 +48,13 @@ export default function Layout() {
 
 ### Step 1: Import Custom Fonts
 
-If you're using custom fonts that are not hosted by a third-party service (like Google Fonts), you'll need to add them to `next/src/fonts` directory if not already added previously.
+If you're using custom fonts that are not hosted by a third-party service (like Google Fonts), you'll need to copy the font files into the WordPress theme assets folder at `wordpress/theme/src/assets/fonts/`. WordPress will not pick up fonts referenced from outside the theme directory, so the files must be present here for the block editor to load them.
 
 ### Step 2: Define Your Fonts in `theme.json`
 
 Fonts must be registered in `wordpress/theme/theme.json`. This is the WordPress-native way to declare font families and exposes them as presets to the block editor.
 
-Add your font under `settings.typography.fontFamilies`, declaring one `fontFace` entry per weight/style. Paths are relative to the theme root:
+Add your font under `settings.typography.fontFamilies`, declaring one `fontFace` entry per weight/style. The `src` path is relative to `theme.json` and must point to the file inside `wordpress/theme/src/assets/fonts/`:
 
 ```json
 {
@@ -68,7 +68,7 @@ Add your font under `settings.typography.fontFamilies`, declaring one `fontFace`
 					"fontFace": [
 						{
 							"src": [
-								"file:../../next/src/fonts/my-custom-font.woff2"
+								"file:./src/assets/fonts/my-custom-font.woff2"
 							],
 							"fontWeight": "400",
 							"fontStyle": "normal",

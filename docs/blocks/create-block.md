@@ -58,6 +58,61 @@ Use this when you need a dedicated block in the inserter
 
 Custom blocks are **dynamic** in this stack: the WordPress editor stores attributes in block JSON, and Next.js handles all frontend rendering.
 
+### Rule: prefer core blocks as inner blocks
+
+**Always favour native WordPress blocks as inner blocks over custom attributes.** A custom attribute (`RichText`, `MediaUpload`, …) should be the exception, not the default.
+
+Before adding an attribute, ask: is there a core block that already does this?
+
+| Content            | Do this                      | Not this                     |
+| ------------------ | ---------------------------- | ---------------------------- |
+| Title              | `core/heading` inner block   | `RichText` on a `title` attr |
+| Text / description | `core/paragraph` inner block | `RichText` on a `text` attr  |
+| Image              | `core/image` inner block     | `MediaUpload` + `image` attr |
+| Button / link      | `core/buttons` inner block   | custom `url` + `label` attrs |
+| List               | `core/list` inner block      | repeater attribute           |
+
+Why: editors keep the native toolbars, typography, colors and block styles; the markup stays standard; Next.js already renders every core block via `<Blocks />`, so there is nothing extra to build on the frontend.
+
+Keep attributes only for structured data that has no core equivalent (a layout variant, an icon name, a post-type filter, a boolean toggle…).
+
+**Locking the structure with a template**
+
+Declare the expected inner blocks with `InnerBlocks` `template` + `templateLock`, so the block always ships with the right children:
+
+```tsx
+import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
+
+const TEMPLATE: any[] = [
+	['core/heading', { level: 3, placeholder: 'Titre' }],
+	['core/paragraph', { placeholder: 'Description' }],
+];
+
+export default function Edit() {
+	return (
+		<div {...useBlockProps()}>
+			<InnerBlocks
+				template={TEMPLATE}
+				templateLock="all"
+				allowedBlocks={['core/heading', 'core/paragraph']}
+			/>
+		</div>
+	);
+}
+```
+
+- `templateLock="all"` — fixed structure, no add/remove/move (use for a title + text block).
+- `templateLock="insert"` — children can be reordered but not added/removed.
+- `templateLock={false}` — the template is only a starting point; combine with `allowedBlocks` to constrain what editors may insert.
+
+On the Next.js side, inner blocks arrive as `children` — render them inside your wrapper:
+
+```tsx
+export default function MyBlock({ children }: MyBlockProps) {
+	return <div className="my-block">{children}</div>;
+}
+```
+
 ### Architecture
 
 ```
@@ -87,8 +142,8 @@ Under `next/src/components/custom/`, create a folder with:
 
 ```json
 {
-  "slug": "superstack/benefits-list-item",
-  "title": "Avantage"
+	"slug": "superstack/benefits-list-item",
+	"title": "Avantage"
 }
 ```
 
@@ -97,7 +152,7 @@ Under `next/src/components/custom/`, create a folder with:
 Add the slug to `blocksList` in [`next/src/components/global/Blocks.tsx`](../../next/src/components/global/Blocks.tsx):
 
 ```ts
-'ramoneurs/benefits-list-item': () =>
+'superstack/benefits-list-item': () =>
   import('../custom/molecules/BenefitsList/BenefitsListItem'),
 ```
 
@@ -123,19 +178,19 @@ import block from '@/components/custom/molecules/BenefitsList/BenefitsListItem/b
 import Edit from './edit';
 
 registerBlockType(block.slug, {
-  title: block.title,
-  category: 'superstack',
-  icon: 'star-filled',
-  attributes: {
-    text: { type: 'string', default: '' },
-  },
-  supports: { anchor: false, multiple: true },
-  edit: Edit,
-  save: () => null,
+	title: block.title,
+	category: 'superstack',
+	icon: 'star-filled',
+	attributes: {
+		text: { type: 'string', default: '' },
+	},
+	supports: { anchor: false, multiple: true },
+	edit: Edit,
+	save: () => null,
 });
 ```
 
-**`edit.tsx`** — build the Gutenberg UI with `@wordpress/block-editor` components (`RichText`, `useBlockProps`, `InnerBlocks`, etc.). See [`benefits-list-item/edit.tsx`](../../wordpress/theme/src/blocks/benefits-list-item/edit.tsx).
+**`edit.tsx`** — build the Gutenberg UI with `@wordpress/block-editor` components (`useBlockProps`, `InnerBlocks`, `RichText`, etc.). Start from `InnerBlocks` + a template of core blocks (see [Rule: prefer core blocks as inner blocks](#rule-prefer-core-blocks-as-inner-blocks)); reach for `RichText` only for data no core block covers.
 
 ### Step 4: Wire the block into the editor bundle
 
@@ -226,4 +281,4 @@ This applies to humans and coding agents alike.
 
 ## Parent / child blocks (optional)
 
-For blocks that belong inside a wrapper (e.g. a list item inside a `<ul>`), register both blocks and set `parent` / `allowedBlocks` on the child once the parent exists. See `ramoneurs/benefits-list-item` for the single-block MVP; a parent `ramoneurs/benefits-list` can be added as a follow-up.
+For blocks that belong inside a wrapper (e.g. a list item inside a `<ul>`), register both blocks and set `parent` / `allowedBlocks` on the child once the parent exists.
