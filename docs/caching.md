@@ -63,7 +63,7 @@ A block's `data.ts` is bundled into both the Next server and the WordPress block
 
 A block declares two things in its `data.ts`:
 
-- **`cacheTags`**, returned next to the data and built with `cache-tags.ts`, e.g. `{ title, cacheTags: [cacheTags.settings()] }`. A block returning none falls back to `content` and `settings`, so it's fetched again after every post or settings change.
+- **`cacheTags`**, returned next to the data and built with `cache-tags.ts`, e.g. `{ title, cacheTags: [cacheTags.settings()] }`. A block returning none falls back to `content` and `settings`, so it's fetched again after every post or settings change. A block returning `cacheTags: []` is only refreshed by Purge all.
 - **`export const usesBaseUri = true;`**, for a Page-dependent block, one that reads the Base URI through `baseUriContext()`. It adds the Base URI to the block's cache key. Every other block gets one entry per site, not per page, which keeps WordPress load and cache memory down. Forgetting it is an ESLint error, and fails `next build` with a `BaseUriNotDeclaredError`.
 
 Which tags to return for which data, and why the opt-in exists, is detailed in [FSE Templating › Caching block data](./fse-templating.md#caching-block-data).
@@ -93,7 +93,7 @@ How each change is mapped:
 | `path` | `revalidatePath(uri)`: the path as the visitor sees it, not a rewritten route |
 | `menu` | `menu:{id}` (`locations` is ignored: nothing reads classic menus by location) |
 | `templates` | `templates` |
-| `settings` | `settings` (sent by the plugin from v2.1) |
+| `settings` | `settings` |
 | `all` | `nodes`, `settings`, `templates`, `uris`: everything |
 | `all` with `type` | `nodes:{type}`, `type:{type}`, and `taxonomy:{t}` for each of `taxonomies` |
 
@@ -111,12 +111,11 @@ Unknown subjects and unknown fields are ignored, so a minor plugin release never
 
 ## Known gaps until plugin v2.1
 
-Two kinds of edits don't reach the site on their own yet:
+Term edits don't reach the site on their own yet. Renaming a category or tag, or changing its slug, sends no change the route maps. The `term:` and `taxonomy:` tags are already in place; the mapping waits for [nextjs-revalidate#55](https://github.com/superhuit-agency/nextjs-revalidate/issues/55).
 
-- **Terms.** Renaming a category or tag, or changing its slug, sends no change the route maps. The `term:` and `taxonomy:` tags are already in place; the mapping waits for [nextjs-revalidate#55](https://github.com/superhuit-agency/nextjs-revalidate/issues/55).
-- **Site settings.** The route handles `settings`, but the plugin only sends it from [nextjs-revalidate#171](https://github.com/superhuit-agency/nextjs-revalidate/issues/171). Until then, changing the site title, tagline, date format, SEO defaults or languages doesn't refresh anything.
+Site settings aren't affected: the plugin sends a `settings` change from v2.0 ([nextjs-revalidate#171](https://github.com/superhuit-agency/nextjs-revalidate/issues/171)).
 
-**Workaround:** after such an edit, use **Purge all** in the plugin's wp-admin screen. It sends an `all` change, which marks every cached entry stale. Pages then refresh one by one as they're requested, each asking WordPress again, so avoid it on a busy site at peak time.
+**Workaround:** after a term edit, use **Purge all** in the plugin's wp-admin screen. It sends an `all` change, which marks every cached entry stale. Pages then refresh one by one as they're requested, each asking WordPress again, so avoid it on a busy site at peak time.
 
 ---
 
