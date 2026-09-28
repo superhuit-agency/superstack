@@ -63,6 +63,7 @@ const blocksList: Record<string, () => Promise<BlockModule>> = {
 	'core/spacer': () => import('../core/Spacer'),
 	'core/table': () => import('../core/Table'),
 	'core/template-part': () => import('../core/TemplatePart'),
+	'core/term-name': () => import('../core/TermName'),
 	'core/terms-query': () => import('../core/TermsQuery'),
 	'core/verse': () => import('../core/Preformatted'),
 	'core/video': () => import('../core/Video'),

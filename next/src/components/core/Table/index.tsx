@@ -2,7 +2,7 @@ import './styles.css';
 
 export default function Table(props: TableProps) {
 	return (
-		<figure className="supt-table">
+		<figure className="wp-block-table">
 			<table>
 				{props.head && (
 					<thead>
