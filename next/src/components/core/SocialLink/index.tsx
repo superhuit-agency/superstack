@@ -10,7 +10,7 @@ export default async function SocialLink(props: SocialLinkProps) {
 	if (!Icon) return null;
 
 	return (
-		<li className="supt-social-link">
+		<li className="wp-block-social-link">
 			<a
 				href={props.url}
 				target="_blank"

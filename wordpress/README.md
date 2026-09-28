@@ -48,12 +48,7 @@ See [`wordpress/theme/migrations/README.md`](theme/migrations/README.md) for det
 
 ## Theme CSS Generation
 
-Theme CSS variables can be generated through a scripts in this repository.
-
-- Script location: `wordpress/scripts/theme-css.sh`
-- Command entrypoint (theme): `wp spck theme-css`
-
-Use this when you need to refresh frontend-consumed theme CSS from WordPress internals.
+See [`docs/setup/theme-css.md`](../docs/setup/theme-css.md).
 
 ## License
 

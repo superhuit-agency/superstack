@@ -16,6 +16,14 @@ module.exports = {
 						'../../next/src/css/resources',
 						id.slice(11)
 					);
+					
+				// resolve alias @components, @import '@components/core/Button/styles.css';
+				if (/^@components/.test(id))
+					return path.resolve(
+						__dirname,
+						'../../next/src/components',
+						id.slice(12)
+					);
 
 				// resolve node_modules, @import '@package-from-node-modules/*'
 				if (/^@/.test(id))

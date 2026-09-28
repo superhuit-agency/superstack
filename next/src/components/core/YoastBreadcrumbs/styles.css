@@ -1,0 +1,23 @@
+.yoast-breadcrumbs {
+	margin: 16px 0;
+
+	ol {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 6px;
+
+		list-style: none;
+		font-size: 0.875rem;
+	}
+
+	li {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+	}
+
+	.-separator {
+		opacity: 0.5;
+	}
+}

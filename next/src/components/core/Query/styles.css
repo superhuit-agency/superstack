@@ -1,7 +1,10 @@
+@import '@resources/index.css';
+
 .wp-block-query {
 	&__posts {
+		@extend %grid-column-gap;
+
 		display: grid;
 		grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-		gap: 1rem;
 	}
 }
