@@ -5,6 +5,6 @@ export default defineConfig({
 		tsconfigPaths: true,
 	},
 	test: {
-		include: ['src/**/*.test.{ts,tsx}'],
+		include: ['src/**/*.test.{ts,tsx}', 'eslint-rules/**/*.test.ts'],
 	},
 });

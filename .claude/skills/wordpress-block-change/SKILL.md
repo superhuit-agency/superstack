@@ -36,6 +36,16 @@ Deliver block-related changes with minimal scope, no duplication, and full compa
 4. Do not add/remove code comments unless explicitly requested.
 5. If a change impacts both WP and Next, update both sides in the same task.
 
+## Block Data Caching Rules
+
+A block's `data.ts` `getData` runs in a cache entry of its own (`next/src/lib/get-cached-block-data.ts`). See `docs/fse-templating.md#caching-block-data`.
+
+1. Return `cacheTags` next to the data, built with `next/src/lib/cache-tags.ts` (e.g. `{ content, cacheTags: [cacheTags.settings()] }`). Without them the block falls back to `content` and `settings` and is refetched after every post or settings change.
+2. If `getData` reads the Base URI (`baseUriContext()`), declare `export const usesBaseUri = true;` in the same `data.ts`. It adds the Base URI to the cache key; without it, one page's data leaks into every other page, and `next build` fails with a `BaseUriNotDeclaredError`.
+3. Don't declare `usesBaseUri` on a block that doesn't read the Base URI: it caches one entry per page for nothing, each fetched from WordPress.
+4. Never import `next/cache` in `data.ts`: it's also bundled into the WordPress block editor.
+5. ESLint enforces 2 and 3 (`superstack/require-uses-base-uri`, `superstack/no-unused-uses-base-uri`): run `cd next && npx eslint <path/to/data.ts>`.
+
 ## Safety Rules
 
 1. If change touches deployment/provisioning paths, stop and ask for confirmation.
@@ -45,9 +55,10 @@ Deliver block-related changes with minimal scope, no duplication, and full compa
 ## Verification Checklist
 
 1. `cd next && npx tsc --noEmit`
-2. `npm --prefix ./wordpress run build` (theme side) or `npm --prefix ./next run build` (frontend side)
-3. Validate block renders in editor and frontend where applicable.
-4. Confirm no unrelated files changed.
+2. `cd next && npx eslint src/components` reports no `superstack/*` problem.
+3. `npm --prefix ./wordpress run build` (theme side) or `npm --prefix ./next run build` (frontend side)
+4. Validate block renders in editor and frontend where applicable.
+5. Confirm no unrelated files changed.
 
 ## Output Format
 

@@ -180,6 +180,15 @@ Outside preview, `getData` runs inside `getCachedBlockData`, in a cache entry of
 - **`cacheTags`.** Return the tags the data depends on next to it, built with `next/src/lib/cache-tags.ts` (e.g. `{ content, cacheTags: [cacheTags.settings()] }`). The wrapper applies them and strips the key. A block returning none falls back to `content` and `settings`, and logs a development warning.
 - **`usesBaseUri`.** A Page-dependent block, one that reads `baseUriContext()`, must declare `export const usesBaseUri = true;` in its `data.ts`. The Base URI is then added to its cache key. Any other block gets one entry per site, and reading the Base URI throws a `BaseUriNotDeclaredError`, which fails `next build`.
 
+  The opt-in exists for two reasons. Without it, the page that fills a Page-dependent block's cache entry leaks its content into every other page. With it on a block that doesn't need it, the block gets one entry per page instead of one per site, each fetched again from WordPress.
+
+  ESLint checks it as the block is written, on every `data.ts` under `next/src/components/{core,custom}` (rules in `next/eslint-rules/`):
+
+  - `superstack/require-uses-base-uri` (**error**): the module imports `baseUriContext` but doesn't declare `usesBaseUri`.
+  - `superstack/no-unused-uses-base-uri` (**warning**): the module declares `usesBaseUri` but never imports `baseUriContext`.
+
+  ESLint only sees imports in `data.ts` itself. The build-time guard above stays the backstop for a Base URI read through a helper module. A block that reads it that way and declares `usesBaseUri` gets a false warning: disable `superstack/no-unused-uses-base-uri` on that line.
+
 ---
 
 ## Refreshing Templates
