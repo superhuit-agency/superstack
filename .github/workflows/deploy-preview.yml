@@ -174,7 +174,7 @@ jobs:
         uses: ./.github/actions/generate-theme-css-remote
         with:
           SERVER: ${{ steps.ssh.outputs.SERVER }}
-          WORDPRESS_PATH: ${{ vars.WORDPRESS_PATH }}s
+          WORDPRESS_PATH: ${{ vars.WORDPRESS_PATH }}
 
       - name: Build Next.js
         uses: ./.github/actions/next-build
