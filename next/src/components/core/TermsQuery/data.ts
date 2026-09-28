@@ -1,5 +1,6 @@
 import configs from '@/configs.json';
 import { baseUriContext } from '@/hooks/use-base-uri';
+import { cacheTags, termTags } from '@/lib/cache-tags';
 import { gql } from '@/utils';
 
 import { taxonomyToGraphqlEnum } from '@/components/core/TaxonomyList/helper';
@@ -121,6 +122,7 @@ export const getData = async (
 	const includeIds = normalizeIncludeIds(termQuery.include ?? []);
 	const hasInclude = includeIds.length > 0;
 
+	let taxonomy: string;
 	let taxonomies: string[] = [];
 	let parent: number | undefined;
 	let childOf: number | undefined;
@@ -132,6 +134,7 @@ export const getData = async (
 	if (archiveContext) {
 		const ctx = archiveContext;
 		const taxSlug = ctx.taxonomyName.toLowerCase();
+		taxonomy = taxSlug;
 		taxonomies = [taxonomyToGraphqlEnum(taxSlug)];
 
 		if (isTaxonomyHierarchical(taxSlug)) {
@@ -142,6 +145,7 @@ export const getData = async (
 			}
 		}
 	} else {
+		taxonomy = termQuery.taxonomy;
 		taxonomies = [taxonomyToGraphqlEnum(termQuery.taxonomy)];
 
 		if (hasInclude) {
@@ -231,5 +235,14 @@ export const getData = async (
 				nodes,
 			},
 		},
+		cacheTags: [
+			cacheTags.taxonomy(taxonomy),
+			...termTags(nodes),
+			...(archiveContext
+				? [cacheTags.term(archiveContext.databaseId)]
+				: []),
+			// Post counts, and so which terms are empty, change with posts
+			cacheTags.content(),
+		],
 	};
 };

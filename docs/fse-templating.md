@@ -177,7 +177,20 @@ if (dataInnerBlocks !== undefined) {
 
 Outside preview, `getData` runs inside `getCachedBlockData`, in a cache entry of its own keyed by the block's name, attributes and language. `data.ts` itself never imports `next/cache`, since it's also bundled into the WordPress block editor.
 
-- **`cacheTags`.** Return the tags the data depends on next to it, built with `next/src/lib/cache-tags.ts` (e.g. `{ content, cacheTags: [cacheTags.settings()] }`). The wrapper applies them and strips the key. A block returning none falls back to `content` and `settings`, and logs a development warning.
+- **`cacheTags`.** Return the tags the data depends on next to it, built with `next/src/lib/cache-tags.ts` (e.g. `{ content, cacheTags: [cacheTags.settings()] }`). The wrapper applies them and strips the key. A block returning none falls back to `content` and `settings`, and logs a development warning. Return `cacheTags: []` when the data depends on nothing WordPress reports a change for (e.g. a user's avatar): only "Purge all" then refreshes it.
+
+  Declare what the data *depends on*, not what it is about:
+
+  | The data renders… | Tags |
+  | --- | --- |
+  | the post at the Base URI | `nodeAtUriTags(databaseId)`: `node:{id}`, or `uris` when no post was found. Never `type:` |
+  | a listing, a query, latest posts, next/previous links | `type:{contentType}`, or `content` with no type filter |
+  | terms | `termTags(terms)`: `term:{databaseId}` for each, so query their `databaseId` |
+  | a term listing | `taxonomy:{taxonomy}` and its terms' tags, plus `content` when post counts show or empty terms are hidden |
+  | a block menu | `menu:{id}` |
+  | the site title, tagline, logo or date format | `settings` |
+
+  A template's `getData` returns `cacheTags` too: the public node read applies them to its own entry. The node read already tags the post's own `categories` and `tags`.
 - **`usesBaseUri`.** A Page-dependent block, one that reads `baseUriContext()`, must declare `export const usesBaseUri = true;` in its `data.ts`. The Base URI is then added to its cache key. Any other block gets one entry per site, and reading the Base URI throws a `BaseUriNotDeclaredError`, which fails `next build`.
 
 ---

@@ -1,3 +1,4 @@
+import { cacheTags, termTags } from '@/lib/cache-tags';
 import { gql } from '@/utils';
 import { taxonomyToGraphqlEnum } from './helper';
 
@@ -5,7 +6,8 @@ export const getData = async (
 	fetcher: FetchApiFuncType,
 	attrs: TaxonomyListAttributes | null = null
 ) => {
-	const taxonomyEnum = taxonomyToGraphqlEnum(attrs?.taxonomy ?? '');
+	const taxonomy = attrs?.taxonomy ?? '';
+	const taxonomyEnum = taxonomyToGraphqlEnum(taxonomy);
 
 	const query = gql`
 		query TaxonomyListTerms(
@@ -45,5 +47,15 @@ export const getData = async (
 
 	const data = await fetcher(query, options);
 
-	return { data };
+	return {
+		data,
+		cacheTags: [
+			cacheTags.taxonomy(taxonomy),
+			...termTags(data?.terms?.nodes),
+			// Post counts, and so which terms are empty, change with posts
+			...(!attrs?.showEmpty || attrs?.showPostCounts
+				? [cacheTags.content()]
+				: []),
+		],
+	};
 };

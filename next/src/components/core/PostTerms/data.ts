@@ -1,5 +1,6 @@
 import { gql } from '@/utils';
 import { baseUriContext } from '@/hooks/use-base-uri';
+import { nodeAtUriTags, termTags } from '@/lib/cache-tags';
 
 export const usesBaseUri = true;
 
@@ -13,9 +14,13 @@ export const getData = async (
 		query = gql`
 			query nodeByIdQuery($uri: String!) {
 				nodeByUri(uri: $uri) {
+					... on ContentNode {
+						databaseId
+					}
 					... on Post {
 						categories {
 							nodes {
+								databaseId
 								name
 								uri
 							}
@@ -30,9 +35,13 @@ export const getData = async (
 		query = gql`
 			query nodeByIdQuery($uri: String!) {
 				nodeByUri(uri: $uri) {
+					... on ContentNode {
+						databaseId
+					}
 					... on Post {
 						tags {
 							nodes {
+								databaseId
 								name
 								uri
 							}
@@ -43,7 +52,7 @@ export const getData = async (
 		`;
 	}
 
-	if (!query) return;
+	if (!query) return { cacheTags: [] };
 
 	const uri = baseUriContext();
 
@@ -55,5 +64,12 @@ export const getData = async (
 	const categories = data?.nodeByUri?.categories?.nodes;
 	const tags = data?.nodeByUri?.tags?.nodes;
 
-	return { categories, tags };
+	return {
+		categories,
+		tags,
+		cacheTags: [
+			...nodeAtUriTags(data?.nodeByUri?.databaseId),
+			...termTags(categories ?? tags),
+		],
+	};
 };

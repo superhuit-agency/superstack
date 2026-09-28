@@ -8,7 +8,7 @@ import {
 	throwIfBaseUriNotDeclared,
 } from '@/hooks/use-base-uri';
 import { fetchAPI, formatBlocksJSON } from '@/lib';
-import { cacheTags } from '@/lib/cache-tags';
+import { cacheTags, termTags } from '@/lib/cache-tags';
 import getBlockFinalComponentProps from '@/lib/get-block-final-component-props';
 import getFseTemplates from '@/lib/get-fse-templates';
 
@@ -57,8 +57,12 @@ export async function getPublicNodeByURI(
 					cacheTags.node(node.id),
 					cacheTags.nodesOfType(node.contentTypeName),
 				]),
-		cacheTags.settings() // The same query returns site SEO and general settings
+		cacheTags.settings(), // The same query returns site SEO and general settings
+		...termTags(node.categories?.nodes),
+		...termTags(node.tags?.nodes),
+		...(node.cacheTags ?? []) // Returned by the template's `getData`
 	);
+	delete node.cacheTags;
 
 	return node;
 }
@@ -83,7 +87,17 @@ export async function getPreviewNodeByURI(
 	auth: AuthType,
 	previewDraft: boolean
 ) {
-	return getNodeByURI(uri, true, auth, previewDraft, routePage, lang);
+	const node = await getNodeByURI(
+		uri,
+		true,
+		auth,
+		previewDraft,
+		routePage,
+		lang
+	);
+	delete node?.cacheTags;
+
+	return node;
 }
 
 /**

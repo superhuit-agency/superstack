@@ -1,4 +1,5 @@
 import { baseUriContext } from '@/hooks/use-base-uri';
+import { cacheTags, nodeAtUriTags } from '@/lib/cache-tags';
 import { gql } from '@/utils';
 
 type NavigationDirection = 'next' | 'previous';
@@ -150,8 +151,17 @@ export const getData = async (
 		!currentNode?.databaseId ||
 		!currentNode?.date
 	) {
-		return { navigationPost: null };
+		return {
+			navigationPost: null,
+			cacheTags: nodeAtUriTags(currentNode?.databaseId),
+		};
 	}
+
+	// The adjacent post is any post of the type: a change to one may move it
+	const tags = [
+		cacheTags.node(currentNode.databaseId),
+		cacheTags.type(currentNode.__typename === 'Post' ? 'post' : 'page'),
+	];
 
 	const categoryIn =
 		taxonomy === 'category'
@@ -327,7 +337,7 @@ export const getData = async (
 		}
 	}
 
-	if (!adjacentPost) return { navigationPost: null };
+	if (!adjacentPost) return { navigationPost: null, cacheTags: tags };
 
 	return {
 		navigationPost: {
@@ -335,5 +345,6 @@ export const getData = async (
 			title: adjacentPost.title,
 			type: direction,
 		},
+		cacheTags: tags,
 	};
 };
