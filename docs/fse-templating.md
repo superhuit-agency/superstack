@@ -34,6 +34,8 @@ Page render (getNodeByURI)
   └─ injects page blocks into the template's core/post-content block
 ```
 
+The `fseTemplate` field follows the WordPress template hierarchy. A post type archive resolves `archive-{postType}` → `archive`. A category archive resolves `category-{slug}` → `category-{id}` → `category` → `archive`, and a tag archive `tag-{slug}` → `tag-{id}` → `tag` → `archive`.
+
 ### Visual Schema
 
 ```mermaid
@@ -184,13 +186,13 @@ Outside preview, `getData` runs inside `getCachedBlockData`, in a cache entry of
   | The data renders… | Tags |
   | --- | --- |
   | the post at the Base URI | `nodeAtUriTags(databaseId)`: `node:{id}`, or `uris` when no post was found. Never `type:` |
-  | a listing, a query, latest posts, next/previous links | `type:{contentType}`, or `content` with no type filter |
+  | a listing, a query, latest posts, next/previous links | `type:{contentType}`, or `content` with no type filter. A `core/query` loop always has a type: it defaults to `post` |
   | terms | `termTags(terms)`: `term:{databaseId}` for each, so query their `databaseId` |
   | a term listing | `taxonomy:{taxonomy}` and its terms' tags, plus `content` when it shows post counts or hides empty terms |
   | a block menu | `menu:{id}` |
   | the site title, tagline, logo or date format | `settings` |
 
-  The public node read tags the post's own `categories` and `tags`.
+  The public node read tags the post's own `categories` and `tags`. On a term archive, it's tagged `term:{databaseId}` and the `type:` of the post type the archive lists, not `node:`.
 - **`usesBaseUri`.** A Page-dependent block, one that reads `baseUriContext()`, must declare `export const usesBaseUri = true;` in its `data.ts`. The Base URI is then added to its cache key. Any other block gets one entry per site, and reading the Base URI throws a `BaseUriNotDeclaredError`, which fails `next build`.
 
   The opt-in exists for two reasons. Without it, the page that fills a Page-dependent block's cache entry leaks its content into every other page. With it on a block that doesn't need it, the block gets one entry per page instead of one per site, each fetched again from WordPress.
@@ -201,6 +203,7 @@ Outside preview, `getData` runs inside `getCachedBlockData`, in a cache entry of
   - `superstack/no-unused-uses-base-uri` (**warning**): the module declares `usesBaseUri` but never imports `baseUriContext`.
 
   ESLint only sees imports in `data.ts` itself. The build-time guard above stays the backstop for a Base URI read through a helper module. A block that reads it that way and declares `usesBaseUri` gets a false warning: disable `superstack/no-unused-uses-base-uri` on that line.
+- **`usesArchiveContext`.** A block whose data changes with the archive being viewed declares `export const usesArchiveContext = true;`. Its `getData` then gets a fourth argument, the `BlockDataContext`: the archive's `term` (`{ taxonomy, databaseId }`) on a term archive, and the post type it lists (`archive.postType`) on a term or post type archive. The context is added to the block's cache key. Other blocks get no context, so they keep one entry per site. `core/query` uses it: a loop with `inherit: true` lists the archive's post type and, on a term archive, only that term's posts.
 
 ---
 

@@ -43,8 +43,9 @@ A block's `data.ts` `getData` runs in a cache entry of its own (`next/src/lib/ge
 1. Return `cacheTags` next to the data, built with `next/src/lib/cache-tags.ts` (e.g. `{ content, cacheTags: [cacheTags.settings()] }`). Without them the block falls back to `content` and `settings` and is refetched after every post or settings change.
 2. If `getData` reads the Base URI (`baseUriContext()`), declare `export const usesBaseUri = true;` in the same `data.ts`. It adds the Base URI to the cache key; without it, one page's data leaks into every other page, and `next build` fails with a `BaseUriNotDeclaredError`.
 3. Don't declare `usesBaseUri` on a block that doesn't read the Base URI: it caches one entry per page for nothing, each fetched from WordPress.
-4. Never import `next/cache` in `data.ts`: it's also bundled into the WordPress block editor.
-5. ESLint enforces 2 and 3 (`superstack/require-uses-base-uri`, `superstack/no-unused-uses-base-uri`): run `cd next && npx eslint <path/to/data.ts>`.
+4. If `getData` needs the archive being viewed (its term or listed post type), declare `export const usesArchiveContext = true;` and read `getData`'s fourth argument, the `BlockDataContext`. It adds the context to the cache key; other blocks don't get it.
+5. Never import `next/cache` in `data.ts`: it's also bundled into the WordPress block editor.
+6. ESLint enforces 2 and 3 (`superstack/require-uses-base-uri`, `superstack/no-unused-uses-base-uri`): run `cd next && npx eslint <path/to/data.ts>`.
 
 ## Safety Rules
 

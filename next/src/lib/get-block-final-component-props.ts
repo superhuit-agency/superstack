@@ -13,6 +13,8 @@ type BlockPropsOptions = {
 	skipGetData?: boolean;
 	lang?: string | null;
 	preview?: boolean;
+	/** The archive being viewed, for blocks declaring `usesArchiveContext`. */
+	context?: BlockDataContext;
 };
 
 // const blocksDataList: { [key: string]: any } = {};
@@ -119,11 +121,19 @@ const getAttributes = async (
 	if (!blockModule?.getData) return { attrs };
 
 	const lang = options?.lang ?? null;
+	const context = blockModule.usesArchiveContext
+		? (options?.context ?? {})
+		: null;
 
 	let data: Record<string, unknown>;
 	if (options?.preview) {
 		const liveData: BlockData = {
-			...(await blockModule.getData(fetchAPI, attributes, lang)),
+			...(await blockModule.getData(
+				fetchAPI,
+				attributes,
+				lang,
+				context ?? undefined
+			)),
 		};
 		delete liveData.cacheTags;
 		data = liveData;
@@ -134,7 +144,8 @@ const getAttributes = async (
 			lang,
 			blockModule.usesBaseUri
 				? ((baseUriContext() as string | undefined) ?? null)
-				: null
+				: null,
+			context
 		);
 	}
 
