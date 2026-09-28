@@ -191,6 +191,10 @@ async function getNodeByURI(
 		}
 	}
 
+	// A node type the query has no fragment for (e.g. a term archive) comes
+	// back as a bare `__typename`: it isn't rendered, so it's a 404.
+	if (!node.uri) return null;
+
 	node.fullUri = uri;
 
 	const [templateBlocks, { blocksJSON, templateData }] = await Promise.all([
