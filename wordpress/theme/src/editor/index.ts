@@ -8,17 +8,12 @@ import {
 	unregisterBlockVariation,
 } from '@wordpress/blocks';
 
-import * as filters from '@/components/filters';
+/**
+ * Import custom blocks
+ */
+import '../blocks';
 
 import './index.css';
-
-// Edit core blocks filters for WP editor
-for (const key in filters) {
-	if (Object.prototype.hasOwnProperty.call(filters, key)) {
-		const filter = filters[key as keyof typeof filters];
-		addFilter(filter.hook, filter.namespace, filter.callback);
-	}
-}
 
 /**
  * Excluded blocks from the editor.

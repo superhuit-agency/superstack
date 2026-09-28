@@ -1,8 +1,9 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
+import { addFilter } from '@wordpress/hooks';
 
-import block from './block.json';
+import block from '@/components/core/Image/block.json';
 
 /**
  * Backfill dimensions from media details when they are missing on the block.
@@ -26,33 +27,57 @@ const editImageBlock = createHigherOrderComponent((BlockEdit) => {
 			[imageId]
 		);
 
+		const previousImageId = useRef(imageId);
+
 		useEffect(() => {
 			if (!isImageBlock) return;
 
-			if (aspectRatio) {
+			// The image was replaced or removed: the dimensions of the previous
+			// media must not be kept.
+			const hasImageChanged = previousImageId.current !== imageId;
+
+			const clearDimensions = () => {
+				if (!width && !height) return;
+
 				props.setAttributes({
 					width: undefined,
 					height: undefined,
 				});
+			};
+
+			if (aspectRatio || !imageId) {
+				previousImageId.current = imageId;
+				clearDimensions();
 
 				return;
 			}
 
 			const mediaWidth = media?.media_details?.width;
 			const mediaHeight = media?.media_details?.height;
-			const nextWidth =
-				width || (mediaWidth ? `${mediaWidth}px` : undefined);
-			const nextHeight =
-				height || (mediaHeight ? `${mediaHeight}px` : undefined);
 
-			if (!nextWidth || !nextHeight) return;
+			// The new media is not loaded yet, only drop the stale dimensions.
+			if (!mediaWidth || !mediaHeight) {
+				if (hasImageChanged) clearDimensions();
+
+				return;
+			}
+
+			const nextWidth = hasImageChanged
+				? `${mediaWidth}px`
+				: width || `${mediaWidth}px`;
+			const nextHeight = hasImageChanged
+				? `${mediaHeight}px`
+				: height || `${mediaHeight}px`;
+
+			previousImageId.current = imageId;
+
 			if (width === nextWidth && height === nextHeight) return;
 
 			props.setAttributes({
 				width: nextWidth,
 				height: nextHeight,
 			});
-		}, [isImageBlock, media, width, height, props]);
+		}, [aspectRatio, imageId, isImageBlock, media, width, height, props]);
 
 		return <BlockEdit {...props} />;
 	};
@@ -60,8 +85,4 @@ const editImageBlock = createHigherOrderComponent((BlockEdit) => {
 	return EnhancedComponent;
 }, 'editImageBlock');
 
-export const ImageEditBlock: WpFilterType = {
-	hook: 'editor.BlockEdit',
-	namespace: 'supt/image-edit-block',
-	callback: editImageBlock,
-};
+addFilter('editor.BlockEdit', 'supt/image-edit-block', editImageBlock);
