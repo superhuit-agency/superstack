@@ -43,6 +43,14 @@ module.exports = {
 			...(defaultConfig.resolve?.alias || {}),
 			'@': path.resolve(__dirname, '../../next/src'),
 			'#': path.resolve(__dirname, './src'),
+			// TODO :: TEMPORARY FIX
+			// WP Editor doesn't support next/link due to React versions incompatibility
+			// so we need to return a regular anchor tag instead
+			// TODO :: REMOVE THIS AFTER WP PACKAGES UPGRADED TO REACT 19
+			'next/link': path.resolve(
+				__dirname,
+				'./src/editor/wp-mocks/MockedLink.tsx'
+			),
 		},
 	},
 	output: {
