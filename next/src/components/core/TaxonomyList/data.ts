@@ -1,9 +1,11 @@
+import configs from '@/configs.json';
 import { gql } from '@/utils';
 import { taxonomyToGraphqlEnum } from './helper';
 
 export const getData = async (
 	fetcher: FetchApiFuncType,
-	attrs: TaxonomyListAttributes | null = null
+	attrs: TaxonomyListAttributes | null = null,
+	lang: string | null = null
 ) => {
 	const taxonomyEnum = taxonomyToGraphqlEnum(attrs?.taxonomy ?? '');
 
@@ -37,7 +39,9 @@ export const getData = async (
 								databaseId
 							}
 						}
+						${configs.isMultilang ? 'language { slug }' : ''}
 					}
+					${configs.isMultilang ? '... on Tag { language { slug } }' : ''}
 				}
 			}
 		}
@@ -52,5 +56,19 @@ export const getData = async (
 
 	const data = await fetcher(query, options);
 
-	return { data };
+	// The generic `terms` connection has no `language` where-arg (Polylang only
+	// adds it to post connections), so terms are filtered on the fetched result.
+	// Terms without an assigned language (empty slug) are kept: Polylang treats
+	// them as belonging to every language.
+	const termNodes: TaxonomyTerm[] = data?.terms?.nodes ?? [];
+	const terms =
+		configs.isMultilang && lang
+			? termNodes.filter(
+					(term) =>
+						!term.language?.slug ||
+						term.language.slug.toLowerCase() === lang.toLowerCase()
+				)
+			: termNodes;
+
+	return { data: { terms: { nodes: terms } } };
 };
