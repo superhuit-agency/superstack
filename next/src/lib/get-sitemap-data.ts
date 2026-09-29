@@ -1,6 +1,11 @@
 import { fetchAPI } from '@/lib';
+import { getWpUrl } from '@/utils/node-utils';
 
 const GRAPHQL_MAX_SIZE = 100;
+
+// Content types registered by WordPress (FSE templates, navigation menus)
+// that are not public content and are not exposed in `seo.contentTypes`.
+const EXCLUDED_CONTENT_TYPES = ['Template', 'TemplatePart', 'NavigationMenu'];
 
 interface PostType {
 	name: string;
@@ -31,7 +36,7 @@ interface NodeType {
 	}[];
 	featuredImage?: {
 		node: {
-			uri: string;
+			sourceUrl: string;
 			title: string;
 		};
 	};
@@ -95,12 +100,16 @@ async function getIndexSitemapData() {
 		return null;
 
 	const contentTypes = data.contentTypes as { nodes: ContentType[] };
+	const indexableTypes = contentTypes.nodes.filter(
+		(type: ContentType) =>
+			!EXCLUDED_CONTENT_TYPES.includes(type.graphqlSingleName)
+	);
 
 	const typesNoIndex = (await fetchAPI(
 		`query TypesNoIndex {
 			seo {
 				contentTypes {
-					${contentTypes.nodes.map(
+					${indexableTypes.map(
 						(type: ContentType) => `
 						${type.graphqlSingleName} {
 							metaRobotsNoindex
@@ -112,38 +121,41 @@ async function getIndexSitemapData() {
 	).catch((error) => {
 		console.error("Can't fetch sitemap noindex types");
 		console.error(error);
-	})) as {
-		seo: {
-			contentTypes: { [key: string]: { metaRobotsNoindex: boolean } };
-		};
-	};
+	})) as
+		| {
+				seo: {
+					contentTypes: {
+						[key: string]: { metaRobotsNoindex: boolean };
+					};
+				};
+		  }
+		| undefined;
 
-	return contentTypes.nodes.reduce(
-		(postTypes: PostType[], type: ContentType) => {
-			if (type.contentNodes.pageInfo.offsetPagination.total > 0) {
-				if (
-					typesNoIndex.seo.contentTypes[type.graphqlSingleName]
-						.metaRobotsNoindex === false
-				) {
-					postTypes.push({
-						name: type.graphqlPluralName,
-						total: type.contentNodes.pageInfo.offsetPagination
-							.total,
-						lastModified: removeTimeFromDate(
-							type.contentNodes.nodes[0].modified
-						),
-					});
-				}
+	if (!typesNoIndex?.seo?.contentTypes) return null;
+
+	return indexableTypes.reduce((postTypes: PostType[], type: ContentType) => {
+		if (type.contentNodes.pageInfo.offsetPagination.total > 0) {
+			if (
+				typesNoIndex.seo.contentTypes[type.graphqlSingleName]
+					?.metaRobotsNoindex === false
+			) {
+				postTypes.push({
+					name: type.graphqlPluralName,
+					total: type.contentNodes.pageInfo.offsetPagination.total,
+					lastModified: removeTimeFromDate(
+						type.contentNodes.nodes[0].modified
+					),
+				});
 			}
-			return postTypes;
-		},
-		[]
-	);
+		}
+		return postTypes;
+	}, []);
 }
 
 async function getSitemapTypeUrls(type = 'posts', page = 1, size = 1000) {
 	// TODO find how to get all images inside content (not only the feature image)
 	let nodes: any[] = [];
+	const featuredImageField = await getFeaturedImageField(type);
 	if (size > GRAPHQL_MAX_SIZE) {
 		(
 			await Promise.allSettled(
@@ -166,12 +178,7 @@ async function getSitemapTypeUrls(type = 'posts', page = 1, size = 1000) {
 										node {
 											uri
 											modified
-											featuredImage {
-												node {
-													uri
-													title
-												}
-											}
+											${featuredImageField}
 											seo {
 												metaRobotsNoindex
 											}
@@ -184,8 +191,9 @@ async function getSitemapTypeUrls(type = 'posts', page = 1, size = 1000) {
 			)
 		).forEach((result, i) => {
 			if (result.status === 'fulfilled') {
-				if (result.value[type].edges.length) {
-					nodes = [...nodes, ...result.value[type].edges];
+				const edges = result.value?.[type]?.edges;
+				if (edges?.length) {
+					nodes = [...nodes, ...edges];
 				}
 			} else {
 				console.error(
@@ -209,12 +217,7 @@ async function getSitemapTypeUrls(type = 'posts', page = 1, size = 1000) {
 					node {
 						uri
 						modified
-						featuredImage {
-							node {
-								uri
-								title
-							}
-						}
+						${featuredImageField}
 						seo {
 							metaRobotsNoindex
 						}
@@ -240,6 +243,53 @@ async function getSitemapTypeUrls(type = 'posts', page = 1, size = 1000) {
 }
 
 /**
+ * Not every content type supports thumbnails, and querying `featuredImage`
+ * on a type that doesn't implement `NodeWithFeaturedImage` fails the whole query.
+ */
+async function getFeaturedImageField(pluralName: string) {
+	const data = await fetchAPI(
+		`query SitemapFeaturedImageSupport {
+			__type(name: "NodeWithFeaturedImage") {
+				possibleTypes {
+					name
+				}
+			}
+			contentTypes {
+				nodes {
+					graphqlSingleName
+					graphqlPluralName
+				}
+			}
+		}`
+	).catch((error) => {
+		console.error("Can't fetch sitemap featured image support");
+		console.error(error);
+	});
+
+	const singularName = data?.contentTypes?.nodes?.find(
+		(type: { graphqlPluralName: string }) =>
+			type.graphqlPluralName === pluralName
+	)?.graphqlSingleName;
+
+	if (!singularName) return '';
+
+	const typeName =
+		singularName.charAt(0).toUpperCase() + singularName.slice(1);
+	const supported = data?.__type?.possibleTypes?.some(
+		({ name }: { name: string }) => name === typeName
+	);
+
+	return supported
+		? `featuredImage {
+				node {
+					sourceUrl
+					title
+				}
+			}`
+		: '';
+}
+
+/**
  * Parse node modified date to remove time
  * (needed for sitemap format to be readable)
  */
@@ -256,10 +306,26 @@ function parseNodeDate(node: NodeType) {
  */
 function parseNodeImages(node: NodeType) {
 	node.images = [];
-	if (node.featuredImage) node.images.push(node.featuredImage.node);
+	if (node.featuredImage)
+		node.images.push({
+			uri: getUploadUri(node.featuredImage.node.sourceUrl),
+			title: node.featuredImage.node.title,
+		});
 	delete node.featuredImage;
 
 	return node;
+}
+
+/**
+ * Keep only the path of a media URL, so it is served
+ * through the `/wp-content/uploads/` proxy instead of the WP domain.
+ */
+function getUploadUri(sourceUrl: string) {
+	try {
+		return new URL(sourceUrl, getWpUrl()).pathname;
+	} catch {
+		return sourceUrl;
+	}
 }
 
 function parseNodeTranslations(node: NodeType) {

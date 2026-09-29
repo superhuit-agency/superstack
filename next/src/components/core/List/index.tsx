@@ -13,7 +13,7 @@ export default function List({
 		<>
 			{ordered ? (
 				<ol
-					className="supt-list"
+					className="wp-block-list"
 					style={{
 						counterSet: start ? `li ${start + 1}` : undefined,
 					}}
@@ -22,7 +22,7 @@ export default function List({
 					{children}
 				</ol>
 			) : (
-				<ul className="supt-list">{children}</ul>
+				<ul className="wp-block-list">{children}</ul>
 			)}
 		</>
 	);

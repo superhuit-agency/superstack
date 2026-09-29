@@ -3,6 +3,8 @@ interface QueryPaginationNextAttributes extends BlockAttributes {
 	label?: string;
 	href?: string | null;
 	isDisabled?: boolean;
+	/** Injected by the parent query; `null` when the total is unknown. */
+	totalPages?: number | null;
 }
 
 type QueryPaginationNextProps = QueryPaginationNextAttributes;

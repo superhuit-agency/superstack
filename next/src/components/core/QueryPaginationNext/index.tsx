@@ -1,6 +1,9 @@
 import Link from 'next/link';
 
 export default function QueryPaginationNext(props: QueryPaginationNextProps) {
+	if (typeof props.totalPages === 'number' && props.totalPages < 2)
+		return null;
+
 	return (
 		<div className="wp-block-query-pagination-next">
 			{props.href && (

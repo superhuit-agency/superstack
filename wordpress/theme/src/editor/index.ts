@@ -8,17 +8,14 @@ import {
 	unregisterBlockVariation,
 } from '@wordpress/blocks';
 
-import * as filters from '@/components/filters';
+/**
+ * Import custom blocks
+ */
+import '../blocks';
+
+import './pattern-slash-inserter';
 
 import './index.css';
-
-// Edit core blocks filters for WP editor
-for (const key in filters) {
-	if (Object.prototype.hasOwnProperty.call(filters, key)) {
-		const filter: WpFilterType = filters[key as keyof typeof filters];
-		addFilter(filter.hook, filter.namespace, filter.callback);
-	}
-}
 
 /**
  * Excluded blocks from the editor.
@@ -60,7 +57,7 @@ domReady(() => {
 	});
 
 	// Unregister embed variants that are not allowed
-	getBlockVariations('core/embed').forEach((variant) => {
+	getBlockVariations('core/embed').forEach((variant: any) => {
 		if (!allowedEmbedVariants.includes(variant.name)) {
 			unregisterBlockVariation('core/embed', variant.name);
 		}

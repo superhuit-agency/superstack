@@ -5,6 +5,7 @@ import { notFound, permanentRedirect, redirect } from 'next/navigation';
 
 import Template from '@/components/global/Template';
 import { useCanonical as getCanonicalUrl } from '@/hooks/use-canonical';
+import { getLocales } from '@/i18n/get-locales';
 import {
 	getAllURIs,
 	getAuthToken,
@@ -13,6 +14,7 @@ import {
 	getWpUriFromNextPath,
 } from '@/lib';
 import { baseUriContext } from '@/hooks/use-base-uri';
+import configs from '@/configs.json';
 
 // see https://nextjs.org/docs/app/api-reference/file-conventions/route-segment-config
 export const revalidate = 3600;
@@ -25,6 +27,47 @@ export async function generateStaticParams() {
 	const allURIs = await getAllURIs();
 
 	return allURIs;
+}
+
+type NodeTranslation = {
+	uri?: string;
+	language?: { locale?: string; code?: string } | null;
+};
+
+// Build the hreflang map: one entry per available language (the node's own
+// language included, as `translations` only holds the other ones) plus the
+// `x-default` entry pointing at the default language.
+function getAlternateLanguages(
+	node: {
+		uri?: string;
+		baseUrl?: string;
+		language?: { locale?: string; code?: string } | null;
+		translations?: NodeTranslation[] | null;
+	} | null,
+	defaultLocale: Locale
+): Record<string, string> | undefined {
+	if (!node) return undefined;
+
+	const baseUrl = node.baseUrl || '';
+	const languages: Record<string, string> = {};
+
+	[
+		{ uri: node.uri, language: node.language },
+		...(node.translations ?? []),
+	].forEach((translation) => {
+		const { uri, language } = translation;
+
+		if (!uri || !language?.locale || !language?.code) return;
+
+		const code = language.code.toLowerCase();
+		const url = baseUrl + (uri === '/' ? `/${code}/` : uri);
+
+		languages[language.locale.replace('_', '-')] = url;
+
+		if (code === defaultLocale.toLowerCase()) languages['x-default'] = url;
+	});
+
+	return Object.keys(languages).length > 0 ? languages : undefined;
 }
 
 // Generate page metadata
@@ -42,6 +85,8 @@ export async function generateMetadata({
 		'http://localhost:3000';
 
 	const node = await getNodeByURI(uri, false, {}, false, false, 1, lang);
+
+	const { defaultLocale } = await getLocales();
 
 	const imageSEO =
 		node?.seo?.opengraphImage?.src ??
@@ -65,28 +110,7 @@ export async function generateMetadata({
 		// Canonical
 		alternates: {
 			canonical: canonical,
-			languages: node?.translations?.reduce(
-				(
-					acc: Record<string, string>,
-					t: {
-						uri?: string;
-						language?: { locale?: string; code?: string } | null;
-					}
-				) => {
-					if (!t.language || !t.language.locale || !t.language.code)
-						return acc;
-
-					return {
-						...acc,
-						[t.language.locale?.replace('_', '-')]:
-							(node?.baseUrl || '') +
-							(t.uri === '/'
-								? `/${t.language.code.toLowerCase()}/`
-								: t.uri),
-					};
-				},
-				{}
-			),
+			languages: getAlternateLanguages(node, defaultLocale),
 		},
 		// Open Graph
 		openGraph: {
@@ -187,15 +211,6 @@ export default async function Page({
 		}
 	}
 
-	const redirection = await getRedirection(uri);
-	if (redirection) {
-		if (redirection.isPermanent) {
-			permanentRedirect(redirection.destination);
-		} else {
-			redirect(redirection.destination);
-		}
-	}
-
 	const node = await getNodeByURI(
 		uri,
 		isDraftModeEnable,
@@ -207,6 +222,26 @@ export default async function Page({
 	);
 
 	if (!node || !node?.uri) {
+		// Only URIs WordPress cannot resolve can be redirections, so the query
+		// stays out of the hot path of every rendered page.
+		// It also prevents infinite redirection loops (ex: /my-url -> /fr/my-url)
+		// that happen when redirecting before fetching the page content.
+		// The Redirection plugin stores its sources as the full public path,
+		// language prefix included (ex: `/de/my-url/`), while `uri` holds the
+		// WordPress URI without it. Look the prefixed path up first and keep
+		// the bare one as a fallback for redirections saved without a language prefix.
+		const redirection =
+			(configs.isMultilang
+				? await getRedirection(`/${lang}${uri}`)
+				: null) ?? (await getRedirection(uri));
+		if (redirection) {
+			if (redirection.isPermanent) {
+				permanentRedirect(redirection.destination);
+			} else {
+				redirect(redirection.destination);
+			}
+		}
+
 		return notFound();
 	}
 

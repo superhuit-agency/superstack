@@ -27,9 +27,42 @@ type BlockPropsType = {
 	 * Per-language `innerBlocks` overrides for `core/template-part` blocks,
 	 * keyed by Polylang language slug (e.g. "de"). Populated at build time from
 	 * translated template parts (`<slug>___<lang>`). See getTemplateBlocks in
-	 * get-node-by-uri.ts for how these are swapped in at request time.
+	 * get-fse-template-blocks.ts for how these are swapped in at request time.
 	 */
 	translations?: Record<string, Array<BlockPropsType | null>>;
+};
+
+/**
+ * Request-time context threaded into a block's `getData(fetcher, attrs, lang, context)`.
+ * Populated per request from the resolved node (see get-node-by-uri.ts) so blocks
+ * like `core/query` can resolve pagination without a rebuild.
+ */
+type BlockDataContext = {
+	/** Current query-loop page from the `/page/{n}` route (1-based). */
+	page?: number;
+	/** Base uri of the resolved node (e.g. "/blog/"), used to build page links. */
+	baseUri?: string;
+	/** The block's own `innerBlocks`, so `getData` can enrich/override children. */
+	innerBlocks?: Array<BlockPropsType>;
+	/**
+	 * The taxonomy term being viewed on a term archive (Tag/Category), so query
+	 * loops can scope their posts to the current term without a rebuild.
+	 */
+	term?: {
+		/** WPGraphQL taxonomy handle, e.g. "tag" | "category". */
+		taxonomy: string;
+		/** The term's WordPress database ID. */
+		databaseId: number;
+	};
+	/**
+	 * The post type archive being viewed (ContentType node), so query loops
+	 * inheriting the template query resolve the right post type — WordPress
+	 * leaves `query.postType` at its default when `query.inherit` is true.
+	 */
+	archive?: {
+		/** The WordPress post type slug, e.g. "post". */
+		postType: string;
+	};
 };
 
 type FseTemplateEntry = {
@@ -85,7 +118,7 @@ type FetchApiFuncType = (
 		variables?: any;
 		auth?: AuthType;
 		endpoint?: string;
-		headers?: any;
+		headers?: Record<string, string>;
 	}
 ) => Promise<any>;
 

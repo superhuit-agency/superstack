@@ -50,6 +50,8 @@ const blocksList: Record<string, () => Promise<BlockModule>> = {
 	'core/query': () => import('../core/Query'),
 	'core/query-pagination': () => import('../core/QueryPagination'),
 	'core/query-pagination-next': () => import('../core/QueryPaginationNext'),
+	'core/query-pagination-numbers': () =>
+		import('../core/QueryPaginationNumbers'),
 	'core/query-pagination-previous': () =>
 		import('../core/QueryPaginationPrevious'),
 	'core/query-title': () => import('../core/QueryTitle'),
@@ -63,12 +65,14 @@ const blocksList: Record<string, () => Promise<BlockModule>> = {
 	'core/spacer': () => import('../core/Spacer'),
 	'core/table': () => import('../core/Table'),
 	'core/template-part': () => import('../core/TemplatePart'),
+	'core/term-name': () => import('../core/TermName'),
 	'core/terms-query': () => import('../core/TermsQuery'),
 	'core/verse': () => import('../core/Preformatted'),
 	'core/video': () => import('../core/Video'),
 	'polylang/language-switcher': () => import('../atoms/LanguageSwitcher'),
 	'polylang/navigation-language-switcher': () =>
 		import('../atoms/NavigationLanguageSwitcher'),
+	'yoast-seo/breadcrumbs': () => import('../core/YoastBreadcrumbs'),
 };
 
 interface PostBodyBlocksProps {

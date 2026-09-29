@@ -1,6 +1,5 @@
-.supt-paragraph {
-	font-family: var(--font-secondary);
-	font-size: var(--wp--preset--font-size--medium);
-	line-height: var(--wp--custom--line-height--medium);
-	font-weight: 400;
+@import '@resources/index.css';
+
+.wp-block-paragraph {
+	@extend %t-paragraph;
 }

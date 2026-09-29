@@ -1,3 +1,4 @@
+import configs from '@/configs.json';
 import { PREVIEW_STATI, fetchAPI } from '@/lib';
 
 const POST_TYPES = ['Page', 'Post'];
@@ -30,6 +31,13 @@ export default async function getPreviewNode({
 					slug
 					uri
 					status
+					${
+						configs.isMultilang
+							? `language {
+						code
+					}`
+							: ''
+					}
 				}`
 				).join('\n')}
 			}

@@ -1,3 +1,4 @@
+import Button from '../Button';
 import block from './block.json';
 
 import './styles.css';
@@ -14,32 +15,32 @@ export default function File({
 }: FileProps) {
 	return (
 		<div className="wp-block-file">
-			{displayPreview && (
-				<object
-					className="wp-block-file__embed"
-					data={href}
-					type="application/pdf"
-					aria-label={`Embed of ${fileName}.`}
-					style={{ width: '100%', height: previewHeight }}
-				/>
-			)}
-			<a
-				href={textLinkHref}
-				target={textLinkTarget ? textLinkTarget : undefined}
-				className="wp-block-file__text-link"
-			>
-				{fileName}
-			</a>
-			{/* TODO :: CHANGE TO BUTTON WHEN AVAILABLE! */}
-			{showDownloadButton && (
+			<div className="wp-block-file__content-wrapper">
+				{displayPreview && (
+					<object
+						className="wp-block-file__embed"
+						data={href}
+						type="application/pdf"
+						aria-label={`Embed of ${fileName}.`}
+						style={{ width: '100%', height: previewHeight }}
+					/>
+				)}
 				<a
 					href={textLinkHref}
-					className="wp-block-file__button"
-					download
+					target={textLinkTarget ? textLinkTarget : undefined}
+					className="wp-block-file__text-link"
 				>
-					{downloadButtonText}
+					{fileName}
 				</a>
-			)}
+				{showDownloadButton && (
+					<Button
+						text={downloadButtonText}
+						url={textLinkHref}
+						className="wp-block-file__button"
+						download
+					/>
+				)}
+			</div>
 		</div>
 	);
 }

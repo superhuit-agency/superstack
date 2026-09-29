@@ -32,4 +32,7 @@ type TaxonomyTerm = {
 			databaseId?: number;
 		} | null;
 	} | null;
+	language?: {
+		slug?: string;
+	} | null;
 };

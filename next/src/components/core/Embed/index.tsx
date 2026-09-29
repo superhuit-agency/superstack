@@ -13,7 +13,10 @@ function getEmbedUrl(
 	if (!rawUrl) return null;
 
 	if (providerNameSlug === 'youtube') {
-		const videoId = rawUrl.match(/[?&]v=([^&]+)/)?.[1];
+		const videoId =
+			rawUrl.match(/[?&]v=([^&]+)/)?.[1] ??
+			rawUrl.match(/youtu\.be\/([^?&]+)/)?.[1] ??
+			rawUrl.match(/youtube\.com\/(?:embed|shorts)\/([^?&]+)/)?.[1];
 		if (!videoId) return null;
 		const finalUrl = `https://www.youtube.com/embed/${videoId}?feature=oembed`;
 

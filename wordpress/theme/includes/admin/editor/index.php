@@ -79,6 +79,7 @@ class Index {
 			$version    = $deps_file['version'] ?? SUPERSTACK_VERSION;
 
 			wp_enqueue_script($unique_id, SUPERSTACK_URL . 'static/editor/editor.js', $dependency, $version, true);
+			wp_set_script_translations($unique_id, 'superstack', SUPERSTACK_PATH . 'languages');
 		}
 
 		wp_enqueue_style($unique_id, SUPERSTACK_URL . 'static/editor/editor.css', [], SUPERSTACK_VERSION);
