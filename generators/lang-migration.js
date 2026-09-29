@@ -16,7 +16,9 @@
  * (GraphQL fragments, get-all-uris, get-node-by-uri, proxy, get-locales…),
  * so this script only handles the structural changes:
  * - move `[[...uri]]` in/out of the `[lang]` route segment
- * - add/remove `[lang]/layout.tsx` and swap the root layout
+ * - swap the root layout: in multilang, `[lang]/layout.tsx` is the root layout
+ *   (so `<html lang>` matches the current language) and `not-found.tsx`
+ *   moves into `[lang]` with it
  * - update `configs.json`, `proxy.ts`, `typings.d.ts`, `locale-context.tsx`
  * - toggle the `IS_MULTILANG` default in `wordpress/scripts/provision.sh`
  *
@@ -39,6 +41,8 @@ const paths = {
 	langUriDir: path.join(rootDir, 'next/src/app/[lang]/[[...uri]]'),
 	rootLayout: path.join(rootDir, 'next/src/app/layout.tsx'),
 	langLayout: path.join(rootDir, 'next/src/app/[lang]/layout.tsx'),
+	notFound: path.join(rootDir, 'next/src/app/not-found.tsx'),
+	langNotFound: path.join(rootDir, 'next/src/app/[lang]/not-found.tsx'),
 	configsJson: path.join(rootDir, 'next/src/configs.json'),
 	proxy: path.join(rootDir, 'next/src/proxy.ts'),
 	typings: path.join(rootDir, 'next/src/i18n/typings.d.ts'),
@@ -273,7 +277,16 @@ function toMultilang(defaultLocale, additionalLocales) {
 		paths.langUriDir,
 		'Moved [[...uri]] into [lang] folder'
 	);
-	copyTemplate('root-layout-multilang.tsx', paths.rootLayout);
+	moveDir(
+		paths.notFound,
+		paths.langNotFound,
+		'Moved not-found.tsx into [lang] folder'
+	);
+
+	if (fs.existsSync(paths.rootLayout)) {
+		fs.rmSync(paths.rootLayout);
+		log('Removed root layout ([lang]/layout.tsx is the root layout)');
+	}
 
 	updateConfigs(true, defaultLocale);
 	updateProxyLocales(locales);
@@ -298,6 +311,11 @@ function toSinglelang(defaultLocale) {
 		paths.langUriDir,
 		paths.uriDir,
 		'Moved [[...uri]] out of [lang] folder'
+	);
+	moveDir(
+		paths.langNotFound,
+		paths.notFound,
+		'Moved not-found.tsx out of [lang] folder'
 	);
 
 	if (fs.existsSync(paths.langDir)) {
