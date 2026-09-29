@@ -30,7 +30,16 @@ assert_container_dir() {
 
 	# Docker stores the symlink-resolved path, hence pwd -P in the caller.
 	owner=$(docker inspect "$1" --format '{{index .Config.Labels "com.docker.compose.project.working_dir"}}')
-	[ "$owner" = "$2" ] && return 0
+	if [ "$owner" = "$2" ]; then
+		# Containers created before docker-compose.yml set `name:` belong to the
+		# "wordpress" compose project; compose would fail on the name clash.
+		project=$(docker inspect "$1" --format '{{index .Config.Labels "com.docker.compose.project"}}')
+		[ "$project" = "${1%_wp}" ] && return 0
+		echo "ERROR: container '$1' was created under compose project '$project'." >&2
+		echo "       Remove it once (data in .data/ is kept), then start again:" >&2
+		echo "         docker rm -f ${1%_wp}_wp ${1%_wp}_db" >&2
+		exit 1
+	fi
 
 	echo "ERROR: container '$1' belongs to another checkout:" >&2
 	echo "         ${owner:-<no compose ownership label>}" >&2
