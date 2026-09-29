@@ -166,8 +166,66 @@ describe('core/query getData', () => {
 
 		expect(variables).toMatchObject({ first: 2, offset: 4 });
 		expect(result.pagination).toMatchObject({
-			currentPage: 3,
+			currentPage: 1,
 			totalPages: 2,
+		});
+	});
+
+	it('follows the route page in an inheriting loop, on top of its offset', async () => {
+		const { variables, result } = await queryLoop(
+			{ inherit: true, perPage: 2, offset: 1 },
+			{ page: 2 }
+		);
+
+		expect(variables).toMatchObject({ first: 2, offset: 3 });
+		expect(result.pagination).toMatchObject({ currentPage: 2 });
+	});
+
+	it('keeps a custom loop on its first page', async () => {
+		const { variables, result } = await queryLoop(
+			{ inherit: false, perPage: 2 },
+			{ page: 2 }
+		);
+
+		expect(variables).toMatchObject({ offset: 0 });
+		expect(result.pagination).toMatchObject({ currentPage: 1 });
+	});
+
+	it('injects the pagination into its pagination blocks', async () => {
+		const { result } = await queryLoop(
+			{ inherit: true, perPage: 1 },
+			{
+				page: 2,
+				baseUri: '/blog/',
+				innerBlocks: [
+					{
+						name: 'core/query-pagination',
+						attributes: {},
+						innerBlocks: [
+							{
+								name: 'core/query-pagination-previous',
+								attributes: {},
+								innerBlocks: [],
+							},
+							{
+								name: 'core/query-pagination-next',
+								attributes: {},
+								innerBlocks: [],
+							},
+						],
+					},
+				],
+			}
+		);
+
+		const [previous, next] = result.innerBlocks![0].innerBlocks;
+		expect(previous.attributes).toMatchObject({
+			href: '/blog/',
+			isDisabled: false,
+		});
+		expect(next.attributes).toMatchObject({
+			href: '/blog/page/3/',
+			isDisabled: false,
 		});
 	});
 });

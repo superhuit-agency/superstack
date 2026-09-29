@@ -57,7 +57,8 @@ class Next_Redirect {
 			$preview_url = rtrim($next_url, '/') . '/api/preview/';
 			$token = Auth::get_refresh_token(wp_get_current_user());
 
-			if (is_archive()) {
+			// The posts page has no resolvable uri in WPGraphQL, so it is handled like an archive
+			if (is_archive() || is_home()) {
 				$uri = $_SERVER['REQUEST_URI'] ?? '';
 
 				if (empty($uri)) {

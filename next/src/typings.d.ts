@@ -28,17 +28,23 @@ type BlockPropsType = {
 	 * keyed by Polylang language slug (e.g. "de"). Populated by the FSE
 	 * templates read (get-fse-templates.ts) from translated template parts
 	 * (`<slug>___<lang>`). See getTemplateBlocks in
-	 * get-node-by-uri.ts for how these are swapped in at request time.
+	 * get-fse-template-blocks.ts for how these are swapped in at request time.
 	 */
 	translations?: Record<string, Array<BlockPropsType | null>>;
 };
 
 /**
- * The archive being viewed, threaded into `getData(fetcher, attrs, lang, context)`
+ * The page being viewed, threaded into `getData(fetcher, attrs, lang, context)`
  * of blocks declaring `usesArchiveContext`. Populated from the resolved node
  * (see get-node-by-uri.ts), and part of their block data's cache key.
  */
 type BlockDataContext = {
+	/** Current query-loop page from the `/page/{n}` route (1-based). */
+	page?: number;
+	/** Base uri of the resolved node (e.g. "/blog/"), used to build page links. */
+	baseUri?: string;
+	/** The block's own `innerBlocks`, so `getData` can enrich/override children. */
+	innerBlocks?: Array<BlockPropsType>;
 	/**
 	 * The taxonomy term being viewed on a term archive (Tag/Category), so query
 	 * loops can scope their posts to the current term.

@@ -4,7 +4,8 @@
 		"allowImportingTsExtensions": true,
 		"noEmit": true,
 		"paths": {
-			"@/*": ["../../next/src/*"]
+			"@/*": ["../../next/src/*"],
+			"#/*": ["./src/*"]
 		}
 	}
 }

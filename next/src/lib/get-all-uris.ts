@@ -1,7 +1,7 @@
 import configs from '@/configs.json';
 import { fetchAPI } from '.';
 
-const POST_TYPES: string[] = ['pages'];
+const POST_TYPES: string[] = ['pages', 'posts'];
 const ARCHIVES: string[] = ['contentTypes']; // contentTypes are for archives but have no where arg — use first: 100
 const TAXONOMIES: string[] = [];
 

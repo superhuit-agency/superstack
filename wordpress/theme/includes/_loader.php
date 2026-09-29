@@ -15,6 +15,11 @@ if (! defined('ABSPATH')) {
 
 
 /**
+ * Load translations.
+ */
+require_once __DIR__ . '/i18n.php';
+
+/**
  * Load traits.
  */
 require_once __DIR__ . '/traits/singleton.php';
@@ -23,6 +28,7 @@ require_once __DIR__ . '/traits/singleton.php';
  * Load Helpers.
  */
 require_once __DIR__ . '/helpers/array-find.php';
+require_once __DIR__ . '/helpers/build-blocks-json.php';
 require_once __DIR__ . '/helpers/get-remote-json.php';
 require_once __DIR__ . '/helpers/relative-site-urls.php';
 require_once __DIR__ . '/helpers/get-next-url.php';
@@ -56,12 +62,12 @@ require_once __DIR__ . '/graphql/graphql-endpoint-script.php';
 require_once __DIR__ . '/graphql/navigation-inner-blocks.php';
 require_once __DIR__ . '/graphql/node-idtype.php';
 require_once __DIR__ . '/graphql/post-edit-link.php';
-require_once __DIR__ . '/graphql/query-pagination-offset.php';
 require_once __DIR__ . '/graphql/register-content-type-translations.php';
 require_once __DIR__ . '/graphql/register-fse-templates.php';
 require_once __DIR__ . '/graphql/register-logo.php';
 require_once __DIR__ . '/graphql/register-tax-term-filter.php';
 require_once __DIR__ . '/graphql/resolve-uris.php';
+require_once __DIR__ . '/graphql/set-current-language-from-uri.php';
 
 /**
  * Load editor classes.
@@ -69,8 +75,8 @@ require_once __DIR__ . '/graphql/resolve-uris.php';
 require_once __DIR__ . '/admin/editor/index.php';
 require_once __DIR__ . '/admin/editor/remote-block-patterns.php';
 require_once __DIR__ . '/admin/editor/unregister-default-patterns.php';
-require_once __DIR__ . '/admin/editor/register-block-styles.php';
 require_once __DIR__ . '/admin/editor/register-block-categories.php';
+require_once __DIR__ . '/admin/editor/register-pattern-categories.php';
 
 /**
  * Load blocks classes.

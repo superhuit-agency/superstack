@@ -36,6 +36,7 @@ An opinionated boilerplate for decoupled (headless) websites that are both perfo
 - Getting Started
 - [Deploy](./docs/setup/deployment.md)
 - [Caching](./docs/caching.md)
+- [Parallel local instances](./docs/setup/parallel-local-dev.md)
 
 
 ## WordPress

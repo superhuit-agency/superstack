@@ -41,7 +41,7 @@ Use this when a section can be built from core blocks (`core/group`, `core/headi
 
 ### Step 3: Add frontend styles
 
-- Add matching styles under [`next/src/css/patterns/`](../../next/src/css/patterns/).
+- Add matching styles in `next/src/css/patterns/_<name>.css` and import it from `next/src/css/patterns/index.css`. The folder does not exist in the starter — on the first pattern, create it and add `@import '../patterns/index.css';` to [`next/src/css/base/index.css`](../../next/src/css/base/index.css).
 - Optionally add editor preview styles under [`wordpress/theme/src/shared/`](../../wordpress/theme/src/shared/).
 
 ### Step 4: Clear the patterns cache (if needed)
@@ -58,23 +58,81 @@ Use this when you need a dedicated block in the inserter
 
 Custom blocks are **dynamic** in this stack: the WordPress editor stores attributes in block JSON, and Next.js handles all frontend rendering.
 
+### Rule: prefer core blocks as inner blocks
+
+**Always favour native WordPress blocks as inner blocks over custom attributes.** A custom attribute (`RichText`, `MediaUpload`, …) should be the exception, not the default.
+
+Before adding an attribute, ask: is there a core block that already does this?
+
+| Content            | Do this                      | Not this                     |
+| ------------------ | ---------------------------- | ---------------------------- |
+| Title              | `core/heading` inner block   | `RichText` on a `title` attr |
+| Text / description | `core/paragraph` inner block | `RichText` on a `text` attr  |
+| Image              | `core/image` inner block     | `MediaUpload` + `image` attr |
+| Button / link      | `core/buttons` inner block   | custom `url` + `label` attrs |
+| List               | `core/list` inner block      | repeater attribute           |
+
+Why: editors keep the native toolbars, typography, colors and block styles; the markup stays standard; Next.js already renders every core block via `<Blocks />`, so there is nothing extra to build on the frontend.
+
+Keep attributes only for structured data that has no core equivalent (a layout variant, an icon name, a post-type filter, a boolean toggle…).
+
+**Locking the structure with a template**
+
+Declare the expected inner blocks with `InnerBlocks` `template` + `templateLock`, so the block always ships with the right children:
+
+```tsx
+import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
+
+const TEMPLATE: any[] = [
+	['core/heading', { level: 3, placeholder: 'Titre' }],
+	['core/paragraph', { placeholder: 'Description' }],
+];
+
+export default function Edit() {
+	return (
+		<div {...useBlockProps()}>
+			<InnerBlocks
+				template={TEMPLATE}
+				templateLock="all"
+				allowedBlocks={['core/heading', 'core/paragraph']}
+			/>
+		</div>
+	);
+}
+```
+
+- `templateLock="all"` — fixed structure, no add/remove/move (use for a title + text block).
+- `templateLock="insert"` — children can be reordered but not added/removed.
+- `templateLock={false}` — the template is only a starting point; combine with `allowedBlocks` to constrain what editors may insert.
+
+On the Next.js side, inner blocks arrive as `children` — render them inside your wrapper:
+
+```tsx
+export default function MyBlock({ children }: MyBlockProps) {
+	return <div className="my-block">{children}</div>;
+}
+```
+
 ### Architecture
 
 ```
-WordPress theme (editor)          Next.js (frontend)
-─────────────────────────         ──────────────────
-src/blocks/<name>/register.ts  →  (not used)
-src/blocks/<name>/edit.tsx     →  (not used)
-                                  components/custom/.../index.tsx
-                                  components/custom/.../block.json  ← slug source of truth
-                                  global/Blocks.tsx                 ← slug → component map
+WordPress theme (editor)                   Next.js (frontend)
+────────────────────────────────           ──────────────────
+src/blocks/custom/<level>/<Name>/register.ts
+src/blocks/custom/<level>/<Name>/edit.tsx
+src/blocks/index.ts   ← barrel
+                                           components/custom/<level>/<Name>/index.tsx
+                                           components/custom/<level>/<Name>/block.json  ← slug source of truth
+                                           global/Blocks.tsx                            ← slug → component map
 ```
+
+`<level>` is `atoms`, `molecules` or `organisms`. The WordPress folder mirrors the Next.js one so each block's editor and frontend code are easy to pair up.
 
 Data flow: Gutenberg saves `<!-- wp:namespace/block {"attr":"…"} /-->` → WPGraphQL `blocksJSON` → Next.js `<Blocks />`.
 
 ### Step 1: Create the Next.js component
 
-Under `next/src/components/custom/`, create a folder with:
+Under `next/src/components/custom/<level>/<Name>/`, create a folder with:
 
 | File           | Purpose                                    |
 | -------------- | ------------------------------------------ |
@@ -83,72 +141,69 @@ Under `next/src/components/custom/`, create a folder with:
 | `index.tsx`    | Default export — frontend render component |
 | `styles.css`   | Frontend styles (optional)                 |
 
-**`block.json`** example:
+**`block.json`** example (the examples below use a hypothetical `superstack/tag` block in `custom/atoms/Tag/`):
 
 ```json
 {
-  "slug": "superstack/benefits-list-item",
-  "title": "Avantage"
+	"slug": "superstack/tag",
+	"title": "Tag"
 }
 ```
+
+Core blocks follow the same convention — see [`core/Heading/block.json`](../../next/src/components/core/Heading/block.json).
 
 ### Step 2: Register the block in Next.js
 
 Add the slug to `blocksList` in [`next/src/components/global/Blocks.tsx`](../../next/src/components/global/Blocks.tsx):
 
 ```ts
-'ramoneurs/benefits-list-item': () =>
-  import('../custom/molecules/BenefitsList/BenefitsListItem'),
+'superstack/tag': () => import('../custom/atoms/Tag'),
 ```
 
 Without this entry, the block saves in WordPress but Next.js will log a dev warning and render nothing.
 
 ### Step 3: Register the block in the WordPress editor
 
-Create files under [`wordpress/theme/src/blocks/<name>/`](../../wordpress/theme/src/blocks/):
+Create files under `wordpress/theme/src/blocks/custom/<level>/<Name>/` (the `custom/` folder does not exist in the starter — the first block creates it):
 
-| File          | Purpose                          |
-| ------------- | -------------------------------- |
-| `register.ts` | Calls `registerBlockType`        |
-| `edit.tsx`    | Gutenberg edit UI                |
-| `edit.css`    | Editor preview styles (optional) |
+| File              | Purpose                                                      |
+| ----------------- | ------------------------------------------------------------ |
+| `register.ts`     | Calls `registerBlockType` (use `.tsx` if `save` returns JSX) |
+| `edit.tsx`        | Gutenberg edit UI                                            |
+| `styles.edit.css` | Editor-only preview styles (optional)                        |
 
 **`register.ts`** — import `block.json` from Next via the `@/` webpack alias (`@` → `next/src`):
 
 ```ts
 import { registerBlockType } from '@wordpress/blocks';
 
-import block from '@/components/custom/molecules/BenefitsList/BenefitsListItem/block.json';
+import block from '@/components/custom/atoms/Tag/block.json';
 
 import Edit from './edit';
 
 registerBlockType(block.slug, {
-  title: block.title,
-  category: 'superstack',
-  icon: 'star-filled',
-  attributes: {
-    text: { type: 'string', default: '' },
-  },
-  supports: { anchor: false, multiple: true },
-  edit: Edit,
-  save: () => null,
+	title: block.title,
+	category: 'superstack',
+	icon: 'tag',
+	attributes: {
+		label: { type: 'string', default: '' },
+	},
+	supports: { anchor: false, multiple: true },
+	edit: Edit,
+	save: () => null,
 });
 ```
 
-**`edit.tsx`** — build the Gutenberg UI with `@wordpress/block-editor` components (`RichText`, `useBlockProps`, `InnerBlocks`, etc.). See [`benefits-list-item/edit.tsx`](../../wordpress/theme/src/blocks/benefits-list-item/edit.tsx).
+`category: 'superstack'` is registered in [`register-block-categories.php`](../../wordpress/theme/includes/admin/editor/register-block-categories.php). Keep `save: () => null` for attribute-only blocks; blocks with inner blocks return `<InnerBlocks.Content />` instead.
+
+**`edit.tsx`** — build the Gutenberg UI with `@wordpress/block-editor` components (`useBlockProps`, `InnerBlocks`, `RichText`, etc.). Start from `InnerBlocks` + a template of core blocks (see [Rule: prefer core blocks as inner blocks](#rule-prefer-core-blocks-as-inner-blocks)); reach for `RichText` only for data no core block covers. Import the frontend styles from Next (`import '@/components/custom/atoms/Tag/styles.css';`) so the editor preview matches the site.
 
 ### Step 4: Wire the block into the editor bundle
 
-Add an import in [`wordpress/theme/src/blocks/index.ts`](../../wordpress/theme/src/blocks/index.ts):
+Add an import to the barrel [`wordpress/theme/src/blocks/index.ts`](../../wordpress/theme/src/blocks/index.ts), which [`editor/index.ts`](../../wordpress/theme/src/editor/index.ts) already loads:
 
 ```ts
-import './benefits-list-item/register';
-```
-
-Ensure [`wordpress/theme/src/editor/editor.ts`](../../wordpress/theme/src/editor/editor.ts) loads the barrel:
-
-```ts
-import '../blocks';
+import './custom/atoms/Tag/register';
 ```
 
 ### Step 5: Build theme assets
@@ -174,13 +229,13 @@ Without this step, the block may save in WordPress but `blocksJSON` may not expo
 
 - Insert the block (category: **Superstack**).
 - Edit content, save the page.
-- Post content should contain: `<!-- wp:your-namespace/your-block {"text":"…"} /-->`
+- Post content should contain: `<!-- wp:superstack/tag {"label":"…"} /-->`
 
 **Next.js frontend**
 
 - Load the page on the Next dev server.
 - Confirm the component renders with the expected attributes.
-- No dev warning: `The following block does not exist: your-namespace/your-block`.
+- No dev warning: `The following block does not exist: superstack/tag`.
 
 **Type check** (optional):
 
@@ -190,22 +245,36 @@ cd next && npx tsc --noEmit
 
 ---
 
-## Extending core blocks (filters)
+## Removing or renaming a block
 
-To tweak an existing core block (e.g. limit heading levels, restrict post types), add an `edit.tsx` filter under `next/src/components/core/<Block>/` and export it from [`next/src/components/filters.ts`](../../next/src/components/filters.ts). This is different from registering a new custom block — see [`Heading/README.md`](../../next/src/components/core/Heading/README.md).
+Registration is not just wiring for new content — it is what keeps **already-published** content renderable. Removing a block's registration, or renaming its slug, breaks every page that already uses it:
+
+- **Drop the slug from `blocksList`** in [`next/src/components/global/Blocks.tsx`](../../next/src/components/global/Blocks.tsx) and the frontend silently renders nothing for that block. Only in development does it log `The following block does not exist: <slug>`; in production the block just disappears.
+- **Drop the WordPress-side registration** and Gutenberg no longer recognises the block, so the editor shows it as unsupported ("Your site doesn't include support for the … block").
+- **Add a core block to `excludedBlocks`** in [`wordpress/theme/src/editor/index.ts`](../../wordpress/theme/src/editor/index.ts) and it is unregistered from the editor — existing content using it is affected the same way.
+
+Because the slug is the link between saved content and code, a rename is a removal plus an addition — old content still references the old slug. Changing a block's `save()` output without a deprecation has a related effect: existing content no longer matches, and Gutenberg flags it as invalid content.
+
+So:
+
+- Never remove or rename a registered block as a side effect of another change. Treat it as a deliberate decision that needs a content migration, not a cleanup.
+- Adding a block is safe; removing one is not.
+- If a block really must go, migrate or remove the content that uses it first.
+
+This applies to humans and coding agents alike.
 
 ## Checklist — custom block
 
-| Step                                           | Location                                |
-| ---------------------------------------------- | --------------------------------------- |
-| 1. `block.json` + `index.tsx` + `typings.d.ts` | `next/src/components/custom/...`        |
-| 2. Register slug                               | `next/src/components/global/Blocks.tsx` |
-| 3. `register.ts` + `edit.tsx`                  | `wordpress/theme/src/blocks/<name>/`    |
-| 4. Barrel import                               | `wordpress/theme/src/blocks/index.ts`   |
-| 5. Build theme assets                          | `npm --prefix ./wordpress run build`    |
-| 6. Sync GraphQL registry                       | WP Admin → GraphQL → Gutenberg          |
-| 7. Verify editor + frontend                    | —                                       |
+| Step                                           | Location                                            |
+| ---------------------------------------------- | --------------------------------------------------- |
+| 1. `block.json` + `index.tsx` + `typings.d.ts` | `next/src/components/custom/<level>/<Name>/`        |
+| 2. Register slug                               | `next/src/components/global/Blocks.tsx`             |
+| 3. `register.ts` + `edit.tsx`                  | `wordpress/theme/src/blocks/custom/<level>/<Name>/` |
+| 4. Barrel import                               | `wordpress/theme/src/blocks/index.ts`               |
+| 5. Build theme assets                          | `npm --prefix ./wordpress run build`                |
+| 6. Sync GraphQL registry                       | WP Admin → GraphQL → Gutenberg                      |
+| 7. Verify editor + frontend                    | —                                                   |
 
 ## Parent / child blocks (optional)
 
-For blocks that belong inside a wrapper (e.g. a list item inside a `<ul>`), register both blocks and set `parent` / `allowedBlocks` on the child once the parent exists. See `ramoneurs/benefits-list-item` for the single-block MVP; a parent `ramoneurs/benefits-list` can be added as a follow-up.
+For blocks that belong inside a wrapper (e.g. a list item inside a `<ul>`), register both blocks and set `parent` / `allowedBlocks` on the child once the parent exists. For example, a `superstack/tag-list` parent would list `superstack/tag` in its `allowedBlocks`, and the tag would set `parent: ['superstack/tag-list']`.

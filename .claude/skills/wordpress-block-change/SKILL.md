@@ -32,9 +32,13 @@ Deliver block-related changes with minimal scope, no duplication, and full compa
 
 1. Keep edits minimal and focused to requested block behavior only.
 2. Do not introduce duplicate block registrations or duplicate data mappers.
-3. Preserve existing naming conventions and folder structure.
-4. Do not add/remove code comments unless explicitly requested.
-5. If a change impacts both WP and Next, update both sides in the same task.
+3. Never remove or rename an existing block registration unless that is the
+   explicit request. Registration is what keeps already-published content
+   renderable — dropping it breaks live pages, not just new ones. See
+   [Removing or renaming a block](../../../docs/blocks/create-block.md#removing-or-renaming-a-block).
+4. Preserve existing naming conventions and folder structure.
+5. Do not add/remove code comments unless explicitly requested.
+6. If a change impacts both WP and Next, update both sides in the same task.
 
 ## Block Data Caching Rules
 
@@ -43,7 +47,7 @@ A block's `data.ts` `getData` runs in a cache entry of its own (`next/src/lib/ge
 1. Return `cacheTags` next to the data, built with `next/src/lib/cache-tags.ts` (e.g. `{ content, cacheTags: [cacheTags.settings()] }`). Without them the block falls back to `content` and `settings` and is refetched after every post or settings change.
 2. If `getData` reads the Base URI (`baseUriContext()`), declare `export const usesBaseUri = true;` in the same `data.ts`. It adds the Base URI to the cache key; without it, one page's data leaks into every other page, and `next build` fails with a `BaseUriNotDeclaredError`.
 3. Don't declare `usesBaseUri` on a block that doesn't read the Base URI: it caches one entry per page for nothing, each fetched from WordPress.
-4. If `getData` needs the archive being viewed (its term or listed post type), declare `export const usesArchiveContext = true;` (or a function of the attributes, when only some depend on it, like `core/query`'s `inherit`) and read `getData`'s fourth argument, the `BlockDataContext`. It adds the context to the cache key; other blocks don't get it.
+4. If `getData` needs the page being viewed (its term or listed post type, the `/page/{n}` page, its `baseUri` or the block's own `innerBlocks`), declare `export const usesArchiveContext = true;` (or a function of the attributes, when only some depend on it, like `core/query`'s `inherit`) and read `getData`'s fourth argument, the `BlockDataContext`. It adds the context to the cache key; other blocks don't get it.
 5. Never import `next/cache` in `data.ts`: it's also bundled into the WordPress block editor.
 6. `fetchAPI` returns `{}` when WordPress doesn't answer. To keep a failure from being cached as empty data, throw a `WordPressReadError` (`next/src/lib/wordpress-read-error.ts`) when the queried field is missing (`undefined`), and keep `null` for "nothing there". `core/navigation` does this.
 7. ESLint enforces 2 and 3 (`superstack/require-uses-base-uri`, `superstack/no-unused-uses-base-uri`): run `cd next && npx eslint <path/to/data.ts>`.

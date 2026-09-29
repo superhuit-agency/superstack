@@ -24,7 +24,7 @@ class RegisterContentTypeTranslations {
 		}
 
 		register_graphql_object_type('ContentTypeTranslationLanguage', [
-			'description' => _x('Language of a content type archive translation.', 'GraphQL type desc', 'supt'),
+			'description' => _x('Language of a content type archive translation.', 'GraphQL type desc', 'superstack'),
 			'fields'      => [
 				'code'   => ['type' => 'String'],
 				'locale' => ['type' => 'String'],
@@ -32,7 +32,7 @@ class RegisterContentTypeTranslations {
 		]);
 
 		register_graphql_object_type('ContentTypeTranslation', [
-			'description' => _x('A content type archive URI in a given language.', 'GraphQL type desc', 'supt'),
+			'description' => _x('A content type archive URI in a given language.', 'GraphQL type desc', 'superstack'),
 			'fields'      => [
 				'uri'      => ['type' => 'String'],
 				'language' => ['type' => 'ContentTypeTranslationLanguage'],
@@ -41,7 +41,7 @@ class RegisterContentTypeTranslations {
 
 		register_graphql_field('ContentType', 'translations', [
 			'type'        => ['list_of' => 'ContentTypeTranslation'],
-			'description' => _x('The archive URI of this content type in every configured language.', 'GraphQL field desc', 'supt'),
+			'description' => _x('The archive URI of this content type in every configured language.', 'GraphQL field desc', 'superstack'),
 			'resolve'     => function ($source) {
 				$post_type = get_post_type_object($source->name ?? '');
 

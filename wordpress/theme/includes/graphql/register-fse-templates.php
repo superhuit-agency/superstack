@@ -56,20 +56,14 @@ class RegisterFseTemplates {
 			$assigned = get_page_template_slug($post);
 
 			if ('page' === $post->post_type) {
-				if (
-					! empty(get_option('page_for_posts')) &&
-					(int) get_option('page_for_posts') === (int) $post->ID
-				) {
+				if ($this->matches_option_post((int) get_option('page_for_posts'), $post)) {
 					$template_type = 'home';
 					$hierarchy     = ['home'];
 				} else {
 					$template_type = 'page';
 					$hierarchy     = ['page-' . $post->post_name, 'page'];
 
-					if (
-						! empty(get_option('page_on_front')) &&
-						(int) get_option('page_on_front') === (int) $post->ID
-					) {
+					if ($this->matches_option_post((int) get_option('page_on_front'), $post)) {
 						array_unshift($hierarchy, 'front-page');
 					}
 
@@ -111,20 +105,29 @@ class RegisterFseTemplates {
 
 			register_graphql_field($graphql_type, 'fseTemplate', [
 				'type'        => 'FseTemplateInfo',
-				'description' => _x('The FSE template used for this content node.', 'GraphQL field desc', 'supt'),
+				'description' => _x('The FSE template used for this content node.', 'GraphQL field desc', 'superstack'),
 				'resolve'     => $resolver,
 			]);
 		}
 
 		register_graphql_field('ContentType', 'fseTemplate', [
 			'type'        => 'FseTemplateInfo',
-			'description' => _x('The FSE template used for this content type archive.', 'GraphQL field desc', 'supt'),
+			'description' => _x('The FSE template used for this content type archive.', 'GraphQL field desc', 'superstack'),
 			'resolve'     => function ($source) {
 				$post_type_name = $source->name;
 				if (! $post_type_name) return null;
 
-				$hierarchy = ["archive-{$post_type_name}", 'archive'];
-				$resolved  = resolve_block_template('archive', $hierarchy, '');
+				// The blog posts index (`post` archive with a static posts page) is rendered
+				// by the `home` template, not `archive`, mirroring WordPress core.
+				if ('post' === $post_type_name && (int) get_option('page_for_posts')) {
+					$template_type = 'home';
+					$hierarchy     = ['home'];
+				} else {
+					$template_type = 'archive';
+					$hierarchy     = ["archive-{$post_type_name}", 'archive'];
+				}
+
+				$resolved = resolve_block_template($template_type, $hierarchy, '');
 
 				if (! $resolved) return null;
 
@@ -134,13 +137,17 @@ class RegisterFseTemplates {
 
 		register_graphql_field('Tag', 'fseTemplate', [
 			'type'        => 'FseTemplateInfo',
-			'description' => _x('The FSE template used for this tag archive.', 'GraphQL field desc', 'supt'),
+			'description' => _x('The FSE template used for this tag archive.', 'GraphQL field desc', 'superstack'),
 			'resolve'     => function ($source) {
 				$term = get_term($source->databaseId, 'post_tag');
-				if (! $term || is_wp_error($term)) return null;
+
+				if (! $term || is_wp_error($term)) {
+					return null;
+				}
 
 				$hierarchy = ["tag-{$term->slug}", "tag-{$term->term_id}", 'tag', 'archive'];
-				$resolved  = resolve_block_template('tag', $hierarchy, '');
+
+				$resolved = resolve_block_template('tag', $hierarchy, '');
 
 				if (! $resolved) return null;
 
@@ -150,19 +157,117 @@ class RegisterFseTemplates {
 
 		register_graphql_field('Category', 'fseTemplate', [
 			'type'        => 'FseTemplateInfo',
-			'description' => _x('The FSE template used for this category archive.', 'GraphQL field desc', 'supt'),
+			'description' => _x('The FSE template used for this category archive.', 'GraphQL field desc', 'superstack'),
 			'resolve'     => function ($source) {
 				$term = get_term($source->databaseId, 'category');
-				if (! $term || is_wp_error($term)) return null;
 
-				$hierarchy = ["category-{$term->slug}", "category-{$term->term_id}", 'category', 'archive'];
-				$resolved  = resolve_block_template('category', $hierarchy, '');
+				if (! $term || is_wp_error($term)) {
+					return null;
+				}
+
+				$hierarchy = $this->category_template_slugs($term);
+
+				// Unlike WordPress core, walk up the ancestors so a subcategory
+				// inherits its parent's template instead of falling straight back to `archive`.
+				foreach (get_ancestors($term->term_id, 'category', 'taxonomy') as $ancestor_id) {
+					$ancestor = get_term($ancestor_id, 'category');
+
+					if (! $ancestor || is_wp_error($ancestor)) {
+						continue;
+					}
+
+					$hierarchy = array_merge($hierarchy, $this->category_template_slugs($ancestor));
+				}
+
+				$hierarchy[] = 'category';
+				$hierarchy[] = 'archive';
+
+				$resolved = resolve_block_template('category', $hierarchy, '');
 
 				if (! $resolved) return null;
 
 				return ['slug' => $resolved->slug];
 			},
 		]);
+
+		$this->register_taxonomy_template_fields();
+	}
+
+	/**
+	 * The template slugs a single category level contributes to the hierarchy:
+	 * the term itself, then its default-language translation.
+	 */
+	private function category_template_slugs(\WP_Term $term): array {
+		$slugs = ["category-{$term->slug}", "category-{$term->term_id}"];
+
+		if (! function_exists('pll_default_language') || ! function_exists('pll_get_term')) {
+			return $slugs;
+		}
+
+		$default_term_id = pll_get_term($term->term_id, pll_default_language());
+		$default_term    = $default_term_id ? get_term($default_term_id, 'category') : null;
+
+		if ($default_term && ! is_wp_error($default_term) && $default_term->term_id !== $term->term_id) {
+			$slugs[] = "category-{$default_term->slug}";
+			$slugs[] = "category-{$default_term->term_id}";
+		}
+
+		return $slugs;
+	}
+
+	/**
+	 * Add the `fseTemplate` field to the term archives of custom taxonomies.
+	 *
+	 * Core's `category`/`post_tag` are handled above with their own hierarchy;
+	 * every other taxonomy exposed in the schema follows the WordPress taxonomy
+	 * hierarchy, extended with the archive of the post type the taxonomy is
+	 * attached to — so a term archive renders the same template as the post type
+	 * archive instead of the generic `archive`.
+	 */
+	function register_taxonomy_template_fields() {
+		$taxonomies = get_taxonomies(['show_in_graphql' => true], 'objects');
+
+		foreach ($taxonomies as $taxonomy) {
+			if (in_array($taxonomy->name, ['category', 'post_tag'])) continue;
+
+			$graphql_type = ! empty($taxonomy->graphql_single_name)
+				? ucfirst($taxonomy->graphql_single_name)
+				: null;
+
+			if (! $graphql_type) continue;
+
+			$taxonomy_name = $taxonomy->name;
+			$object_types  = (array) $taxonomy->object_type;
+
+			register_graphql_field($graphql_type, 'fseTemplate', [
+				'type'        => 'FseTemplateInfo',
+				'description' => _x('The FSE template used for this term archive.', 'GraphQL field desc', 'superstack'),
+				'resolve'     => function ($source) use ($taxonomy_name, $object_types) {
+					$term = get_term($source->databaseId, $taxonomy_name);
+
+					if (! $term || is_wp_error($term)) {
+						return null;
+					}
+
+					$hierarchy = [
+						"taxonomy-{$taxonomy_name}-{$term->slug}",
+						"taxonomy-{$taxonomy_name}",
+					];
+
+					foreach ($object_types as $post_type) {
+						$hierarchy[] = "archive-{$post_type}";
+					}
+
+					$hierarchy[] = 'archive';
+
+					$resolved = resolve_block_template('taxonomy', $hierarchy, '');
+
+					if (! $resolved) return null;
+
+					return ['slug' => $resolved->slug];
+				},
+			]);
+		}
 	}
 
 	/**
@@ -171,7 +276,7 @@ class RegisterFseTemplates {
 	function register_template_part_area_field() {
 		register_graphql_field('TemplatePart', 'area', [
 			'type'        => 'String',
-			'description' => _x('The template part area slug (header, footer, uncategorized, ...).', 'GraphQL field desc', 'supt'),
+			'description' => _x('The template part area slug (header, footer, uncategorized, ...).', 'GraphQL field desc', 'superstack'),
 			'resolve'     => function ($source) {
 				$post_id = 0;
 
@@ -274,10 +379,40 @@ class RegisterFseTemplates {
 		]);
 	}
 
+	/**
+	 * Whether $post is the post assigned to $option_id, including translations.
+	 *
+	 * `page_on_front` / `page_for_posts` only store the default-language post ID,
+	 * so a Polylang translation of the front/posts page never matches it directly.
+	 */
+	private function matches_option_post(int $option_id, \WP_Post $post): bool {
+		if (! $option_id) {
+			return false;
+		}
+
+		if ($option_id === (int) $post->ID) {
+			return true;
+		}
+
+		if (! function_exists('pll_get_post_language') || ! function_exists('pll_get_post')) {
+			return false;
+		}
+
+		$lang = pll_get_post_language($post->ID);
+
+		if (! $lang) {
+			return false;
+		}
+
+		$translated_id = pll_get_post($option_id, $lang);
+
+		return $translated_id && (int) $translated_id === (int) $post->ID;
+	}
+
 	private function format_template(\WP_Block_Template $template): array {
 		return [
 			'slug'       => $template->slug,
-			'blocksJSON' => $this->build_blocks_json($template->content ?? ''),
+			'blocksJSON' => \Superstack\build_blocks_json($template->content ?? ''),
 		];
 	}
 
@@ -285,20 +420,8 @@ class RegisterFseTemplates {
 		return [
 			'slug'       => $part->slug,
 			'area'       => $part->area ?? null,
-			'blocksJSON' => $this->build_blocks_json($part->content ?? ''),
+			'blocksJSON' => \Superstack\build_blocks_json($part->content ?? ''),
 		];
-	}
-
-	private function build_blocks_json(string $content): string {
-		if (empty(trim($content))) return '[]';
-
-		$blocks = \WPGraphQLGutenberg\Blocks\Block::create_blocks(
-			parse_blocks($content),
-			0,
-			\WPGraphQLGutenberg\Blocks\Registry::get_registry()
-		);
-
-		return \WPGraphQLGutenberg\Blocks\BlocksJSON::encode_blocks($blocks, null);
 	}
 }
 

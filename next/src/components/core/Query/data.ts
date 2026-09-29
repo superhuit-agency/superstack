@@ -155,7 +155,100 @@ const queryContentNodes = gql`
   }
 `;
 
-/** A loop inheriting the template query lists the archive being viewed. */
+const PAGINATION_BLOCKS = new Set([
+	'core/query-pagination-next',
+	'core/query-pagination-previous',
+	'core/query-pagination-numbers',
+]);
+
+const buildPageHref = (baseUri: string, page: number) => {
+	if (page <= 1) return baseUri;
+	const base = baseUri.endsWith('/') ? baseUri : `${baseUri}/`;
+	return `${base}page/${page}/`;
+};
+
+/**
+ * Compute the request-time attributes for a single pagination child block,
+ * mirroring what WordPress core injects when it server-renders these blocks.
+ */
+const paginationChildAttrs = (
+	name: string,
+	attrs: Record<string, unknown>,
+	currentPage: number,
+	totalPages: number | null,
+	baseUri: string
+): Record<string, unknown> => {
+	if (name === 'core/query-pagination-numbers') {
+		return { currentPage, totalPages, baseUri };
+	}
+
+	const isNext = name === 'core/query-pagination-next';
+	const rawLabel = typeof attrs.label === 'string' ? attrs.label.trim() : '';
+	const label = rawLabel || (isNext ? 'Next Page' : 'Previous Page');
+
+	let href: string | null = null;
+	let enabled = false;
+
+	if (isNext) {
+		const canGoNext = totalPages === null ? true : currentPage < totalPages;
+		if (canGoNext) {
+			href = buildPageHref(baseUri, currentPage + 1);
+			enabled = true;
+		}
+	} else if (currentPage > 1) {
+		href = buildPageHref(baseUri, currentPage - 1);
+		enabled = true;
+	}
+
+	return { href, label, isDisabled: !enabled, totalPages };
+};
+
+/**
+ * Walk this query's `innerBlocks` and inject the resolved pagination state into
+ * its pagination children, so they stay in sync at request time (no rebuild
+ * needed when posts are added). Nested `core/query` loops are left untouched —
+ * each resolves its own pagination.
+ */
+const injectPagination = (
+	blocks: BlockPropsType[],
+	currentPage: number,
+	totalPages: number | null,
+	baseUri: string
+): BlockPropsType[] =>
+	blocks.map((block) => {
+		if (block.name === 'core/query') return block;
+
+		if (PAGINATION_BLOCKS.has(block.name)) {
+			return {
+				...block,
+				attributes: {
+					...block.attributes,
+					...paginationChildAttrs(
+						block.name,
+						block.attributes,
+						currentPage,
+						totalPages,
+						baseUri
+					),
+				},
+			};
+		}
+
+		return {
+			...block,
+			innerBlocks: injectPagination(
+				block.innerBlocks ?? [],
+				currentPage,
+				totalPages,
+				baseUri
+			),
+		};
+	});
+
+/**
+ * A loop inheriting the template query lists the archive being viewed, and
+ * follows the `/page/{n}` route.
+ */
 export const usesArchiveContext = (attrs: Pick<QueryAttributes, 'query'>) =>
 	attrs?.query?.inherit === true;
 
@@ -166,15 +259,21 @@ export const getData = async (
 	context: BlockDataContext = {}
 ) => {
 	// `inherit: true` means "take your parameters from the WordPress main
-	// query", so everything standing in for that main query — post type and
-	// current term — is gated on it.
+	// query", so everything standing in for that main query — post type,
+	// current term, current page — is gated on it.
 	const inherit = attrs?.query?.inherit === true;
 
 	const perPageRaw = attrs?.query?.perPage;
 	const perPage = Math.min(100, Math.max(1, toPositiveInt(perPageRaw) ?? 10));
 
+	// Only the loop inheriting the main query follows the `/page/{n}` route; a
+	// custom loop paginates on its own `queryId` in WordPress, which this
+	// implementation does not read, so it stays on its first page.
+	const page = inherit && context?.page && context.page > 0 ? context.page : 1;
+
 	const offsetRaw = attrs?.query?.offset;
-	const offset = Math.max(0, toPositiveInt(offsetRaw) ?? 0);
+	const offset =
+		Math.max(0, toPositiveInt(offsetRaw) ?? 0) + (page - 1) * perPage;
 
 	const order = toOrderEnum(attrs?.query?.order);
 	const orderby = toOrderByEnum(attrs?.query?.orderBy);
@@ -254,7 +353,7 @@ export const getData = async (
 		typeof total === 'number' && total >= 0
 			? Math.ceil(total / perPage)
 			: null;
-	const currentPage = Math.floor(offset / perPage) + 1;
+	const currentPage = page;
 
 	const nodes = (connection?.nodes ?? []).map((node: unknown) => ({
 		excerpt: '',
@@ -263,6 +362,16 @@ export const getData = async (
 		featuredImage: null,
 		...(node as Record<string, unknown>),
 	}));
+
+	const baseUri = context?.baseUri ?? '/';
+	const innerBlocks = Array.isArray(context?.innerBlocks)
+		? injectPagination(
+				context.innerBlocks,
+				currentPage,
+				totalPages,
+				baseUri
+			)
+		: undefined;
 
 	return {
 		data: {
@@ -277,6 +386,7 @@ export const getData = async (
 			total,
 			totalPages,
 		},
+		...(innerBlocks !== undefined ? { innerBlocks } : {}),
 		cacheTags: [cacheTags.type(postType)],
 	};
 };

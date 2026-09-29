@@ -14,7 +14,7 @@ type BlockPropsOptions = {
 	skipGetData?: boolean;
 	lang?: string | null;
 	preview?: boolean;
-	/** The archive being viewed, for blocks declaring `usesArchiveContext`. */
+	/** The page being viewed, for blocks declaring `usesArchiveContext`. */
 	context?: BlockDataContext;
 };
 
@@ -66,7 +66,7 @@ export default async function getBlockFinalComponentProps(
 	};
 
 	const results = await Promise.allSettled([
-		getAttributes(name, attributes, options),
+		getAttributes(name, attributes, innerBlocks, options),
 		getInnerBlocks(innerBlocks, options),
 	]);
 	throwIfBaseUriNotDeclared(results);
@@ -79,10 +79,16 @@ export default async function getBlockFinalComponentProps(
 		const { attrs, innerBlocks: dataInnerBlocks } = attrsResult.value;
 		props.attributes = attrs ?? {};
 
-		// If getData returned innerBlocks, use those (fresh) and skip the static ones.
-		// (this is a fix made for core/navigation for example, which has links as innerBlocks, but we want them to be always up to date, even if it's part of the FSE template)
+		// If getData returned innerBlocks, use those (fresh) instead of the
+		// static ones — but still run them back through this same enrichment
+		// pipeline, so any dynamic block nested inside (e.g. a `core/navigation`
+		// nested inside a submenu, or a pagination block inside a `core/query`)
+		// gets its own getData resolved too.
 		if (dataInnerBlocks !== undefined) {
-			props.innerBlocks = dataInnerBlocks;
+			props.innerBlocks = (await getInnerBlocks(
+				dataInnerBlocks,
+				options
+			)) as BlockPropsType['innerBlocks'];
 		} else if (blksResult.status === 'fulfilled') {
 			props.innerBlocks =
 				(blksResult.value as BlockPropsType['innerBlocks']) ?? [];
@@ -110,6 +116,7 @@ export default async function getBlockFinalComponentProps(
 const getAttributes = async (
 	name: string,
 	attributes: object,
+	innerBlocks: Array<BlockPropsType>,
 	options?: BlockPropsOptions
 ): Promise<{
 	attrs: Record<string, unknown>;
@@ -130,7 +137,7 @@ const getAttributes = async (
 			? usesArchiveContext(attributes)
 			: usesArchiveContext
 	)
-		? (options?.context ?? {})
+		? { ...options?.context, innerBlocks }
 		: undefined;
 
 	let data: Record<string, unknown>;
@@ -152,13 +159,15 @@ const getAttributes = async (
 		);
 	}
 
-	const { innerBlocks, ...restData } = data as {
+	const { innerBlocks: dataInnerBlocks, ...restData } = data as {
 		innerBlocks?: BlockPropsType[];
 	} & Record<string, unknown>;
 
 	return {
 		attrs: { ...attrs, ...restData },
-		...(innerBlocks !== undefined ? { innerBlocks } : {}),
+		...(dataInnerBlocks !== undefined
+			? { innerBlocks: dataInnerBlocks }
+			: {}),
 	};
 };
 

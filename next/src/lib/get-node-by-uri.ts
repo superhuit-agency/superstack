@@ -9,8 +9,11 @@ import {
 } from '@/hooks/use-base-uri';
 import { fetchAPI, formatBlocksJSON } from '@/lib';
 import { cacheTags, termTags } from '@/lib/cache-tags';
-import getBlockFinalComponentProps from '@/lib/get-block-final-component-props';
-import getFseTemplates from '@/lib/get-fse-templates';
+import {
+	enrichTemplateBlocks,
+	getTemplateBlocks,
+} from '@/lib/get-fse-template-blocks';
+import injectBreadcrumbs from '@/lib/inject-breadcrumbs';
 import {
 	isWordPressReadError,
 	throwIfWordPressReadFailed,
@@ -70,7 +73,8 @@ export async function getPublicNodeByURI(
  * archive lists.
  */
 const nodeTags = (node: ResolvedNode): string[] => {
-	const { term, archive } = getBlockDataContext(node);
+	const term = getTermContext(node);
+	const archive = getArchiveContext(node);
 
 	if (archive) {
 		return [
@@ -155,9 +159,6 @@ async function getNodeByURI(
 	const response = await fetchAPI(query, {
 		variables,
 		auth,
-		headers: {
-			'X-Query-Page': String(routePage && routePage > 0 ? routePage : 1),
-		},
 	});
 
 	const { node: rawNode, seo, generalSettings } = response;
@@ -217,15 +218,15 @@ async function getNodeByURI(
 
 	node.fullUri = uri;
 
-	// On an archive, expose the term and post type it lists, so query loops
-	// inheriting the template query scope their posts to it.
-	const context = getBlockDataContext(node);
+	// Expose the current page, and on an archive the term and post type it
+	// lists, so query loops inheriting the template query follow them.
+	const context = getBlockDataContext(node, uri, routePage);
 
 	const [templateBlocks, { blocksJSON, templateData }] = await Promise.all([
 		// Not settled with the rest: a failed template read must fail the page,
 		// not be cached as a page without its header and footer.
 		getTemplateBlocks(node?.fseTemplate?.slug, lang).then((blocks) =>
-			enrichTemplateBlocks(blocks, lang, preview, context)
+			enrichTemplateBlocks(blocks, { lang, preview, context })
 		),
 		Promise.allSettled([
 			formatBlocksJSON(
@@ -264,10 +265,15 @@ async function getNodeByURI(
 			}),
 	]);
 
-	const blocks =
+	const blocksWithContent =
 		templateBlocks.length > 0
 			? injectPostContentBlocks(templateBlocks, blocksJSON)
 			: blocksJSON;
+
+	const blocks = injectBreadcrumbs(
+		blocksWithContent,
+		node.seo?.breadcrumbs ?? []
+	);
 
 	if (node.preview) delete node.preview;
 
@@ -460,11 +466,17 @@ const getArchiveContext = (
  * The block data context of a node: only the keys it has, since the context
  * is part of the block data's cache key.
  */
-const getBlockDataContext = (node: ResolvedNode): BlockDataContext => {
+const getBlockDataContext = (
+	node: ResolvedNode,
+	baseUri: string,
+	page: number
+): BlockDataContext => {
 	const term = getTermContext(node);
 	const archive = getArchiveContext(node);
 
 	return {
+		page: page > 0 ? page : 1,
+		baseUri,
 		...(term ? { term } : {}),
 		...(archive ? { archive } : {}),
 	};
@@ -506,83 +518,3 @@ const injectPostContentBlocks = (
 			),
 		};
 	});
-
-/**
- * Gets the blocks of the template from the cached FSE templates read,
- * swapping in the `lang`-specific variant of any translated template part
- * (e.g. footer, header) before request-time enrichment runs.
- * @param templateSlug - The slug of the template
- * @param lang - The requested language code, if any
- * @returns
- */
-const getTemplateBlocks = async (
-	templateSlug: string,
-	lang: string | null = null
-): Promise<BlockPropsType[]> => {
-	if (!templateSlug) return [];
-
-	const fseTemplate: FseTemplateEntry | null =
-		(await getFseTemplates()).find((tpl) => tpl?.slug === templateSlug) ??
-		null;
-
-	if (!fseTemplate?.blocks?.length) return [];
-
-	return applyTemplatePartTranslations(
-		fseTemplate.blocks.filter(Boolean) as BlockPropsType[],
-		lang
-	);
-};
-
-/**
- * Recursively swaps a `core/template-part` block's `innerBlocks` for its
- * `translations[lang]` variant, when the template read found one.
- * Falls back to the default (base-language) `innerBlocks` otherwise.
- */
-const applyTemplatePartTranslations = (
-	blocks: BlockPropsType[],
-	lang: string | null
-): BlockPropsType[] =>
-	blocks.map((block) => {
-		const translatedInnerBlocks =
-			lang && block.name === 'core/template-part'
-				? block.translations?.[lang]
-				: undefined;
-
-		return {
-			...block,
-			innerBlocks: applyTemplatePartTranslations(
-				translatedInnerBlocks ?? block.innerBlocks ?? [],
-				lang
-			),
-		};
-	});
-
-/**
- * Runs getData enrichment on template blocks at request time so dynamic data
- * (navigation, site logo, etc.) is fetched per page, not baked into the cached
- * FSE templates.
- */
-const enrichTemplateBlocks = (
-	blocks: BlockPropsType[],
-	lang: string | null = null,
-	preview = false,
-	context: BlockDataContext = {}
-): Promise<BlockPropsType[]> =>
-	blocks.length === 0
-		? Promise.resolve([])
-		: Promise.allSettled(
-				blocks.map((block) =>
-					getBlockFinalComponentProps(block, {
-						lang,
-						preview,
-						context,
-					})
-				)
-			).then((results) => {
-				throwIfBaseUriNotDeclared(results);
-				throwIfWordPressReadFailed(results);
-
-				return results
-					.map((r) => (r.status === 'fulfilled' ? r.value : null))
-					.filter(Boolean) as BlockPropsType[];
-			});

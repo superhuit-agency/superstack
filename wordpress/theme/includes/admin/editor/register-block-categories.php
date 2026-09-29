@@ -44,7 +44,7 @@ class Register_Block_Categories {
 			[
 				[
 					'slug'  => 'superstack',
-					'title' => _x('Superstack', 'block category', SUPERSTACK_THEME_NAME),
+					'title' => _x('Superstack', 'block category', 'superstack'),
 					'icon'  => null,
 				],
 			],

@@ -5,19 +5,44 @@ import block from './block.json';
 
 import './styles.css';
 
+const PRESET_VALUE_REGEX = /^var:preset\|([^|]+)\|(.+)$/;
+
+function getSpacingValue(value?: string): string | undefined {
+	if (!value || value === '0') return undefined;
+
+	const preset = value.match(PRESET_VALUE_REGEX);
+
+	return preset ? `var(--wp--preset--${preset[1]}--${preset[2]})` : value;
+}
+
+function getSpacingStyle(
+	property: 'padding' | 'margin',
+	values?: BoxSpacing
+): React.CSSProperties | undefined {
+	if (!values) return undefined;
+
+	return {
+		[`${property}Top`]: getSpacingValue(values.top),
+		[`${property}Right`]: getSpacingValue(values.right),
+		[`${property}Bottom`]: getSpacingValue(values.bottom),
+		[`${property}Left`]: getSpacingValue(values.left),
+	};
+}
+
 export default function Group({
 	tagName = 'div',
 	layout,
 	className,
+	anchor,
 	style,
 	children,
-	...props
 }: GroupProps) {
 	const layoutType = layout?.type;
 	const isFlex = layoutType === 'flex';
 	const isStack = isFlex && layout?.orientation === 'vertical';
 	const isNoWrap = isFlex && layout?.flexWrap !== 'wrap';
 	const justifyContent = layout?.justifyContent;
+	const verticalAlignment = layout?.verticalAlignment;
 	const isGrid = layoutType === 'grid';
 
 	const classes = cx(
@@ -27,13 +52,14 @@ export default function Group({
 		layoutType && `wp-block-group-is-layout-${layoutType}`,
 		isStack && 'is-vertical',
 		isNoWrap && 'is-nowrap',
-		justifyContent && `is-content-justification-${justifyContent}`
+		justifyContent && `is-content-justification-${justifyContent}`,
+		verticalAlignment && `is-vertically-aligned-${verticalAlignment}`
 	);
 
 	const columnCount = layout?.columnCount;
 	const minimumColumnWidth = layout?.minimumColumnWidth ?? undefined;
 
-	const gridStyle: React.CSSProperties | undefined = isGrid
+	const gridContainerStyle: React.CSSProperties | undefined = isGrid
 		? columnCount && columnCount > 0
 			? { gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))` }
 			: {
@@ -43,14 +69,27 @@ export default function Group({
 				}
 		: undefined;
 
-	const groupStyle = gridStyle ? { ...style, ...gridStyle } : style;
+	const gridChildStyle = style?.layout?.columnSpan
+		? {
+				gridColumn: `${style?.layout?.columnStart || 'auto'} / span ${style?.layout?.columnSpan}`,
+			}
+		: undefined;
+
+	const spacingStyle = {
+		...getSpacingStyle('padding', style?.spacing?.padding),
+		...getSpacingStyle('margin', style?.spacing?.margin),
+	};
 
 	return createElement(
 		tagName,
 		{
-			...props,
 			className: classes,
-			style: groupStyle,
+			id: anchor,
+			style: {
+				...gridContainerStyle,
+				...gridChildStyle,
+				...spacingStyle,
+			},
 		},
 		children
 	);

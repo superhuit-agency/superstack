@@ -1,6 +1,6 @@
 @import '@resources/index.css';
 
-.supt-list {
+.wp-block-list {
 	@extend %t-paragraph;
 
 	list-style: none;

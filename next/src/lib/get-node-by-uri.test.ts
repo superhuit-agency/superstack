@@ -162,6 +162,8 @@ describe('getPublicNodeByURI', () => {
 		await getPublicNodeByURI('/category/news/');
 
 		const context = {
+			page: 1,
+			baseUri: '/category/news/',
 			term: { taxonomy: 'category', databaseId: 7 },
 			archive: { postType: 'post' },
 		};
@@ -188,12 +190,16 @@ describe('getPublicNodeByURI', () => {
 		expect(vi.mocked(formatBlocksJSON)).toHaveBeenCalledWith(
 			'',
 			expect.objectContaining({
-				context: { archive: { postType: 'event' } },
+				context: {
+					page: 1,
+					baseUri: '/events/',
+					archive: { postType: 'event' },
+				},
 			})
 		);
 	});
 
-	it('gives no archive context to a single post', async () => {
+	it('gives only the page to a single post', async () => {
 		wordpressReturns({
 			__typename: 'Post',
 			contentTypeName: 'post',
@@ -201,11 +207,11 @@ describe('getPublicNodeByURI', () => {
 			uri: '/hello/',
 		});
 
-		await getPublicNodeByURI('/hello/');
+		await getPublicNodeByURI('/hello/', null, 3);
 
 		expect(vi.mocked(formatBlocksJSON)).toHaveBeenCalledWith(
 			'',
-			expect.objectContaining({ context: {} })
+			expect.objectContaining({ context: { page: 3, baseUri: '/hello/' } })
 		);
 	});
 

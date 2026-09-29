@@ -14,9 +14,14 @@ vi.mock('@/lib/get-cached-block-data', () => ({
 vi.mock('@/lib/fetch-api', () => ({ default: vi.fn() }));
 
 const context: BlockDataContext = {
+	page: 2,
+	baseUri: '/category/news/',
 	term: { taxonomy: 'category', databaseId: 7 },
 	archive: { postType: 'post' },
 };
+
+/** The context a block using it gets: the page's, plus its own innerBlocks. */
+const blockContext = { ...context, innerBlocks: [] };
 
 function blockModuleIs(blockModule: BlockDataModule) {
 	vi.mocked(getBlockDataModule).mockResolvedValue(blockModule);
@@ -43,7 +48,7 @@ describe('getBlockFinalComponentProps', () => {
 			{},
 			null,
 			null,
-			context
+			blockContext
 		);
 	});
 
@@ -87,8 +92,31 @@ describe('getBlockFinalComponentProps', () => {
 			expect.anything(),
 			{},
 			null,
-			context
+			blockContext
 		);
 		expect(vi.mocked(getCachedBlockData)).not.toHaveBeenCalled();
+	});
+
+	it('enriches the innerBlocks returned by getData', async () => {
+		const pagination = {
+			name: 'core/query-pagination-next',
+			attributes: { href: '/blog/page/2/' },
+			innerBlocks: [],
+		};
+		vi.mocked(getBlockDataModule).mockImplementation(async (name) =>
+			name === 'core/query'
+				? { getData: vi.fn(), usesArchiveContext: true }
+				: null
+		);
+		vi.mocked(getCachedBlockData).mockResolvedValue({
+			innerBlocks: [pagination],
+		});
+
+		const props = await render();
+
+		expect(props.innerBlocks).toEqual([pagination]);
+		expect(getBlockDataModule).toHaveBeenCalledWith(
+			'core/query-pagination-next'
+		);
 	});
 });
