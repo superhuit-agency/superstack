@@ -14,11 +14,11 @@ function register_arg($fields) {
 	if (isset($fields['node'])) {
 		$fields['node']['args']['idType'] = [
 			'type'        => 'ContentNodeIdTypeEnum',
-			'description' => __('Type of unique identifier to fetch a menu by. Default is Global ID', 'supt'),
+			'description' => __('Type of unique identifier to fetch a menu by. Default is Global ID', 'superstack'),
 		];
 		$fields['node']['args']['stati'] = [
 			'type'        => ['list_of' => 'PostStatusEnum'],
-			'description' => __('The status of the object.', 'supt'),
+			'description' => __('The status of the object.', 'superstack'),
 		];
 	}
 

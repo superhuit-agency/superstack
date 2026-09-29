@@ -14,7 +14,9 @@
     "predev": "THEME_CSS_SOFT=1 WPCLI=\"${WPCLI:-wp @local}\" npm run generate:theme-css",
     "dev": "npm --prefix ./theme run dev",
     "build": "npm --prefix ./theme run build",
-    "setup-composer-auth": "sh ./scripts/setup-composer-auth.sh"
+    "setup-composer-auth": "sh ./scripts/setup-composer-auth.sh",
+    "generate:pot": "wp i18n make-pot ./theme theme/languages/superstack.pot",
+    "generate:json": "wp i18n make-json ./theme/languages --no-purge"
   },
   "repository": {
     "type": "git",
