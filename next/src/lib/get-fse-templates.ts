@@ -60,10 +60,7 @@ export default async function getFseTemplates(): Promise<FseTemplateEntry[]> {
 	const templates = await resolvePromises(
 		allTemplates.filter(Boolean).map(async (template: FseTemplateNode) => ({
 			slug: template.slug,
-			blocks: await inlineTemplateParts(
-				await parseBlocksWithoutData(template),
-				templateParts
-			),
+			blocks: await parseAndInlineBlocks(template, templateParts),
 		}))
 	);
 
@@ -112,9 +109,11 @@ async function inlineTemplatePart(
 ): Promise<BlockPropsType> {
 	const requestedSlug = block.attributes?.slug;
 
-	if (seen.includes(String(requestedSlug))) return block;
+	if (typeof requestedSlug !== 'string' || seen.includes(requestedSlug)) {
+		return block;
+	}
 
-	const nestedSeen = [...seen, String(requestedSlug)];
+	const nestedSeen = [...seen, requestedSlug];
 
 	// Group every part sharing this base slug (e.g. "footer" and
 	// "footer___de") — Polylang Pro's FSE naming convention,
@@ -129,20 +128,12 @@ async function inlineTemplatePart(
 	);
 
 	const [innerBlocks, translationEntries] = await Promise.all([
-		parseBlocksWithoutData(basePart).then((blocks) =>
-			inlineTemplateParts(blocks, templateParts, nestedSeen)
-		),
+		parseAndInlineBlocks(basePart, templateParts, nestedSeen),
 		resolvePromises(
 			translationParts.map(
-				async (
-					part
-				): Promise<[string, Array<BlockPropsType | null>]> => [
+				async (part): Promise<[string, BlockPropsType[]]> => [
 					part.language!.code,
-					await inlineTemplateParts(
-						await parseBlocksWithoutData(part),
-						templateParts,
-						nestedSeen
-					),
+					await parseAndInlineBlocks(part, templateParts, nestedSeen),
 				]
 			)
 		).then((entries) => entries.filter((entry) => entry !== null)),
@@ -161,7 +152,18 @@ async function inlineTemplatePart(
 	};
 }
 
-/** Parses a template's or part's blocks, without fetching any block data. */
-function parseBlocksWithoutData(node?: FseTemplateNode) {
-	return formatBlocksJSON(node?.blocksJSON ?? '', { skipGetData: true });
+/**
+ * Parses a template's or part's blocks, without fetching any block data, and
+ * inlines the template parts they include.
+ */
+async function parseAndInlineBlocks(
+	node: FseTemplateNode | undefined,
+	templateParts: FseTemplatePartNode[],
+	seen: string[] = []
+): Promise<BlockPropsType[]> {
+	const blocks = await formatBlocksJSON(node?.blocksJSON ?? '', {
+		skipGetData: true,
+	});
+
+	return inlineTemplateParts(blocks, templateParts, seen);
 }

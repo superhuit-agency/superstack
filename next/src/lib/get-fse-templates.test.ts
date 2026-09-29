@@ -124,6 +124,53 @@ describe('getFseTemplates', () => {
 		});
 	});
 
+	it('keeps the area and translations of a nested template part', async () => {
+		wordpressReturns(
+			[part('footer')],
+			[
+				{
+					slug: 'footer',
+					blocksJSON: JSON.stringify([part('credits')]),
+				},
+				{
+					slug: 'credits',
+					area: 'uncategorized',
+					blocksJSON: JSON.stringify([paragraph('©')]),
+				},
+				{
+					slug: 'credits___de',
+					language: { baseSlug: 'credits', code: 'de' },
+					blocksJSON: JSON.stringify([paragraph('© DE')]),
+				},
+			]
+		);
+
+		const [footer] = await pageTemplateBlocks();
+
+		expect(footer.innerBlocks[0]).toMatchObject({
+			attributes: { slug: 'credits', area: 'uncategorized' },
+			innerBlocks: [paragraph('©')],
+			translations: { de: [paragraph('© DE')] },
+		});
+	});
+
+	it('inlines the same template part used twice', async () => {
+		wordpressReturns(
+			[part('divider'), group(part('divider'))],
+			[
+				{
+					slug: 'divider',
+					blocksJSON: JSON.stringify([paragraph('—')]),
+				},
+			]
+		);
+
+		const [first, wrapper] = await pageTemplateBlocks();
+
+		expect(first.innerBlocks).toEqual([paragraph('—')]);
+		expect(wrapper.innerBlocks[0].innerBlocks).toEqual([paragraph('—')]);
+	});
+
 	it('stops at a template part that references itself', async () => {
 		wordpressReturns(
 			[part('loop')],
@@ -138,5 +185,22 @@ describe('getFseTemplates', () => {
 		const [loop] = await pageTemplateBlocks();
 
 		expect(loop.innerBlocks[0].innerBlocks[0]).toEqual(part('loop'));
+	});
+
+	it('stops at template parts that reference each other', async () => {
+		wordpressReturns(
+			[part('a')],
+			[
+				{ slug: 'a', blocksJSON: JSON.stringify([part('b')]) },
+				{ slug: 'b', blocksJSON: JSON.stringify([part('a')]) },
+			]
+		);
+
+		const [a] = await pageTemplateBlocks();
+
+		expect(a.innerBlocks[0]).toMatchObject({
+			attributes: { slug: 'b' },
+			innerBlocks: [part('a')],
+		});
 	});
 });
