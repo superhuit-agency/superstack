@@ -55,7 +55,7 @@ class ResolveUris {
 	 * @return mixed
 	 */
 	public function graphql_resolve_relative_uris($result, $source, $args, $context, $info, $type_name, $field_key, $field, $field_resolver) {
-		// Bail early if not the field we are interrested in.
+		// Bail early if not the field we are interrested in, or if it did not resolve to a string.
 		if (!in_array($field_key, self::RELATIVE_URI_FIELDS) || !is_string($result)) return $result;
 
 		$site_url = preg_replace('/https?:\/\//', '', get_site_url());
@@ -88,7 +88,7 @@ class ResolveUris {
 	 * @return mixed
 	 */
 	public function graphql_resolve_absolute_uris($result, $source, $args, $context, $info, $type_name, $field_key, $field, $field_resolver) {
-		return (in_array($field_key, self::ABSOLUTE_URI_FIELDS) && is_string($result)
+		return (in_array($field_key, self::ABSOLUTE_URI_FIELDS) && is_string($result) && $result !== ''
 			? trailingslashit(trim(get_next_url(), "/") . wp_make_link_relative($result))
 			: $result
 		);
