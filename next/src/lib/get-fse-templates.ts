@@ -52,26 +52,50 @@ export default async function getFseTemplates(): Promise<FseTemplateEntry[]> {
 		throw new Error('Could not read the FSE templates from WordPress');
 	}
 
-	const templateParts: FseTemplatePartNode[] = allTemplateParts.filter(Boolean);
+	const templateParts: FseTemplatePartNode[] =
+		allTemplateParts.filter(Boolean);
 
 	// Settled one by one, so a template that fails to parse is dropped
 	// instead of failing every page
 	const templates = await resolvePromises(
 		allTemplates.filter(Boolean).map(async (template: FseTemplateNode) => ({
 			slug: template.slug,
-			blocks: await resolvePromises(
-				(await parseBlocksWithoutData(template))
-					.filter((block): block is BlockPropsType => !!block)
-					.map((block: BlockPropsType) =>
-						block.name === 'core/template-part'
-							? inlineTemplatePart(block, templateParts)
-							: Promise.resolve(block)
-					)
-			),
+			blocks: await parseAndInlineBlocks(template, templateParts),
 		}))
 	);
 
 	return templates.filter(Boolean) as FseTemplateEntry[];
+}
+
+/**
+ * Inlines every `core/template-part` block at any depth — a template may wrap
+ * one in a group, and a part may include another part. `seen` holds the slugs
+ * already being inlined, so a part that (indirectly) references itself
+ * doesn't loop.
+ */
+async function inlineTemplateParts(
+	blocks: Array<BlockPropsType | null>,
+	templateParts: FseTemplatePartNode[],
+	seen: string[] = []
+): Promise<BlockPropsType[]> {
+	const inlined = await resolvePromises(
+		blocks
+			.filter((block): block is BlockPropsType => !!block)
+			.map(async (block: BlockPropsType) =>
+				block.name === 'core/template-part'
+					? inlineTemplatePart(block, templateParts, seen)
+					: {
+							...block,
+							innerBlocks: await inlineTemplateParts(
+								block.innerBlocks ?? [],
+								templateParts,
+								seen
+							),
+						}
+			)
+	);
+
+	return inlined.filter(Boolean) as BlockPropsType[];
 }
 
 /**
@@ -80,9 +104,16 @@ export default async function getFseTemplates(): Promise<FseTemplateEntry[]> {
  */
 async function inlineTemplatePart(
 	block: BlockPropsType,
-	templateParts: FseTemplatePartNode[]
+	templateParts: FseTemplatePartNode[],
+	seen: string[]
 ): Promise<BlockPropsType> {
 	const requestedSlug = block.attributes?.slug;
+
+	if (typeof requestedSlug !== 'string' || seen.includes(requestedSlug)) {
+		return block;
+	}
+
+	const nestedSeen = [...seen, requestedSlug];
 
 	// Group every part sharing this base slug (e.g. "footer" and
 	// "footer___de") — Polylang Pro's FSE naming convention,
@@ -97,14 +128,12 @@ async function inlineTemplatePart(
 	);
 
 	const [innerBlocks, translationEntries] = await Promise.all([
-		parseBlocksWithoutData(basePart),
+		parseAndInlineBlocks(basePart, templateParts, nestedSeen),
 		resolvePromises(
 			translationParts.map(
-				async (
-					part
-				): Promise<[string, Array<BlockPropsType | null>]> => [
+				async (part): Promise<[string, BlockPropsType[]]> => [
 					part.language!.code,
-					await parseBlocksWithoutData(part),
+					await parseAndInlineBlocks(part, templateParts, nestedSeen),
 				]
 			)
 		).then((entries) => entries.filter((entry) => entry !== null)),
@@ -123,7 +152,18 @@ async function inlineTemplatePart(
 	};
 }
 
-/** Parses a template's or part's blocks, without fetching any block data. */
-function parseBlocksWithoutData(node?: FseTemplateNode) {
-	return formatBlocksJSON(node?.blocksJSON ?? '', { skipGetData: true });
+/**
+ * Parses a template's or part's blocks, without fetching any block data, and
+ * inlines the template parts they include.
+ */
+async function parseAndInlineBlocks(
+	node: FseTemplateNode | undefined,
+	templateParts: FseTemplatePartNode[],
+	seen: string[] = []
+): Promise<BlockPropsType[]> {
+	const blocks = await formatBlocksJSON(node?.blocksJSON ?? '', {
+		skipGetData: true,
+	});
+
+	return inlineTemplateParts(blocks, templateParts, seen);
 }
