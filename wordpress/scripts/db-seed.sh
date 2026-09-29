@@ -28,12 +28,22 @@ src_env() {
 	sed -n "s/^$1=//p" "$SRC_ENV"
 }
 SRC_CODE=$(src_env PROJECT_CODE); SRC_CODE=${SRC_CODE:-spck}
-SRC_URL=$(src_env WORDPRESS_URL);  SRC_URL=${SRC_URL:-http://localhost}
-SRC_NEXT_URL=$(src_env NEXT_URL)
 
 load_instance_env
+# An unconfigured target (the main checkout) runs on the docker-compose and
+# next/.env.example defaults.
+WORDPRESS_URL=${WORDPRESS_URL:-http://localhost}
+NEXT_URL=${NEXT_URL:-http://localhost:3000}
 assert_container_dir "${SRC_CODE}_wp" "$(cd "$SRC/wordpress" && pwd -P)" require
 assert_container_dir "${PROJECT_CODE}_wp" "$(pwd -P)" require
+
+# Read the URLs from the source database itself rather than its .env: they are
+# what the stored content actually contains, and an unconfigured source has no
+# .env to read. `home` resolves through WP_HOME when the instance defines it.
+SRC_URL=$(docker exec "${SRC_CODE}_wp" wp option get home --quiet 2>/dev/null) || SRC_URL=
+SRC_NEXT_URL=$(docker exec "${SRC_CODE}_wp" wp option get next_url --quiet 2>/dev/null) || SRC_NEXT_URL=
+[ -n "$SRC_URL" ] ||
+	{ echo "ERROR: could not read the WordPress URL of ${SRC_CODE}_wp." >&2; exit 1; }
 
 # Staged through a temp file, not piped: a pipeline reports only the import's
 # status, so a failed export would import a truncated dump and call it success.
@@ -42,26 +52,29 @@ trap 'rm -f "$TMP"' EXIT
 docker exec "${SRC_CODE}_wp" wp db export - > "$TMP"
 docker exec -i "${PROJECT_CODE}_wp" wp db import - < "$TMP"
 
-# Replace the more specific URL first: a bare "http://localhost" source URL is
-# a prefix of "http://localhost:3000", so doing it the other way round leaves
-# the port dangling ("http://localhost:8083:3000") on every stored frontend URL.
-if [ -n "$SRC_NEXT_URL" ] && [ -n "$NEXT_URL" ] && [ "$SRC_NEXT_URL" != "$NEXT_URL" ]; then
-	docker exec "${PROJECT_CODE}_wp" wp search-replace "$SRC_NEXT_URL" "$NEXT_URL" --all-tables --quiet ||
-		echo "WARNING: Next.js URL search-replace failed — content may still point at $SRC_NEXT_URL" >&2
-fi
+replace_url() {
+	docker exec "${PROJECT_CODE}_wp" wp search-replace "$1" "$2" --all-tables --quiet ||
+		echo "WARNING: search-replace '$1' → '$2' failed — content may still point at the source" >&2
+}
 
-if [ -n "$WORDPRESS_URL" ] && [ "$SRC_URL" != "$WORDPRESS_URL" ]; then
-	docker exec "${PROJECT_CODE}_wp" wp search-replace "$SRC_URL" "$WORDPRESS_URL" --all-tables --quiet ||
-		echo "WARNING: WordPress URL search-replace failed — content may still point at $SRC_URL" >&2
-fi
+# A bare "http://localhost" WordPress URL is a prefix of every Next.js URL
+# ("http://localhost:3000", and this instance's "http://localhost:310N"), so
+# replacing it in either order leaves ports dangling ("http://localhost:8082:3000").
+# Park the Next.js URL behind a placeholder while the WordPress URL is replaced.
+NEXT_PLACEHOLDER="superstack-seed-next-url.invalid"
+[ -n "$SRC_NEXT_URL" ] && replace_url "$SRC_NEXT_URL" "$NEXT_PLACEHOLDER"
+[ "$SRC_URL" != "$WORDPRESS_URL" ] && replace_url "$SRC_URL" "$WORDPRESS_URL"
+[ -n "$SRC_NEXT_URL" ] && replace_url "$NEXT_PLACEHOLDER" "$NEXT_URL"
 
-# The source .env may not exist (seeding from an unconfigured main checkout),
-# in which case the replace above could not run. Set it outright, as
-# provision.sh does on boot.
-if [ -n "$NEXT_URL" ]; then
-	docker exec "${PROJECT_CODE}_wp" wp option update next_url "$NEXT_URL" --quiet ||
-		echo "WARNING: could not set next_url to $NEXT_URL" >&2
-fi
+# The stored rows may not match what the source actually served (WP_HOME
+# overrides home/siteurl in a configured instance), and the main checkout has
+# no WP_HOME to fall back on. Set them outright, like provision.sh does next_url.
+for opt in home siteurl; do
+	docker exec "${PROJECT_CODE}_wp" wp option update "$opt" "$WORDPRESS_URL" --quiet ||
+		echo "WARNING: could not set $opt to $WORDPRESS_URL" >&2
+done
+docker exec "${PROJECT_CODE}_wp" wp option update next_url "$NEXT_URL" --quiet ||
+	echo "WARNING: could not set next_url to $NEXT_URL" >&2
 
 if [ -d "$SRC/wordpress/.data/uploads" ]; then
 	mkdir -p ./.data/uploads
