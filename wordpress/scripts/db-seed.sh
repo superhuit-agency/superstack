@@ -50,6 +50,24 @@ SRC_NEXT_URL=$(docker exec "${SRC_CODE}_wp" wp option get next_url --quiet 2>/de
 TMP=$(mktemp "${TMPDIR:-/tmp}/superstack-seed.XXXXXX")
 trap 'rm -f "$TMP"' EXIT
 docker exec "${SRC_CODE}_wp" wp db export - > "$TMP"
+
+# The import replaces this instance's whole database and the rsync below
+# deletes uploads the source lacks, so keep what is about to be lost.
+# The newest $SEED_BACKUP_KEEP backups are kept.
+SEED_BACKUP_KEEP=${SEED_BACKUP_KEEP:-5}
+case "$SEED_BACKUP_KEEP" in
+	'' | *[!0-9]* | 0) SEED_BACKUP_KEEP=5 ;;
+esac
+BACKUP_DIR="$(pwd -P)/.data/seed-backups"
+STAMP=$(date +%Y%m%d_%H%M%S)
+BACKUP_FILE="$BACKUP_DIR/db-$STAMP.sql"
+mkdir -p "$BACKUP_DIR"
+if ! docker exec "${PROJECT_CODE}_wp" wp db export - > "$BACKUP_FILE" || [ ! -s "$BACKUP_FILE" ]; then
+	rm -f "$BACKUP_FILE"
+	echo "ERROR: could not back up this instance's database, nothing was changed." >&2
+	exit 1
+fi
+
 docker exec -i "${PROJECT_CODE}_wp" wp db import - < "$TMP"
 
 replace_url() {
@@ -78,10 +96,21 @@ docker exec "${PROJECT_CODE}_wp" wp option update next_url "$NEXT_URL" --quiet |
 
 if [ -d "$SRC/wordpress/.data/uploads" ]; then
 	mkdir -p ./.data/uploads
-	rsync -a --delete "$SRC/wordpress/.data/uploads/" ./.data/uploads/
+	rsync -a --delete --backup --backup-dir="$BACKUP_DIR/uploads-$STAMP" \
+		"$SRC/wordpress/.data/uploads/" ./.data/uploads/
 fi
 
 docker exec "${PROJECT_CODE}_wp" wp cache flush --quiet || true
 docker exec "${PROJECT_CODE}_wp" wp rewrite flush --hard --quiet || true
 
+ls -1t "$BACKUP_DIR"/db-*.sql | tail -n +$((SEED_BACKUP_KEEP + 1)) | while read -r old; do
+	old_stamp=${old##*/db-}
+	rm -rf "$old" "$BACKUP_DIR/uploads-${old_stamp%.sql}"
+done
+
 echo "Seeded from $SRC"
+echo "Previous content backed up — to restore it:"
+echo "  docker exec -i ${PROJECT_CODE}_wp wp db import - < $BACKUP_FILE"
+if [ -d "$BACKUP_DIR/uploads-$STAMP" ]; then
+	echo "  rsync -a $BACKUP_DIR/uploads-$STAMP/ $(pwd -P)/.data/uploads/"
+fi

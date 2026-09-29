@@ -33,6 +33,11 @@ sh wordpress/scripts/db-seed.sh /path/to/<project>
 Both instances must be running. Exports the source database into this one,
 rewrites stored URLs to this instance's ports, and rsyncs its uploads.
 
+This **replaces** this instance's database and deletes uploads the source
+doesn't have. Before it does, the current database and any replaced or deleted
+uploads are saved to `wordpress/.data/seed-backups/` (newest 5 kept, override
+with `SEED_BACKUP_KEEP`), and the restore commands are printed at the end.
+
 The instance scripts refuse to act on a container belonging to a different
 checkout — `PROJECT_CODE` defaults to `spck`, which every superstack-derived
 project shares, so without that check an unconfigured checkout would act on
