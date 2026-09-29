@@ -19,10 +19,13 @@ runs:
         cache-dependency-path: |
           wordpress/package-lock.json
           wordpress/theme/package-lock.json
+          next/package-lock.json
 
     - name: Install node dependencies
       shell: bash
-      run: npm --prefix ./wordpress ci
+      run: |
+        npm --prefix ./wordpress ci
+        npm --prefix ./next ci
 
     - name: Build assets
       shell: bash
