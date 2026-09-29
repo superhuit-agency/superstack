@@ -28,6 +28,7 @@ require_once __DIR__ . '/traits/singleton.php';
  * Load Helpers.
  */
 require_once __DIR__ . '/helpers/array-find.php';
+require_once __DIR__ . '/helpers/build-blocks-json.php';
 require_once __DIR__ . '/helpers/get-remote-json.php';
 require_once __DIR__ . '/helpers/relative-site-urls.php';
 require_once __DIR__ . '/helpers/get-next-url.php';
