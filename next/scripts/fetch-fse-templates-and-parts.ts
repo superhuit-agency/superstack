@@ -56,6 +56,121 @@ async function fetchAllTemplates() {
 	return data?.allTemplates ?? [];
 }
 
+/**
+ * Recursively replaces every `core/template-part` block — at any depth, as a
+ * template may wrap one in a group — with the blocks of the matching part,
+ * keeping its translated variants alongside. `seen` guards against a part that
+ * (indirectly) references itself.
+ */
+async function resolveTemplateParts(
+	blocks: Array<BlockPropsType | null>,
+	templateParts: GraphQlNode[],
+	seen: string[] = []
+): Promise<BlockPropsType[]> {
+	const resolved = await resolvePromises(
+		blocks
+			.filter((b: BlockPropsType | null) => !!b)
+			.map(async (block: BlockPropsType) => {
+				// For each block of type 'core/template-part', replace with the actual block from templateParts.
+				if (block?.name === 'core/template-part') {
+					const requestedSlug = block?.attributes?.slug;
+
+					if (seen.includes(String(requestedSlug))) return block;
+
+					const nestedSeen = [...seen, String(requestedSlug)];
+
+					// Group every part sharing this base slug (e.g. "footer" and
+					// "footer___de") — Polylang Pro's FSE naming convention,
+					// parsed server-side into `language.baseSlug` / `language.code`.
+					const matchingParts = templateParts.filter(
+						(part: GraphQlNode) =>
+							(part.language?.baseSlug ?? part.slug) ===
+							requestedSlug
+					);
+					const basePart =
+						matchingParts.find(
+							(part: GraphQlNode) => !part.language?.code
+						) ?? matchingParts[0];
+					const translationParts = matchingParts.filter(
+						(part: GraphQlNode) =>
+							part.language?.code && part !== basePart
+					);
+
+					const formattedTemplatePart = await resolveTemplateParts(
+						await formatBlocksJSON(basePart?.blocksJSON ?? '', {
+							skipGetData: true,
+						}),
+						templateParts,
+						nestedSeen
+					);
+
+					const translationEntries: [
+						string,
+						Array<BlockPropsType | null>,
+					][] = translationParts.length
+						? (
+								await resolvePromises(
+									translationParts.map(
+										async (
+											part: GraphQlNode
+										): Promise<
+											[
+												string,
+												Array<BlockPropsType | null>,
+											]
+										> => [
+											part.language!.code,
+											await resolveTemplateParts(
+												await formatBlocksJSON(
+													part.blocksJSON ?? '',
+													{ skipGetData: true }
+												),
+												templateParts,
+												nestedSeen
+											),
+										]
+									)
+								)
+							).filter(
+								(
+									entry
+								): entry is [
+									string,
+									Array<BlockPropsType | null>,
+								] => entry !== null
+							)
+						: [];
+
+					return {
+						...block,
+						attributes: {
+							...(block?.attributes ?? {}),
+							...(basePart?.area ? { area: basePart.area } : {}),
+						},
+						innerBlocks: formattedTemplatePart,
+						...(translationEntries.length
+							? {
+									translations:
+										Object.fromEntries(translationEntries),
+								}
+							: {}),
+					};
+				}
+
+				return {
+					...block,
+					innerBlocks: await resolveTemplateParts(
+						block?.innerBlocks ?? [],
+						templateParts,
+						seen
+					),
+				};
+			})
+	);
+
+	return resolved.filter(Boolean) as BlockPropsType[];
+}
+
 const outDir = path.join(__dirname, '../src/lib/fse');
 const outPath = path.join(outDir, 'fse-templates-and-parts.json');
 
@@ -81,95 +196,9 @@ async function main() {
 					{ skipGetData: true }
 				);
 
-				const formattedBlocks = await resolvePromises(
-					blocks
-						.filter((b: BlockPropsType | null) => !!b)
-						.map(async (block: BlockPropsType) => {
-							// For each block of type 'core/template-part', replace with the actual block from templateParts.
-							if (block?.name === 'core/template-part') {
-								const requestedSlug = block?.attributes?.slug;
-
-								// Group every part sharing this base slug (e.g. "footer" and
-								// "footer___de") — Polylang Pro's FSE naming convention,
-								// parsed server-side into `language.baseSlug` / `language.code`.
-								const matchingParts = templateParts.filter(
-									(part: GraphQlNode) =>
-										(part.language?.baseSlug ??
-											part.slug) === requestedSlug
-								);
-								const basePart =
-									matchingParts.find(
-										(part: GraphQlNode) =>
-											!part.language?.code
-									) ?? matchingParts[0];
-								const translationParts = matchingParts.filter(
-									(part: GraphQlNode) =>
-										part.language?.code && part !== basePart
-								);
-
-								const formattedTemplatePart =
-									await formatBlocksJSON(
-										basePart?.blocksJSON ?? '',
-										{ skipGetData: true }
-									);
-
-								const translationEntries: [
-									string,
-									Array<BlockPropsType | null>,
-								][] = translationParts.length
-									? (
-											await resolvePromises(
-												translationParts.map(
-													async (
-														part: GraphQlNode
-													): Promise<
-														[
-															string,
-															Array<BlockPropsType | null>,
-														]
-													> => [
-														part.language!.code,
-														await formatBlocksJSON(
-															part.blocksJSON ??
-																'',
-															{
-																skipGetData: true,
-															}
-														),
-													]
-												)
-											)
-										).filter(
-											(
-												entry
-											): entry is [
-												string,
-												Array<BlockPropsType | null>,
-											] => entry !== null
-										)
-									: [];
-
-								return {
-									...block,
-									attributes: {
-										...(block?.attributes ?? {}),
-										...(basePart?.area
-											? { area: basePart.area }
-											: {}),
-									},
-									innerBlocks: formattedTemplatePart,
-									...(translationEntries.length
-										? {
-												translations:
-													Object.fromEntries(
-														translationEntries
-													),
-											}
-										: {}),
-								};
-							}
-							return block;
-						})
+				const formattedBlocks = await resolveTemplateParts(
+					blocks,
+					templateParts
 				);
 
 				return {
