@@ -4,7 +4,7 @@
 		"Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
 		"This file is @generated automatically"
 	],
-	"content-hash": "6ffbee34fddb69b35f41ab5a72dbbf6c",
+	"content-hash": "2a8276a49b0d7cec7cbfbf5f371501dd",
 	"packages": [
 		{
 			"name": "ashhitch/wp-graphql-yoast-seo",
@@ -695,58 +695,12 @@
 		},
 		{
 			"name": "superhuit/wp-graphql-redirection",
-			"version": "v1.1.1",
-			"source": {
-				"type": "git",
-				"url": "https://github.com/superhuit-agency/wp-graphql-redirection.git",
-				"reference": "726c67e9133966df0df833be26693a8bfaafcbd1"
-			},
+			"version": "2.0.2",
 			"dist": {
 				"type": "zip",
-				"url": "https://api.github.com/repos/superhuit-agency/wp-graphql-redirection/zipball/726c67e9133966df0df833be26693a8bfaafcbd1",
-				"reference": "726c67e9133966df0df833be26693a8bfaafcbd1",
-				"shasum": ""
+				"url": "https://github.com/superhuit-agency/wp-graphql-redirection/releases/download/v2.0.2/wp-graphql-redirection.zip"
 			},
-			"require": {
-				"php": "^7.4 || ^8.0"
-			},
-			"require-dev": {
-				"wp-graphql/wp-graphql": "^1.8",
-				"wpackagist-plugin/redirection": "^5.3"
-			},
-			"type": "wordpress-plugin",
-			"autoload": {
-				"psr-4": {
-					"WPGraphQLRedirection\\": "include/"
-				},
-				"classmap": [
-					"include/"
-				]
-			},
-			"notification-url": "https://packagist.org/downloads/",
-			"license": [
-				"GPL-3.0-or-later"
-			],
-			"authors": [
-				{
-					"name": "superhuit",
-					"email": "tech@superhuit.ch",
-					"homepage": "https://superhuit.ch",
-					"role": "Developer"
-				}
-			],
-			"description": "Exposes Redirection WP plugin in the WP-GraphQL schema",
-			"homepage": "https://github.com/superhuit-agency/wp-graphql-redirection",
-			"keywords": [
-				"graphql",
-				"redirection",
-				"wordpress"
-			],
-			"support": {
-				"issues": "https://github.com/superhuit-agency/wp-graphql-redirection/issues",
-				"source": "https://github.com/superhuit-agency/wp-graphql-redirection/tree/v1.1.1"
-			},
-			"time": "2024-09-19T15:23:36+00:00"
+			"type": "wordpress-plugin"
 		},
 		{
 			"name": "symfony/css-selector",
