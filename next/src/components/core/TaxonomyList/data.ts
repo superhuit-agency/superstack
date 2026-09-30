@@ -1,4 +1,5 @@
 import configs from '@/configs.json';
+import { cacheTags, termTags } from '@/lib/cache-tags';
 import { gql } from '@/utils';
 import { taxonomyToGraphqlEnum } from './helper';
 
@@ -7,13 +8,14 @@ export const getData = async (
 	attrs: TaxonomyListAttributes | null = null,
 	lang: string | null = null
 ) => {
-	const taxonomyEnum = taxonomyToGraphqlEnum(attrs?.taxonomy ?? '');
+	const taxonomy = attrs?.taxonomy ?? '';
+	const taxonomyEnum = taxonomyToGraphqlEnum(taxonomy);
 
 	// A block that has not been configured yet has no taxonomy. Querying
 	// `terms` without one is both invalid (an empty `TaxonomyEnum` value) and
 	// pointless: the list renders nothing without terms.
 	if (!taxonomyEnum) {
-		return { data: { terms: { nodes: [] } } };
+		return { data: { terms: { nodes: [] } }, cacheTags: [] };
 	}
 
 	const query = gql`
@@ -70,5 +72,14 @@ export const getData = async (
 				)
 			: termNodes;
 
-	return { data: { terms: { nodes: terms } } };
+	return {
+		data: { terms: { nodes: terms } },
+		cacheTags: [
+			...(taxonomy ? [cacheTags.taxonomy(taxonomy)] : []),
+			...termTags(terms),
+			...(!attrs?.showEmpty || attrs?.showPostCounts
+				? [cacheTags.content()]
+				: []),
+		],
+	};
 };

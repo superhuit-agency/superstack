@@ -10,7 +10,7 @@ import {
 	getTemplateBlocks,
 } from './get-fse-template-blocks';
 import getFunkyWpUploadsURI from './get-funky-wp-uploads-uri';
-import getNodeByURI from './get-node-by-uri';
+import { getPreviewNodeByURI, getPublicNodeByURI } from './get-node-by-uri';
 import getNotFoundBreadcrumbs from './get-not-found-breadcrumbs';
 import getWpUriFromNextPath from './get-wp-uri-from-next-path';
 
@@ -31,9 +31,10 @@ export {
 	enrichTemplateBlocks,
 	getTemplateBlocks,
 	getFunkyWpUploadsURI,
-	getNodeByURI,
 	getNotFoundBreadcrumbs,
 	getPreviewNode,
+	getPreviewNodeByURI,
+	getPublicNodeByURI,
 	getSitemapData,
 	getRedirection,
 	getWpUriFromNextPath,

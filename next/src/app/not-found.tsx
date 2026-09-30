@@ -9,7 +9,7 @@ import {
 
 export default async function NotFound() {
 	const [templateBlocks, breadcrumbs] = await Promise.all([
-		enrichTemplateBlocks(getTemplateBlocks('404')),
+		getTemplateBlocks('404').then((blocks) => enrichTemplateBlocks(blocks)),
 		getNotFoundBreadcrumbs(),
 	]);
 

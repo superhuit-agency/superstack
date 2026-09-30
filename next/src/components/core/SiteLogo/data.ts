@@ -1,3 +1,4 @@
+import { cacheTags } from '@/lib/cache-tags';
 import { gql } from '@/utils';
 
 export const getData = async (
@@ -17,11 +18,13 @@ export const getData = async (
 		}
 	`;
 
+	const tags = [cacheTags.settings()];
+
 	const data = await fetcher(query);
 	const siteLogo = data?.siteLogo;
 
 	if (!siteLogo?.sourceUrl) {
-		return {};
+		return { cacheTags: tags };
 	}
 
 	const computedWidth =
@@ -48,5 +51,6 @@ export const getData = async (
 		alt: siteLogo.altText ?? '',
 		width: computedWidth,
 		height: computedHeight,
+		cacheTags: tags,
 	};
 };

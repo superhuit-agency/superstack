@@ -23,22 +23,26 @@ npm run dev
 
 ## Available npm Scripts
 
-| Command           | Description                                   |
-| ----------------- | --------------------------------------------- |
-| `dev`             | Start the Next.js dev server                  |
-| `predev`          | Fetch FSE templates/parts data before `dev`   |
-| `build`           | Build Next.js for production                  |
-| `prebuild`        | Fetch FSE templates/parts data before `build` |
-| `start`           | Run the production server (`next start`)      |
-| `lint`            | Run ESLint                                    |
-| `storybook`       | Start Storybook on port 6006                  |
-| `build-storybook` | Build Storybook static output                 |
+| Command           | Description                              |
+| ----------------- | ---------------------------------------- |
+| `dev`             | Start the Next.js dev server             |
+| `build`           | Build Next.js for production             |
+| `start`           | Run the production server (`next start`) |
+| `lint`            | Run ESLint                               |
+| `test`            | Run the Vitest suite once                |
+| `storybook`       | Start Storybook on port 6006             |
+| `build-storybook` | Build Storybook static output            |
 
 ## Pages FSE Templates
 
-- `predev` and `prebuild` run `scripts/fetch-fse-templates-and-parts.ts`.
-- This script writes data used by template rendering to `src/lib/fse/fse-templates-and-parts.json`.
+- FSE templates and template parts are read from WordPress at runtime by `src/lib/get-fse-templates.ts`.
+- The read is cached until the `templates` cache tag is revalidated, so template edits reach the site without a deploy.
 - See [docs/fse-templating.md](/docs/fse-templating.md) for a full explanation of the FSE templating architecture.
+
+## Caching
+
+- Content read from WordPress is cached indefinitely and refreshed by tag when the nextjs-revalidate plugin reports a change.
+- See [docs/caching.md](/docs/caching.md) for the tag scheme, the revalidate route, sizing the cache and the known risks.
 
 ## Custom Post Types
 

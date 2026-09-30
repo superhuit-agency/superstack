@@ -1,6 +1,22 @@
 // import * as blocksData from '@/components/data';
-import { blocksDataList } from '@/components/global/blockRegistry';
+import {
+	baseUriContext,
+	throwIfBaseUriNotDeclared,
+} from '@/hooks/use-base-uri';
 import fetchAPI from '@/lib/fetch-api';
+import getCachedBlockData, {
+	type BlockData,
+	getBlockDataModule,
+} from '@/lib/get-cached-block-data';
+import { throwIfWordPressReadFailed } from '@/lib/wordpress-read-error';
+
+type BlockPropsOptions = {
+	skipGetData?: boolean;
+	lang?: string | null;
+	preview?: boolean;
+	/** The page being viewed, for blocks declaring `usesArchiveContext`. */
+	context?: BlockDataContext;
+};
 
 // const blocksDataList: { [key: string]: any } = {};
 // for (const key in blocksData) {
@@ -21,14 +37,17 @@ import fetchAPI from '@/lib/fetch-api';
  *
  * A block's `data.ts` may export `getData(fetcher, attrs)` which returns
  * `{ ...extraAttrs, innerBlocks? }`. When `innerBlocks` is present in that
- * return value, it overrides the static `innerBlocks` from the JSON snapshot
+ * return value, it overrides the static `innerBlocks` from the FSE templates
  * — used by blocks whose children change independently of the template
  * (e.g. `core/navigation` menu items). See docs/fse-templating.md.
+ *
+ * Outside preview, `getData` runs in its own cache entry, tagged with the
+ * `cacheTags` it returns next to its data (see `getCachedBlockData`).
  *
  * @param block A block object coming from Wp GraphQl's blocksJSON
  * @returns the same block, with only necessary data
  */
-export default function getBlockFinalComponentProps(
+export default async function getBlockFinalComponentProps(
 	{
 		name,
 		attributes,
@@ -38,57 +57,53 @@ export default function getBlockFinalComponentProps(
 		attributes: object;
 		innerBlocks: Array<BlockPropsType>;
 	},
-	options?: {
-		skipGetData?: boolean;
-		lang?: string | null;
-		page?: number;
-		baseUri?: string;
-		term?: BlockDataContext['term'];
-		archive?: BlockDataContext['archive'];
-	}
+	options?: BlockPropsOptions
 ): Promise<BlockPropsType> {
-	return new Promise(async (res) => {
-		const props: BlockPropsType = {
-			name,
-			attributes: {},
-			innerBlocks: [],
-		};
+	const props: BlockPropsType = {
+		name,
+		attributes: {},
+		innerBlocks: [],
+	};
 
-		Promise.allSettled([
-			getAttributes(name, attributes, innerBlocks, options),
-			getInnerBlocks(innerBlocks, options),
-		]).then(async ([attrsResult, blksResult]) => {
-			if (attrsResult.status === 'fulfilled') {
-				const { attrs, innerBlocks: dataInnerBlocks } =
-					attrsResult.value as {
-						attrs: Record<string, unknown>;
-						innerBlocks?: BlockPropsType[];
-					};
-				props.attributes = attrs ?? {};
+	const results = await Promise.allSettled([
+		getAttributes(name, attributes, innerBlocks, options),
+		getInnerBlocks(innerBlocks, options),
+	]);
+	throwIfBaseUriNotDeclared(results);
+	// Nothing is cached in preview: the block falls back to its own attributes
+	if (!options?.preview) throwIfWordPressReadFailed(results);
 
-				// If getData returned innerBlocks, use those (fresh) instead of the
-				// static ones — but still run them back through this same enrichment
-				// pipeline, so any dynamic block nested inside (e.g. a `core/navigation`
-				// nested inside a submenu, or a pagination block inside a `core/query`)
-				// gets its own getData resolved too.
-				if (dataInnerBlocks !== undefined) {
-					props.innerBlocks = (await getInnerBlocks(
-						dataInnerBlocks,
-						options
-					).catch(() => [])) as BlockPropsType['innerBlocks'];
-				} else if (blksResult.status === 'fulfilled') {
-					props.innerBlocks =
-						(blksResult.value as BlockPropsType['innerBlocks']) ??
-						[];
-				}
-			} else if (blksResult.status === 'fulfilled') {
-				props.innerBlocks =
-					(blksResult.value as BlockPropsType['innerBlocks']) ?? [];
-			}
+	const [attrsResult, blksResult] = results;
 
-			res(props);
-		});
-	});
+	if (attrsResult.status === 'fulfilled') {
+		const { attrs, innerBlocks: dataInnerBlocks } = attrsResult.value;
+		props.attributes = attrs ?? {};
+
+		// If getData returned innerBlocks, use those (fresh) instead of the
+		// static ones — but still run them back through this same enrichment
+		// pipeline, so any dynamic block nested inside (e.g. a `core/navigation`
+		// nested inside a submenu, or a pagination block inside a `core/query`)
+		// gets its own getData resolved too.
+		if (dataInnerBlocks !== undefined) {
+			props.innerBlocks = (await getInnerBlocks(
+				dataInnerBlocks,
+				options
+			)) as BlockPropsType['innerBlocks'];
+		} else if (blksResult.status === 'fulfilled') {
+			props.innerBlocks =
+				(blksResult.value as BlockPropsType['innerBlocks']) ?? [];
+		}
+	} else {
+		// getData failed: render the block with its own attributes
+		props.attributes = attributes as Record<string, unknown>;
+
+		if (blksResult.status === 'fulfilled') {
+			props.innerBlocks =
+				(blksResult.value as BlockPropsType['innerBlocks']) ?? [];
+		}
+	}
+
+	return props;
 }
 
 /**
@@ -98,84 +113,77 @@ export default function getBlockFinalComponentProps(
  * @param   {any}    attributes Initial block's attributes. Will be returned as it or enriched and/or formatted.
  * @returns {any}
  */
-const getAttributes = (
+const getAttributes = async (
 	name: string,
 	attributes: object,
 	innerBlocks: Array<BlockPropsType>,
-	options?: {
-		skipGetData?: boolean;
-		lang?: string | null;
-		page?: number;
-		baseUri?: string;
-		term?: BlockDataContext['term'];
-		archive?: BlockDataContext['archive'];
+	options?: BlockPropsOptions
+): Promise<{
+	attrs: Record<string, unknown>;
+	innerBlocks?: BlockPropsType[];
+}> => {
+	const attrs = attributes as Record<string, unknown>;
+
+	if (options?.skipGetData) return { attrs };
+
+	const blockModule = await getBlockDataModule(name);
+
+	if (!blockModule?.getData) return { attrs };
+
+	const lang = options?.lang ?? null;
+	const { usesArchiveContext } = blockModule;
+	const context = (
+		typeof usesArchiveContext === 'function'
+			? usesArchiveContext(attributes)
+			: usesArchiveContext
+	)
+		? { ...options?.context, innerBlocks }
+		: undefined;
+
+	let data: Record<string, unknown>;
+	if (options?.preview) {
+		const liveData: BlockData = {
+			...(await blockModule.getData(fetchAPI, attributes, lang, context)),
+		};
+		delete liveData.cacheTags;
+		data = liveData;
+	} else {
+		data = await getCachedBlockData(
+			name,
+			attributes,
+			lang,
+			blockModule.usesBaseUri
+				? ((baseUriContext() as string | undefined) ?? null)
+				: null,
+			context
+		);
 	}
-) =>
-	new Promise(async (res) => {
-		if (
-			options?.skipGetData ||
-			!blocksDataList[name as keyof typeof blocksDataList]
-		)
-			res({ attrs: attributes });
-		else {
-			const blockModule =
-				await blocksDataList[name as keyof typeof blocksDataList]?.();
-			const getData = (
-				blockModule as {
-					getData?: (
-						fetcher: FetchApiFuncType,
-						attrs: object,
-						lang?: string | null,
-						context?: BlockDataContext
-					) => Promise<object>;
-				}
-			).getData;
 
-			if (!getData) {
-				res({ attrs: attributes });
-				return;
-			}
+	const { innerBlocks: dataInnerBlocks, ...restData } = data as {
+		innerBlocks?: BlockPropsType[];
+	} & Record<string, unknown>;
 
-			getData(fetchAPI, attributes, options?.lang ?? null, {
-				page: options?.page,
-				baseUri: options?.baseUri,
-				term: options?.term,
-				archive: options?.archive,
-				innerBlocks,
-			}).then(
-				(data = {}) => {
-					const { innerBlocks, ...restData } = data as {
-						innerBlocks?: BlockPropsType[];
-					} & Record<string, unknown>;
-					res({
-						attrs: { ...attributes, ...restData },
-						...(innerBlocks !== undefined ? { innerBlocks } : {}),
-					});
-				}
-			);
-		}
-	});
+	return {
+		attrs: { ...attrs, ...restData },
+		...(dataInnerBlocks !== undefined
+			? { innerBlocks: dataInnerBlocks }
+			: {}),
+	};
+};
 
-const getInnerBlocks = (
+const getInnerBlocks = async (
 	blocks: Array<BlockPropsType>,
-	options?: {
-		skipGetData?: boolean;
-		lang?: string | null;
-		page?: number;
-		baseUri?: string;
-		term?: BlockDataContext['term'];
-		archive?: BlockDataContext['archive'];
-	}
-) =>
-	new Promise((res, rej) => {
-		if (!(blocks?.length > 0)) rej([]);
-		else {
-			Promise.allSettled(
-				blocks.map((block) =>
-					getBlockFinalComponentProps({ ...block }, options)
-				)
-			).then((rs) =>
-				res(rs.map((r) => (r.status === 'fulfilled' ? r.value : null)))
-			);
-		}
-	});
+	options?: BlockPropsOptions
+) => {
+	if (!(blocks?.length > 0)) return [];
+
+	const rs = await Promise.allSettled(
+		blocks.map((block) =>
+			getBlockFinalComponentProps({ ...block }, options)
+		)
+	);
+	throwIfBaseUriNotDeclared(rs);
+	throwIfWordPressReadFailed(rs);
+
+	return rs.map((r) => (r.status === 'fulfilled' ? r.value : null));
+};

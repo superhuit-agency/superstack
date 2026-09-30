@@ -1,4 +1,5 @@
 import { baseUriContext } from '@/hooks/use-base-uri';
+import { nodeAtUriTags } from '@/lib/cache-tags';
 import { gql } from '@/utils';
 
 import {
@@ -13,6 +14,7 @@ const DEFAULT_WORD_COUNT_TYPE: WordCountType = 'words';
 
 type ContentBundle = {
 	__typename?: string | null;
+	databaseId?: number | null;
 	rawContent?: string | null;
 	/** Last resort: full HTML; prefer `<main>` slice to avoid counting the whole document. */
 	renderedContent?: string | null;
@@ -180,6 +182,8 @@ const normalizeReadingSpeed = (value: unknown): number => {
 	return Math.floor(n);
 };
 
+export const usesBaseUri = true;
+
 export const getData = async (
 	fetcher: FetchApiFuncType,
 	attrs: PostTimeToReadAttributes | null = null
@@ -197,6 +201,7 @@ export const getData = async (
 			query PostTimeToReadByPostId($postId: ID!) {
 				post(id: $postId) {
 					__typename
+					databaseId
 					rawContent: content(format: RAW)
 					renderedContent: content(format: RENDERED)
 					blocksJSON
@@ -211,6 +216,9 @@ export const getData = async (
 		const byUriQuery = gql`
 			query PostTimeToReadByUri($uri: String!) {
 				nodeByUri(uri: $uri) {
+					... on ContentNode {
+						databaseId
+					}
 					__typename
 					... on Post {
 						rawContent: content(format: RAW)
@@ -237,11 +245,11 @@ export const getData = async (
 		wordCountType
 	);
 
-	const base: Pick<PostTimeToReadAttributes, 'wordCountType' | 'totalUnits'> =
-		{
-			wordCountType,
-			totalUnits,
-		};
+	const base = {
+		wordCountType,
+		totalUnits,
+		cacheTags: nodeAtUriTags(bundle?.databaseId),
+	};
 
 	if (displayMode !== 'time') {
 		return base;
