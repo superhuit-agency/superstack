@@ -61,6 +61,8 @@ export async function getPublicNodeByURI(
 	cacheTag(
 		...nodeTags(node),
 		cacheTags.settings(), // The same query returns site SEO and general settings
+		// Its translations' URIs (hreflang, language switcher) move with other posts
+		...(configs.isMultilang ? [cacheTags.uris()] : []),
 		...termTags(node.categories?.nodes),
 		...termTags(node.tags?.nodes)
 	);

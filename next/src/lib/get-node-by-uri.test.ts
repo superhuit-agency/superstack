@@ -240,4 +240,39 @@ describe('getPublicNodeByURI', () => {
 		expect(await getPublicNodeByURI('/en/hello/', 'en')).toBeNull();
 		expect(cacheTagsGiven()).toEqual(['nodes', 'uris']);
 	});
+
+	it('tags a translated node `uris`, since it links to its translations', async () => {
+		configs.isMultilang = true;
+		wordpressReturns({
+			__typename: 'Page',
+			contentTypeName: 'page',
+			translation: {
+				id: 12,
+				uri: '/en/about/',
+				language: { code: 'EN', locale: 'en_US' },
+				translations: [
+					{
+						uri: '/fr/a-propos/',
+						language: { code: 'FR', locale: 'fr_FR' },
+					},
+				],
+			},
+		});
+
+		const node = await getPublicNodeByURI('/about/', 'en');
+
+		expect(node?.translations).toEqual([
+			{
+				uri: '/fr/a-propos/',
+				language: { code: 'FR', locale: 'fr_FR' },
+			},
+		]);
+		expect(cacheTagsGiven()).toEqual([
+			'node:12',
+			'nodes',
+			'nodes:page',
+			'settings',
+			'uris',
+		]);
+	});
 });
