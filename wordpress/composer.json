@@ -35,7 +35,7 @@
 		"wpackagist-plugin/wp-nested-pages": "^3.2",
 		"ashhitch/wp-graphql-yoast-seo": "^5.0",
 		"pristas-peter/wp-graphql-gutenberg": "dev-master",
-		"superhuit/wp-graphql-redirection": "^1.1",
+		"superhuit/wp-graphql-redirection": "^2.0",
 		"valu/wp-graphql-offset-pagination": "^0.2.1",
 		"wp-graphql/wp-graphql-jwt-authentication": "^0.7.2",
 		"superhuit-agency/nextjs-revalidate": "^1.6",
@@ -73,6 +73,18 @@
 		{
 			"type": "vcs",
 			"url": "https://github.com/superhuit-agency/wp-graphql-gutenberg"
+		},
+		{
+			"type": "package",
+			"package": {
+				"name": "superhuit/wp-graphql-redirection",
+				"version": "2.0.2",
+				"type": "wordpress-plugin",
+				"dist": {
+					"url": "https://github.com/superhuit-agency/wp-graphql-redirection/releases/download/v2.0.2/wp-graphql-redirection.zip",
+					"type": "zip"
+				}
+			}
 		},
 		{
 			"type": "package",
