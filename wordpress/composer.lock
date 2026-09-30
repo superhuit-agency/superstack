@@ -4,7 +4,7 @@
 		"Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
 		"This file is @generated automatically"
 	],
-	"content-hash": "6ffbee34fddb69b35f41ab5a72dbbf6c",
+	"content-hash": "67415a877857d6ac43013fc809b96bc1",
 	"packages": [
 		{
 			"name": "ashhitch/wp-graphql-yoast-seo",
@@ -550,25 +550,28 @@
 		},
 		{
 			"name": "pristas-peter/wp-graphql-gutenberg",
-			"version": "dev-master",
+			"version": "v0.5.1",
 			"source": {
 				"type": "git",
 				"url": "https://github.com/superhuit-agency/wp-graphql-gutenberg.git",
-				"reference": "d80cef61c18678098c2c2cc73f80369d53988f93"
+				"reference": "2959bf962098783d8613a9cf3c76ee12ba6eb46d"
 			},
 			"dist": {
 				"type": "zip",
-				"url": "https://api.github.com/repos/superhuit-agency/wp-graphql-gutenberg/zipball/d80cef61c18678098c2c2cc73f80369d53988f93",
-				"reference": "d80cef61c18678098c2c2cc73f80369d53988f93",
+				"url": "https://api.github.com/repos/superhuit-agency/wp-graphql-gutenberg/zipball/2959bf962098783d8613a9cf3c76ee12ba6eb46d",
+				"reference": "2959bf962098783d8613a9cf3c76ee12ba6eb46d",
 				"shasum": ""
 			},
 			"require": {
 				"opis/json-schema": "^1.0",
+				"php": ">=8.0",
 				"voku/simple_html_dom": "~4.8.10"
 			},
 			"require-dev": {
-				"automattic/vipwpcs": "^2.2",
-				"phpcompatibility/phpcompatibility-wp": "^2.1"
+				"automattic/vipwpcs": "^3.0",
+				"phpcompatibility/phpcompatibility-wp": "^2.1",
+				"squizlabs/php_codesniffer": "^3.13.6",
+				"wp-coding-standards/wpcs": "^3.4.1"
 			},
 			"type": "wordpress-plugin",
 			"autoload": {
@@ -580,6 +583,12 @@
 				]
 			},
 			"scripts": {
+				"post-install-cmd": [
+					"@composer dump-autoload --no-dev"
+				],
+				"post-update-cmd": [
+					"@composer dump-autoload --no-dev"
+				],
 				"phpcs-i": [
 					"@php ./vendor/bin/phpcs -i"
 				],
@@ -592,9 +601,9 @@
 			},
 			"description": "Query gutenberg blocks with wp-graphql",
 			"support": {
-				"source": "https://github.com/superhuit-agency/wp-graphql-gutenberg/tree/master"
+				"source": "https://github.com/superhuit-agency/wp-graphql-gutenberg/tree/v0.5.1"
 			},
-			"time": "2026-07-22T14:19:25+00:00"
+			"time": "2026-09-30T13:55:04+00:00"
 		},
 		{
 			"name": "squizlabs/php_codesniffer",
@@ -1330,9 +1339,7 @@
 	"packages-dev": [],
 	"aliases": [],
 	"minimum-stability": "stable",
-	"stability-flags": {
-		"pristas-peter/wp-graphql-gutenberg": 20
-	},
+	"stability-flags": [],
 	"prefer-stable": false,
 	"prefer-lowest": false,
 	"platform": {
