@@ -23,7 +23,7 @@ export default function Cover({
 					className="wp-block-cover__image-background"
 					style={{
 						objectPosition: focalPoint
-							? `${focalPoint.x}% ${focalPoint.y}%`
+							? `${focalPoint.x * 100}% ${focalPoint.y * 100}%`
 							: undefined,
 					}}
 				/>

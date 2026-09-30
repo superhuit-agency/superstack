@@ -80,7 +80,7 @@ const Image: FC<ImageProps> & BlockConfigs = forwardRef<
 					}
 					style={{
 						objectPosition: focalPoint
-							? `${focalPoint.x}% ${focalPoint.y}%`
+							? `${focalPoint.x * 100}% ${focalPoint.y * 100}%`
 							: undefined,
 						aspectRatio: aspectRatio || undefined,
 						objectFit: scale || undefined,
