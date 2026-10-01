@@ -102,7 +102,7 @@ export default async function getSitemapData(
 async function getIndexSitemapData() {
 	const data = await fetchAPI(
 		`query ContentTypes {
-			contentTypes {
+			contentTypes(first: 100) {
 				nodes {
 					graphqlSingleName
 					graphqlPluralName
@@ -394,7 +394,7 @@ async function getFeaturedImageField(pluralName: string) {
 					name
 				}
 			}
-			contentTypes {
+			contentTypes(first: 100) {
 				nodes {
 					graphqlSingleName
 					graphqlPluralName
