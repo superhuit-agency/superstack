@@ -6,6 +6,22 @@ import { getWpUrl } from '@/utils/node-utils';
 
 const GRAPHQL_MAX_SIZE = 100;
 
+// Not every content type supports thumbnails, and spreading
+// `NodeWithFeaturedImage` on a type that can't implement it fails the whole
+// query. Inside `ContentNode` the spread is valid for any type and only
+// answers for the ones that implement it. No introspection needed: it is off
+// for public requests on staging and production.
+const FEATURED_IMAGE_FIELD = `... on ContentNode {
+	... on NodeWithFeaturedImage {
+		featuredImage {
+			node {
+				sourceUrl
+				title
+			}
+		}
+	}
+}`;
+
 // Content types registered by WordPress (FSE templates, navigation menus)
 // that are not public content and are not exposed in `seo.contentTypes`.
 const EXCLUDED_CONTENT_TYPES = ['Template', 'TemplatePart', 'NavigationMenu'];
@@ -182,15 +198,6 @@ async function getSitemapTypeUrls(type = 'posts', page = 1, size = 1000) {
 
 	cacheTag(cacheTags.type(contentType.name));
 
-	const featuredImageField = contentType.supportsFeaturedImage
-		? `featuredImage {
-				node {
-					sourceUrl
-					title
-				}
-			}`
-		: '';
-
 	if (size > GRAPHQL_MAX_SIZE) {
 		(
 			await Promise.all(
@@ -213,7 +220,7 @@ async function getSitemapTypeUrls(type = 'posts', page = 1, size = 1000) {
 										node {
 											uri
 											modified
-											${featuredImageField}
+											${FEATURED_IMAGE_FIELD}
 											seo {
 												metaRobotsNoindex
 											}
@@ -248,7 +255,7 @@ async function getSitemapTypeUrls(type = 'posts', page = 1, size = 1000) {
 					node {
 						uri
 						modified
-						${featuredImageField}
+						${FEATURED_IMAGE_FIELD}
 						seo {
 							metaRobotsNoindex
 						}
@@ -275,21 +282,14 @@ async function getSitemapTypeUrls(type = 'posts', page = 1, size = 1000) {
 }
 
 /**
- * The public content type behind a sitemap's plural name: its post type name (for the
- * `type:` cache tag) and whether it supports thumbnails, since querying
- * `featuredImage` on a type that doesn't implement `NodeWithFeaturedImage`
- * fails the whole query.
+ * The public content type behind a sitemap's plural name, for its `type:`
+ * cache tag.
  */
 async function getContentType(
 	pluralName: string
-): Promise<{ name: string; supportsFeaturedImage: boolean } | null> {
+): Promise<{ name: string } | null> {
 	const data = await fetchAPI(
 		`query SitemapContentType {
-			__type(name: "NodeWithFeaturedImage") {
-				possibleTypes {
-					name
-				}
-			}
 			contentTypes {
 				nodes {
 					name
@@ -310,16 +310,7 @@ async function getContentType(
 			!EXCLUDED_CONTENT_TYPES.includes(type.graphqlSingleName)
 	);
 
-	if (!contentType) return null;
-
-	const singularName: string = contentType.graphqlSingleName;
-	const typeName =
-		singularName.charAt(0).toUpperCase() + singularName.slice(1);
-	const supportsFeaturedImage = !!data.__type?.possibleTypes?.some(
-		({ name }: { name: string }) => name === typeName
-	);
-
-	return { name: contentType.name, supportsFeaturedImage };
+	return contentType ? { name: contentType.name } : null;
 }
 
 /**
