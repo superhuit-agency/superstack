@@ -5,6 +5,19 @@ const getWpUrl = () => process.env.WORDPRESS_URL ?? 'http://localhost';
 
 const nextConfig: NextConfig = {
 	trailingSlash: true, // to match wp links format and avoid many redirects
+	async headers() {
+		return [
+			{
+				source: '/wp-content/uploads/:path*',
+				headers: [
+					{
+						key: 'Cache-Control',
+						value: 'public, max-age=604800, stale-while-revalidate=86400',
+					},
+				],
+			},
+		];
+	},
 	turbopack: {
 		root: path.join(__dirname, '.'),
 	},
