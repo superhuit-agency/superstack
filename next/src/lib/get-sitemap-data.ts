@@ -7,6 +7,9 @@ const GRAPHQL_MAX_SIZE = 100;
 // that are not public content and are not exposed in `seo.contentTypes`.
 const EXCLUDED_CONTENT_TYPES = ['Template', 'TemplatePart', 'NavigationMenu'];
 
+// Taxonomies registered by WordPress that have no archive page.
+const EXCLUDED_TAXONOMIES = ['postFormats'];
+
 interface PostType {
 	name: string;
 	total: number;
@@ -28,6 +31,26 @@ interface ContentType {
 	};
 }
 
+interface TermConnectionType {
+	pageInfo: {
+		hasNextPage: boolean;
+		endCursor: string | null;
+	};
+	nodes: TermType[];
+}
+
+interface TermType {
+	uri: string | null;
+	seo?: {
+		metaRobotsNoindex: string;
+	};
+	contentNodes?: {
+		nodes: {
+			modified: string;
+		}[];
+	};
+}
+
 interface NodeType {
 	modified: string;
 	images?: {
@@ -40,7 +63,8 @@ interface NodeType {
 			title: string;
 		};
 	};
-	uri: string;
+	uri: string | null;
+	link?: string | null;
 	seo: {
 		metaRobotsNoindex: string;
 	};
@@ -61,8 +85,17 @@ export default async function getSitemapData(
 	page = 1,
 	size = 1000
 ) {
-	return await (type === 'all'
-		? getIndexSitemapData()
+	if (type === 'all') {
+		const [contentTypes, taxonomies] = await Promise.all([
+			getIndexSitemapData(),
+			getIndexTaxonomiesSitemapData(),
+		]);
+		return [...(contentTypes ?? []), ...taxonomies];
+	}
+
+	const taxonomies = await getTaxonomyNames();
+	return await (taxonomies.includes(type)
+		? getSitemapTaxonomyUrls(type, page, size)
 		: getSitemapTypeUrls(type, page, size));
 }
 
@@ -177,6 +210,7 @@ async function getSitemapTypeUrls(type = 'posts', page = 1, size = 1000) {
 									edges {
 										node {
 											uri
+											link
 											modified
 											${featuredImageField}
 											seo {
@@ -216,6 +250,7 @@ async function getSitemapTypeUrls(type = 'posts', page = 1, size = 1000) {
 				edges {
 					node {
 						uri
+						link
 						modified
 						${featuredImageField}
 						seo {
@@ -234,12 +269,117 @@ async function getSitemapTypeUrls(type = 'posts', page = 1, size = 1000) {
 	}
 
 	return nodes.reduce((urls, { node }) => {
-		if (node.seo.metaRobotsNoindex === 'index')
+		node.uri = node.uri ?? getLinkUri(node.link);
+		if (node.uri && node.seo.metaRobotsNoindex === 'index')
 			urls.push(
 				parseNodeTranslations(parseNodeImages(parseNodeDate(node)))
 			);
 		return urls;
 	}, []);
+}
+
+async function getTaxonomyNames(): Promise<string[]> {
+	const data = await fetchAPI(
+		`query SitemapTaxonomies {
+			taxonomies(first: 100) {
+				nodes {
+					graphqlPluralName
+				}
+			}
+		}`
+	).catch((error) => {
+		console.error("Can't fetch sitemap taxonomies");
+		console.error(error);
+	});
+
+	return (data?.taxonomies?.nodes ?? [])
+		.map(
+			({ graphqlPluralName }: { graphqlPluralName: string }) =>
+				graphqlPluralName
+		)
+		.filter((name: string) => !EXCLUDED_TAXONOMIES.includes(name));
+}
+
+/**
+ * Term connections don't support offset pagination,
+ * so walk through every page with the cursor.
+ */
+async function getIndexableTerms(taxonomy: string) {
+	let terms: TermType[] = [];
+	let after: string | null = null;
+
+	do {
+		const data: { [key: string]: TermConnectionType } | void =
+			await fetchAPI(
+				`query SitemapTaxonomyUrls($after: String) {
+				${taxonomy}(first: ${GRAPHQL_MAX_SIZE}, after: $after, where: { hideEmpty: true }) {
+					pageInfo {
+						hasNextPage
+						endCursor
+					}
+					nodes {
+						uri
+						seo {
+							metaRobotsNoindex
+						}
+						contentNodes(first: 1, where: { orderby: { field: MODIFIED, order: DESC } }) {
+							nodes {
+								modified
+							}
+						}
+					}
+				}
+			}`,
+				{ variables: { after } }
+			).catch((error) => {
+				console.error(`Can't fetch sitemap ${taxonomy} urls`);
+				console.error(error);
+			});
+
+		const connection: TermConnectionType | undefined = data?.[taxonomy];
+		terms = [...terms, ...(connection?.nodes ?? [])];
+		after = connection?.pageInfo?.hasNextPage
+			? connection.pageInfo.endCursor
+			: null;
+	} while (after);
+
+	return terms.reduce((urls: { uri: string; modified: string }[], term) => {
+		const modified = term.contentNodes?.nodes?.[0]?.modified;
+		if (term.uri && modified && term.seo?.metaRobotsNoindex === 'index')
+			urls.push({
+				uri: term.uri,
+				modified: removeTimeFromDate(modified),
+			});
+		return urls;
+	}, []);
+}
+
+async function getIndexTaxonomiesSitemapData() {
+	const taxonomies = await getTaxonomyNames();
+
+	const results = await Promise.all(
+		taxonomies.map(async (name): Promise<PostType | null> => {
+			const terms = await getIndexableTerms(name);
+			if (!terms.length) return null;
+
+			return {
+				name,
+				total: terms.length,
+				lastModified: terms
+					.map(({ modified }) => modified)
+					.sort()
+					.reverse()[0],
+			};
+		})
+	);
+
+	return results.filter((result): result is PostType => result !== null);
+}
+
+async function getSitemapTaxonomyUrls(taxonomy: string, page = 1, size = 1000) {
+	const terms = await getIndexableTerms(taxonomy);
+
+	return terms.slice((page - 1) * size, page * size);
 }
 
 /**
@@ -325,6 +465,19 @@ function getUploadUri(sourceUrl: string) {
 		return new URL(sourceUrl, getWpUrl()).pathname;
 	} catch {
 		return sourceUrl;
+	}
+}
+
+/**
+ * WPGraphQL returns a `null` uri for the page set as "Posts page",
+ * so fall back on the path of its permalink.
+ */
+function getLinkUri(link?: string | null) {
+	if (!link) return null;
+	try {
+		return new URL(link, getWpUrl()).pathname;
+	} catch {
+		return null;
 	}
 }
 
