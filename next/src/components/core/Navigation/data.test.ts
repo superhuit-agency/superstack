@@ -37,7 +37,7 @@ describe('Navigation getData', () => {
 	});
 
 	it('throws a WordPressReadError when the menu read fails', async () => {
-		// fetchAPI resolves to `{}` on a network, HTTP or GraphQL error
+		// `navigationMenu` is missing, not `null`: the read failed
 		const fetcher = fetcherReturning({});
 
 		const error = await getData(fetcher, { ref: 12 }).catch((e) => e);

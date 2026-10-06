@@ -1,5 +1,6 @@
 import { getWpGraphqlUrl } from '@/utils/node-utils';
 import { dedupeFragments, getQueryAttrs } from '@/utils';
+import { WordPressReadError } from '@/lib/wordpress-read-error';
 
 const WP_GRAPHQL_URL = getWpGraphqlUrl();
 
@@ -129,6 +130,15 @@ ${sep}
 ${err.message}
 ${limit}
 `)
+		);
+
+		// A failed read is never data: callers that turned `{}` into an empty
+		// result would cache it with `cacheLife('max')`. The digest survives a
+		// `use cache` boundary, so the public render fails and keeps serving the
+		// previous entry, while preview falls back to the block's attributes.
+		throw new WordPressReadError(
+			`the "${name || 'unnamed'}" query`,
+			name || 'query'
 		);
 	}
 
