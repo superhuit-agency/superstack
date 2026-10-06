@@ -137,6 +137,11 @@ async function getNodeByURI(
 		uri = `/${lang}${uri.startsWith('/') ? '' : '/'}${uri}`;
 	}
 
+	// The blocks read the node at the Base URI: without its language prefix,
+	// a path shared by two languages (e.g. the home, `/`) resolves to the
+	// default language's node.
+	baseUriContext(uri);
+
 	// The slug may be the id of an unpublished post
 	const [match, id] = uri.match(/^(?:\/?\w{2})?\/(\d+)\/?/) || [];
 	const isId = !!match;
