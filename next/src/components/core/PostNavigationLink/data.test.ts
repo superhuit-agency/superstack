@@ -62,6 +62,20 @@ describe('PostNavigationLink getData', () => {
 		});
 	});
 
+	it('links nothing past the last post, without failing', async () => {
+		const fetcher = vi
+			.fn()
+			.mockResolvedValueOnce(currentPost)
+			.mockResolvedValueOnce({
+				posts: { nodes: [] },
+			}) as unknown as FetchApiFuncType;
+
+		await expect(getData(fetcher, attributes('next'))).resolves.toEqual({
+			navigationPost: null,
+			cacheTags: ['node:42', 'type:post'],
+		});
+	});
+
 	it('fails when the adjacent post read fails, instead of caching another link', async () => {
 		const fetcher = vi
 			.fn()
