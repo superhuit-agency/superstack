@@ -167,8 +167,18 @@ describe('core/query getData', () => {
 		expect(variables).toMatchObject({ first: 2, offset: 4 });
 		expect(result.pagination).toMatchObject({
 			currentPage: 1,
-			totalPages: 2,
+			totalPages: 0,
 		});
+	});
+
+	it("leaves the posts the block's offset skips out of the pages", async () => {
+		const { result } = await queryLoop({
+			inherit: true,
+			perPage: 2,
+			offset: 1,
+		});
+
+		expect(result.pagination).toMatchObject({ total: 3, totalPages: 1 });
 	});
 
 	it('follows the route page in an inheriting loop, on top of its offset', async () => {
