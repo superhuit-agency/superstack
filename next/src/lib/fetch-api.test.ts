@@ -248,20 +248,55 @@ describe('fetchAPI', () => {
 			);
 		});
 
-		it('sends a mutation once', async () => {
+		it.each([
+			[
+				'a named mutation',
+				`mutation Refresh($t: String!) { refreshJwtAuthToken(input: { jwtRefreshToken: $t }) { authToken } }`,
+			],
+			['an anonymous mutation', `mutation { logout { status } }`],
+			[
+				'a mutation with variables and no name',
+				`mutation($t: String!) { refreshJwtAuthToken(input: { jwtRefreshToken: $t }) { authToken } }`,
+			],
+			[
+				'a mutation after a comment naming a query',
+				`# query Old, kept for reference\nmutation Send { sendForm { ok } }`,
+			],
+			[
+				'a mutation after a fragment',
+				`fragment F on Payload { ok }\nmutation Send { sendForm { ...F } }`,
+			],
+		])('sends %s once', async (_, mutation) => {
 			vi.spyOn(console, 'error').mockImplementation(() => {});
 			const fetchMock = vi
 				.fn()
 				.mockResolvedValue(new Response('', { status: 503 }));
 			vi.stubGlobal('fetch', fetchMock);
 
-			const read = fetchAPI(
-				`mutation Refresh($t: String!) { refreshJwtAuthToken(input: { jwtRefreshToken: $t }) { authToken } }`
-			).catch((e) => e);
+			const read = fetchAPI(mutation).catch((e) => e);
 			await vi.runAllTimersAsync();
 
 			expect(isWordPressReadError(await read)).toBe(true);
 			expect(fetchMock).toHaveBeenCalledTimes(1);
+		});
+
+		it.each([
+			['a comment', `# Not a mutation\nquery Menu { menu { name } }`],
+			['a string', `query Log { logs(type: "mutation") { id } }`],
+			['a field', `query Log { mutation { id } }`],
+			['a variable', `query Log($mutation: Boolean) { logs { id } }`],
+		])('retries a query that says "mutation" in %s', async (_, read) => {
+			const fetchMock = vi
+				.fn()
+				.mockResolvedValueOnce(new Response('', { status: 503 }))
+				.mockResolvedValueOnce(ok(data));
+			vi.stubGlobal('fetch', fetchMock);
+
+			const result = fetchAPI(read);
+			await vi.runAllTimersAsync();
+
+			await expect(result).resolves.toEqual(data.data);
+			expect(fetchMock).toHaveBeenCalledTimes(2);
 		});
 
 		it('keeps at most 4 requests in flight', async () => {
@@ -284,6 +319,105 @@ describe('fetchAPI', () => {
 
 			pending.forEach((release) => release());
 			await expect(Promise.all(reads)).resolves.toHaveLength(5);
+		});
+
+		it('frees its slot whatever the outcome', async () => {
+			vi.spyOn(console, 'error').mockImplementation(() => {});
+			const mutation = `mutation Send { sendForm { ok } }`;
+			const droppedBody = () =>
+				new Response(
+					new ReadableStream({
+						start: (controller) =>
+							controller.error(new TypeError('terminated')),
+					})
+				);
+			const fetchMock = vi
+				.fn()
+				.mockResolvedValueOnce(new Response('', { status: 503 }))
+				.mockResolvedValueOnce(new Response('', { status: 503 }))
+				.mockRejectedValueOnce(connectionReset())
+				.mockRejectedValueOnce(connectionReset())
+				.mockResolvedValueOnce(droppedBody())
+				.mockResolvedValueOnce(droppedBody())
+				.mockResolvedValueOnce(
+					new Response('<html>Notice</html>', { status: 200 })
+				)
+				.mockResolvedValueOnce(
+					new Response('<html>Notice</html>', { status: 200 })
+				)
+				.mockImplementation(async () => ok(data));
+			vi.stubGlobal('fetch', fetchMock);
+
+			const failed = Promise.all(
+				Array.from({ length: 8 }, () =>
+					fetchAPI(mutation).catch((e) => e)
+				)
+			);
+			await vi.runAllTimersAsync();
+			const errors = await failed;
+			expect(errors.every(isWordPressReadError)).toBe(true);
+
+			const reads = Array.from({ length: 4 }, () => fetchAPI(query));
+			await vi.advanceTimersByTimeAsync(0);
+			expect(fetchMock).toHaveBeenCalledTimes(12);
+			await expect(Promise.all(reads)).resolves.toHaveLength(4);
+		});
+
+		it('counts the wait for a slot in its 45 s, and fails naming it', async () => {
+			const consoleError = vi
+				.spyOn(console, 'error')
+				.mockImplementation(() => {});
+			// Four reads that take longer than the budget hold every slot
+			const fetchMock = vi.fn(
+				() =>
+					new Promise<Response>((resolve) =>
+						setTimeout(() => resolve(ok(data)), 46000)
+					)
+			);
+			vi.stubGlobal('fetch', fetchMock);
+
+			const busy = Array.from({ length: 4 }, () => fetchAPI(query));
+			const queued = fetchAPI(query).catch((e) => e);
+
+			await vi.advanceTimersByTimeAsync(44999);
+			expect(consoleError).not.toHaveBeenCalled();
+
+			await vi.advanceTimersByTimeAsync(1);
+			expect(isWordPressReadError(await queued)).toBe(true);
+			expect(consoleError.mock.calls.flat().join('\n')).toContain(
+				'No free slot before the 45000 ms budget ran out'
+			);
+
+			await vi.advanceTimersByTimeAsync(1000);
+			await expect(Promise.all(busy)).resolves.toHaveLength(4);
+			expect(fetchMock).toHaveBeenCalledTimes(4);
+		});
+
+		it("doesn't retry past its 45 s, counting the wait for a slot", async () => {
+			vi.spyOn(console, 'error').mockImplementation(() => {});
+			let calls = 0;
+			// Four reads hold every slot for 40 s, then the queued one gets a
+			// 503 it has no time left to retry
+			const fetchMock = vi.fn(() => {
+				calls++;
+				return calls <= 4
+					? new Promise<Response>((resolve) =>
+							setTimeout(() => resolve(ok(data)), 40000)
+						)
+					: Promise.resolve(new Response('', { status: 503 }));
+			});
+			vi.stubGlobal('fetch', fetchMock);
+			vi.spyOn(Math, 'random').mockReturnValue(0.5);
+
+			const busy = Array.from({ length: 4 }, () => fetchAPI(query));
+			const queued = fetchAPI(query).catch((e) => e);
+			await vi.runAllTimersAsync();
+
+			expect(isWordPressReadError(await queued)).toBe(true);
+			await Promise.all(busy);
+			// 40 s queued, then 503s after 1 s and 2 s of backoff: the next
+			// 4 s would end past 45 s
+			expect(fetchMock).toHaveBeenCalledTimes(7);
 		});
 	});
 });

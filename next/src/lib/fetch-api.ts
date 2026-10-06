@@ -4,44 +4,85 @@ import { WordPressReadError } from '@/lib/wordpress-read-error';
 
 const WP_GRAPHQL_URL = getWpGraphqlUrl();
 
+/** A numeric env var, or `fallback` when it's unset or not a number. */
+function envNumber(name: string, fallback: number, min: number): number {
+	const value = Number(process.env[name] || NaN);
+	return Number.isFinite(value) ? Math.max(min, value) : fallback;
+}
+
 // WordPress, or its host, refuses bursts (503/429) when a re-render or a build
 // sends many reads at once, and connections drop. Retry those with a jittered
 // exponential backoff before failing.
-const MAX_RETRIES = Number(process.env.WORDPRESS_FETCH_MAX_RETRIES ?? 4);
-const RETRY_DELAY = Number(process.env.WORDPRESS_FETCH_RETRY_DELAY ?? 1000);
+const MAX_RETRIES = envNumber('WORDPRESS_FETCH_MAX_RETRIES', 4, 0);
+const RETRY_DELAY = envNumber('WORDPRESS_FETCH_RETRY_DELAY', 1000, 0);
 const RETRYABLE_STATUS = new Set([408, 425, 429, 500, 502, 503, 504]);
 
 // Without a timeout, a WordPress that accepts the connection but never answers
 // costs undici's 300 s headers timeout on every attempt.
-const TIMEOUT = Number(process.env.WORDPRESS_FETCH_TIMEOUT ?? 15000);
+const TIMEOUT = envNumber('WORDPRESS_FETCH_TIMEOUT', 15000, 1);
 
-// Next gives a `'use cache'` entry 50 s to fill during a prerender: stop
-// retrying before that, so the read fails with its own cause.
+// Next gives a `'use cache'` entry 50 s to fill during a prerender, counted
+// from when it starts, waiting for a slot included: stop before that, so the
+// read fails with its own cause.
 const BUDGET = Math.max(45000, TIMEOUT);
 
 // WordPress requests in flight at once, per process. PHP-FPM's default pool
 // has 5 workers, and editors need one too.
-const CONCURRENCY = Math.max(
-	1,
-	Number(process.env.WORDPRESS_FETCH_CONCURRENCY ?? 4)
-);
+const CONCURRENCY = envNumber('WORDPRESS_FETCH_CONCURRENCY', 4, 1);
 
 let active = 0;
 const waiting: Array<() => void> = [];
 
-/** Run `task` once fewer than `CONCURRENCY` others are running. */
-async function withSlot<T>(task: () => Promise<T>): Promise<T> {
-	if (active < CONCURRENCY) active++;
-	else await new Promise<void>((resolve) => waiting.push(resolve));
-
-	try {
-		return await task();
-	} finally {
-		// Hand the slot over, or free it
-		const next = waiting.shift();
-		if (next) next();
-		else active--;
+/**
+ * Take one of the `CONCURRENCY` slots, first come first served. Resolves
+ * `false` if none came free before `deadline`.
+ */
+function takeSlot(deadline: number): Promise<boolean> {
+	if (active < CONCURRENCY) {
+		active++;
+		return Promise.resolve(true);
 	}
+
+	return new Promise((resolve) => {
+		const take = () => {
+			clearTimeout(timer);
+			resolve(true);
+		};
+		const timer = setTimeout(() => {
+			const index = waiting.indexOf(take);
+			if (index >= 0) waiting.splice(index, 1);
+			resolve(false);
+		}, deadline - Date.now());
+
+		waiting.push(take);
+	});
+}
+
+/** Hand the slot over to the next in line, or free it. */
+function releaseSlot() {
+	const next = waiting.shift();
+	if (next) next();
+	else active--;
+}
+
+/**
+ * Whether the document sends a mutation, named or anonymous, wherever it
+ * stands among fragments. Comments and strings don't count.
+ */
+function isMutation(document: string): boolean {
+	const code = document.replace(
+		/"""[\s\S]*?"""|"(?:[^"\\\n]|\\.)*"|#[^\n]*/g,
+		' '
+	);
+	let depth = 0;
+
+	for (const [token] of code.matchAll(/[{}]|(?<![$\w])mutation(?!\w)/g)) {
+		if (token === '{') depth++;
+		else if (token === '}') depth--;
+		else if (depth === 0) return true;
+	}
+
+	return false;
 }
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -135,7 +176,7 @@ const fetchAPI: FetchApiFuncType = async (query, options) => {
 
 	let result: any = {};
 
-	const { name, type } = getQueryAttrs(query);
+	const { name } = getQueryAttrs(query);
 	// console.debug('== fetchAPI %s - %s', name, type);
 	// // Debug performances
 	// const perfsId = fetchAPITester.markStart(`${type} - ${name}`);
@@ -143,75 +184,88 @@ const fetchAPI: FetchApiFuncType = async (query, options) => {
 	let dedupedQuery = dedupeFragments(query);
 
 	// A mutation may not be safe to send twice: it gets one attempt
-	const attempts = type === 'mutation' ? 1 : MAX_RETRIES + 1;
-	let deadline = 0;
+	const attempts = isMutation(dedupedQuery) ? 1 : MAX_RETRIES + 1;
+	const deadline = Date.now() + BUDGET;
 
-	// One request, response body included, inside a concurrency slot
-	const attempt = () =>
-		withSlot(async (): Promise<Attempt> => {
-			if (!deadline) deadline = Date.now() + BUDGET;
-			const timeout = Math.max(
-				0,
-				Math.min(TIMEOUT, deadline - Date.now())
-			);
+	// One request, response body included. Never throws.
+	const attempt = async (timeout: number): Promise<Attempt> => {
+		try {
+			const res = await fetch(endpoint, {
+				method: 'POST',
+				headers,
+				body: JSON.stringify({
+					query: dedupedQuery,
+					variables,
+				}),
+				signal: AbortSignal.timeout(timeout),
+			});
 
-			try {
-				const res = await fetch(endpoint, {
-					method: 'POST',
-					headers,
-					body: JSON.stringify({
-						query: dedupedQuery,
-						variables,
-					}),
-					signal: AbortSignal.timeout(timeout),
-				});
-
-				if (RETRYABLE_STATUS.has(res.status)) {
-					// Unread, the body would hold its connection until GC
-					await res.body?.cancel();
-					return {
-						failure: `The server responded with ${res.status} ${res.statusText}`,
-						retryAfter: parseRetryAfter(
-							res.headers.get('Retry-After')
-						),
-					};
-				}
-
-				// We first convert the response to text,
-				// to be able to console.error the response
-				// in case the JSON parsing fails
-				return { text: await res.text() };
-			} catch (error) {
-				// The connection failed, timed out or dropped mid-body: as
-				// transient as a 503
-				return { failure: describeFetchError(error, timeout) };
+			if (RETRYABLE_STATUS.has(res.status)) {
+				// Unread, the body would hold its connection until GC
+				await res.body?.cancel();
+				return {
+					failure: `The server responded with ${res.status} ${res.statusText}`,
+					retryAfter: parseRetryAfter(res.headers.get('Retry-After')),
+				};
 			}
-		});
+
+			// We first convert the response to text,
+			// to be able to console.error the response
+			// in case the JSON parsing fails
+			return { text: await res.text() };
+		} catch (error) {
+			// The connection failed, timed out or dropped mid-body: as
+			// transient as a 503
+			return { failure: describeFetchError(error, timeout) };
+		}
+	};
 
 	try {
 		let resText: string;
+		let failure = '';
 
 		for (let n = 1; ; n++) {
-			const outcome = await attempt();
+			// The budget counts the wait for a slot: during a build, other
+			// pages' reads queue in the same process
+			const slot = await takeSlot(deadline);
+			const timeout = Math.min(TIMEOUT, deadline - Date.now());
+
+			if (!slot || timeout <= 0) {
+				if (slot) releaseSlot();
+				throw new Error(
+					`\t- No free slot before the ${BUDGET} ms budget ran out: ${CONCURRENCY} WordPress requests were in flight (WORDPRESS_FETCH_CONCURRENCY).` +
+						(failure ? `\n\t- Before that: ${failure}.` : '')
+				);
+			}
+
+			let outcome: Attempt;
+			try {
+				outcome = await attempt(timeout);
+			} finally {
+				releaseSlot();
+			}
 
 			if ('text' in outcome) {
 				resText = outcome.text;
 				break;
 			}
 
+			failure = outcome.failure;
 			const backoff = RETRY_DELAY * 2 ** (n - 1) * (0.5 + Math.random());
 			const delay = Math.max(backoff, outcome.retryAfter ?? 0);
 
 			if (n >= attempts || Date.now() + delay >= deadline) {
 				throw new Error(
-					`\t- ${outcome.failure}${n > 1 ? ` after ${n} attempts` : ''}.`
+					`\t- ${failure}${n > 1 ? ` after ${n} attempts` : ''}` +
+						(n < attempts ? `, with no time left to retry` : '') +
+						'.'
 				);
 			}
 
 			console.warn(
 				'== fetchAPI %s - %s, retrying in %sms (%s/%s)',
 				name,
-				outcome.failure,
+				failure,
 				Math.round(delay),
 				n,
 				attempts - 1
