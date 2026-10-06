@@ -3,6 +3,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import fetchAPI from '@/lib/fetch-api';
 import { isWordPressReadError } from '@/lib/wordpress-read-error';
 
+// `WORDPRESS_FETCH_CONCURRENCY`'s default
+const CAP = 6;
+
 const respond = (body: unknown) =>
 	vi.stubGlobal(
 		'fetch',
@@ -299,7 +302,7 @@ describe('fetchAPI', () => {
 			expect(fetchMock).toHaveBeenCalledTimes(2);
 		});
 
-		it('keeps at most 4 requests in flight', async () => {
+		it(`keeps at most ${CAP} requests in flight`, async () => {
 			const pending: Array<() => void> = [];
 			const fetchMock = vi.fn(
 				() =>
@@ -309,16 +312,18 @@ describe('fetchAPI', () => {
 			);
 			vi.stubGlobal('fetch', fetchMock);
 
-			const reads = Array.from({ length: 5 }, () => fetchAPI(query));
+			const reads = Array.from({ length: CAP + 1 }, () =>
+				fetchAPI(query)
+			);
 			await vi.advanceTimersByTimeAsync(0);
-			expect(fetchMock).toHaveBeenCalledTimes(4);
+			expect(fetchMock).toHaveBeenCalledTimes(CAP);
 
 			pending.shift()!();
 			await vi.advanceTimersByTimeAsync(0);
-			expect(fetchMock).toHaveBeenCalledTimes(5);
+			expect(fetchMock).toHaveBeenCalledTimes(CAP + 1);
 
 			pending.forEach((release) => release());
-			await expect(Promise.all(reads)).resolves.toHaveLength(5);
+			await expect(Promise.all(reads)).resolves.toHaveLength(CAP + 1);
 		});
 
 		it('frees its slot whatever the outcome', async () => {
@@ -357,17 +362,17 @@ describe('fetchAPI', () => {
 			const errors = await failed;
 			expect(errors.every(isWordPressReadError)).toBe(true);
 
-			const reads = Array.from({ length: 4 }, () => fetchAPI(query));
+			const reads = Array.from({ length: CAP }, () => fetchAPI(query));
 			await vi.advanceTimersByTimeAsync(0);
-			expect(fetchMock).toHaveBeenCalledTimes(12);
-			await expect(Promise.all(reads)).resolves.toHaveLength(4);
+			expect(fetchMock).toHaveBeenCalledTimes(8 + CAP);
+			await expect(Promise.all(reads)).resolves.toHaveLength(CAP);
 		});
 
 		it('counts the wait for a slot in its 45 s, and fails naming it', async () => {
 			const consoleError = vi
 				.spyOn(console, 'error')
 				.mockImplementation(() => {});
-			// Four reads that take longer than the budget hold every slot
+			// Reads that take longer than the budget hold every slot
 			const fetchMock = vi.fn(
 				() =>
 					new Promise<Response>((resolve) =>
@@ -376,7 +381,7 @@ describe('fetchAPI', () => {
 			);
 			vi.stubGlobal('fetch', fetchMock);
 
-			const busy = Array.from({ length: 4 }, () => fetchAPI(query));
+			const busy = Array.from({ length: CAP }, () => fetchAPI(query));
 			const queued = fetchAPI(query).catch((e) => e);
 
 			await vi.advanceTimersByTimeAsync(44999);
@@ -389,18 +394,18 @@ describe('fetchAPI', () => {
 			);
 
 			await vi.advanceTimersByTimeAsync(1000);
-			await expect(Promise.all(busy)).resolves.toHaveLength(4);
-			expect(fetchMock).toHaveBeenCalledTimes(4);
+			await expect(Promise.all(busy)).resolves.toHaveLength(CAP);
+			expect(fetchMock).toHaveBeenCalledTimes(CAP);
 		});
 
 		it("doesn't retry past its 45 s, counting the wait for a slot", async () => {
 			vi.spyOn(console, 'error').mockImplementation(() => {});
 			let calls = 0;
-			// Four reads hold every slot for 40 s, then the queued one gets a
+			// Reads hold every slot for 40 s, then the queued one gets a
 			// 503 it has no time left to retry
 			const fetchMock = vi.fn(() => {
 				calls++;
-				return calls <= 4
+				return calls <= CAP
 					? new Promise<Response>((resolve) =>
 							setTimeout(() => resolve(ok(data)), 40000)
 						)
@@ -409,7 +414,7 @@ describe('fetchAPI', () => {
 			vi.stubGlobal('fetch', fetchMock);
 			vi.spyOn(Math, 'random').mockReturnValue(0.5);
 
-			const busy = Array.from({ length: 4 }, () => fetchAPI(query));
+			const busy = Array.from({ length: CAP }, () => fetchAPI(query));
 			const queued = fetchAPI(query).catch((e) => e);
 			await vi.runAllTimersAsync();
 
@@ -417,7 +422,7 @@ describe('fetchAPI', () => {
 			await Promise.all(busy);
 			// 40 s queued, then 503s after 1 s and 2 s of backoff: the next
 			// 4 s would end past 45 s
-			expect(fetchMock).toHaveBeenCalledTimes(7);
+			expect(fetchMock).toHaveBeenCalledTimes(CAP + 3);
 		});
 	});
 });

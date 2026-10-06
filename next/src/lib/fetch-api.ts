@@ -26,9 +26,10 @@ const TIMEOUT = envNumber('WORDPRESS_FETCH_TIMEOUT', 15000, 1);
 // read fails with its own cause.
 const BUDGET = Math.max(45000, TIMEOUT);
 
-// WordPress requests in flight at once, per process. PHP-FPM's default pool
-// has 5 workers, and editors need one too.
-const CONCURRENCY = envNumber('WORDPRESS_FETCH_CONCURRENCY', 4, 1);
+// WordPress requests in flight at once, per process. Each `next build` worker
+// prerenders up to 8 pages behind its own cap: 6 keeps a batch well under the
+// 45 s budget on a WordPress answering in 0.8 s (see docs/caching.md).
+const CONCURRENCY = envNumber('WORDPRESS_FETCH_CONCURRENCY', 6, 1);
 
 let active = 0;
 const waiting: Array<() => void> = [];
