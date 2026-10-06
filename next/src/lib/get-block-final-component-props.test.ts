@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import getBlockFinalComponentProps from '@/lib/get-block-final-component-props';
 import getCachedBlockData, {
@@ -12,6 +12,17 @@ vi.mock('@/lib/get-cached-block-data', () => ({
 }));
 
 vi.mock('@/lib/fetch-api', () => ({ default: vi.fn() }));
+
+// React only memoises `cache` during a server render: stand in for one render
+// per test
+const reactRender = vi.hoisted(() => ({ cached: new Map<unknown, unknown>() }));
+vi.mock('react', async (importOriginal) => ({
+	...(await importOriginal<typeof import('react')>()),
+	cache: (fn: () => unknown) => () => {
+		if (!reactRender.cached.has(fn)) reactRender.cached.set(fn, fn());
+		return reactRender.cached.get(fn);
+	},
+}));
 
 const context: BlockDataContext = {
 	page: 2,
@@ -35,6 +46,7 @@ const render = (preview = false) =>
 
 afterEach(() => {
 	vi.clearAllMocks();
+	reactRender.cached = new Map();
 });
 
 describe('getBlockFinalComponentProps', () => {
@@ -118,5 +130,69 @@ describe('getBlockFinalComponentProps', () => {
 		expect(getBlockDataModule).toHaveBeenCalledWith(
 			'core/query-pagination-next'
 		);
+	});
+
+	describe('on a cold cache', () => {
+		beforeEach(() => {
+			blockModuleIs({ getData: vi.fn() });
+			vi.mocked(getCachedBlockData).mockResolvedValue({});
+		});
+
+		it('reads the data of identical blocks once per render', async () => {
+			const siteTitle = {
+				name: 'core/site-title',
+				attributes: {},
+				innerBlocks: [],
+			};
+
+			await Promise.all([
+				getBlockFinalComponentProps(siteTitle, { lang: 'en' }),
+				getBlockFinalComponentProps({ ...siteTitle }, { lang: 'en' }),
+			]);
+
+			expect(vi.mocked(getCachedBlockData)).toHaveBeenCalledTimes(1);
+		});
+
+		it('reads blocks with different cache keys separately', async () => {
+			const siteTitle = {
+				name: 'core/site-title',
+				attributes: {},
+				innerBlocks: [],
+			};
+
+			await Promise.all([
+				getBlockFinalComponentProps(siteTitle, { lang: 'en' }),
+				getBlockFinalComponentProps(siteTitle, { lang: 'fr' }),
+				getBlockFinalComponentProps(
+					{ ...siteTitle, attributes: { level: 2 } },
+					{ lang: 'en' }
+				),
+			]);
+
+			expect(vi.mocked(getCachedBlockData)).toHaveBeenCalledTimes(3);
+		});
+
+		it('gives every identical block the failure of their shared read', async () => {
+			vi.mocked(getCachedBlockData).mockRejectedValueOnce(
+				new Error('WordPress is down')
+			);
+			const siteTitle = {
+				name: 'core/site-title',
+				attributes: {},
+				innerBlocks: [],
+			};
+
+			const results = await Promise.all([
+				getBlockFinalComponentProps(siteTitle, { lang: 'en' }),
+				getBlockFinalComponentProps({ ...siteTitle }, { lang: 'en' }),
+			]);
+
+			expect(vi.mocked(getCachedBlockData)).toHaveBeenCalledTimes(1);
+			// Not a WordPressReadError: both fall back to their own attributes
+			expect(results).toEqual([
+				{ name: 'core/site-title', attributes: {}, innerBlocks: [] },
+				{ name: 'core/site-title', attributes: {}, innerBlocks: [] },
+			]);
+		});
 	});
 });
