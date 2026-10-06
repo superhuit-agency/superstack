@@ -109,6 +109,14 @@ const fetchAPI: FetchApiFuncType = async (query, options) => {
 			throw new Error(errs);
 		}
 
+		// Without `errors`, a GraphQL answer always has `data`: anything else
+		// isn't WordPress answering
+		if (!data) {
+			throw new Error(
+				`\t- The response has neither data nor errors.\n\t- Text response: \n\t${resText?.slice(0, 1000)}...`
+			);
+		}
+
 		result = data;
 	} catch (errors) {
 		const limit = '=================';

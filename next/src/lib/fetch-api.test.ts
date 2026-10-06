@@ -59,6 +59,15 @@ describe('fetchAPI', () => {
 		expect(isWordPressReadError(error)).toBe(true);
 	});
 
+	it('fails the read when the answer has neither data nor errors', async () => {
+		vi.spyOn(console, 'error').mockImplementation(() => {});
+		respond({});
+
+		const error = await fetchAPI(query).catch((e) => e);
+
+		expect(isWordPressReadError(error)).toBe(true);
+	});
+
 	it('fails the read when WordPress does not answer', async () => {
 		vi.spyOn(console, 'error').mockImplementation(() => {});
 		vi.stubGlobal(
