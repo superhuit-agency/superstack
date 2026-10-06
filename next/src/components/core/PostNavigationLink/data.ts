@@ -74,37 +74,6 @@ const toWpDateInput = (
 	};
 };
 
-const getFallbackAdjacentNode = (
-	nodes: unknown,
-	current: PostContext,
-	direction: NavigationDirection
-): NavigationCandidate | null => {
-	const currentTimestamp = new Date(current.date).getTime();
-	if (!Number.isFinite(currentTimestamp)) return null;
-
-	const sorted = normalizeCandidates(nodes).sort(
-		(a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-	);
-
-	if (direction === 'next') {
-		return (
-			sorted.find(
-				(node) =>
-					node.databaseId !== current.databaseId &&
-					new Date(node.date).getTime() > currentTimestamp
-			) ?? null
-		);
-	}
-
-	for (let i = sorted.length - 1; i >= 0; i -= 1) {
-		const node = sorted[i];
-		if (node.databaseId === current.databaseId) continue;
-		if (new Date(node.date).getTime() < currentTimestamp) return node;
-	}
-
-	return null;
-};
-
 export const usesBaseUri = true;
 
 export const getData = async (
@@ -236,48 +205,6 @@ export const getData = async (
     }
   `;
 
-	const fallbackPostsQuery = gql`
-		query PostNavigationLinkFallbackPosts(
-			$categoryIn: [ID]
-			$tagIn: [ID]
-			$notIn: [ID]
-		) {
-			posts(
-				first: 20
-				where: {
-					orderby: { field: DATE, order: ASC }
-					stati: PUBLISH
-					categoryIn: $categoryIn
-					tagIn: $tagIn
-					notIn: $notIn
-				}
-			) {
-				nodes {
-					databaseId
-					date
-					uri
-					title(format: RENDERED)
-				}
-			}
-		}
-	`;
-
-	const fallbackPagesQuery = gql`
-		query PostNavigationLinkFallbackPages($notIn: [ID]) {
-			pages(
-				first: 20
-				where: { orderby: { field: DATE, order: ASC }, notIn: $notIn }
-			) {
-				nodes {
-					databaseId
-					date
-					uri
-					title(format: RENDERED)
-				}
-			}
-		}
-	`;
-
 	const commonVariables = {
 		date: toWpDateInput(currentNode.date),
 		order,
@@ -286,54 +213,26 @@ export const getData = async (
 
 	let adjacentPost: NavigationCandidate | null = null;
 
-	try {
-		if (currentNode.__typename === 'Post') {
-			const postData = await fetcher(postAdjacentQuery, {
-				variables: {
-					...commonVariables,
-					categoryIn: categoryIn?.length ? categoryIn : null,
-					tagIn: tagIn?.length ? tagIn : null,
-				},
-			});
-			adjacentPost = pickAdjacentNode(
-				postData?.posts?.nodes,
-				currentNode.databaseId
-			);
-		} else {
-			const pageData = await fetcher(pageAdjacentQuery, {
-				variables: commonVariables,
-			});
-			adjacentPost = pickAdjacentNode(
-				pageData?.pages?.nodes,
-				currentNode.databaseId
-			);
-		}
-	} catch {
-		if (currentNode.__typename === 'Post') {
-			const fallbackData = await fetcher(fallbackPostsQuery, {
-				variables: {
-					categoryIn: categoryIn?.length ? categoryIn : null,
-					tagIn: tagIn?.length ? tagIn : null,
-					notIn: [currentNode.databaseId],
-				},
-			});
-			adjacentPost = getFallbackAdjacentNode(
-				fallbackData?.posts?.nodes,
-				currentNode,
-				direction
-			);
-		} else {
-			const fallbackData = await fetcher(fallbackPagesQuery, {
-				variables: {
-					notIn: [currentNode.databaseId],
-				},
-			});
-			adjacentPost = getFallbackAdjacentNode(
-				fallbackData?.pages?.nodes,
-				currentNode,
-				direction
-			);
-		}
+	if (currentNode.__typename === 'Post') {
+		const postData = await fetcher(postAdjacentQuery, {
+			variables: {
+				...commonVariables,
+				categoryIn: categoryIn?.length ? categoryIn : null,
+				tagIn: tagIn?.length ? tagIn : null,
+			},
+		});
+		adjacentPost = pickAdjacentNode(
+			postData?.posts?.nodes,
+			currentNode.databaseId
+		);
+	} else {
+		const pageData = await fetcher(pageAdjacentQuery, {
+			variables: commonVariables,
+		});
+		adjacentPost = pickAdjacentNode(
+			pageData?.pages?.nodes,
+			currentNode.databaseId
+		);
 	}
 
 	if (!adjacentPost) return { navigationPost: null, cacheTags: tags };
