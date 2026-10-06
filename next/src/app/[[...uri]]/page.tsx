@@ -7,6 +7,7 @@ import Template from '@/components/global/Template';
 import { useCanonical as getCanonicalUrl } from '@/hooks/use-canonical';
 import { getLocales } from '@/i18n/get-locales';
 import {
+	addLangPrefix,
 	getAllURIs,
 	getAuthToken,
 	getPreviewNodeByURI,
@@ -195,7 +196,7 @@ export default async function Page({ params }: PageProps) {
 		token = '';
 
 	const { uri, routePage } = parseRouteSegments(uriSegments);
-	baseUriContext(uri);
+	baseUriContext(addLangPrefix(uri, lang));
 
 	let auth: { authToken?: string } = {};
 
