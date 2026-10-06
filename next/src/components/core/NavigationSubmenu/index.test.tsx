@@ -35,27 +35,44 @@ describe('NavigationSubmenu', () => {
 	const test = setUpRoot();
 
 	/**
-	 * Renders the header of page /a, hidden while the user is on another page
+	 * Renders the header of page /a, hidden while the user is on another page,
+	 * with `pathname` as what usePathname() returns
 	 */
-	function visit(currentPage: string) {
-		router.pathname = currentPage;
+	function visit(currentPage: string, pathname = currentPage) {
+		router.pathname = pathname;
 		renderPages(test.root, ['/a'], currentPage, () => header('Product'));
 	}
 
 	const submenuButton = () =>
 		test.container.querySelector<HTMLElement>('[aria-haspopup="true"]')!;
 
-	it('is closed when the user comes back to a page they left with it open', () => {
-		visit('/a');
+	function hoverSubmenu() {
 		act(() => {
 			submenuButton().dispatchEvent(
 				new MouseEvent('mouseover', { bubbles: true })
 			);
 		});
 		expect(submenuButton().getAttribute('aria-expanded')).toBe('true');
+	}
 
-		// A link in the submenu navigates while the pointer is still over it
+	it('is closed when the user comes back to a page they left with it open', () => {
+		visit('/a');
+		hoverSubmenu();
+
+		// Its label is a link: clicking it navigates while the pointer is still over it
 		visit('/b');
+		visit('/a');
+
+		expect(submenuButton().getAttribute('aria-expanded')).toBe('false');
+	});
+
+	it('is closed when the page left never sees the pathname change', () => {
+		visit('/a');
+		hoverSubmenu();
+
+		// A hidden page can keep the pathname it was left with: the reset has to
+		// come from <Activity> showing the page again, not from a new pathname
+		visit('/b', '/a');
 		visit('/a');
 
 		expect(submenuButton().getAttribute('aria-expanded')).toBe('false');
