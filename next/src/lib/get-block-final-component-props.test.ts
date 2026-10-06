@@ -120,7 +120,7 @@ describe('getBlockFinalComponentProps', () => {
 				? { getData: vi.fn(), usesArchiveContext: true }
 				: null
 		);
-		vi.mocked(getCachedBlockData).mockResolvedValue({
+		vi.mocked(getCachedBlockData).mockResolvedValueOnce({
 			innerBlocks: [pagination],
 		});
 
@@ -135,7 +135,6 @@ describe('getBlockFinalComponentProps', () => {
 	describe('on a cold cache', () => {
 		beforeEach(() => {
 			blockModuleIs({ getData: vi.fn() });
-			vi.mocked(getCachedBlockData).mockResolvedValue({});
 		});
 
 		it('reads the data of identical blocks once per render', async () => {
