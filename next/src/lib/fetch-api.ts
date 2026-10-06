@@ -97,10 +97,9 @@ const fetchAPI: FetchApiFuncType = async (query, options) => {
 			);
 		}
 
-		// Make sure to return the data if any
-		// even if there are some errors
-		if (!!data) result = data;
-
+		// A field that failed resolves to `null` next to the data that didn't:
+		// returning that partial data would read as "nothing there", and be
+		// cached as such, so any error fails the whole read.
 		if (errors) {
 			const errs = errors
 				.map((e: any) => `\t- ${e.message} [${e.extensions?.category}]`)
