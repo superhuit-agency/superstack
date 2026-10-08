@@ -39,6 +39,7 @@ function register_navigation_menu_blocks_json_field(): void {
 
 			$blocks = parse_blocks($content);
 			$blocks = filter_out_empty_blocks_recursive(is_array($blocks) ? $blocks : []);
+			$blocks = resolve_bound_urls($blocks);
 			$blocks = normalize_blocks_for_graphql_shape($blocks);
 
 			return wp_json_encode($blocks);
@@ -67,6 +68,41 @@ function normalize_blocks_for_graphql_shape(array $blocks): array {
 	}
 
 	return $blocks;
+}
+
+/**
+ * Replace the stored `url` of blocks whose `url` is bound (e.g. a link to a
+ * page, bound to its `core/post-data` link) with the bound value, as WordPress
+ * does when it renders them, so a link follows the page when it moves.
+ */
+function resolve_bound_urls(array $blocks): array {
+	foreach ($blocks as $index => $block) {
+		$binding = $block['attrs']['metadata']['bindings']['url'] ?? null;
+		$source  = is_array($binding) && is_string($binding['source'] ?? null) && function_exists('get_block_bindings_source')
+			? get_block_bindings_source($binding['source'])
+			: null;
+
+		if ($source) {
+			$url = $source->get_value((array) ($binding['args'] ?? []), new \WP_Block($block), 'url');
+
+			if (is_string($url) && '' !== $url) {
+				$blocks[$index]['attrs']['url'] = relative_if_internal(html_entity_decode($url, ENT_QUOTES));
+			}
+		}
+
+		$blocks[$index]['innerBlocks'] = resolve_bound_urls($block['innerBlocks']);
+	}
+
+	return $blocks;
+}
+
+/**
+ * Make a URL of this site relative, as the front end links to it.
+ */
+function relative_if_internal(string $url): string {
+	return wp_parse_url($url, PHP_URL_HOST) === wp_parse_url(home_url(), PHP_URL_HOST)
+		? wp_make_link_relative($url)
+		: $url;
 }
 
 /**
