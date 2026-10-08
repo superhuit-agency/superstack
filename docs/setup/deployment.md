@@ -166,6 +166,17 @@ The front-end caches what it reads from WordPress until the nextjs-revalidate pl
 
 Each environment has its own domain and secret. `provision.sh` doesn't set them: the secret lives only in the front-end's environment, not in the GitHub variables, and a domain carrying basic-auth credentials would be overwritten on every deploy. Check the result with the plugin's **Probe** tab. How the front-end handles the changes it receives is described in [Caching](../caching.md).
 
+## 🔑 Configure preview
+
+WordPress sends logged-in users to the front-end's `/api/preview/` route with a secret, which the route checks before turning on Draft Mode. Set the same value on both sides, generated with `openssl rand -hex 32`, in each environment:
+
+| Side      | Where                                                                                                                                                     |
+| --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Next.js   | `WORDPRESS_PREVIEW_SECRET` in the front-end's environment (`shared/.env` on an SSH deployment, the project's environment variables on Vercel). **Required**: without it, every preview is refused with a `401`. |
+| WordPress | A `WORDPRESS_PREVIEW_SECRET` constant in `wp-config.php` (`wp config set WORDPRESS_PREVIEW_SECRET <secret>`), or an environment variable of that name. Without it, the theme sends `spck`, the local development default, which a front-end with a secret of its own refuses. |
+
+`provision.sh` sets neither.
+
 ## 🚀 Production deployments
 
 When we push to the `production` git branch, Next.js and WordPress are automatically deployed to production.
