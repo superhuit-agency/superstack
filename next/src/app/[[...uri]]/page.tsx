@@ -81,7 +81,11 @@ export async function generateMetadata({
 	params,
 }: PageProps): Promise<Metadata> {
 	const { uri: uriSegments, lang } = await params;
-	const { uri, routePage } = parseRouteSegments(uriSegments);
+	// Next passes the metadata its params decoded, but the page encoded:
+	// encode them as Next does for the page, so both read the same URI
+	const { uri, routePage } = parseRouteSegments(
+		uriSegments?.map((segment) => encodeURIComponent(segment))
+	);
 
 	const { locales, defaultLocale } = await getLocales();
 	if (configs.isMultilang && !locales.includes(lang)) notFound();

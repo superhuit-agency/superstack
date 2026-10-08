@@ -88,6 +88,75 @@ describe('Page', () => {
 		expect(vi.mocked(notFound)).toHaveBeenCalled();
 	});
 
+	it('reads a non-ASCII URI decoded, as its metadata does', async () => {
+		const node = { uri: '/привет-мир/' } as never;
+		vi.mocked(getPublicNodeByURI)
+			.mockResolvedValueOnce(node)
+			.mockResolvedValueOnce(node);
+
+		// Next passes the page its params encoded, its metadata decoded
+		await render([
+			'%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82-%D0%BC%D0%B8%D1%80',
+		]);
+		await generateMetadata({
+			params: Promise.resolve({
+				uri: ['привет-мир'],
+				lang: 'fr' as Locale,
+			}),
+		});
+
+		expect(vi.mocked(getPublicNodeByURI).mock.calls).toEqual([
+			['/привет-мир/', 'fr', 1],
+			['/привет-мир/', 'fr', 1],
+		]);
+		expect(vi.mocked(notFound)).not.toHaveBeenCalled();
+	});
+
+	it.each([
+		// An encoded `?` would cut the URI short for WordPress
+		['company%3Fx', 'company?x', '/company%3Fx/'],
+		// Next decodes the metadata params once already
+		['%2541', '%41', '/%41/'],
+	])(
+		'reads the same URI for %s in the page and its metadata',
+		async (pageSegment, metadataSegment, uri) => {
+			await expect(render([pageSegment])).rejects.toThrow();
+			await generateMetadata({
+				params: Promise.resolve({
+					uri: [metadataSegment],
+					lang: 'fr' as Locale,
+				}),
+			});
+
+			expect(vi.mocked(getPublicNodeByURI).mock.calls).toEqual([
+				[uri, 'fr', 1],
+				[uri, 'fr', 1],
+			]);
+		}
+	);
+
+	it('reads the query loop page of a non-ASCII URI', async () => {
+		await expect(
+			render(['%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82', 'page', '2'])
+		).rejects.toThrow('NEXT_NOT_FOUND');
+
+		expect(vi.mocked(getPublicNodeByURI)).toHaveBeenCalledWith(
+			'/привет/',
+			'fr',
+			2
+		);
+	});
+
+	it('looks a non-ASCII URI up as a redirect source decoded', async () => {
+		await expect(
+			render(['%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82'])
+		).rejects.toThrow('NEXT_REDIRECT');
+
+		expect(vi.mocked(getRedirection)).toHaveBeenCalledWith(
+			configs.isMultilang ? '/fr/привет/' : '/привет/'
+		);
+	});
+
 	it.each([
 		[['blog', 'page', '2abc'], '/blog/page/2abc/'],
 		[['company', 'page', '01'], '/company/page/01/'],
