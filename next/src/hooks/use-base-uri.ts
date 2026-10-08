@@ -17,7 +17,8 @@ export class BaseUriNotDeclaredError extends Error {
 	constructor(blockName: string) {
 		super(
 			`Block "${blockName}" read the Base URI without declaring it. ` +
-				`Add \`export const usesBaseUri = true;\` to its data module. ` +
+				`Add \`export const usesBaseUri = true;\` to its data module, ` +
+				`or have its \`usesBaseUri\` function return true for these attributes. ` +
 				`Its data is otherwise cached once per site, so the page that ` +
 				`fills the cache would leak its content into every other page.`
 		);

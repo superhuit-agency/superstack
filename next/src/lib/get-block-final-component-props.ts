@@ -8,6 +8,7 @@ import {
 import fetchAPI from '@/lib/fetch-api';
 import getCachedBlockData, {
 	type BlockData,
+	blockUsesBaseUri,
 	getBlockDataModule,
 } from '@/lib/get-cached-block-data';
 import { throwIfWordPressReadFailed } from '@/lib/wordpress-read-error';
@@ -181,7 +182,7 @@ const getAttributes = async (
 			name,
 			attributes,
 			lang,
-			blockModule.usesBaseUri
+			blockUsesBaseUri(blockModule, attributes)
 				? ((baseUriContext() as string | undefined) ?? null)
 				: null,
 			context

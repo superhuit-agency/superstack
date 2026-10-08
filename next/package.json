@@ -17,7 +17,7 @@
 		"js-cookie": "^3.0.5",
 		"lodash": "^4.18.1",
 		"negotiator": "^1.0.0",
-		"next": "16.2.3",
+		"next": "16.2.12",
 		"react": "19.2.4",
 		"react-dom": "19.2.4"
 	},
@@ -30,7 +30,7 @@
 		"@types/react": "^19",
 		"@types/react-dom": "^19",
 		"eslint": "^9",
-		"eslint-config-next": "16.2.3",
+		"eslint-config-next": "16.2.12",
 		"eslint-plugin-storybook": "^10.3.5",
 		"graphql": "^16.13.2",
 		"happy-dom": "^20.14.5",

@@ -3,7 +3,10 @@ import Link from 'next/link';
 export default function QueryPaginationPrevious(
 	props: QueryPaginationPreviousProps
 ) {
-	if (typeof props.totalPages === 'number' && props.totalPages < 2)
+	if (
+		props.totalPages === undefined ||
+		(typeof props.totalPages === 'number' && props.totalPages < 2)
+	)
 		return null;
 
 	return (

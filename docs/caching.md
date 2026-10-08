@@ -67,7 +67,7 @@ A block's `data.ts` is bundled into both the Next server and the WordPress block
 A block declares two things in its `data.ts`:
 
 - **`cacheTags`**, returned next to the data and built with `cache-tags.ts`, e.g. `{ title, cacheTags: [cacheTags.settings()] }`. A block returning none falls back to `content` and `settings`, so it's fetched again after every post or settings change. A block returning `cacheTags: []` is only refreshed by Purge all.
-- **`export const usesBaseUri = true;`**, for a Page-dependent block, one that reads the Base URI through `baseUriContext()`. It adds the Base URI to the block's cache key. Every other block gets one entry per site, not per page, which keeps WordPress load and cache memory down. Forgetting it is an ESLint error, and fails `next build` with a `BaseUriNotDeclaredError`.
+- **`export const usesBaseUri = true;`**, for a Page-dependent block, one that reads the Base URI through `baseUriContext()`. It adds the Base URI to the block's cache key. It can also be a function of the block's attributes, for a block that reads the Base URI with some of them only. Every other block gets one entry per site, not per page, which keeps WordPress load and cache memory down. Forgetting it is an ESLint error, and fails `next build` with a `BaseUriNotDeclaredError`.
 
 Which tags to return for which data, and why the opt-in exists, is detailed in [FSE Templating › Caching block data](./fse-templating.md#caching-block-data).
 
@@ -223,6 +223,7 @@ Never measure with `next dev`: it adds a hash to cache keys, so entries aren't r
 - **`<Activity>` ships with Cache Components.** Component state (dropdowns, dialogs, form inputs) now survives client-side navigation. This will likely be reported as a component bug: reset state on navigation where it matters, in a `useLayoutEffect` on `usePathname()`, which re-runs when `<Activity>` shows the page again (see `NavigationSubmenu`). A page left also stays in the document, hidden: build element IDs with `useId()`, never fixed or from a label, or they appear twice.
 - **Floods of random URLs.** Each URL that finds no post is cached as a small 404, and the LRU doesn't count key overhead against its limit. A flood of random URLs (e.g. a bot scan) creates many small entries that use more memory than the 50 MB limit implies. It's still much better than each one reaching WordPress.
 - **Sizing.** Hot entries evicted by a too-small `cacheMaxMemorySize` show up as misses, not errors. See [Sizing the cache](#sizing-the-cache).
+- **Upgrading Next past 16.2 empties the 404 page again.** When the catch-all page calls `notFound()`, only Next 16.2.5 to 16.2.12 with Cache Components server-render the 404 template. 16.2.4 and earlier, and 16.3.0 to at least 16.5.0-canary.3, answer with an empty `<html id="__next_error__">` shell, without `lang`, and the 404 template only appears once JavaScript renders it ([#234](https://github.com/superhuit-agency/superstack/issues/234), [vercel/next.js#99287](https://github.com/vercel/next.js/issues/99287)). Even on 16.2.12, a 404 in Draft Mode (preview) gets that shell: only a prerender renders the template. Before upgrading Next, check that a 404 URL's HTML still has `<html lang>` and the 404 template.
 
 ---
 
@@ -269,6 +270,7 @@ And:
 - [ ] Editing one post doesn't refresh an unrelated post's page.
 - [ ] A `path` change evicts that path's cached entries.
 - [ ] Preview shows the latest draft and bypasses the cache.
+- [ ] A URL with no post answers 404 with `<html lang>` and the 404 template (header, breadcrumbs, footer) in the HTML itself, not only in the `<script>` payload: check it with `curl`.
 - [ ] The WordPress editor bundle builds (`npm --prefix ./wordpress run build`) and blocks show live data in the editor.
 - [ ] `npm run build` still reports the catch-all page (`/[[...uri]]`) as a static shell (Partial Prerendering).
 
