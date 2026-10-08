@@ -269,11 +269,12 @@ export const getData = async (
 	// Only the loop inheriting the main query follows the `/page/{n}` route; a
 	// custom loop paginates on its own `queryId` in WordPress, which this
 	// implementation does not read, so it stays on its first page.
-	const page = inherit && context?.page && context.page > 0 ? context.page : 1;
+	const page =
+		inherit && context?.page && context.page > 0 ? context.page : 1;
 
 	const offsetRaw = attrs?.query?.offset;
-	const offset =
-		Math.max(0, toPositiveInt(offsetRaw) ?? 0) + (page - 1) * perPage;
+	const blockOffset = Math.max(0, toPositiveInt(offsetRaw) ?? 0);
+	const offset = blockOffset + (page - 1) * perPage;
 
 	const order = toOrderEnum(attrs?.query?.order);
 	const orderby = toOrderByEnum(attrs?.query?.orderBy);
@@ -349,9 +350,11 @@ export const getData = async (
 		typeof connection?.pageInfo?.offsetPagination?.total === 'number'
 			? connection.pageInfo.offsetPagination.total
 			: null;
+	// `total` counts the posts the block's offset skips: past them, the last
+	// pages would be empty
 	const totalPages =
 		typeof total === 'number' && total >= 0
-			? Math.ceil(total / perPage)
+			? Math.ceil(Math.max(0, total - blockOffset) / perPage)
 			: null;
 	const currentPage = page;
 
