@@ -1,6 +1,8 @@
 import NextImage from 'next/image';
 
 export default function PostFeaturedImage(props: PostFeaturedImageProps) {
+	if (!props.featuredImage) return null;
+
 	return (
 		<div className="wp-block-post-feature-image">
 			<NextImage

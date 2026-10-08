@@ -76,6 +76,8 @@ export const getData = async (
 
 	const uri = baseUriContext();
 
+	if (!uri) return { featuredImage: null, cacheTags: [] };
+
 	const variables = {
 		uri: uri,
 	};

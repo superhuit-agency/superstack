@@ -32,6 +32,8 @@ export const getData = async (fetcher: FetchApiFuncType) => {
 
 	const uri = baseUriContext();
 
+	if (!uri) return { name: null, uri: null, cacheTags: [] };
+
 	const variables = {
 		uri: uri,
 	};

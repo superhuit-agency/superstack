@@ -28,6 +28,8 @@ export const getData = async (
 
 	const uri = baseUriContext();
 
+	if (!uri) return { content: '', cacheTags: [] };
+
 	const variables = {
 		uri: uri,
 	};

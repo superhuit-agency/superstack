@@ -56,6 +56,8 @@ export const getData = async (
 
 	const uri = baseUriContext();
 
+	if (!uri) return { cacheTags: [] };
+
 	const variables = {
 		uri,
 	};
