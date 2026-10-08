@@ -2,6 +2,7 @@ import { cookies, draftMode } from 'next/headers';
 import { notFound, permanentRedirect, redirect } from 'next/navigation';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import configs from '@/configs.json';
 import { getLocales } from '@/i18n/get-locales';
 import {
 	getAuthToken,
@@ -34,10 +35,15 @@ vi.mock('@/components/global/Template', () => ({ default: () => null }));
 
 vi.mock('@/hooks/use-base-uri', () => ({ baseUriContext: vi.fn() }));
 
-vi.mock('@/i18n/get-locales', () => ({ getLocales: vi.fn() }));
+vi.mock('@/i18n/get-locales', () => ({
+	getLocales: vi.fn(async () => ({
+		locales: ['fr'],
+		defaultLocale: 'fr',
+	})),
+}));
 
 vi.mock('@/lib', async () => ({
-	addLangPrefix: (uri: string) => uri,
+	addLangPrefix: (uri: string, lang: string) => `/${lang}${uri}`,
 	getAllURIs: vi.fn(),
 	getAuthToken: vi.fn(),
 	getPreviewNodeByURI: vi.fn(),
@@ -61,7 +67,10 @@ describe('Page', () => {
 	it('redirects a URI with no node that is a redirect source', async () => {
 		await expect(render(['old'])).rejects.toThrow('NEXT_REDIRECT');
 
-		expect(vi.mocked(getRedirection)).toHaveBeenCalledWith('/old/');
+		// A multilingual site looks the language-prefixed path up first
+		expect(vi.mocked(getRedirection)).toHaveBeenCalledWith(
+			configs.isMultilang ? '/fr/old/' : '/old/'
+		);
 		expect(vi.mocked(permanentRedirect)).toHaveBeenCalledWith('/new/');
 	});
 
@@ -77,6 +86,20 @@ describe('Page', () => {
 		);
 		expect(vi.mocked(getRedirection)).not.toHaveBeenCalled();
 		expect(vi.mocked(notFound)).toHaveBeenCalled();
+	});
+
+	it.each([
+		[['blog', 'page', '2abc'], '/blog/page/2abc/'],
+		[['company', 'page', '01'], '/company/page/01/'],
+		[['company', 'page', '0'], '/company/page/0/'],
+	])('reads %j as a URI, not as a query loop page', async (segments, uri) => {
+		await expect(render(segments)).rejects.toThrow('NEXT_REDIRECT');
+
+		expect(vi.mocked(getPublicNodeByURI)).toHaveBeenCalledWith(
+			uri,
+			'fr',
+			1
+		);
 	});
 });
 
@@ -145,7 +168,7 @@ describe('generateMetadata', () => {
 		await expect(metadata(['37'])).rejects.toThrow('NEXT_REDIRECT');
 
 		expect(vi.mocked(redirect)).toHaveBeenCalledWith(
-			'/api/preview-exit?redirect=/37/'
+			'/api/preview-exit?redirect=%2Ffr%2F37%2F'
 		);
 		expect(vi.mocked(getPreviewNodeByURI)).not.toHaveBeenCalled();
 	});

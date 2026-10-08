@@ -6,10 +6,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { getAuthToken, getPreviewNode } from '@/lib';
 
 const enable = vi.fn();
+const cookieStore = vi.hoisted(() => ({ set: vi.fn() }));
 
 vi.mock('next/headers', () => ({
 	draftMode: vi.fn(async () => ({ enable })),
-	cookies: vi.fn(async () => ({ set: vi.fn() })),
+	cookies: vi.fn(async () => cookieStore),
 }));
 
 vi.mock('next/navigation', () => ({
@@ -32,9 +33,9 @@ async function loadRoute() {
 	return import('@/app/api/preview/route');
 }
 
-function preview(secret: string) {
+function preview(secret: string, query = 'id=42') {
 	return new NextRequest(
-		`http://localhost:3000/api/preview/?secret=${secret}&id=42&token=refresh-token`
+		`http://localhost:3000/api/preview/?secret=${secret}&${query}&token=refresh-token`
 	);
 }
 
@@ -59,6 +60,47 @@ describe('GET /api/preview', () => {
 		expect(enable).toHaveBeenCalled();
 		expect(vi.mocked(redirect)).toHaveBeenCalledWith('/42/');
 	});
+
+	it('keeps the refresh token away from page scripts', async () => {
+		vi.stubEnv('WORDPRESS_PREVIEW_SECRET', SECRET);
+		const route = await loadRoute();
+
+		await route.GET(preview(SECRET));
+
+		expect(cookieStore.set).toHaveBeenCalledWith(
+			'token',
+			'refresh-token',
+			expect.objectContaining({
+				httpOnly: true,
+				sameSite: 'lax',
+				path: '/',
+			})
+		);
+		// The preview toolbar toggles it
+		expect(cookieStore.set).toHaveBeenCalledWith('preview-draft', 'false');
+	});
+
+	it('redirects to the `uri` of an archive', async () => {
+		vi.stubEnv('WORDPRESS_PREVIEW_SECRET', SECRET);
+		const route = await loadRoute();
+
+		await route.GET(preview(SECRET, 'uri=%2Fblog%2F'));
+
+		expect(enable).toHaveBeenCalled();
+		expect(vi.mocked(redirect)).toHaveBeenCalledWith('/blog/');
+	});
+
+	it.each(['//evil.example', '/\\evil.example', 'https://evil.example/x'])(
+		'redirects to the home page instead of the `uri` "%s"',
+		async (uri) => {
+			vi.stubEnv('WORDPRESS_PREVIEW_SECRET', SECRET);
+			const route = await loadRoute();
+
+			await route.GET(preview(SECRET, `uri=${encodeURIComponent(uri)}`));
+
+			expect(vi.mocked(redirect)).toHaveBeenCalledWith('/');
+		}
+	);
 
 	it('refuses a wrong secret with a 401', async () => {
 		vi.stubEnv('WORDPRESS_PREVIEW_SECRET', SECRET);
