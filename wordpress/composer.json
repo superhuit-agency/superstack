@@ -38,7 +38,7 @@
 		"superhuit/wp-graphql-redirection": "^1.1",
 		"valu/wp-graphql-offset-pagination": "^0.2.1",
 		"wp-graphql/wp-graphql-jwt-authentication": "^0.7.2",
-		"superhuit-agency/nextjs-revalidate": "^1.6",
+		"superhuit-agency/nextjs-revalidate": "^2.1",
 		"wpackagist-plugin/wpgraphql-acf": "^2.6",
 		"wpackagist-plugin/acf-options-for-polylang": "^2.0",
 		"superhuit-agency/starterpack-i18n": "^1.0",
@@ -62,10 +62,10 @@
 			"type": "package",
 			"package": {
 				"name": "superhuit-agency/nextjs-revalidate",
-				"version": "1.6.4",
+				"version": "2.1.0",
 				"type": "wordpress-plugin",
 				"dist": {
-					"url": "https://github.com/superhuit-agency/nextjs-revalidate/releases/download/v1.6.4/nextjs-revalidate-v1.6.4.zip",
+					"url": "https://github.com/superhuit-agency/nextjs-revalidate/releases/download/v2.1.0/nextjs-revalidate-v2.1.0.zip",
 					"type": "zip"
 				}
 			}

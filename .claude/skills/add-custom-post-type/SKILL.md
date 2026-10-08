@@ -48,7 +48,7 @@ The `fseTemplate` GraphQL field is registered globally for all CPTs with `show_i
 
 Create `next/src/components/templates/Single[TypeName]/data.ts`.
 
-Model on `SinglePage/data.ts` for simple CPTs, or `SinglePost/data.ts` if the CPT needs `getData`.
+Model on `SinglePage/data.ts`, or `SinglePost/data.ts` if the CPT displays terms (query their `databaseId`: the public node read tags them). A hierarchical CPT also queries `ancestors(first: 100) { nodes { databaseId } }`, as `SinglePage` does: the public node read tags each entry with its ancestors, so renaming a parent refreshes its children's breadcrumbs.
 
 Minimum required shape:
 
@@ -86,7 +86,7 @@ export const fragment = gql`
 Rules:
 - `slug` must equal `single-${__typename.toLowerCase()}` — this is how `get-node-by-uri.ts` routes to the right template.
 - Fragment name and `on TypeName` must use the exact PascalCase GraphQL type name.
-- Add `getData` only if the CPT needs extra data at render time.
+- Add `getData` only if the CPT needs extra data at render time. It runs inside the public node read, so it's cached with that read's tags only: data about other posts (related posts, upcoming events) stays stale when they change. Render that through a block whose `data.ts` returns its `cacheTags` (see `docs/caching.md#block-data`).
 
 ## Step 3 — Next.js: export the template data
 
@@ -98,20 +98,27 @@ export * as singleEventData from "./SingleEvent/data";
 
 ## Step 4 — Next.js: register in `get-node-by-uri.ts`
 
-**4a.** Destructure the new export alongside existing entries (around line 11):
+**4a.** Add the new export to the `templatesData` destructure near the top of the file, keeping the existing entries:
 
 ```ts
-const { archiveData, singlePageData, singlePostData, singleEventData } =
-  templatesData;
+const {
+  archiveData,
+  categoryData,
+  singlePageData,
+  singlePostData,
+  tagData,
+  singleEventData,
+} = templatesData;
 ```
 
-**4b.** Add an entry to the `types` array (around line 144):
+**4b.** Add an entry to the `types` array:
 
 ```ts
 {
   type: "Event",
   fragment: singleEventData.fragment,
   fields: "singleEventFragment",
+  translatable: true, // false if Polylang doesn't translate the CPT
 },
 ```
 
@@ -119,7 +126,7 @@ const { archiveData, singlePageData, singlePostData, singleEventData } =
 
 ## Step 5 — Next.js: register in `get-preview-node.ts`
 
-Add the type name to `POST_TYPES` at line 3:
+Add the type name to its `POST_TYPES` constant:
 
 ```ts
 const POST_TYPES = ["Page", "Post", "Event"];
@@ -131,10 +138,10 @@ Without this, WordPress → Next.js preview redirect resolves to `/undefined`.
 
 Only needed if the CPT should generate static paths at build time.
 
-Add the GraphQL plural name to `POST_TYPES` at line 3:
+Add the GraphQL plural name to its `POST_TYPES` constant:
 
 ```ts
-const POST_TYPES: string[] = ["pages", "events"];
+const POST_TYPES: string[] = ["pages", "posts", "events"];
 ```
 
 Value must match `graphql_plural_name` registered in PHP (lowercase).
@@ -142,11 +149,12 @@ Value must match `graphql_plural_name` registered in PHP (lowercase).
 ## Verification Checklist
 
 1. `cd next && npx tsc --noEmit`
-2. `npm --prefix ./next run build`
-3. Confirm CPT is visible in WordPress GraphQL schema.
-4. Confirm a single CPT entry resolves correctly in Next.js routing.
-5. Confirm preview works for a draft entry.
-6. Confirm no unrelated files changed.
+2. `cd next && npm test` and `npm run lint -- --pass-on-unpruned-suppressions`, the pull request checks (`.github/workflows/checks.yml`).
+3. `npm --prefix ./next run build`
+4. Confirm CPT is visible in WordPress GraphQL schema.
+5. Confirm a single CPT entry resolves correctly in Next.js routing.
+6. Confirm preview works for a draft entry.
+7. Confirm no unrelated files changed.
 
 ## Output Format
 

@@ -21,8 +21,8 @@ All multilang behaviour is controlled by `next/src/configs.json`:
 | Key | Description |
 |-----|-------------|
 | `isMultilang` | Enables multilang mode. Set to `false` to run as a single-language site. |
-| `staticLang` | The default/fallback locale (used when multilang is off, and as the fallback in middleware). |
-| `hasCurrentLocaleInLangSwitcher` | When `true`, prepends the current page's own translation to the `translations` array returned by `getNodeByURI`, so the active language appears in the language switcher. |
+| `staticLang` | The default/fallback locale (used when multilang is off, and as the fallback in the proxy). |
+| `hasCurrentLocaleInLangSwitcher` | When `true`, prepends the current page's own translation to the `translations` array returned by `getPublicNodeByURI` and `getPreviewNodeByURI`, so the active language appears in the language switcher. |
 
 ## Architecture
 
@@ -37,9 +37,10 @@ All multilang behaviour is controlled by `next/src/configs.json`:
 | File | Role |
 |------|------|
 | `src/configs.json` | Feature flags and default locale |
-| `src/middleware.ts` | Redirects the root `/` to `/{locale}` based on the browser's `Accept-Language` header |
-| `src/app/[lang]/layout.tsx` | Loads the dictionary for the current locale and wraps children in `LocaleProvider` |
-| `src/app/[lang]/[[...uri]]/page.tsx` | Passes `lang` to `getNodeByURI` to fetch the correct translation from WP |
+| `src/proxy.ts` | Redirects the root `/` to `/{locale}` based on the browser's `Accept-Language` header |
+| `src/app/[lang]/layout.tsx` | Loads the dictionary for the current locale and wraps children in `LocaleProvider`. Answers 404 when the first segment isn't a locale (paths with an extension, e.g. `/llms.txt`, skip the proxy) |
+| `src/app/[lang]/[[...uri]]/page.tsx` | Passes `lang` to `getPublicNodeByURI` (or `getPreviewNodeByURI` in preview) to fetch the correct translation from WP |
+| `src/app/[lang]/not-found.tsx` | Renders the 404 template, its template parts and breadcrumbs in the current language. It gets no `params`: `[lang]/layout.tsx` stores `lang` with `langContext()` (`src/hooks/use-lang.ts`), and the 404 reads it back |
 | `src/lib/get-all-uris.ts` | In multilang mode, fetches `language { code }` per node and maps URIs to `{ lang, uri }` pairs for `generateStaticParams` |
 | `src/lib/get-node-by-uri.ts` | Wraps type fragments in `translation(language: LANG) { ... }` when multilang is enabled |
 | `src/lib/fragments/language.ts` | GraphQL `language { code, locale }` fields — empty string when `isMultilang: false` |
@@ -53,7 +54,7 @@ All multilang behaviour is controlled by `next/src/configs.json`:
 
 1. Add the language in **WP Admin → Languages** (Polylang)
 2. Add a dictionary file: `next/src/i18n/dictionaries/{slug}.json`
-3. Add the slug to the `locales` array in `next/src/middleware.ts`
+3. Add the slug to the `locales` array in `next/src/proxy.ts`
 
 ## Using translations in components
 

@@ -1,3 +1,4 @@
+import addLangPrefix from './add-lang-prefix';
 import fetchAPI from './fetch-api';
 import formatBlocksJSON from './format-blocks-json';
 
@@ -10,7 +11,7 @@ import {
 	getTemplateBlocks,
 } from './get-fse-template-blocks';
 import getFunkyWpUploadsURI from './get-funky-wp-uploads-uri';
-import getNodeByURI from './get-node-by-uri';
+import { getPreviewNodeByURI, getPublicNodeByURI } from './get-node-by-uri';
 import getNotFoundBreadcrumbs from './get-not-found-breadcrumbs';
 import getWpUriFromNextPath from './get-wp-uri-from-next-path';
 
@@ -23,6 +24,7 @@ import injectBreadcrumbs from './inject-breadcrumbs';
 export const PREVIEW_STATI = ['PUBLISH', 'DRAFT', 'FUTURE', 'PRIVATE'];
 
 export {
+	addLangPrefix,
 	fetchAPI,
 	formatBlocksJSON,
 	getAllURIs,
@@ -31,9 +33,10 @@ export {
 	enrichTemplateBlocks,
 	getTemplateBlocks,
 	getFunkyWpUploadsURI,
-	getNodeByURI,
 	getNotFoundBreadcrumbs,
 	getPreviewNode,
+	getPreviewNodeByURI,
+	getPublicNodeByURI,
 	getSitemapData,
 	getRedirection,
 	getWpUriFromNextPath,

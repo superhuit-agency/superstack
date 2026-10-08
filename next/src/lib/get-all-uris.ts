@@ -1,4 +1,5 @@
 import configs from '@/configs.json';
+import { WordPressReadError } from '@/lib/wordpress-read-error';
 import { fetchAPI } from '.';
 
 const POST_TYPES: string[] = ['pages', 'posts'];
@@ -13,6 +14,9 @@ type UriNode = {
 };
 
 export default async function getAllURIs() {
+	// Like the per-type reads below, a failed count skips its URIs instead of
+	// failing the build: they're rendered on their first request instead
+	let countFailed = false;
 	const nodeCounts = await fetchAPI(
 		`query nodeCounts {
 			${POST_TYPES.map(
@@ -35,7 +39,10 @@ export default async function getAllURIs() {
 					: ''
 			}
 		}`
-	);
+	).catch(() => {
+		countFailed = true;
+		return {};
+	});
 
 	const nodesPromises: Promise<any>[] = [];
 	POST_TYPES.forEach((postType) => {
@@ -141,7 +148,7 @@ export default async function getAllURIs() {
 			.slice(1), // remove first segment = lang prefix
 		lang: node.language
 			? node.language.code.toLowerCase()
-			: nodeCounts.defaultLanguage.slug,
+			: (nodeCounts?.defaultLanguage?.slug ?? configs.staticLang),
 	});
 
 	const mapForSingleLang = (node: { uri: string }) => ({
@@ -168,7 +175,19 @@ export default async function getAllURIs() {
 			)
 		: nodes;
 
-	return expandedNodes
+	const uris = expandedNodes
 		.filter((node: any) => node.uri && !node.isRedirected)
 		.map(callback);
+
+	// Nothing to prerender because WordPress didn't answer: an empty list would
+	// fail the build with Next's misleading `EmptyGenerateStaticParamsError`
+	if (
+		!uris.length &&
+		(countFailed ||
+			nodesQueries.some(({ status }) => status === 'rejected'))
+	) {
+		throw new WordPressReadError('the URIs to prerender', 'AllURIs');
+	}
+
+	return uris;
 }

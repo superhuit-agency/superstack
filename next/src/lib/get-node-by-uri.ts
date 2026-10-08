@@ -1,11 +1,24 @@
+import { cacheLife, cacheTag } from 'next/cache';
+
 import * as _templatesData from '@/components/templates/data';
 import configs from '@/configs.json';
+import {
+	baseUriContext,
+	isBaseUriNotDeclaredError,
+	throwIfBaseUriNotDeclared,
+} from '@/hooks/use-base-uri';
 import { fetchAPI, formatBlocksJSON } from '@/lib';
+import addLangPrefix from '@/lib/add-lang-prefix';
+import { ancestorTags, cacheTags, termTags } from '@/lib/cache-tags';
 import {
 	enrichTemplateBlocks,
 	getTemplateBlocks,
 } from '@/lib/get-fse-template-blocks';
 import injectBreadcrumbs from '@/lib/inject-breadcrumbs';
+import {
+	isWordPressReadError,
+	throwIfWordPressReadFailed,
+} from '@/lib/wordpress-read-error';
 
 const templatesData: any = _templatesData;
 
@@ -13,35 +26,155 @@ const { archiveData, categoryData, singlePageData, singlePostData, tagData } =
 	templatesData;
 
 /**
+ * Public read of a node, cached until one of its tags is revalidated.
+ * Shared by page rendering and metadata generation.
+ *
+ * Takes plain arguments only: they make up the cache key, so no auth token
+ * or preview flag may ever be passed here (see `getPreviewNodeByURI`).
+ *
+ * @param {string}      uri
+ * @param {string|null} lang - The language code
+ * @param {number}      routePage
+ *
+ * @returns
+ */
+export async function getPublicNodeByURI(
+	uri: string,
+	lang: string | null = null,
+	routePage = 1
+) {
+	'use cache';
+	cacheLife('max');
+	cacheTag(cacheTags.nodes());
+
+	// The request-scoped Base URI doesn't cross into a cached scope,
+	// so set it again for the blocks enriched below.
+	baseUriContext(uri);
+
+	const node = await getNodeByURI(uri, false, {}, false, routePage, lang);
+
+	if (!node) {
+		// Cached 404, cleared when a post change moves a URI
+		cacheTag(cacheTags.uris());
+		return null;
+	}
+
+	cacheTag(
+		...nodeTags(node),
+		cacheTags.settings(), // The same query returns site SEO and general settings
+		// Its translations' URIs (hreflang, language switcher) move with other posts
+		...(configs.isMultilang ? [cacheTags.uris()] : []),
+		...termTags(node.categories?.nodes),
+		...termTags(node.tags?.nodes),
+		...ancestorTags(node.ancestors?.nodes)
+	);
+
+	// A page the node doesn't have is a cached 404, with the node's tags and
+	// its loops': a new post can add it
+	if (routePage > 1 && !hasRoutePage(node.blocks, routePage)) return null;
+
+	return node;
+}
+
+/**
+ * Whether the `/page/{n}` route exists: only a loop inheriting the template
+ * query follows it, up to its last page when its total is known.
+ */
+const hasRoutePage = (
+	blocks: Array<BlockPropsType | null> | undefined,
+	page: number
+): boolean =>
+	(blocks ?? []).some((block) => {
+		if (!block) return false;
+
+		const { query, pagination } = (block.attributes ?? {}) as {
+			query?: { inherit?: boolean };
+			pagination?: { totalPages?: unknown };
+		};
+
+		if (block.name === 'core/query' && query?.inherit === true) {
+			const totalPages = pagination?.totalPages;
+			return typeof totalPages !== 'number' || page <= totalPages;
+		}
+
+		return hasRoutePage(block.innerBlocks, page);
+	});
+
+/**
+ * Tags of what a node read renders itself: the post or page, or what an
+ * archive lists.
+ */
+const nodeTags = (node: ResolvedNode): string[] => {
+	const term = getTermContext(node);
+	const archive = getArchiveContext(node);
+
+	if (archive) {
+		return [
+			...(term ? [cacheTags.term(term.databaseId)] : []),
+			cacheTags.type(archive.postType),
+		];
+	}
+
+	return [
+		cacheTags.node(String(node.id)),
+		cacheTags.nodesOfType(String(node.contentTypeName)),
+	];
+};
+
+/**
+ * Preview read of a node, never cached: it carries the user's auth token.
+ *
+ * NOTE: the `uri` could be in fact the ID (i.e. a draft doesn't have a slug/uri yet)
+ *
+ * @param {string}      uri
+ * @param {string|null} lang - The language code
+ * @param {number}      routePage
+ * @param {object}      auth
+ * @param {boolean}     previewDraft
+ *
+ * @returns
+ */
+export async function getPreviewNodeByURI(
+	uri: string,
+	lang: string | null,
+	routePage: number,
+	auth: AuthType,
+	previewDraft: boolean
+) {
+	return getNodeByURI(uri, true, auth, previewDraft, routePage, lang);
+}
+
+/**
  * NOTE: in preview, the `uri` could be in fact the ID (i.e. a draft doesn't have a slug/uri yet)
  *
  * @param {string}      uri
  * @param {boolean}     preview
  * @param {object}      auth
- * @param {string|null} lang - The language code
  * @param {boolean}     previewDraft
- * @param {boolean}     blockEnrichment - Whether to enrich the node with blocksJSON and templateData
  * @param {number}      routePage
+ * @param {string|null} lang - The language code
  *
  * @returns
  */
-export default async function getNodeByURI(
+async function getNodeByURI(
 	uri: string,
 	preview: boolean,
 	auth: AuthType,
 	previewDraft: boolean,
-	blockEnrichment = true,
 	routePage = 1,
 	lang: string | null = null
 ) {
 	// Ensure URI includes language prefix if multilang is enabled
-	if (configs.isMultilang && lang && !uri.startsWith(`/${lang}/`)) {
-		uri = `/${lang}${uri.startsWith('/') ? '' : '/'}${uri}`;
-	}
+	uri = addLangPrefix(uri, lang);
+
+	// The blocks read the node at the Base URI: without its language prefix,
+	// a path shared by two languages (e.g. the home, `/`) resolves to the
+	// default language's node.
+	baseUriContext(uri);
 
 	// The slug may be the id of an unpublished post
-	const [match, id] = uri.match(/^(?:\/?\w{2})?\/(\d+)\/?/) || [];
-	const isId = !!match;
+	const id = preview ? getPreviewId(uri, lang) : undefined;
+	const isId = id !== undefined;
 
 	const variables: {
 		isPreview: boolean;
@@ -53,7 +186,7 @@ export default async function getNodeByURI(
 		isPreviewDraft: previewDraft,
 	};
 
-	if (isId) variables.id = Number.parseInt(id);
+	if (isId) variables.id = id;
 	else variables.uri = uri;
 
 	const query = isId ? nodeByIdQuery(lang) : nodeByUriQuery(lang);
@@ -65,14 +198,20 @@ export default async function getNodeByURI(
 
 	const { node: rawNode, seo, generalSettings } = response;
 
+	// `node` is `null` when WordPress has no content at this URI, but missing
+	// when the request failed: don't let a failure pass (and be cached) as a 404.
+	if (rawNode === undefined) {
+		throw new Error(`Could not read the node at "${uri}" from WordPress`);
+	}
+
 	if (!rawNode) return null;
 
 	let node = rawNode;
 
 	if (configs.isMultilang) {
 		if (node.translation) {
-			const { __typename } = node;
-			node = { __typename, ...node.translation };
+			const { __typename, contentTypeName } = node;
+			node = { __typename, contentTypeName, ...node.translation };
 		} else if (lang && Array.isArray(node.translations)) {
 			// Non-translatable nodes (ContentType archives) have no `language`
 			// of their own — derive it from the requested lang so the rest of
@@ -93,91 +232,107 @@ export default async function getNodeByURI(
 				};
 			}
 		}
+	}
 
-		if (configs.hasCurrentLocaleInLangSwitcher) {
-			if (!node.translations) node.translations = [];
-			if (!node.language?.locale || !node.language?.code) return null;
+	// A node type the query has no fragment for (e.g. a term archive) comes
+	// back as a bare `__typename`: it isn't rendered, so it's a 404.
+	if (!node.uri) return null;
 
-			node.translations.unshift({
-				uri: node.uri,
-				language: {
-					locale: node.language.locale,
-					code: node.language.code,
-				},
-			});
-		}
+	if (configs.isMultilang && configs.hasCurrentLocaleInLangSwitcher) {
+		if (!node.translations) node.translations = [];
+		if (!node.language?.locale || !node.language?.code) return null;
+
+		node.translations.unshift({
+			uri: node.uri,
+			language: {
+				locale: node.language.locale,
+				code: node.language.code,
+			},
+		});
 	}
 
 	node.fullUri = uri;
 
-	// On a term archive (Tag/Category), expose the current term so query loops
-	// inside the archive template scope their posts to it at request time.
-	const term = getTermContext(node);
+	// Expose the current page, and on an archive the term and post type it
+	// lists, so query loops inheriting the template query follow them.
+	const context = getBlockDataContext(node, uri, routePage);
 
-	// On a post type archive, expose the post type so query loops inheriting the
-	// template query list that type instead of falling back to plain posts.
-	const archive = getArchiveContext(node);
+	const [templateBlocks, { blocksJSON, templateData }] = await Promise.all([
+		// Not settled with the rest: a failed template read must fail the page,
+		// not be cached as a page without its header and footer.
+		getTemplateBlocks(node?.fseTemplate?.slug, lang).then((blocks) =>
+			enrichTemplateBlocks(blocks, { lang, preview, context })
+		),
+		Promise.allSettled([
+			formatBlocksJSON(
+				previewDraft
+					? (node.preview?.node?.blocksJSON ?? '')
+					: (node?.blocksJSON ?? ''),
+				{ lang, preview, context }
+			),
+			getTemplateData(node),
+		])
+			.then((results) => {
+				throwIfBaseUriNotDeclared(results);
+				throwIfWordPressReadFailed(results);
 
-	if (blockEnrichment) {
-		const { blocksJSON, templateData, templateBlocks } =
-			await Promise.allSettled([
-				formatBlocksJSON(
-					previewDraft
-						? (node.preview?.node?.blocksJSON ?? '')
-						: (node?.blocksJSON ?? ''),
-					{ lang, page: routePage, baseUri: uri, term, archive }
-				),
-				getTemplateData(node),
-				enrichTemplateBlocks(
-					getTemplateBlocks(node?.fseTemplate?.slug, lang),
-					{ lang, page: routePage, baseUri: uri, term, archive }
-				),
-			])
-				.then(([bProm, tProm, tbProm]) => ({
+				const [bProm, tProm] = results;
+				return {
 					blocksJSON: bProm.status === 'fulfilled' ? bProm.value : [],
 					templateData:
 						tProm.status === 'fulfilled' ? tProm.value : {},
-					templateBlocks:
-						tbProm.status === 'fulfilled' ? tbProm.value : [],
-				}))
-				.catch(() => {
-					console.error(
-						'Error while enriching & formatting blocksJSON and templateData'
-					);
-					return {
-						blocksJSON: [],
-						templateData: {},
-						templateBlocks: [],
-					};
-				});
+				};
+			})
+			.catch((error) => {
+				if (
+					isBaseUriNotDeclaredError(error) ||
+					isWordPressReadError(error)
+				)
+					throw error;
 
-		const blocksWithContent =
-			templateBlocks.length > 0
-				? injectPostContentBlocks(templateBlocks, blocksJSON)
-				: blocksJSON;
+				console.error(
+					'Error while enriching & formatting blocksJSON and templateData'
+				);
+				return {
+					blocksJSON: [],
+					templateData: {},
+				};
+			}),
+	]);
 
-		const blocks = injectBreadcrumbs(
-			blocksWithContent,
-			node.seo?.breadcrumbs ?? []
-		);
+	const blocksWithContent =
+		templateBlocks.length > 0
+			? injectPostContentBlocks(templateBlocks, blocksJSON)
+			: blocksJSON;
 
-		if (node.preview) delete node.preview;
+	const blocks = injectBreadcrumbs(
+		blocksWithContent,
+		node.seo?.breadcrumbs ?? []
+	);
 
-		return {
-			...node,
-			blocks,
-			...templateData,
-			siteSEO: seo,
-			siteSettings: generalSettings,
-		};
-	}
+	if (node.preview) delete node.preview;
 
 	return {
 		...node,
+		blocks,
+		...templateData,
 		siteSEO: seo,
 		siteSettings: generalSettings,
 	};
 }
+
+/**
+ * The database ID a preview URI stands for: an unpublished post has no URI
+ * yet, so the preview route sends `/{id}/`, after its language prefix on a
+ * multilingual site. Any other path, e.g. a date permalink, is a URI.
+ */
+const getPreviewId = (uri: string, lang: string | null) => {
+	const path =
+		lang && uri.startsWith(`/${lang}/`) ? uri.slice(lang.length + 1) : uri;
+	const [, id] = path.match(/^\/(\d+)\/?$/) ?? [];
+
+	return id ? Number.parseInt(id, 10) : undefined;
+};
 
 const commonFields = `
 	generalSettings {
@@ -246,6 +401,9 @@ const nodeByUriQuery = (lang: string | null) => `
 	) {
 		node: nodeByUri(uri: $uri) {
 			__typename
+			...on ContentNode {
+				contentTypeName
+			}
 			${types
 				.map(({ type, fields, translatable }) =>
 					configs.isMultilang && lang && translatable
@@ -272,6 +430,9 @@ const nodeByIdQuery = (lang: string | null) => `
 	) {
 		node(id: $id, idType: DATABASE_ID) {
 			__typename
+			...on ContentNode {
+				contentTypeName
+			}
 			${types
 				.map(({ type, fields, translatable }) =>
 					configs.isMultilang && lang && translatable
@@ -301,35 +462,43 @@ for (const key in templatesData) {
 	}
 }
 
-// Maps a resolved node's `__typename` to its WPGraphQL taxonomy handle. Only
-// term archives qualify — single posts/pages and ContentType (post-type)
-// archives have no current term to scope a query loop by. `postType` is set for
-// taxonomies attached to a custom post type, whose term archives render that
-// post type's own archive template (see below).
-const TERM_TAXONOMIES: Record<string, { taxonomy: string; postType?: string }> =
+// Maps a resolved node's `__typename` to its WPGraphQL taxonomy handle, and
+// the post type its term archive lists. Only term archives qualify: single
+// posts/pages and ContentType (post-type) archives have no current term.
+const TERM_TAXONOMIES: Record<string, { taxonomy: string; postType: string }> =
 	{
-		Tag: { taxonomy: 'tag' },
-		Category: { taxonomy: 'category' },
+		Tag: { taxonomy: 'tag', postType: 'post' },
+		Category: { taxonomy: 'category', postType: 'post' },
 	};
 
-const getTermContext = (node: any): BlockDataContext['term'] | undefined => {
-	const { taxonomy } = TERM_TAXONOMIES[node?.__typename] ?? {};
+/** The fields of a resolved node that tell what it renders. */
+type ResolvedNode = {
+	__typename?: string;
+	id?: unknown;
+	name?: unknown;
+	contentTypeName?: unknown;
+};
+
+const getTermContext = (
+	node: ResolvedNode
+): BlockDataContext['term'] | undefined => {
+	const { taxonomy } = TERM_TAXONOMIES[node?.__typename ?? ''] ?? {};
 	if (!taxonomy) return undefined;
 
 	// The term fragments alias `id: databaseId`, so `node.id` is the WP DB id.
 	const databaseId =
-		typeof node?.id === 'number' ? node.id : Number.parseInt(node?.id, 10);
+		typeof node?.id === 'number'
+			? node.id
+			: Number.parseInt(String(node?.id), 10);
 	if (!Number.isFinite(databaseId)) return undefined;
 
 	return { taxonomy, databaseId };
 };
 
 const getArchiveContext = (
-	node: any
+	node: ResolvedNode
 ): BlockDataContext['archive'] | undefined => {
-	// A term archive of a custom taxonomy renders its post type's archive
-	// template, so the query loops it holds inherit that post type too.
-	const termPostType = TERM_TAXONOMIES[node?.__typename]?.postType;
+	const termPostType = TERM_TAXONOMIES[node?.__typename ?? '']?.postType;
 	if (termPostType) return { postType: termPostType };
 
 	if (node?.__typename !== 'ContentType') return undefined;
@@ -339,6 +508,26 @@ const getArchiveContext = (
 	if (!postType) return undefined;
 
 	return { postType };
+};
+
+/**
+ * The block data context of a node: only the keys it has, since the context
+ * is part of the block data's cache key.
+ */
+const getBlockDataContext = (
+	node: ResolvedNode,
+	baseUri: string,
+	page: number
+): BlockDataContext => {
+	const term = getTermContext(node);
+	const archive = getArchiveContext(node);
+
+	return {
+		page: page > 0 ? page : 1,
+		baseUri,
+		...(term ? { term } : {}),
+		...(archive ? { archive } : {}),
+	};
 };
 
 const getTemplateData = async (node: any) => {

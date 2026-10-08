@@ -1,7 +1,26 @@
+import { cacheLife, cacheTag } from 'next/cache';
+
 import { fetchAPI } from '@/lib';
+import { cacheTags } from '@/lib/cache-tags';
 import { getWpUrl } from '@/utils/node-utils';
 
 const GRAPHQL_MAX_SIZE = 100;
+
+// Not every content type supports thumbnails, and spreading
+// `NodeWithFeaturedImage` on a type that can't implement it fails the whole
+// query. Inside `ContentNode` the spread is valid for any type and only
+// answers for the ones that implement it. No introspection needed: it is off
+// for public requests on staging and production.
+const FEATURED_IMAGE_FIELD = `... on ContentNode {
+	... on NodeWithFeaturedImage {
+		featuredImage {
+			node {
+				sourceUrl
+				title
+			}
+		}
+	}
+}`;
 
 // Content types registered by WordPress (FSE templates, navigation menus)
 // that are not public content and are not exposed in `seo.contentTypes`.
@@ -29,6 +48,11 @@ interface ContentType {
 			modified: string;
 		}[];
 	};
+}
+
+interface Taxonomy {
+	name: string;
+	graphqlPluralName: string;
 }
 
 interface TermConnectionType {
@@ -85,21 +109,45 @@ export default async function getSitemapData(
 	page = 1,
 	size = 1000
 ) {
+	try {
+		return await getCachedSitemapData(type, page, size);
+	} catch (error) {
+		console.error(`Can't fetch sitemap ${type} data`);
+		console.error(error);
+		return null;
+	}
+}
+
+/**
+ * Cached per `(type, page)` until one of its tags is revalidated.
+ * A failed request throws, so it is never cached as an empty sitemap.
+ */
+async function getCachedSitemapData(type: string, page: number, size: number) {
+	'use cache';
+	cacheLife('max');
+	// Which types and posts are noindex comes from the SEO plugin's settings
+	cacheTag(cacheTags.settings(), cacheTags.nodes());
+
 	if (type === 'all') {
 		const [contentTypes, taxonomies] = await Promise.all([
 			getIndexSitemapData(),
 			getIndexTaxonomiesSitemapData(),
 		]);
-		return [...(contentTypes ?? []), ...taxonomies];
+		return [...contentTypes, ...taxonomies];
 	}
 
-	const taxonomies = await getTaxonomyNames();
-	return await (taxonomies.includes(type)
-		? getSitemapTaxonomyUrls(type, page, size)
+	const taxonomy = (await getTaxonomies()).find(
+		({ graphqlPluralName }) => graphqlPluralName === type
+	);
+	return await (taxonomy
+		? getSitemapTaxonomyUrls(taxonomy, page, size)
 		: getSitemapTypeUrls(type, page, size));
 }
 
 async function getIndexSitemapData() {
+	// Lists each type's last-modified date
+	cacheTag(cacheTags.content());
+
 	const data = await fetchAPI(
 		`query ContentTypes {
 			contentTypes(first: 100) {
@@ -119,18 +167,11 @@ async function getIndexSitemapData() {
 				}
 			}
 		}`
-	).catch((error) => {
-		console.error("Can't fetch sitemap content types");
-		console.error(error);
-	});
+	);
 
-	if (
-		!data ||
-		typeof data !== 'object' ||
-		!('contentTypes' in data) ||
-		!data?.contentTypes
-	)
-		return null;
+	if (!data?.contentTypes) {
+		throw new Error("Can't fetch sitemap content types");
+	}
 
 	const contentTypes = data.contentTypes as { nodes: ContentType[] };
 	const indexableTypes = contentTypes.nodes.filter(
@@ -151,10 +192,7 @@ async function getIndexSitemapData() {
         }
 			}
 		}`
-	).catch((error) => {
-		console.error("Can't fetch sitemap noindex types");
-		console.error(error);
-	})) as
+	)) as
 		| {
 				seo: {
 					contentTypes: {
@@ -164,7 +202,9 @@ async function getIndexSitemapData() {
 		  }
 		| undefined;
 
-	if (!typesNoIndex?.seo?.contentTypes) return null;
+	if (!typesNoIndex?.seo?.contentTypes) {
+		throw new Error("Can't fetch sitemap noindex types");
+	}
 
 	return indexableTypes.reduce((postTypes: PostType[], type: ContentType) => {
 		if (type.contentNodes.pageInfo.offsetPagination.total > 0) {
@@ -188,10 +228,19 @@ async function getIndexSitemapData() {
 async function getSitemapTypeUrls(type = 'posts', page = 1, size = 1000) {
 	// TODO find how to get all images inside content (not only the feature image)
 	let nodes: any[] = [];
-	const featuredImageField = await getFeaturedImageField(type);
+	const contentType = await getContentType(type);
+
+	// Not a public content type: nothing to list, and nothing to query
+	if (!contentType) {
+		cacheTag(cacheTags.content());
+		return [];
+	}
+
+	cacheTag(cacheTags.type(contentType.name));
+
 	if (size > GRAPHQL_MAX_SIZE) {
 		(
-			await Promise.allSettled(
+			await Promise.all(
 				new Array(Math.ceil(size / GRAPHQL_MAX_SIZE))
 					.fill(0)
 					.map((v, i) =>
@@ -212,7 +261,7 @@ async function getSitemapTypeUrls(type = 'posts', page = 1, size = 1000) {
 											uri
 											link
 											modified
-											${featuredImageField}
+											${FEATURED_IMAGE_FIELD}
 											seo {
 												metaRobotsNoindex
 											}
@@ -224,17 +273,13 @@ async function getSitemapTypeUrls(type = 'posts', page = 1, size = 1000) {
 					)
 			)
 		).forEach((result, i) => {
-			if (result.status === 'fulfilled') {
-				const edges = result.value?.[type]?.edges;
-				if (edges?.length) {
-					nodes = [...nodes, ...edges];
-				}
-			} else {
-				console.error(
+			const edges = result?.[type]?.edges;
+			if (!Array.isArray(edges)) {
+				throw new Error(
 					`Can't fetch ${i * 100}-${(i + 1) * 100} sitemap ${type} urls`
 				);
-				console.error(result.reason);
 			}
+			nodes = [...nodes, ...edges];
 		});
 	} else {
 		const data = await fetchAPI(
@@ -252,7 +297,7 @@ async function getSitemapTypeUrls(type = 'posts', page = 1, size = 1000) {
 						uri
 						link
 						modified
-						${featuredImageField}
+						${FEATURED_IMAGE_FIELD}
 						seo {
 							metaRobotsNoindex
 						}
@@ -260,12 +305,13 @@ async function getSitemapTypeUrls(type = 'posts', page = 1, size = 1000) {
 				}
 			}
 		}`
-		).catch((error) => {
-			console.error(`Can't fetch sitemap ${type} urls`);
-			console.error(error);
-		});
+		);
 
-		nodes = data?.[type]?.edges ?? [];
+		if (!Array.isArray(data?.[type]?.edges)) {
+			throw new Error(`Can't fetch sitemap ${type} urls`);
+		}
+
+		nodes = data[type].edges;
 	}
 
 	return nodes.reduce((urls, { node }) => {
@@ -278,41 +324,45 @@ async function getSitemapTypeUrls(type = 'posts', page = 1, size = 1000) {
 	}, []);
 }
 
-async function getTaxonomyNames(): Promise<string[]> {
+async function getTaxonomies(): Promise<Taxonomy[]> {
 	const data = await fetchAPI(
 		`query SitemapTaxonomies {
 			taxonomies(first: 100) {
 				nodes {
+					name
 					graphqlPluralName
 				}
 			}
 		}`
-	).catch((error) => {
-		console.error("Can't fetch sitemap taxonomies");
-		console.error(error);
-	});
+	);
 
-	return (data?.taxonomies?.nodes ?? [])
-		.map(
-			({ graphqlPluralName }: { graphqlPluralName: string }) =>
-				graphqlPluralName
-		)
-		.filter((name: string) => !EXCLUDED_TAXONOMIES.includes(name));
+	if (!data?.taxonomies?.nodes) {
+		throw new Error("Can't fetch sitemap taxonomies");
+	}
+
+	return data.taxonomies.nodes.filter(
+		({ graphqlPluralName }: Taxonomy) =>
+			!EXCLUDED_TAXONOMIES.includes(graphqlPluralName)
+	);
 }
 
 /**
  * Term connections don't support offset pagination,
  * so walk through every page with the cursor.
  */
-async function getIndexableTerms(taxonomy: string) {
+async function getIndexableTerms({ name, graphqlPluralName }: Taxonomy) {
+	// A term's last-modified date is its latest post's, and a term is only
+	// listed while it has posts
+	cacheTag(cacheTags.taxonomy(name), cacheTags.content());
+
 	let terms: TermType[] = [];
 	let after: string | null = null;
 
 	do {
-		const data: { [key: string]: TermConnectionType } | void =
+		const data: { [key: string]: TermConnectionType } | undefined =
 			await fetchAPI(
 				`query SitemapTaxonomyUrls($after: String) {
-				${taxonomy}(first: ${GRAPHQL_MAX_SIZE}, after: $after, where: { hideEmpty: true }) {
+				${graphqlPluralName}(first: ${GRAPHQL_MAX_SIZE}, after: $after, where: { hideEmpty: true }) {
 					pageInfo {
 						hasNextPage
 						endCursor
@@ -331,14 +381,16 @@ async function getIndexableTerms(taxonomy: string) {
 				}
 			}`,
 				{ variables: { after } }
-			).catch((error) => {
-				console.error(`Can't fetch sitemap ${taxonomy} urls`);
-				console.error(error);
-			});
+			);
 
-		const connection: TermConnectionType | undefined = data?.[taxonomy];
-		terms = [...terms, ...(connection?.nodes ?? [])];
-		after = connection?.pageInfo?.hasNextPage
+		const connection: TermConnectionType | undefined =
+			data?.[graphqlPluralName];
+		if (!Array.isArray(connection?.nodes)) {
+			throw new Error(`Can't fetch sitemap ${graphqlPluralName} urls`);
+		}
+
+		terms = [...terms, ...connection.nodes];
+		after = connection.pageInfo?.hasNextPage
 			? connection.pageInfo.endCursor
 			: null;
 	} while (after);
@@ -355,15 +407,15 @@ async function getIndexableTerms(taxonomy: string) {
 }
 
 async function getIndexTaxonomiesSitemapData() {
-	const taxonomies = await getTaxonomyNames();
+	const taxonomies = await getTaxonomies();
 
 	const results = await Promise.all(
-		taxonomies.map(async (name): Promise<PostType | null> => {
-			const terms = await getIndexableTerms(name);
+		taxonomies.map(async (taxonomy): Promise<PostType | null> => {
+			const terms = await getIndexableTerms(taxonomy);
 			if (!terms.length) return null;
 
 			return {
-				name,
+				name: taxonomy.graphqlPluralName,
 				total: terms.length,
 				lastModified: terms
 					.map(({ modified }) => modified)
@@ -376,57 +428,46 @@ async function getIndexTaxonomiesSitemapData() {
 	return results.filter((result): result is PostType => result !== null);
 }
 
-async function getSitemapTaxonomyUrls(taxonomy: string, page = 1, size = 1000) {
+async function getSitemapTaxonomyUrls(
+	taxonomy: Taxonomy,
+	page = 1,
+	size = 1000
+) {
 	const terms = await getIndexableTerms(taxonomy);
 
 	return terms.slice((page - 1) * size, page * size);
 }
 
 /**
- * Not every content type supports thumbnails, and querying `featuredImage`
- * on a type that doesn't implement `NodeWithFeaturedImage` fails the whole query.
+ * The public content type behind a sitemap's plural name, for its `type:`
+ * cache tag.
  */
-async function getFeaturedImageField(pluralName: string) {
+async function getContentType(
+	pluralName: string
+): Promise<{ name: string } | null> {
 	const data = await fetchAPI(
-		`query SitemapFeaturedImageSupport {
-			__type(name: "NodeWithFeaturedImage") {
-				possibleTypes {
-					name
-				}
-			}
+		`query SitemapContentType {
 			contentTypes(first: 100) {
 				nodes {
+					name
 					graphqlSingleName
 					graphqlPluralName
 				}
 			}
 		}`
-	).catch((error) => {
-		console.error("Can't fetch sitemap featured image support");
-		console.error(error);
-	});
-
-	const singularName = data?.contentTypes?.nodes?.find(
-		(type: { graphqlPluralName: string }) =>
-			type.graphqlPluralName === pluralName
-	)?.graphqlSingleName;
-
-	if (!singularName) return '';
-
-	const typeName =
-		singularName.charAt(0).toUpperCase() + singularName.slice(1);
-	const supported = data?.__type?.possibleTypes?.some(
-		({ name }: { name: string }) => name === typeName
 	);
 
-	return supported
-		? `featuredImage {
-				node {
-					sourceUrl
-					title
-				}
-			}`
-		: '';
+	if (!data?.contentTypes?.nodes) {
+		throw new Error("Can't fetch sitemap content type");
+	}
+
+	const contentType = data.contentTypes.nodes.find(
+		(type: { graphqlSingleName: string; graphqlPluralName: string }) =>
+			type.graphqlPluralName === pluralName &&
+			!EXCLUDED_CONTENT_TYPES.includes(type.graphqlSingleName)
+	);
+
+	return contentType ? { name: contentType.name } : null;
 }
 
 /**

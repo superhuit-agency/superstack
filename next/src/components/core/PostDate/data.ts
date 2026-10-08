@@ -1,4 +1,5 @@
 import { baseUriContext } from '@/hooks/use-base-uri';
+import { cacheTags, nodeAtUriTags } from '@/lib/cache-tags';
 import { gql } from '@/utils';
 
 import { parsePostDateToUtcMs } from './format-post-date';
@@ -35,6 +36,9 @@ const queryPostDate = gql`
 		}
 		nodeByUri(uri: $uri) {
 			__typename
+			... on ContentNode {
+				databaseId
+			}
 			... on Post {
 				date
 				modified
@@ -82,6 +86,8 @@ const fetchGeneralSettings = async (fetcher: FetchApiFuncType) => {
 	};
 };
 
+export const usesBaseUri = true;
+
 export const getData = async (
 	fetcher: FetchApiFuncType,
 	attrs: PostDateAttributes | null = null
@@ -92,7 +98,7 @@ export const getData = async (
 		typeof uriRaw === 'string' && uriRaw.trim() ? uriRaw.trim() : '';
 
 	if (typeof attrs?.datetime === 'string' && !attrs.datetime.trim()) {
-		return { renderEmpty: true as const };
+		return { renderEmpty: true as const, cacheTags: [] };
 	}
 
 	const presetDatetime =
@@ -105,7 +111,7 @@ export const getData = async (
 
 	if (!fetchFromNode && presetDatetime) {
 		if (parsePostDateToUtcMs(presetDatetime) === null) {
-			return { renderEmpty: true as const };
+			return { renderEmpty: true as const, cacheTags: [] };
 		}
 
 		if (formatAttr === 'human-diff') {
@@ -116,6 +122,7 @@ export const getData = async (
 				showModifiedClass: resolveGraphqlField(attrs) === 'modified',
 				isHumanDiff: true as const,
 				phpDatePattern: '',
+				cacheTags: [],
 			};
 		}
 
@@ -132,18 +139,26 @@ export const getData = async (
 			showModifiedClass: resolveGraphqlField(attrs) === 'modified',
 			isHumanDiff,
 			phpDatePattern,
+			cacheTags: [cacheTags.settings()],
 		};
 	}
 
 	if (!baseUri) {
-		return { renderEmpty: true as const };
+		return { renderEmpty: true as const, cacheTags: [] };
 	}
 
 	const data = await fetcher(queryPostDate, { variables: { uri: baseUri } });
 	const node = data?.nodeByUri as
-		| { date?: string; modified?: string; uri?: string }
+		| {
+				databaseId?: number;
+				date?: string;
+				modified?: string;
+				uri?: string;
+		  }
 		| null
 		| undefined;
+
+	const tags = [...nodeAtUriTags(node?.databaseId), cacheTags.settings()];
 
 	const field = resolveGraphqlField(attrs);
 	const raw =
@@ -157,11 +172,11 @@ export const getData = async (
 
 	const machineDatetime = raw.trim();
 	if (!machineDatetime) {
-		return { renderEmpty: true as const };
+		return { renderEmpty: true as const, cacheTags: tags };
 	}
 
 	if (parsePostDateToUtcMs(machineDatetime) === null) {
-		return { renderEmpty: true as const };
+		return { renderEmpty: true as const, cacheTags: tags };
 	}
 
 	const siteDateFormat =
@@ -186,5 +201,6 @@ export const getData = async (
 		showModifiedClass: field === 'modified',
 		isHumanDiff,
 		phpDatePattern,
+		cacheTags: tags,
 	};
 };

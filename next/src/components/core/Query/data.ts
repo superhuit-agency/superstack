@@ -1,4 +1,5 @@
 import configs from '@/configs.json';
+import { cacheTags } from '@/lib/cache-tags';
 import { gql } from '@/utils';
 
 const ORDER_ENUMS = new Set(['ASC', 'DESC']);
@@ -43,139 +44,115 @@ const normalizeIdList = (value?: Array<string> | string[]) => {
 	return ids.length ? ids : null;
 };
 
-const postNodeFields = `
-	id
-	databaseId
-	uri
-	date
-	title(format: RENDERED)
-	excerpt(format: RENDERED)
-	content(format: RENDERED)
-	author {
-		node {
-			name
-		}
-	}
-	featuredImage {
-		node {
-			sourceUrl
-			altText
-			mediaDetails {
-				width
-				height
-			}
-		}
-	}
-	categories {
-		nodes {
-			slug
-		}
-	}
+const nodeFields = `
+        id
+        databaseId
+        uri
+        date
+        ... on NodeWithTitle {
+          title(format: RENDERED)
+        }
+        ... on NodeWithExcerpt {
+          excerpt(format: RENDERED)
+        }
+        ... on NodeWithContentEditor {
+          content(format: RENDERED)
+        }
+        ... on NodeWithAuthor {
+          author {
+            node {
+              name
+            }
+          }
+        }
+        ... on NodeWithFeaturedImage {
+          featuredImage {
+            node {
+              sourceUrl
+              altText
+              mediaDetails {
+                width
+                height
+              }
+            }
+          }
+        }
 `;
 
 const queryPosts = gql`
-	query QueryPosts(
-		$first: Int!
-		$offset: Int!
-		$order: OrderEnum!
-		$orderby: PostObjectsConnectionOrderbyEnum!
-		$notIn: [ID]
-		$search: String
-		$categoryIn: [ID]
-		$tagIn: [ID]
-   		${configs.isMultilang ? '$language: LanguageCodeFilterEnum' : ''}
-	) {
-		posts(
-			first: $first
-			where: {
-				offsetPagination: { offset: $offset, size: $first }
-				orderby: { field: $orderby, order: $order }
-				notIn: $notIn
-				search: $search
-				stati: PUBLISH
-				categoryIn: $categoryIn
-				tagIn: $tagIn
-        		${configs.isMultilang ? 'language: $language' : ''}
-			}
-		) {
-			pageInfo {
-				offsetPagination {
-					total
-				}
-			}
-			nodes {
-				${postNodeFields}
-			}
-		}
-	}
+  query QueryPosts(
+    $first: Int!
+    $offset: Int!
+    $order: OrderEnum!
+    $orderby: PostObjectsConnectionOrderbyEnum!
+    $notIn: [ID]
+    $search: String
+    $categoryId: Int
+    $categoryIn: [ID]
+    $tagIn: [ID]
+    ${configs.isMultilang ? '$language: LanguageCodeFilterEnum' : ''}
+  ) {
+    posts(
+      first: $first
+      where: {
+        offsetPagination: { offset: $offset, size: $first }
+        orderby: { field: $orderby, order: $order }
+        notIn: $notIn
+        search: $search
+        stati: PUBLISH
+        categoryId: $categoryId
+        categoryIn: $categoryIn
+        tagIn: $tagIn
+        ${configs.isMultilang ? 'language: $language' : ''}
+      }
+    ) {
+      pageInfo {
+        offsetPagination {
+          total
+        }
+      }
+      nodes {
+        ${nodeFields}
+      }
+    }
+  }
 `;
 
 const queryContentNodes = gql`
-	query QueryContentNodes(
-		$first: Int!
-		$offset: Int!
-		$order: OrderEnum!
-		$orderby: PostObjectsConnectionOrderbyEnum!
-		$notIn: [ID]
-		$search: String
-		$contentTypes: [ContentTypeEnum]
-		$taxTermIn: [ID]
-   		${configs.isMultilang ? '$language: LanguageCodeFilterEnum' : ''}
-	) {
-		contentNodes(
-			first: $first
-			where: {
-				offsetPagination: { offset: $offset, size: $first }
-				orderby: { field: $orderby, order: $order }
-				notIn: $notIn
-				search: $search
-				stati: PUBLISH
-				contentTypes: $contentTypes
-				taxTermIn: $taxTermIn
+  query QueryContentNodes(
+    $first: Int!
+    $offset: Int!
+    $order: OrderEnum!
+    $orderby: PostObjectsConnectionOrderbyEnum!
+    $notIn: [ID]
+    $search: String
+    $contentTypes: [ContentTypeEnum]
+    $taxTermIn: [ID]
+    ${configs.isMultilang ? '$language: LanguageCodeFilterEnum' : ''}
+  ) {
+    contentNodes(
+      first: $first
+      where: {
+        offsetPagination: { offset: $offset, size: $first }
+        orderby: { field: $orderby, order: $order }
+        notIn: $notIn
+        search: $search
+        stati: PUBLISH
+        contentTypes: $contentTypes
+        taxTermIn: $taxTermIn
         ${configs.isMultilang ? 'language: $language' : ''}
-			}
-		) {
-			pageInfo {
-				offsetPagination {
-					total
-				}
-			}
-			nodes {
-				id
-				databaseId
-				uri
-				date
-				... on NodeWithTitle {
-					title(format: RENDERED)
-				}
-				... on NodeWithExcerpt {
-					excerpt(format: RENDERED)
-				}
-				... on NodeWithContentEditor {
-					content(format: RENDERED)
-				}
-				... on NodeWithAuthor {
-					author {
-						node {
-							name
-						}
-					}
-				}
-				... on NodeWithFeaturedImage {
-					featuredImage {
-						node {
-							sourceUrl
-							altText
-							mediaDetails {
-								width
-								height
-							}
-						}
-					}
-				}
-			}
-		}
-	}
+      }
+    ) {
+      pageInfo {
+        offsetPagination {
+          total
+        }
+      }
+      nodes {
+        ${nodeFields}
+      }
+    }
+  }
 `;
 
 const PAGINATION_BLOCKS = new Set([
@@ -268,6 +245,13 @@ const injectPagination = (
 		};
 	});
 
+/**
+ * A loop inheriting the template query lists the archive being viewed, and
+ * follows the `/page/{n}` route.
+ */
+export const usesArchiveContext = (attrs: Pick<QueryAttributes, 'query'>) =>
+	attrs?.query?.inherit === true;
+
 export const getData = async (
 	fetcher: FetchApiFuncType,
 	attrs: QueryAttributes | null = null,
@@ -279,21 +263,29 @@ export const getData = async (
 	// current term, current page — is gated on it.
 	const inherit = attrs?.query?.inherit === true;
 
-	const perPage = Math.min(
-		100,
-		Math.max(1, toPositiveInt(attrs?.query?.perPage) ?? 10)
-	);
+	const perPageRaw = attrs?.query?.perPage;
+	const perPage = Math.min(100, Math.max(1, toPositiveInt(perPageRaw) ?? 10));
+
 	// Only the loop inheriting the main query follows the `/page/{n}` route; a
 	// custom loop paginates on its own `queryId` in WordPress, which this
 	// implementation does not read, so it stays on its first page.
-	const page = inherit && context?.page && context.page > 0 ? context.page : 1;
-	const offset = (page - 1) * perPage;
+	const page =
+		inherit && context?.page && context.page > 0 ? context.page : 1;
+
+	const offsetRaw = attrs?.query?.offset;
+	const blockOffset = Math.max(0, toPositiveInt(offsetRaw) ?? 0);
+	const offset = blockOffset + (page - 1) * perPage;
+
 	const order = toOrderEnum(attrs?.query?.order);
 	const orderby = toOrderByEnum(attrs?.query?.orderBy);
+
 	const search =
 		typeof attrs?.query?.search === 'string' && attrs.query.search.trim()
 			? attrs.query.search.trim()
 			: null;
+
+	const notIn = normalizeIdList(attrs?.query?.exclude);
+
 	// In "default" query mode (`inherit: true`) WordPress never persists the post
 	// type — it leaves `query.postType` at the block default ("post") and resolves
 	// the type from the template's main query at render time. Mirror that here by
@@ -302,33 +294,33 @@ export const getData = async (
 		? (context?.archive?.postType ?? 'post')
 		: (attrs?.query?.postType ?? 'post');
 
-	// Scope the loop to the current term archive (Tag/Category page) when one is
-	// in context, on top of any taxonomy filters set on the block itself. A
-	// custom loop keeps its own taxonomy filters instead: it is not the archive
-	// listing, even when it sits on an archive page.
+	// An inheriting loop lists the current term archive (Tag/Category page)
+	// when one is in context, and ignores the block's own taxonomy filters, as
+	// WordPress does. A custom loop keeps its own taxonomy filters instead: it
+	// is not the archive listing, even when it sits on an archive page.
 	const term = inherit ? (context?.term ?? null) : null;
-	const termCategoryId = term?.taxonomy === 'category' ? term.databaseId : null;
-	const tagIn = term?.taxonomy === 'tag' ? [term.databaseId] : null;
+	// `categoryId` maps to WP_Query's `cat`, which, like a category archive,
+	// includes the child categories' posts.
+	const categoryId = term?.taxonomy === 'category' ? term.databaseId : null;
+	const termTagIn = term?.taxonomy === 'tag' ? [term.databaseId] : null;
 	// Custom taxonomies have no dedicated where arg in WPGraphQL: they go
 	// through the theme's `taxTermIn` filter on the content node connection.
 	const taxTermIn =
-		term && !termCategoryId && !tagIn ? [term.databaseId] : null;
+		term && !categoryId && !termTagIn ? [term.databaseId] : null;
 
-	const notIn = normalizeIdList(attrs?.query?.exclude);
+	const categoryIn = inherit
+		? null
+		: normalizeIdList(
+				attrs?.query?.taxQuery?.category as Array<string> | undefined
+			);
+	const tagIn = inherit
+		? termTagIn
+		: normalizeIdList(
+				attrs?.query?.taxQuery?.post_tag as Array<string> | undefined
+			);
 
-	const attrCategoryIn =
-		normalizeIdList(
-			attrs?.query?.taxQuery?.category as Array<string> | undefined
-		) ?? [];
-	const mergedCategoryIn = [
-		...attrCategoryIn,
-		...(termCategoryId ? [termCategoryId] : []),
-	];
-	const categoryIn = mergedCategoryIn.length ? mergedCategoryIn : null;
+	const usePostsQuery = postType === 'post' && !taxTermIn;
 
-	const usePostsQuery = postType === 'post';
-
-	const query = usePostsQuery ? queryPosts : queryContentNodes;
 	const variables: Record<string, unknown> = {
 		first: perPage,
 		offset,
@@ -341,6 +333,7 @@ export const getData = async (
 			: {}),
 	};
 	if (usePostsQuery) {
+		variables.categoryId = categoryId;
 		variables.categoryIn = categoryIn;
 		variables.tagIn = tagIn;
 	} else {
@@ -348,16 +341,20 @@ export const getData = async (
 		variables.taxTermIn = taxTermIn;
 	}
 
-	const data = await fetcher(query, { variables });
+	const data = await fetcher(usePostsQuery ? queryPosts : queryContentNodes, {
+		variables,
+	});
 
 	const connection = usePostsQuery ? data?.posts : data?.contentNodes;
 	const total =
 		typeof connection?.pageInfo?.offsetPagination?.total === 'number'
 			? connection.pageInfo.offsetPagination.total
 			: null;
+	// `total` counts the posts the block's offset skips: past them, the last
+	// pages would be empty
 	const totalPages =
 		typeof total === 'number' && total >= 0
-			? Math.ceil(total / perPage)
+			? Math.ceil(Math.max(0, total - blockOffset) / perPage)
 			: null;
 	const currentPage = page;
 
@@ -366,7 +363,6 @@ export const getData = async (
 		content: null,
 		author: null,
 		featuredImage: null,
-		categories: null,
 		...(node as Record<string, unknown>),
 	}));
 
@@ -394,5 +390,6 @@ export const getData = async (
 			totalPages,
 		},
 		...(innerBlocks !== undefined ? { innerBlocks } : {}),
+		cacheTags: [cacheTags.type(postType)],
 	};
 };

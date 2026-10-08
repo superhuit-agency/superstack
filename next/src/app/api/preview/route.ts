@@ -3,6 +3,10 @@ import { draftMode, cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 import { getAuthToken, getPreviewNode } from '@/lib';
+import getSameOriginPath from '@/lib/get-same-origin-path';
+import secretMatches from '@/lib/secret-matches';
+
+let hasLoggedMissingSecret = false;
 
 export async function GET(request: NextRequest) {
 	// pass an id or slug for page/post
@@ -11,14 +15,20 @@ export async function GET(request: NextRequest) {
 		request.nextUrl.searchParams
 	);
 
-	const WORDPRESS_PREVIEW_SECRET =
-		process.env.WORDPRESS_PREVIEW_SECRET ?? 'spck';
+	const WORDPRESS_PREVIEW_SECRET = process.env.WORDPRESS_PREVIEW_SECRET;
+
+	if (!WORDPRESS_PREVIEW_SECRET && !hasLoggedMissingSecret) {
+		hasLoggedMissingSecret = true;
+		console.error(
+			'WORDPRESS_PREVIEW_SECRET is not set: every preview is refused (see next/.env.example)'
+		);
+	}
 
 	// Check the secret and next parameters
 	// This secret should only be known by this API route
 	if (
 		!WORDPRESS_PREVIEW_SECRET ||
-		secret !== WORDPRESS_PREVIEW_SECRET ||
+		!secretMatches(secret ?? '', WORDPRESS_PREVIEW_SECRET) ||
 		(!id && !slug && !uri)
 	) {
 		return NextResponse.json(
@@ -68,10 +78,17 @@ export async function GET(request: NextRequest) {
 	// Set cookies to pass token + preview-draft
 	// (Note: We used to pass these as search params but it wasn't working)
 	const cookieStore = await cookies();
-	cookieStore.set('token', token); // Expires when the browser closes (at the end of the session) -- same as Next.js draftMode cookie
+	// The WordPress refresh token: only the server reads it. `lax` is enough,
+	// as it's set and sent on top-level navigations from WordPress
+	cookieStore.set('token', token, {
+		httpOnly: true,
+		secure: process.env.NODE_ENV === 'production',
+		sameSite: 'lax',
+		path: '/',
+	}); // Expires when the browser closes (at the end of the session) -- same as Next.js draftMode cookie
 	cookieStore.set('preview-draft', draft ? 'true' : 'false'); // Expires when the browser closes (at the end of the session) -- same as Next.js draftMode cookie
 
-	return redirect(location);
+	return redirect(getSameOriginPath(location, request.nextUrl.origin));
 }
 
 const getUriPrefix = (node: any) => {

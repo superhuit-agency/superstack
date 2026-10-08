@@ -1,5 +1,6 @@
 import Template from '@/components/global/Template';
 
+import { langContext } from '@/hooks/use-lang';
 import {
 	enrichTemplateBlocks,
 	getNotFoundBreadcrumbs,
@@ -8,9 +9,13 @@ import {
 } from '@/lib';
 
 export default async function NotFound() {
+	const lang = langContext();
+
 	const [templateBlocks, breadcrumbs] = await Promise.all([
-		enrichTemplateBlocks(getTemplateBlocks('404')),
-		getNotFoundBreadcrumbs(),
+		getTemplateBlocks('404', lang).then((blocks) =>
+			enrichTemplateBlocks(blocks, { lang })
+		),
+		getNotFoundBreadcrumbs(lang),
 	]);
 
 	const blocks = injectBreadcrumbs(

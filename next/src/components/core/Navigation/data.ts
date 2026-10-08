@@ -1,3 +1,5 @@
+import { cacheTags } from '@/lib/cache-tags';
+import { WordPressReadError } from '@/lib/wordpress-read-error';
 import { gql } from '@/utils';
 
 const getSubmenuVisibility = (attrs: NavigationAttributes | null) => {
@@ -9,6 +11,28 @@ const getSubmenuVisibility = (attrs: NavigationAttributes | null) => {
 	return attrs?.submenuVisibility ?? 'hover';
 };
 
+/**
+ * Tags of the posts and terms whose link a menu item's URL is bound to:
+ * WordPress resolves the URL to their current one, so it changes when they move.
+ */
+const boundEntityTags = (blocks: BlockPropsType[] = []): string[] =>
+	blocks.flatMap(({ attributes, innerBlocks }) => [
+		...boundEntityTag(attributes ?? {}),
+		...boundEntityTags(innerBlocks),
+	]);
+
+const boundEntityTag = ({ id, metadata }: Record<string, unknown>) => {
+	const source = (metadata as BoundMetadata | undefined)?.bindings?.url
+		?.source;
+
+	if (typeof id !== 'number') return [];
+	if (source === 'core/post-data') return [cacheTags.node(id)];
+	if (source === 'core/term-data') return [cacheTags.term(id)];
+	return [];
+};
+
+type BoundMetadata = { bindings?: { url?: { source?: unknown } } };
+
 const navigationMenuQuery = gql`
 	query NavigationMenuBlocks($id: ID!) {
 		navigationMenu(id: $id, idType: DATABASE_ID) {
@@ -18,7 +42,7 @@ const navigationMenuQuery = gql`
 `;
 
 // Returns `innerBlocks` so menu items are fetched fresh at request time
-// instead of being baked into the FSE JSON snapshot. See docs/fse-templating.md.
+// instead of being baked into the cached FSE templates. See docs/fse-templating.md.
 export const getData = async (
 	fetcher: FetchApiFuncType,
 	attrs: NavigationAttributes | null = null
@@ -26,19 +50,35 @@ export const getData = async (
 	const submenuVisibility = getSubmenuVisibility(attrs);
 
 	if (typeof attrs?.ref !== 'number' || attrs.ref <= 0) {
-		return { submenuVisibility, innerBlocks: [] };
+		return { submenuVisibility, innerBlocks: [], cacheTags: [] };
+	}
+
+	const tags = [cacheTags.menu(attrs.ref)];
+
+	const data = await fetcher(navigationMenuQuery, {
+		variables: { id: String(attrs.ref) },
+	});
+
+	// `navigationMenu` is `null` when the menu doesn't exist, but missing
+	// when the request failed: don't let a failure be cached as an empty menu.
+	if (data?.navigationMenu === undefined) {
+		throw new WordPressReadError(
+			`the navigation menu ${attrs.ref}`,
+			tags[0]
+		);
 	}
 
 	try {
-		const data = await fetcher(navigationMenuQuery, {
-			variables: { id: String(attrs.ref) },
-		});
-		const blocksJSON = data?.navigationMenu?.blocksJSON;
+		const blocksJSON = data.navigationMenu?.blocksJSON;
 		const innerBlocks: BlockPropsType[] = blocksJSON
 			? JSON.parse(blocksJSON)
 			: [];
-		return { submenuVisibility, innerBlocks };
+		return {
+			submenuVisibility,
+			innerBlocks,
+			cacheTags: [...new Set([...tags, ...boundEntityTags(innerBlocks)])],
+		};
 	} catch {
-		return { submenuVisibility, innerBlocks: [] };
+		return { submenuVisibility, innerBlocks: [], cacheTags: tags };
 	}
 };

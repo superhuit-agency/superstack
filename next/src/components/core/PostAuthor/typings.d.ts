@@ -10,9 +10,10 @@ interface PostAuthorAttributes extends BlockAttributes {
 interface PostAuthorProps extends PostAuthorAttributes {
 	author: {
 		uri: string;
+		// `null` when avatars are turned off in WordPress
 		avatar: {
 			url: string;
-		};
+		} | null;
 		name: string;
 		description: string;
 	};

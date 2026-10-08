@@ -1,10 +1,16 @@
 import { baseUriContext } from '@/hooks/use-base-uri';
+import { nodeAtUriTags } from '@/lib/cache-tags';
 import { gql } from '@/utils';
+
+export const usesBaseUri = true;
 
 export const getData = async (fetcher: FetchApiFuncType) => {
 	const query = gql`
 		query nodeByUriQuery($uri: String!) {
 			nodeByUri(uri: $uri) {
+				... on ContentNode {
+					databaseId
+				}
 				... on Post {
 					author {
 						node {
@@ -32,6 +38,8 @@ export const getData = async (fetcher: FetchApiFuncType) => {
 
 	const uri = baseUriContext();
 
+	if (!uri) return { author: null, cacheTags: [] };
+
 	const variables = {
 		uri,
 	};
@@ -41,5 +49,6 @@ export const getData = async (fetcher: FetchApiFuncType) => {
 
 	return {
 		author: author?.node,
+		cacheTags: nodeAtUriTags(data?.nodeByUri?.databaseId),
 	};
 };

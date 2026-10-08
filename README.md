@@ -35,6 +35,7 @@ An opinionated boilerplate for decoupled (headless) websites that are both perfo
 
 - Getting Started
 - [Deploy](./docs/setup/deployment.md)
+- [Caching](./docs/caching.md)
 - [Parallel local instances](./docs/setup/parallel-local-dev.md)
 
 
@@ -84,6 +85,7 @@ For more details, see the [WordPress README](wordpress/README.md).
 ```bash
 cd next
 npm install
+cp .env.example .env # preview is refused without WORDPRESS_PREVIEW_SECRET
 ```
 
 ## Development

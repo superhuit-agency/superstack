@@ -19,7 +19,9 @@ Keep cross-app data flow consistent when changing GraphQL queries, block props, 
 
 - Data fetching/mapping:
   - `next/src/lib/fetch-api.ts`
-  - `next/src/lib/get-node-by-uri.ts`
+  - `next/src/lib/get-node-by-uri.ts` (`getPublicNodeByURI`, cached; `getPreviewNodeByURI`, uncached)
+  - `next/src/lib/cache-tags.ts`
+  - `next/src/lib/get-cached-block-data.ts`
   - `next/src/lib/get-preview-node.ts`
   - `next/src/lib/get-auth-token.ts`
 - Block/data mapping:
@@ -38,6 +40,16 @@ Keep cross-app data flow consistent when changing GraphQL queries, block props, 
 4. Reuse existing helpers and query patterns.
 5. Avoid broad refactors unrelated to the requested data change.
 
+## Caching Rules
+
+Every public read of WordPress is cached until a Change clears one of its tags. See `docs/caching.md`.
+
+1. Public and preview reads are split. A cached read takes plain arguments only, since they make up its cache key (the node read: URI, language, route page). The auth token and the preview flag go to the uncached preview read (`getPreviewNodeByURI`), never to a cached one.
+2. Tag everything a read renders, with names built by `cache-tags.ts`. A field showing another post, a term or a menu without its tag stays stale when that thing changes. Term tags use `databaseId`: query it wherever terms render.
+3. A block returns its `cacheTags` next to its data, and declares `usesBaseUri` (reads the Base URI) or `usesArchiveContext` (changes with the archive being viewed), as `true` or a function of its attributes. The `wordpress-block-change` skill has the details.
+4. Let `WordPressReadError` propagate: `fetchAPI` throws it on a failed read, and catching it into `{}` or `[]` caches the failure as "nothing there". Return `null` for a genuine "nothing there".
+5. A template's `getData` (`next/src/components/templates/*/data.ts`) runs inside the public node read, so it's cached with that read's tags only. Data about other posts belongs in a block returning its own `cacheTags`.
+
 ## Safety Rules
 
 1. Do not silently change auth/preview semantics.
@@ -47,9 +59,11 @@ Keep cross-app data flow consistent when changing GraphQL queries, block props, 
 ## Verification Checklist
 
 1. `cd next && npx tsc --noEmit`
-2. Verify touched queries/mappers still satisfy consuming components.
-3. Confirm preview path still works when relevant.
-4. Confirm no unintended changes outside data-flow scope.
+2. `cd next && npm test` and `npm run lint -- --pass-on-unpruned-suppressions`, the pull request checks (`.github/workflows/checks.yml`).
+3. Verify touched queries/mappers still satisfy consuming components.
+4. Confirm preview path still works when relevant.
+5. After changing a read's tags or the revalidate route, run [Verifying caching end to end](../../../docs/caching.md#verifying-caching-end-to-end).
+6. Confirm no unintended changes outside data-flow scope.
 
 ## Output Format
 

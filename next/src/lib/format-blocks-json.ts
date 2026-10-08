@@ -1,16 +1,16 @@
 import { getWpUrl } from '@/utils/node-utils';
 import getFunkyWpUploadsURI from '@/lib/get-funky-wp-uploads-uri';
 import getBlockFinalComponentProps from '@/lib/get-block-final-component-props';
+import { throwIfBaseUriNotDeclared } from '@/hooks/use-base-uri';
+import { throwIfWordPressReadFailed } from '@/lib/wordpress-read-error';
 
 export default async function formatBlocksJSON(
 	blocksJSON: string,
 	options?: {
 		skipGetData?: boolean;
 		lang?: string | null;
-		page?: number;
-		baseUri?: string;
-		term?: BlockDataContext['term'];
-		archive?: BlockDataContext['archive'];
+		preview?: boolean;
+		context?: BlockDataContext;
 	}
 ) {
 	/**
@@ -33,15 +33,17 @@ export default async function formatBlocksJSON(
 		);
 	}
 
-	return blocksJSON
-		? (
-				await Promise.allSettled(
-					JSON.parse(blocksJSON).map((block: any) =>
-						getBlockFinalComponentProps(block, options)
-					)
-				)
-			).map((p: PromiseSettledResult<BlockPropsType>) =>
-				p.status === 'fulfilled' ? p.value : null
-			)
-		: [];
+	if (!blocksJSON) return [];
+
+	const results = await Promise.allSettled(
+		JSON.parse(blocksJSON).map((block: any) =>
+			getBlockFinalComponentProps(block, options)
+		)
+	);
+	throwIfBaseUriNotDeclared(results);
+	throwIfWordPressReadFailed(results);
+
+	return results.map((p: PromiseSettledResult<BlockPropsType>) =>
+		p.status === 'fulfilled' ? p.value : null
+	);
 }

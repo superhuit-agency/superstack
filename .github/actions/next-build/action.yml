@@ -28,6 +28,10 @@ runs:
       shell: bash
       run: npm --prefix next ci
 
+    - name: Test Next
+      shell: bash
+      run: npm --prefix next test
+
     - name: Download environment file from remote server
       shell: bash
       run: |

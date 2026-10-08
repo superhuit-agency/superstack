@@ -1,0 +1,214 @@
+{
+	".storybook/main.ts": {
+		"@typescript-eslint/no-explicit-any": {
+			"count": 1
+		}
+	},
+	"postcss.config.js": {
+		"@typescript-eslint/no-require-imports": {
+			"count": 2
+		}
+	},
+	"src/app/api/preview/route.ts": {
+		"@typescript-eslint/no-explicit-any": {
+			"count": 1
+		}
+	},
+	"src/components/admin/PreviewToolbar/index.tsx": {
+		"react-hooks/set-state-in-effect": {
+			"count": 1
+		}
+	},
+	"src/components/core/AccordionHeading/typings.d.ts": {
+		"@typescript-eslint/no-empty-object-type": {
+			"count": 1
+		}
+	},
+	"src/components/core/Button/Button.stories.tsx": {
+		"storybook/no-renderer-packages": {
+			"count": 1
+		}
+	},
+	"src/components/core/Buttons/Buttons.stories.tsx": {
+		"storybook/no-renderer-packages": {
+			"count": 1
+		}
+	},
+	"src/components/core/Code/typings.d.ts": {
+		"@typescript-eslint/no-empty-object-type": {
+			"count": 1
+		}
+	},
+	"src/components/core/CustomHtml/typings.d.ts": {
+		"@typescript-eslint/no-empty-object-type": {
+			"count": 1
+		}
+	},
+	"src/components/core/Heading/Heading.stories.tsx": {
+		"storybook/no-renderer-packages": {
+			"count": 1
+		}
+	},
+	"src/components/core/Heading/typings.d.ts": {
+		"@typescript-eslint/no-empty-object-type": {
+			"count": 1
+		}
+	},
+	"src/components/core/List/List.stories.tsx": {
+		"storybook/no-renderer-packages": {
+			"count": 1
+		}
+	},
+	"src/components/core/List/typings.d.ts": {
+		"@typescript-eslint/no-empty-object-type": {
+			"count": 1
+		}
+	},
+	"src/components/core/ListItem/typings.d.ts": {
+		"@typescript-eslint/no-empty-object-type": {
+			"count": 1
+		}
+	},
+	"src/components/core/Math/typings.d.ts": {
+		"@typescript-eslint/no-empty-object-type": {
+			"count": 1
+		}
+	},
+	"src/components/core/NavigationSubmenu/typings.d.ts": {
+		"@typescript-eslint/no-empty-object-type": {
+			"count": 1
+		}
+	},
+	"src/components/core/Paragraph/Paragraph.stories.tsx": {
+		"storybook/no-renderer-packages": {
+			"count": 1
+		}
+	},
+	"src/components/core/Preformatted/typings.d.ts": {
+		"@typescript-eslint/no-empty-object-type": {
+			"count": 1
+		}
+	},
+	"src/components/core/Pullquote/typings.d.ts": {
+		"@typescript-eslint/no-empty-object-type": {
+			"count": 1
+		}
+	},
+	"src/components/core/QueryPagination/typings.d.ts": {
+		"@typescript-eslint/no-empty-object-type": {
+			"count": 1
+		}
+	},
+	"src/components/core/Quote/typings.d.ts": {
+		"@typescript-eslint/no-empty-object-type": {
+			"count": 1
+		}
+	},
+	"src/components/core/SiteTagline/typings.d.ts": {
+		"@typescript-eslint/no-empty-object-type": {
+			"count": 1
+		}
+	},
+	"src/components/core/SiteTitle/typings.d.ts": {
+		"@typescript-eslint/no-empty-object-type": {
+			"count": 1
+		}
+	},
+	"src/components/core/SocialLink/typings.d.ts": {
+		"@typescript-eslint/no-empty-object-type": {
+			"count": 1
+		}
+	},
+	"src/components/core/SocialLinks/typings.d.ts": {
+		"@typescript-eslint/no-empty-object-type": {
+			"count": 1
+		}
+	},
+	"src/components/core/Table/typings.d.ts": {
+		"@typescript-eslint/no-empty-object-type": {
+			"count": 1
+		}
+	},
+	"src/components/global/Container.tsx": {
+		"@typescript-eslint/no-empty-object-type": {
+			"count": 1
+		}
+	},
+	"src/components/global/Template.tsx": {
+		"@typescript-eslint/no-explicit-any": {
+			"count": 1
+		}
+	},
+	"src/components/templates/SinglePage/typings.d.ts": {
+		"@typescript-eslint/no-empty-object-type": {
+			"count": 1
+		}
+	},
+	"src/i18n/dictionaries.ts": {
+		"@typescript-eslint/no-explicit-any": {
+			"count": 5
+		}
+	},
+	"src/i18n/typings.d.ts": {
+		"@typescript-eslint/no-explicit-any": {
+			"count": 1
+		}
+	},
+	"src/lib/fetch-api.ts": {
+		"@typescript-eslint/no-explicit-any": {
+			"count": 2
+		},
+		"prefer-const": {
+			"count": 1
+		}
+	},
+	"src/lib/format-blocks-json.ts": {
+		"@typescript-eslint/no-explicit-any": {
+			"count": 1
+		}
+	},
+	"src/lib/get-all-uris.ts": {
+		"@typescript-eslint/ban-ts-comment": {
+			"count": 1
+		},
+		"@typescript-eslint/no-empty-object-type": {
+			"count": 1
+		},
+		"@typescript-eslint/no-explicit-any": {
+			"count": 3
+		}
+	},
+	"src/lib/get-node-by-uri.ts": {
+		"@typescript-eslint/no-explicit-any": {
+			"count": 4
+		}
+	},
+	"src/lib/get-sitemap-data.ts": {
+		"@typescript-eslint/no-explicit-any": {
+			"count": 1
+		}
+	},
+	"src/lib/get-wp-uri-from-next-path.ts": {
+		"prefer-const": {
+			"count": 1
+		}
+	},
+	"src/stories/Page.tsx": {
+		"react/no-unescaped-entities": {
+			"count": 2
+		}
+	},
+	"src/types/wordpress-block-editor.d.ts": {
+		"@typescript-eslint/no-empty-object-type": {
+			"count": 1
+		},
+		"@typescript-eslint/no-explicit-any": {
+			"count": 1
+		}
+	},
+	"src/typings.d.ts": {
+		"@typescript-eslint/no-explicit-any": {
+			"count": 6
+		}
+	}
+}

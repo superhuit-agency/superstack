@@ -1,12 +1,11 @@
+import { throwIfBaseUriNotDeclared } from '@/hooks/use-base-uri';
 import getBlockFinalComponentProps from '@/lib/get-block-final-component-props';
-
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore — file is gitignored and generated at dev/build time via predev/prebuild
-import fseTemplatesData from '@/lib/fse/fse-templates-and-parts.json';
+import getFseTemplates from '@/lib/get-fse-templates';
+import { throwIfWordPressReadFailed } from '@/lib/wordpress-read-error';
 
 /**
  * Recursively swaps a `core/template-part` block's `innerBlocks` for its
- * `translations[lang]` variant, when one was baked into the JSON snapshot.
+ * `translations[lang]` variant, when the template read found one.
  * Falls back to the default (base-language) `innerBlocks` otherwise.
  */
 const applyTemplatePartTranslations = (
@@ -31,23 +30,22 @@ const applyTemplatePartTranslations = (
 	});
 
 /**
- * Gets the blocks of the template from the FSE templates and parts data,
+ * Gets the blocks of the template from the cached FSE templates read,
  * swapping in the `lang`-specific variant of any translated template part
  * (e.g. footer, header) before request-time enrichment runs.
  * @param templateSlug - The slug of the template
  * @param lang - The requested language code, if any
  * @returns
  */
-export const getTemplateBlocks = (
+export const getTemplateBlocks = async (
 	templateSlug: string,
 	lang: string | null = null
-): BlockPropsType[] => {
+): Promise<BlockPropsType[]> => {
 	if (!templateSlug) return [];
 
 	const fseTemplate: FseTemplateEntry | null =
-		(fseTemplatesData as FseTemplatesData)?.templates?.find(
-			(tpl) => tpl?.slug === templateSlug
-		) ?? null;
+		(await getFseTemplates()).find((tpl) => tpl?.slug === templateSlug) ??
+		null;
 
 	if (!fseTemplate?.blocks?.length) return [];
 
@@ -59,7 +57,8 @@ export const getTemplateBlocks = (
 
 /**
  * Runs getData enrichment on template blocks at request time so dynamic data
- * (navigation, site logo, etc.) is always fresh and not baked in at build time.
+ * (navigation, site logo, etc.) is fetched per page, not baked into the cached
+ * FSE templates.
  */
 export const enrichTemplateBlocks = (
 	blocks: BlockPropsType[],
@@ -71,9 +70,11 @@ export const enrichTemplateBlocks = (
 				blocks.map((block) =>
 					getBlockFinalComponentProps(block, options)
 				)
-			).then(
-				(results) =>
-					results
-						.map((r) => (r.status === 'fulfilled' ? r.value : null))
-						.filter(Boolean) as BlockPropsType[]
-			);
+			).then((results) => {
+				throwIfBaseUriNotDeclared(results);
+				throwIfWordPressReadFailed(results);
+
+				return results
+					.map((r) => (r.status === 'fulfilled' ? r.value : null))
+					.filter(Boolean) as BlockPropsType[];
+			});

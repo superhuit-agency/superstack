@@ -6,6 +6,7 @@ use Superstack\Traits\Singleton;
 use WPGraphQL\JWT_Authentication\Auth;
 
 use function Superstack\get_next_url;
+use function Superstack\get_preview_secret;
 
 if (! defined('ABSPATH')) {
 	exit;
@@ -67,7 +68,7 @@ class Next_Redirect {
 
 				$location = add_query_arg(
 					[
-						'secret' => 'spck',
+						'secret' => rawurlencode(get_preview_secret()),
 						'uri' => $uri,
 						'token' => $token,
 					],
@@ -81,7 +82,7 @@ class Next_Redirect {
 				}
 
 				$location_args = [
-					'secret' => 'spck',
+					'secret' => rawurlencode(get_preview_secret()),
 					'id' => $id,
 					'token' => $token,
 					'nonce' => wp_create_nonce('wp_rest'),

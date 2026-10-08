@@ -1,0 +1,244 @@
+import { cookies, draftMode } from 'next/headers';
+import { notFound, permanentRedirect, redirect } from 'next/navigation';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+import configs from '@/configs.json';
+import { getLocales } from '@/i18n/get-locales';
+import {
+	getAuthToken,
+	getPreviewNodeByURI,
+	getPublicNodeByURI,
+	getRedirection,
+} from '@/lib';
+import Page, { generateMetadata } from './page';
+
+vi.mock('next/dynamic', () => ({ default: () => () => null }));
+
+vi.mock('next/headers', () => ({
+	draftMode: vi.fn(async () => ({ isEnabled: false })),
+	cookies: vi.fn(),
+}));
+
+vi.mock('next/navigation', () => ({
+	notFound: vi.fn(() => {
+		throw new Error('NEXT_NOT_FOUND');
+	}),
+	permanentRedirect: vi.fn(() => {
+		throw new Error('NEXT_REDIRECT');
+	}),
+	redirect: vi.fn(() => {
+		throw new Error('NEXT_REDIRECT');
+	}),
+}));
+
+vi.mock('@/components/global/Template', () => ({ default: () => null }));
+
+vi.mock('@/hooks/use-base-uri', () => ({ baseUriContext: vi.fn() }));
+
+vi.mock('@/i18n/get-locales', () => ({
+	getLocales: vi.fn(async () => ({
+		locales: ['fr'],
+		defaultLocale: 'fr',
+	})),
+}));
+
+vi.mock('@/lib', async () => ({
+	addLangPrefix: (uri: string, lang: string) => `/${lang}${uri}`,
+	getAllURIs: vi.fn(),
+	getAuthToken: vi.fn(),
+	getPreviewNodeByURI: vi.fn(),
+	getPublicNodeByURI: vi.fn(async () => null),
+	getRedirection: vi.fn(async () => ({
+		destination: '/new/',
+		isPermanent: true,
+	})),
+	getWpUriFromNextPath: (await import('@/lib/get-wp-uri-from-next-path'))
+		.default,
+}));
+
+const render = (uri: string[]) =>
+	Page({ params: Promise.resolve({ uri, lang: 'fr' as Locale }) });
+
+afterEach(() => {
+	vi.clearAllMocks();
+});
+
+describe('Page', () => {
+	it('redirects a URI with no node that is a redirect source', async () => {
+		await expect(render(['old'])).rejects.toThrow('NEXT_REDIRECT');
+
+		// A multilingual site looks the language-prefixed path up first
+		expect(vi.mocked(getRedirection)).toHaveBeenCalledWith(
+			configs.isMultilang ? '/fr/old/' : '/old/'
+		);
+		expect(vi.mocked(permanentRedirect)).toHaveBeenCalledWith('/new/');
+	});
+
+	it('answers 404 to a `/page/{n}` with no node, without a redirect lookup', async () => {
+		await expect(render(['old', 'page', '2'])).rejects.toThrow(
+			'NEXT_NOT_FOUND'
+		);
+
+		expect(vi.mocked(getPublicNodeByURI)).toHaveBeenCalledWith(
+			'/old/',
+			'fr',
+			2
+		);
+		expect(vi.mocked(getRedirection)).not.toHaveBeenCalled();
+		expect(vi.mocked(notFound)).toHaveBeenCalled();
+	});
+
+	it('reads a non-ASCII URI decoded, as its metadata does', async () => {
+		const node = { uri: '/привет-мир/' } as never;
+		vi.mocked(getPublicNodeByURI)
+			.mockResolvedValueOnce(node)
+			.mockResolvedValueOnce(node);
+
+		// Next passes the page its params encoded, its metadata decoded
+		await render([
+			'%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82-%D0%BC%D0%B8%D1%80',
+		]);
+		await generateMetadata({
+			params: Promise.resolve({
+				uri: ['привет-мир'],
+				lang: 'fr' as Locale,
+			}),
+		});
+
+		expect(vi.mocked(getPublicNodeByURI).mock.calls).toEqual([
+			['/привет-мир/', 'fr', 1],
+			['/привет-мир/', 'fr', 1],
+		]);
+		expect(vi.mocked(notFound)).not.toHaveBeenCalled();
+	});
+
+	it.each([
+		// An encoded `?` would cut the URI short for WordPress
+		['company%3Fx', 'company?x', '/company%3Fx/'],
+		// Next decodes the metadata params once already
+		['%2541', '%41', '/%41/'],
+	])(
+		'reads the same URI for %s in the page and its metadata',
+		async (pageSegment, metadataSegment, uri) => {
+			await expect(render([pageSegment])).rejects.toThrow();
+			await generateMetadata({
+				params: Promise.resolve({
+					uri: [metadataSegment],
+					lang: 'fr' as Locale,
+				}),
+			});
+
+			expect(vi.mocked(getPublicNodeByURI).mock.calls).toEqual([
+				[uri, 'fr', 1],
+				[uri, 'fr', 1],
+			]);
+		}
+	);
+
+	it('reads the query loop page of a non-ASCII URI', async () => {
+		await expect(
+			render(['%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82', 'page', '2'])
+		).rejects.toThrow('NEXT_NOT_FOUND');
+
+		expect(vi.mocked(getPublicNodeByURI)).toHaveBeenCalledWith(
+			'/привет/',
+			'fr',
+			2
+		);
+	});
+
+	it('looks a non-ASCII URI up as a redirect source decoded', async () => {
+		await expect(
+			render(['%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82'])
+		).rejects.toThrow('NEXT_REDIRECT');
+
+		expect(vi.mocked(getRedirection)).toHaveBeenCalledWith(
+			configs.isMultilang ? '/fr/привет/' : '/привет/'
+		);
+	});
+
+	it.each([
+		[['blog', 'page', '2abc'], '/blog/page/2abc/'],
+		[['company', 'page', '01'], '/company/page/01/'],
+		[['company', 'page', '0'], '/company/page/0/'],
+	])('reads %j as a URI, not as a query loop page', async (segments, uri) => {
+		await expect(render(segments)).rejects.toThrow('NEXT_REDIRECT');
+
+		expect(vi.mocked(getPublicNodeByURI)).toHaveBeenCalledWith(
+			uri,
+			'fr',
+			1
+		);
+	});
+});
+
+describe('generateMetadata', () => {
+	const metadata = (uri: string[]) =>
+		generateMetadata({
+			params: Promise.resolve({ uri, lang: 'fr' as Locale }),
+		});
+
+	const enableDraftMode = () => {
+		vi.mocked(draftMode).mockResolvedValueOnce({
+			isEnabled: true,
+		} as never);
+		vi.mocked(cookies).mockResolvedValueOnce({
+			get: (name: string) =>
+				({
+					token: { value: 'refresh' },
+					'preview-draft': { value: 'true' },
+				})[name],
+		} as never);
+	};
+
+	beforeEach(() => {
+		vi.mocked(getLocales).mockResolvedValue({
+			locales: ['fr'],
+			defaultLocale: 'fr',
+		} as never);
+	});
+
+	it('reads the public node outside Draft Mode', async () => {
+		vi.mocked(getPublicNodeByURI).mockResolvedValueOnce({
+			title: 'Public',
+		} as never);
+
+		const { title } = await metadata(['hello']);
+
+		expect(title).toBe('Public');
+		expect(vi.mocked(getPreviewNodeByURI)).not.toHaveBeenCalled();
+	});
+
+	it('reads the preview node, with auth, in Draft Mode', async () => {
+		enableDraftMode();
+		vi.mocked(getAuthToken).mockResolvedValueOnce('auth');
+		vi.mocked(getPreviewNodeByURI).mockResolvedValueOnce({
+			title: 'Draft',
+		} as never);
+
+		// A never-published draft is previewed at its ID
+		const { title } = await metadata(['37']);
+
+		expect(title).toBe('Draft');
+		expect(vi.mocked(getPreviewNodeByURI)).toHaveBeenCalledWith(
+			'/37/',
+			'fr',
+			1,
+			{ authToken: 'auth' },
+			true
+		);
+		expect(vi.mocked(getPublicNodeByURI)).not.toHaveBeenCalled();
+	});
+
+	it('exits preview in Draft Mode when the refresh token is invalid', async () => {
+		enableDraftMode();
+		vi.mocked(getAuthToken).mockResolvedValueOnce(false as never);
+
+		await expect(metadata(['37'])).rejects.toThrow('NEXT_REDIRECT');
+
+		expect(vi.mocked(redirect)).toHaveBeenCalledWith(
+			'/api/preview-exit?redirect=%2Ffr%2F37%2F'
+		);
+		expect(vi.mocked(getPreviewNodeByURI)).not.toHaveBeenCalled();
+	});
+});

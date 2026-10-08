@@ -4,6 +4,7 @@ import path from 'path';
 const getWpUrl = () => process.env.WORDPRESS_URL ?? 'http://localhost';
 
 const nextConfig: NextConfig = {
+	cacheComponents: true,
 	trailingSlash: true, // to match wp links format and avoid many redirects
 	async headers() {
 		return [

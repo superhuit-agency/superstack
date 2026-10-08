@@ -25,17 +25,18 @@ type BlockPropsType = {
 	innerBlocks: Array<any>;
 	/**
 	 * Per-language `innerBlocks` overrides for `core/template-part` blocks,
-	 * keyed by Polylang language slug (e.g. "de"). Populated at build time from
-	 * translated template parts (`<slug>___<lang>`). See getTemplateBlocks in
+	 * keyed by Polylang language slug (e.g. "de"). Populated by the FSE
+	 * templates read (get-fse-templates.ts) from translated template parts
+	 * (`<slug>___<lang>`). See getTemplateBlocks in
 	 * get-fse-template-blocks.ts for how these are swapped in at request time.
 	 */
 	translations?: Record<string, Array<BlockPropsType | null>>;
 };
 
 /**
- * Request-time context threaded into a block's `getData(fetcher, attrs, lang, context)`.
- * Populated per request from the resolved node (see get-node-by-uri.ts) so blocks
- * like `core/query` can resolve pagination without a rebuild.
+ * The page being viewed, threaded into `getData(fetcher, attrs, lang, context)`
+ * of blocks declaring `usesArchiveContext`. Populated from the resolved node
+ * (see get-node-by-uri.ts), and part of their block data's cache key.
  */
 type BlockDataContext = {
 	/** Current query-loop page from the `/page/{n}` route (1-based). */
@@ -46,7 +47,7 @@ type BlockDataContext = {
 	innerBlocks?: Array<BlockPropsType>;
 	/**
 	 * The taxonomy term being viewed on a term archive (Tag/Category), so query
-	 * loops can scope their posts to the current term without a rebuild.
+	 * loops can scope their posts to the current term.
 	 */
 	term?: {
 		/** WPGraphQL taxonomy handle, e.g. "tag" | "category". */
@@ -55,9 +56,9 @@ type BlockDataContext = {
 		databaseId: number;
 	};
 	/**
-	 * The post type archive being viewed (ContentType node), so query loops
-	 * inheriting the template query resolve the right post type — WordPress
-	 * leaves `query.postType` at its default when `query.inherit` is true.
+	 * The post type the archive lists (a ContentType node, or a term archive),
+	 * so query loops inheriting the template query resolve the right post type:
+	 * WordPress leaves `query.postType` at its default when `query.inherit` is true.
 	 */
 	archive?: {
 		/** The WordPress post type slug, e.g. "post". */
@@ -68,11 +69,6 @@ type BlockDataContext = {
 type FseTemplateEntry = {
 	slug: string;
 	blocks: Array<BlockPropsType | null>;
-};
-
-type FseTemplatesData = {
-	generatedAt: string;
-	templates: Array<FseTemplateEntry>;
 };
 
 type WpFilterType = {

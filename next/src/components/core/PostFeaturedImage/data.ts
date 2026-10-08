@@ -1,5 +1,8 @@
 import { baseUriContext } from '@/hooks/use-base-uri';
+import { nodeAtUriTags } from '@/lib/cache-tags';
 import { gql } from '@/utils';
+
+export const usesBaseUri = true;
 
 export const getData = async (
 	fetcher: FetchApiFuncType,
@@ -9,6 +12,7 @@ export const getData = async (
 		const query = gql`
 			query PostFeaturedImageData($postId: ID!) {
 				post(id: $postId) {
+					databaseId
 					featuredImage {
 						node {
 							sourceUrl
@@ -32,12 +36,16 @@ export const getData = async (
 
 		return {
 			featuredImage: featuredImage?.node,
+			cacheTags: nodeAtUriTags(data?.post?.databaseId),
 		};
 	}
 
 	const query = gql`
 		query PostFeaturedImageData($uri: String!) {
 			nodeByUri(uri: $uri) {
+				... on ContentNode {
+					databaseId
+				}
 				... on Post {
 					featuredImage {
 						node {
@@ -68,6 +76,8 @@ export const getData = async (
 
 	const uri = baseUriContext();
 
+	if (!uri) return { featuredImage: null, cacheTags: [] };
+
 	const variables = {
 		uri: uri,
 	};
@@ -78,5 +88,6 @@ export const getData = async (
 
 	return {
 		featuredImage: featuredImage?.node,
+		cacheTags: nodeAtUriTags(data?.nodeByUri?.databaseId),
 	};
 };
