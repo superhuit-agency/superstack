@@ -29,7 +29,11 @@ export const cacheTags = {
 	templates: () => 'templates',
 	/** The redirect lookup for one URI, including a "no redirect" result. */
 	redirect: (uri: string) => `redirect:${normalizeUri(uri)}`,
-	/** Public node reads that found no node (cached 404s). */
+	/**
+	 * Reads that depend on which post is at which URI: cached 404s,
+	 * Page-dependent blocks that found no post, and on a multilingual site
+	 * every public node read, since it links to its translations.
+	 */
 	uris: () => 'uris',
 	/** Every redirect lookup, so every cached 404 and cached redirect. */
 	redirects: () => 'redirects',
@@ -60,6 +64,20 @@ export const termTags = (
 		.map((term) => term?.databaseId)
 		.filter((id): id is number => typeof id === 'number')
 		.map(cacheTags.term);
+
+/**
+ * `node:` tags of a post's ancestors, whose titles and URIs its breadcrumbs
+ * display: renaming a parent page sends a change for the parent only.
+ *
+ * @param ancestors Ancestors carrying their `databaseId`
+ */
+export const ancestorTags = (
+	ancestors: Array<{ databaseId?: unknown } | null> | null | undefined
+): string[] =>
+	(ancestors ?? [])
+		.map((ancestor) => ancestor?.databaseId)
+		.filter((id): id is number => typeof id === 'number')
+		.map(cacheTags.node);
 
 /**
  * Normalise a URI so the redirect lookup and an incoming `redirect` change

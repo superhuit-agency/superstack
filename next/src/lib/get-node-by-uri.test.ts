@@ -1,6 +1,7 @@
 import { cacheTag } from 'next/cache';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { baseUriContext } from '@/hooks/use-base-uri';
 import { fetchAPI, formatBlocksJSON } from '@/lib';
 import getBlockFinalComponentProps from '@/lib/get-block-final-component-props';
 import getFseTemplates from '@/lib/get-fse-templates';
@@ -25,6 +26,11 @@ vi.mock('@/lib', () => ({
 
 vi.mock('@/lib/get-fse-templates', () => ({
 	default: vi.fn(async () => []),
+}));
+
+vi.mock('@/hooks/use-base-uri', async (importOriginal) => ({
+	...(await importOriginal<typeof import('@/hooks/use-base-uri')>()),
+	baseUriContext: vi.fn(),
 }));
 
 vi.mock('@/lib/get-block-final-component-props', () => ({
@@ -102,6 +108,38 @@ describe('getPublicNodeByURI', () => {
 			'nodes:page',
 			'settings',
 		]);
+	});
+
+	it('tags a child page with its ancestors, whose titles and URIs its breadcrumbs display', async () => {
+		wordpressReturns({
+			__typename: 'Page',
+			contentTypeName: 'page',
+			id: 14,
+			uri: '/about/team/jobs/',
+			ancestors: { nodes: [{ databaseId: 13 }, { databaseId: 12 }] },
+		});
+
+		await getPublicNodeByURI('/about/team/jobs/');
+
+		expect(cacheTagsGiven()).toEqual([
+			'node:12',
+			'node:13',
+			'node:14',
+			'nodes',
+			'nodes:page',
+			'settings',
+		]);
+	});
+
+	it("queries a page's ancestors", async () => {
+		wordpressReturns(null);
+
+		await getPublicNodeByURI('/about/team/');
+
+		const [query] = vi.mocked(fetchAPI).mock.calls[0];
+		expect(query.replace(/\s+/g, ' ')).toContain(
+			'ancestors(first: 100) { nodes { databaseId } }'
+		);
 	});
 
 	it('renders a category archive, tagged with its term, its listing and settings', async () => {
@@ -211,7 +249,9 @@ describe('getPublicNodeByURI', () => {
 
 		expect(vi.mocked(formatBlocksJSON)).toHaveBeenCalledWith(
 			'',
-			expect.objectContaining({ context: { page: 3, baseUri: '/hello/' } })
+			expect.objectContaining({
+				context: { page: 3, baseUri: '/hello/' },
+			})
 		);
 	});
 
@@ -239,5 +279,76 @@ describe('getPublicNodeByURI', () => {
 
 		expect(await getPublicNodeByURI('/en/hello/', 'en')).toBeNull();
 		expect(cacheTagsGiven()).toEqual(['nodes', 'uris']);
+	});
+
+	it('tags a translated node `uris`, since it links to its translations', async () => {
+		configs.isMultilang = true;
+		wordpressReturns({
+			__typename: 'Page',
+			contentTypeName: 'page',
+			translation: {
+				id: 12,
+				uri: '/en/about/',
+				language: { code: 'EN', locale: 'en_US' },
+				translations: [
+					{
+						uri: '/fr/a-propos/',
+						language: { code: 'FR', locale: 'fr_FR' },
+					},
+				],
+			},
+		});
+
+		const node = await getPublicNodeByURI('/about/', 'en');
+
+		expect(node?.translations).toEqual([
+			{
+				uri: '/fr/a-propos/',
+				language: { code: 'FR', locale: 'fr_FR' },
+			},
+		]);
+		expect(cacheTagsGiven()).toEqual([
+			'node:12',
+			'nodes',
+			'nodes:page',
+			'settings',
+			'uris',
+		]);
+	});
+
+	it('tags a node with no translation yet `uris`, since publishing one adds a link', async () => {
+		configs.isMultilang = true;
+		wordpressReturns({
+			__typename: 'Page',
+			contentTypeName: 'page',
+			translation: {
+				id: 12,
+				uri: '/en/about/',
+				language: { code: 'EN', locale: 'en_US' },
+				translations: [],
+			},
+		});
+
+		await getPublicNodeByURI('/about/', 'en');
+
+		expect(cacheTagsGiven()).toContain('uris');
+	});
+
+	it('gives the blocks the Base URI with its language prefix', async () => {
+		configs.isMultilang = true;
+		wordpressReturns({
+			__typename: 'Page',
+			contentTypeName: 'page',
+			translation: {
+				id: 582,
+				uri: '/de/',
+				language: { code: 'DE', locale: 'de_CH' },
+				fseTemplate: { slug: 'front-page' },
+			},
+		});
+
+		await getPublicNodeByURI('/', 'de');
+
+		expect(vi.mocked(baseUriContext)).toHaveBeenLastCalledWith('/de/');
 	});
 });

@@ -13,6 +13,11 @@ export const fragment = gql`
     blocksJSON
     uri
     isFrontPage
+    ancestors(first: 100) {
+      nodes {
+        databaseId
+      }
+    }
     fseTemplate {
       slug
     }

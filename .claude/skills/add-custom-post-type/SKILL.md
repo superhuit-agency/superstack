@@ -48,7 +48,7 @@ The `fseTemplate` GraphQL field is registered globally for all CPTs with `show_i
 
 Create `next/src/components/templates/Single[TypeName]/data.ts`.
 
-Model on `SinglePage/data.ts`, or `SinglePost/data.ts` if the CPT displays terms (query their `databaseId`: the public node read tags them).
+Model on `SinglePage/data.ts`, or `SinglePost/data.ts` if the CPT displays terms (query their `databaseId`: the public node read tags them). A hierarchical CPT also queries `ancestors(first: 100) { nodes { databaseId } }`, as `SinglePage` does: the public node read tags each entry with its ancestors, so renaming a parent refreshes its children's breadcrumbs.
 
 Minimum required shape:
 
