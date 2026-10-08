@@ -2,6 +2,7 @@ import { cookies, draftMode } from 'next/headers';
 import { notFound, permanentRedirect, redirect } from 'next/navigation';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import configs from '@/configs.json';
 import { getLocales } from '@/i18n/get-locales';
 import {
 	getAuthToken,
@@ -34,7 +35,12 @@ vi.mock('@/components/global/Template', () => ({ default: () => null }));
 
 vi.mock('@/hooks/use-base-uri', () => ({ baseUriContext: vi.fn() }));
 
-vi.mock('@/i18n/get-locales', () => ({ getLocales: vi.fn() }));
+vi.mock('@/i18n/get-locales', () => ({
+	getLocales: vi.fn(async () => ({
+		locales: ['fr'],
+		defaultLocale: 'fr',
+	})),
+}));
 
 vi.mock('@/lib', async () => ({
 	addLangPrefix: (uri: string, lang: string) => `/${lang}${uri}`,
@@ -61,7 +67,10 @@ describe('Page', () => {
 	it('redirects a URI with no node that is a redirect source', async () => {
 		await expect(render(['old'])).rejects.toThrow('NEXT_REDIRECT');
 
-		expect(vi.mocked(getRedirection)).toHaveBeenCalledWith('/old/');
+		// A multilingual site looks the language-prefixed path up first
+		expect(vi.mocked(getRedirection)).toHaveBeenCalledWith(
+			configs.isMultilang ? '/fr/old/' : '/old/'
+		);
 		expect(vi.mocked(permanentRedirect)).toHaveBeenCalledWith('/new/');
 	});
 
@@ -84,7 +93,7 @@ describe('Page', () => {
 		[['company', 'page', '01'], '/company/page/01/'],
 		[['company', 'page', '0'], '/company/page/0/'],
 	])('reads %j as a URI, not as a query loop page', async (segments, uri) => {
-		await expect(render(segments)).rejects.toThrow();
+		await expect(render(segments)).rejects.toThrow('NEXT_REDIRECT');
 
 		expect(vi.mocked(getPublicNodeByURI)).toHaveBeenCalledWith(
 			uri,
