@@ -126,10 +126,10 @@ Inside `getPublicNodeByURI` (or `getPreviewNodeByURI` in preview), after the WP 
 ```typescript
 const [templateBlocks, { blocksJSON, templateData }] = await Promise.all([
 	getTemplateBlocks(node?.fseTemplate?.slug, lang).then((blocks) =>
-		enrichTemplateBlocks(blocks, lang)
+		enrichTemplateBlocks(blocks, { lang, preview, context })
 	), // FSE template
 	Promise.allSettled([
-		formatBlocksJSON(node?.blocksJSON ?? '', { lang }), // page's own blocks
+		formatBlocksJSON(node?.blocksJSON ?? '', { lang, preview, context }), // page's own blocks (the draft's in preview)
 		getTemplateData(node), // template-level extra data
 	]).then(/* … */),
 ]);
@@ -239,6 +239,8 @@ The template read is refreshed by revalidating the `templates` tag. The revalida
 The read is also refreshed by a **Purge all** (the `all` change clears `templates` too). Pages that were rendered with a template carry its `templates` tag, so they are refreshed along with it, on their next request. No rebuild or restart is needed.
 
 Menu links and any other block that returns `innerBlocks` from `getData` aren't part of the template read, so a `templates` change isn't needed for them.
+
+The theme makes templates, template parts and block menus (`wp_navigation`) public to expose them to WPGraphQL, so the plugin would also report each save as a `post` change, which clears every listing. Its `skip_theme_post_types` filter (`wordpress/theme/includes/admin/nextjs-revalidate.php`) drops those: a template save sends a `templates` change only, a menu save a `menu` change only. Add any other internal post type you expose to WPGraphQL to it.
 
 ---
 
