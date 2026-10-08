@@ -41,6 +41,6 @@ export default async function getRedirection(uri: string) {
 		? null
 		: {
 				destination: redirections[0].target,
-				isPermanent: redirections[0].code === 301,
+				isPermanent: [301, 308].includes(redirections[0].code),
 			};
 }
