@@ -62,6 +62,44 @@ describe('getAllURIs', () => {
 
 			await expect(getAllURIs()).resolves.toEqual([{ uri: ['blog'] }]);
 		});
+
+		it('fails naming WordPress when it answers none of the reads', async () => {
+			fetchAPI.mockRejectedValue(countFailure());
+
+			await expect(getAllURIs()).rejects.toThrow(
+				'Could not read the URIs to prerender from WordPress'
+			);
+		});
+
+		it('fails when a read failed and nothing else is left to prerender', async () => {
+			fetchAPI.mockImplementation(async (query: string) => {
+				if (query.includes('nodeCounts')) {
+					return {
+						pages: { pageInfo: { offsetPagination: { total: 0 } } },
+						posts: { pageInfo: { offsetPagination: { total: 0 } } },
+					};
+				}
+				throw new WordPressReadError('the archives', 'AllURIs');
+			});
+
+			await expect(getAllURIs()).rejects.toBeInstanceOf(
+				WordPressReadError
+			);
+		});
+
+		it('lists nothing on a site with no content', async () => {
+			fetchAPI.mockImplementation(async (query: string) => {
+				if (query.includes('nodeCounts')) {
+					return {
+						pages: { pageInfo: { offsetPagination: { total: 0 } } },
+						posts: { pageInfo: { offsetPagination: { total: 0 } } },
+					};
+				}
+				return { contentTypes: { nodes: [] } };
+			});
+
+			await expect(getAllURIs()).resolves.toEqual([]);
+		});
 	});
 
 	describe('on a multilingual site', () => {
