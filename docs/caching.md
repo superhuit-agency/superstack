@@ -10,6 +10,7 @@ The app uses Next.js 16 [Cache Components](https://nextjs.org/docs/app/api-refer
 - Each cached entry carries **cache tags** naming what it depends on.
 - When an editor changes something, the [nextjs-revalidate](https://github.com/superhuit-agency/nextjs-revalidate) plugin sends a **Change** to `POST /api/revalidate`. The route turns it into `revalidateTag(tag, 'max')` calls.
 - `'max'` means stale-while-revalidate: the entry is marked stale, not deleted. The next visitor gets the stale page while a fresh one is generated, and the visitor after that gets the new content.
+- A change that may turn a cached page into a redirect **expires** its tags instead (`revalidateTag(tag, { expire: 0 })`): the next visitor waits for a fresh render. See [Redirects are never re-rendered in the background](#redirects-are-never-re-rendered-in-the-background).
 - Public pages are served from a prerendered static shell. WordPress is only asked again for what changed, and only when someone next requests it.
 - Preview never reads or writes the cache.
 
@@ -88,13 +89,13 @@ How each change is mapped:
 
 | Change | Clears |
 | --- | --- |
-| `post` | `node:{id}`, `type:{type}`, `content`; plus `uris` when `before.uri !== after.uri` (a missing side counts as no URI) |
-| `redirect` | `redirect:{uri}`, the URI normalised by `normalizeUri` as in the lookup: path only, decoded, lowercased, with leading and trailing slashes |
+| `post` | `node:{id}`, `type:{type}`, `content`; plus `uris` when `before.uri !== after.uri` (a missing side counts as no URI), and `node:{id}` is then expired |
+| `redirect` | `redirect:{uri}`, expired, the URI normalised by `normalizeUri` as in the lookup: path only, decoded, lowercased, with leading and trailing slashes |
 | `path` | `revalidatePath(uri)`: the path as the visitor sees it, not a rewritten route |
 | `menu` | `menu:{id}` (`locations` is ignored: nothing reads classic menus by location) |
 | `templates` | `templates` |
 | `settings` | `settings` |
-| `all` | `nodes`, `settings`, `templates`, `uris`: everything |
+| `all` | `nodes`, `settings`, `templates`, `uris`: everything, with `uris` expired |
 | `all` with `type` | `nodes:{type}`, `type:{type}`, and `taxonomy:{t}` for each of `taxonomies` |
 
 Responses:
@@ -103,9 +104,21 @@ Responses:
 | --- | --- |
 | Missing or wrong secret | `401` |
 | Body isn't JSON, `version` isn't `2`, or `changes` is missing | `400`, so the plugin reports a failure in wp-admin |
-| Anything else | `200` as soon as the tags are marked stale |
+| Anything else | `200` as soon as the tags are marked stale or expired |
 
 Unknown subjects and unknown fields are ignored, so a minor plugin release never breaks the site. The contract is covered by `route.test.ts` (`npm --prefix ./next test`). If you change the route, change the tests with it.
+
+### Redirects are never re-rendered in the background
+
+The catch-all page looks a redirect up only for a URI that has no node, and calls `permanentRedirect()` or `redirect()` when it finds one. When a stale entry is re-rendered in the background and that render ends in a redirect, Next 16.2 caches the response as a 308 (or 307) **without its `Location` header**, and serves it as a HIT until the next invalidation. Clients without JavaScript (crawlers, `curl`, link checkers) can't follow it. A blocking render caches the redirect correctly.
+
+So every change that can turn a cached page into a redirect expires the tags of that page rather than marking them stale:
+
+- a `redirect` change: `redirect:{uri}`, which a cached 404 at that URI carries;
+- a `post` change whose URI changed: `node:{id}`, which the page at its old URI carries. Its old URI may now be a redirect source, e.g. through Redirection's slug monitor;
+- `all`: `uris`, which every cached 404 carries, so a 404 that is now a redirect source renders the redirect.
+
+The next request for each of these pages waits for WordPress (`x-nextjs-cache: MISS`). They are rare changes, and only the pages that carry those tags pay for it.
 
 ---
 
@@ -174,7 +187,7 @@ Check the sequence for each of these:
 - [ ] Publishing at a URI that used to 404
 - [ ] Editing a template part in the Site Editor
 - [ ] Editing a block menu in the Site Editor
-- [ ] Adding a redirect
+- [ ] Adding a redirect, from a cached 404 and from a slug change: the source goes **HIT → MISS → HIT**, a 308 with a `Location` header on both
 - [ ] Purge all
 
 And:

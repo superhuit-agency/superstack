@@ -34,18 +34,31 @@ function send(changes: unknown[]) {
 	return route.POST(request(body(changes)));
 }
 
+const STALE = 'max';
+const EXPIRED = { expire: 0 };
+
 /**
- * The tags marked stale (asserting they're all cleared with the `max`
- * profile), sorted: the order they're cleared in doesn't matter.
+ * The tags cleared with `profile`, sorted: the order they're cleared in
+ * doesn't matter.
  */
-function tagsMarkedStale() {
+function tagsClearedWith(profile: typeof STALE | typeof EXPIRED) {
 	return vi
 		.mocked(revalidateTag)
-		.mock.calls.map(([tag, profile]) => {
-			expect(profile).toBe('max');
-			return tag;
-		})
+		.mock.calls.filter(
+			([, given]) => JSON.stringify(given) === JSON.stringify(profile)
+		)
+		.map(([tag]) => tag)
 		.sort();
+}
+
+/** The tags marked stale: the next visitor still gets the cached entry. */
+function tagsMarkedStale() {
+	return tagsClearedWith(STALE);
+}
+
+/** The tags expired: the next visitor waits for a fresh render. */
+function tagsExpired() {
+	return tagsClearedWith(EXPIRED);
 }
 
 beforeEach(() => {
@@ -53,8 +66,15 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+	// Every tag is cleared once, either marked stale or expired
+	const tags = vi.mocked(revalidateTag).mock.calls.map(([tag]) => tag);
+	const cleared = [...tagsMarkedStale(), ...tagsExpired()];
+
 	vi.unstubAllEnvs();
 	vi.clearAllMocks();
+
+	expect(cleared).toHaveLength(tags.length);
+	expect(new Set(tags).size).toBe(tags.length);
 });
 
 describe('POST /api/revalidate', () => {
@@ -83,23 +103,49 @@ describe('POST /api/revalidate', () => {
 				'node:42',
 				'type:post',
 			]);
+			expect(tagsExpired()).toEqual([]);
 		});
 
 		it.each([
 			['a publish', null, { uri: '/hello/' }],
 			['an unpublish, trash or delete', { uri: '/hello/' }, null],
 			['a slug change', { uri: '/hello/' }, { uri: '/hello-world/' }],
-		])('also clears the cached 404s for %s', async (_, before, after) => {
+		])(
+			'also clears the cached 404s, and expires the post, for %s',
+			async (_, before, after) => {
+				await send([
+					{ subject: 'post', id: 42, type: 'event', before, after },
+				]);
+
+				expect(tagsMarkedStale()).toEqual([
+					'content',
+					'type:event',
+					'uris',
+				]);
+				expect(tagsExpired()).toEqual(['node:42']);
+			}
+		);
+
+		it('expires a post edited and moved in the same request', async () => {
 			await send([
-				{ subject: 'post', id: 42, type: 'event', before, after },
+				{
+					subject: 'post',
+					id: 42,
+					type: 'post',
+					before: { uri: '/hello/' },
+					after: { uri: '/hello/' },
+				},
+				{
+					subject: 'post',
+					id: 42,
+					type: 'post',
+					before: { uri: '/hello/' },
+					after: { uri: '/hello-world/' },
+				},
 			]);
 
-			expect(tagsMarkedStale()).toEqual([
-				'content',
-				'node:42',
-				'type:event',
-				'uris',
-			]);
+			expect(tagsMarkedStale()).toEqual(['content', 'type:post', 'uris']);
+			expect(tagsExpired()).toEqual(['node:42']);
 		});
 
 		it('clears each tag once for several posts', async () => {
@@ -120,13 +166,8 @@ describe('POST /api/revalidate', () => {
 				},
 			]);
 
-			expect(tagsMarkedStale()).toEqual([
-				'content',
-				'node:1',
-				'node:2',
-				'type:post',
-				'uris',
-			]);
+			expect(tagsMarkedStale()).toEqual(['content', 'type:post', 'uris']);
+			expect(tagsExpired()).toEqual(['node:1', 'node:2']);
 		});
 	});
 
@@ -138,11 +179,12 @@ describe('POST /api/revalidate', () => {
 			['old-path'],
 			['/Old-Path/'],
 		])(
-			'clears the redirect lookup of "%s" under its normalised URI',
+			'expires the redirect lookup of "%s" under its normalised URI',
 			async (uri) => {
 				await send([{ subject: 'redirect', uri }]);
 
-				expect(tagsMarkedStale()).toEqual(['redirect:/old-path/']);
+				expect(tagsMarkedStale()).toEqual([]);
+				expect(tagsExpired()).toEqual(['redirect:/old-path/']);
 			}
 		);
 	});
@@ -163,15 +205,15 @@ describe('POST /api/revalidate', () => {
 	});
 
 	describe('an all change', () => {
-		it('clears everything for the whole site', async () => {
+		it('clears everything for the whole site, and expires the cached 404s', async () => {
 			await send([{ subject: 'all' }]);
 
 			expect(tagsMarkedStale()).toEqual([
 				'nodes',
 				'settings',
 				'templates',
-				'uris',
 			]);
+			expect(tagsExpired()).toEqual(['uris']);
 		});
 
 		it('clears the single pages, the type and its taxonomies for one post type', async () => {
