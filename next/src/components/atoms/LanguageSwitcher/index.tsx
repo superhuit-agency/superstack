@@ -35,7 +35,7 @@ export default function LanguageSwitcher() {
 				hreflang: el.getAttribute('hreflang') ?? '',
 				href: toRelativePath(el.getAttribute('href') ?? ''),
 			}))
-			.filter((l) => l.hreflang && l.href);
+			.filter((l) => l.hreflang && l.hreflang !== 'x-default' && l.href);
 		// Syncing external DOM state (alternate <link> tags) to React state
 		// eslint-disable-next-line react-hooks/set-state-in-effect
 		setAlternates(next);
