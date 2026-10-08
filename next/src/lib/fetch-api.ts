@@ -131,10 +131,10 @@ ${err.message}
 ${limit}
 `)
 		);
+	} finally {
+		// Debug performances
+		fetchAPITester.markEnd(perfsId);
 	}
-
-	// Debug performances
-	fetchAPITester.markEnd(perfsId);
 
 	return result;
 };
