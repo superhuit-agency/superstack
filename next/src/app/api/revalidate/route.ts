@@ -1,7 +1,7 @@
-import { createHash, timingSafeEqual } from 'node:crypto';
 import { revalidatePath, revalidateTag } from 'next/cache';
 
-import { cacheTags } from '@/lib/cache-tags';
+import { cacheTags, decodePath } from '@/lib/cache-tags';
+import secretMatches from '@/lib/secret-matches';
 
 /** The nextjs-revalidate contract version this route speaks. */
 const CONTRACT_VERSION = 2;
@@ -41,7 +41,9 @@ export async function POST(request: Request) {
 		const invalidation = invalidationOf(change);
 		invalidation.tags?.forEach((tag) => tags.add(tag));
 		invalidation.expiredTags?.forEach((tag) => expiredTags.add(tag));
-		if (invalidation.path) paths.add(invalidation.path);
+		// Decoded: Next tags a page by its decoded path, WordPress sends it
+		// percent-encoded
+		if (invalidation.path) paths.add(decodePath(invalidation.path));
 	}
 
 	// Marked stale only: the next visitor gets the stale entry while a fresh
@@ -186,20 +188,13 @@ function isAuthorized(headers: Headers): boolean {
 	if (!secret) return false;
 
 	const own = headers.get('X-Nextjs-Revalidate-Secret');
-	if (own !== null) return matches(own, secret);
+	if (own !== null) return secretMatches(own, secret);
 
 	const authorization = headers.get('Authorization');
-	return authorization !== null && matches(authorization, `Bearer ${secret}`);
-}
-
-function matches(given: string, expected: string): boolean {
-	// Hashed first: `timingSafeEqual` needs equal lengths, and checking them
-	// would leak the secret's
-	return timingSafeEqual(sha256(given), sha256(expected));
-}
-
-function sha256(value: string): Buffer {
-	return createHash('sha256').update(value).digest();
+	return (
+		authorization !== null &&
+		secretMatches(authorization, `Bearer ${secret}`)
+	);
 }
 
 function isId(value: unknown): value is number {

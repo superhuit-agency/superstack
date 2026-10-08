@@ -100,15 +100,17 @@ How each change is mapped:
 
 | Change | Clears |
 | --- | --- |
-| `post` | `node:{id}`, `type:{type}`, `content`; plus `uris` when `before.uri !== after.uri` (a missing side counts as no URI), and then `revalidatePath(before.uri)` when there is one. The post's `terms` on each side (2.1) are ignored until [#154](https://github.com/superhuit-agency/superstack/issues/154) |
+| `post` | `node:{id}`, `type:{type}`, `content`; plus `uris` when `before.uri !== after.uri` (a missing side counts as no URI), and then `revalidatePath(before.uri)` when there is one, decoded. The post's `terms` on each side (2.1) are ignored until [#154](https://github.com/superhuit-agency/superstack/issues/154) |
 | `term` (2.1) | Nothing yet: ignored until [#154](https://github.com/superhuit-agency/superstack/issues/154) (see [Term changes](#term-changes)) |
-| `redirect` | `redirect:{uri}`, expired, the URI normalised by `normalizeUri` as in the lookup: path only, decoded, lowercased, with leading and trailing slashes; and `revalidatePath(uri)` |
-| `path` | `revalidatePath(uri)`: the path as the visitor sees it, not a rewritten route |
+| `redirect` | `redirect:{uri}`, expired, the URI normalised by `normalizeUri` as in the lookup: path only, decoded, lowercased, with leading and trailing slashes; and `revalidatePath(uri)`, decoded |
+| `path` | `revalidatePath(uri)`, decoded: the path as the visitor sees it, not a rewritten route |
 | `menu` | `menu:{id}` (`locations` is ignored: nothing reads classic menus by location) |
 | `templates` | `templates` |
 | `settings` | `settings` |
 | `all` | `nodes`, `settings`, `templates`, `uris`: everything; and `redirects`, expired |
 | `all` with `type` | `nodes:{type}`, `type:{type}`, and `taxonomy:{t}` for each of `taxonomies` |
+
+Every path given to `revalidatePath` is decoded first by `decodePath()` (`next/src/lib/cache-tags.ts`), keeping its case: Next tags a page by its decoded path, while WordPress sends a non-ASCII slug percent-encoded in lower case (`/caf%c3%a9/`), which would never match.
 
 Renaming a parent page sends a `post` change for the parent only. Its descendants' node reads carry `node:{parent}` for their breadcrumbs, so they go stale too: one entry per descendant (and per paginated route), however small the edit. When the parent's slug or its own parent changes, the plugin also reports each descendant whose URI moved as a `post` change of its own, so its old URI stops serving.
 
@@ -146,13 +148,32 @@ The next request for each of these pages waits for WordPress (`x-nextjs-cache: M
 
 ### Term changes
 
-Term edits don't reach the site on their own yet. The shipped plugin (2.1.0) sends them: a `term` change when a category or tag is created, edited or deleted, and the post's terms on both sides of a `post` change. The route maps neither yet ([#154](https://github.com/superhuit-agency/superstack/issues/154)): it ignores the `term` change like any unknown subject, and a post's `terms` like any unknown field, so a post change clears the same as with 2.0, and none of its terms' archives. The `term:` and `taxonomy:` tags are already in place.
+Term edits don't reach the site on their own yet. The shipped plugin (2.1.0) sends them: a `term` change when a category or tag is created, edited or deleted, and the post's terms on both sides of a `post` change. The route maps neither yet ([#154](https://github.com/superhuit-agency/superstack/issues/154)): it ignores the `term` change like any unknown subject, and a post's `terms` like any unknown field, so a post change clears the same as with 2.0, and none of its terms' archives. The `term:` and `taxonomy:` tags are already in place. When #154 maps them, a term whose URI moved, or that was deleted, needs its old URI expired by path, as a post's is: marked stale only, a term archive that turns into a redirect is re-rendered in the background and cached without its `Location` (see [Redirects are never re-rendered in the background](#redirects-are-never-re-rendered-in-the-background)).
 
 Site settings aren't affected: the plugin sends a `settings` change from v2.0 ([nextjs-revalidate#171](https://github.com/superhuit-agency/nextjs-revalidate/issues/171)).
 
 A post's breadcrumbs can also show what its node read isn't tagged with: the parent categories of its category, and on a site with a static front page, the posts page. Renaming either leaves the trail as it was until the post itself changes. A page's ancestors are covered (see [The revalidate route](#the-revalidate-route)).
 
 **Workaround:** after a term edit or a posts page rename, use **Purge all** in the plugin's wp-admin screen (**Settings › Next.js Revalidate**). It sends an `all` change, which marks every cached entry stale. Pages then refresh one by one as they're requested, each asking WordPress again, so avoid it on a busy site at peak time.
+
+### Synced patterns
+
+WPGraphQL Gutenberg inlines a synced pattern's (`wp_block`) content into the `blocksJSON` of whatever uses it, so it's cached inside each post's node read, and inside the templates read when a template or a template part uses it. A pattern isn't viewable, so the plugin reports nothing for it. The theme does instead (`wordpress/theme/includes/admin/nextjs-revalidate.php`): when a pattern is saved, trashed, restored or permanently deleted, it finds the published and private posts whose content uses it, directly or through patterns that nest it, and reports:
+
+- a `post` change for each post using it, through `nextjs_revalidate_post()`;
+- a `templates` change when a template or a template part uses it. The plugin has no public function for that change, so the theme adds it to the request's pending changes the way the plugin's own `FseSnapshot` does. Check this still works after updating the plugin.
+
+All of them go to the front-end in the request the save made, like any other change. To find the users, a `LIKE` on `post_content` narrows the candidates, which scans the posts table, then each candidate's blocks are parsed to keep exact `core/block` references. That's fine for an edit as rare as a pattern save, with one more query per level of nesting.
+
+Not covered: a template or a template part that uses a pattern from a theme file (`templates/*.html`, `parts/*.html`) rather than from the database, since a pattern is referenced by its database ID. Use **Purge all** after editing such a pattern.
+
+### Users and media
+
+The plugin never reports a user. Author names, bios and avatars, shown by PostAuthor, PostAuthorName, LatestPosts and Query, stay as they are after a profile edit until **Purge all** or the [30-day expiry](#entries-expire-after-30-days-in-memory).
+
+Nor does it report a media edit: it ignores attachments, which have no page of their own. What a block reads from the attachment itself rather than from the post's content, such as a featured image's alt text or sizes, stays the same way. An image block's alt text is saved in the post's content, so it changes with the post.
+
+**Workaround:** re-save the posts concerned, or use **Purge all**.
 
 ### Options that move URIs
 
@@ -170,6 +191,12 @@ It doesn't refresh what isn't:
 - listings and menu links, which show a page's URI: a Query Loop carries `type:{type}`, a menu `menu:{id}` and the `node:{id}` of the posts it links to, so they keep linking to the new front page's old URI, and to `/` for the old one.
 
 Use **Purge all** after saving **Settings › Reading** when one of these is involved. `posts_per_page` (**Blog pages show at most**) isn't reported either, and nothing in the front-end reads it: a Query Loop paginates by the `perPage` saved in the block. A loop that inherits the template's query has no **Items per page** of its own: the block editor sets its `perPage` to `posts_per_page`, so a new value reaches it once the template or page holding it is opened in the editor and saved again. Until then, the theme's `archive.html` lists 10 posts per page.
+
+### A post made private
+
+A post going from published to private keeps its URI: the plugin sends the same URI on both sides, so the route expires no path and only marks `node:{id}` stale. The background render then answers 404, which is right. If a Redirection rule exists at that URI, it ends in the redirect instead, and the 308 is cached without its `Location` (see [Redirects are never re-rendered in the background](#redirects-are-never-re-rendered-in-the-background)). This is rare.
+
+**Workaround:** expire that URI with the plugin's **Probe** tab (**Settings › Next.js Revalidate**), which sends a `path` change for it.
 
 ### Regex redirections
 
