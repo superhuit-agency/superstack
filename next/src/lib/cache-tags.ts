@@ -29,7 +29,11 @@ export const cacheTags = {
 	templates: () => 'templates',
 	/** The redirect lookup for one URI, including a "no redirect" result. */
 	redirect: (uri: string) => `redirect:${normalizeUri(uri)}`,
-	/** Public node reads that found no node (cached 404s). */
+	/**
+	 * Reads that depend on which post is at which URI: cached 404s,
+	 * Page-dependent blocks that found no post, and on a multilingual site
+	 * every public node read, since it links to its translations.
+	 */
 	uris: () => 'uris',
 	/** Every cached read. Only cleared by a manual "Purge all". */
 	nodes: () => 'nodes',

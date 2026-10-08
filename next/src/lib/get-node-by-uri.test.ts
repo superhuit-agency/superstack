@@ -211,7 +211,9 @@ describe('getPublicNodeByURI', () => {
 
 		expect(vi.mocked(formatBlocksJSON)).toHaveBeenCalledWith(
 			'',
-			expect.objectContaining({ context: { page: 3, baseUri: '/hello/' } })
+			expect.objectContaining({
+				context: { page: 3, baseUri: '/hello/' },
+			})
 		);
 	});
 
@@ -274,5 +276,23 @@ describe('getPublicNodeByURI', () => {
 			'settings',
 			'uris',
 		]);
+	});
+
+	it('tags a node with no translation yet `uris`, since publishing one adds a link', async () => {
+		configs.isMultilang = true;
+		wordpressReturns({
+			__typename: 'Page',
+			contentTypeName: 'page',
+			translation: {
+				id: 12,
+				uri: '/en/about/',
+				language: { code: 'EN', locale: 'en_US' },
+				translations: [],
+			},
+		});
+
+		await getPublicNodeByURI('/about/', 'en');
+
+		expect(cacheTagsGiven()).toContain('uris');
 	});
 });

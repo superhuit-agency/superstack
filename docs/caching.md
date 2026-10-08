@@ -172,6 +172,7 @@ Check the sequence for each of these:
 - [ ] Publishing a new post: it appears in listings
 - [ ] Changing a slug: the old URI stops serving, the new one works
 - [ ] Publishing at a URI that used to 404
+- [ ] On a multilingual site, changing a translation's slug or publishing a new one: the other languages' hreflang and language switcher follow
 - [ ] Editing a template part in the Site Editor
 - [ ] Editing a block menu in the Site Editor
 - [ ] Adding a redirect
