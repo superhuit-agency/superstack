@@ -1,3 +1,4 @@
+import { cacheTag } from 'next/cache';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { fetchAPI } from '@/lib';
@@ -51,6 +52,18 @@ describe('getRedirection', () => {
 			expect(await getRedirection('/old/')).toBeNull();
 		}
 	);
+
+	it('tags the lookup `redirects`, so a Purge all expires every cached 404 and redirect', async () => {
+		wordpressReturns([]);
+
+		await getRedirection('/Old/');
+
+		expect(cacheTag).toHaveBeenCalledExactlyOnceWith(
+			'redirect:/old/',
+			'redirects',
+			'nodes'
+		);
+	});
 
 	it('throws when the request failed, so no "no redirect" is cached', async () => {
 		vi.mocked(fetchAPI).mockResolvedValue({});

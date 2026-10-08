@@ -52,9 +52,11 @@ export async function POST(request: Request) {
 
 	// Expired: the next visitor waits for a fresh render. A page that may turn
 	// into a redirect can't be re-rendered in the background, which Next
-	// caches as a 308 without its Location header (#207)
+	// caches as a 308 without its Location header (#207). Only tags no change
+	// marks stale: a later `'max'` on a tag replaces its expiry
 	for (const tag of expiredTags) revalidateTag(tag, { expire: 0 });
 
+	// Expired too: the page at that path
 	for (const path of paths) revalidatePath(path);
 
 	return Response.json({ revalidated: true, now: Date.now() });
@@ -74,10 +76,15 @@ function invalidationOf(change: Record<string, unknown>): {
 		case 'post':
 			return postInvalidation(change);
 
-		// Normalised by the helper, the same way as the redirect lookup's tag
+		// Normalised by the helper, the same way as the redirect lookup's tag.
+		// The page at the source path too: it may be a page, not a cached 404,
+		// e.g. a post's old URI after Redirection's slug monitor
 		case 'redirect':
 			return typeof change.uri === 'string'
-				? { expiredTags: [cacheTags.redirect(change.uri)] }
+				? {
+						expiredTags: [cacheTags.redirect(change.uri)],
+						path: change.uri,
+					}
 				: {};
 
 		// this should be the actual path not a rewritten path
@@ -106,9 +113,8 @@ function invalidationOf(change: Record<string, unknown>): {
 /**
  * A post's own entry, its type's listings and the untyped listings. When its
  * URI changed (a publish, an unpublish, a trash, a delete or a slug change),
- * also the cached 404s, so a URI that now has content stops answering 404.
- * Its own entry is then expired, not marked stale: its old URI may now be a
- * redirect source (e.g. through Redirection's slug monitor).
+ * also the cached 404s, so a URI that now has content stops answering 404,
+ * and the page at its old URI, expired: that URI may now be a redirect source.
  */
 function postInvalidation({
 	id,
@@ -118,23 +124,25 @@ function postInvalidation({
 }: Record<string, unknown>) {
 	if (!isId(id) || typeof type !== 'string') return {};
 
-	const tags = [cacheTags.type(type), cacheTags.content()];
+	const tags = [
+		cacheTags.node(id),
+		cacheTags.type(type),
+		cacheTags.content(),
+	];
 
-	if (uriOf(before) === uriOf(after)) {
-		return { tags: [cacheTags.node(id), ...tags] };
-	}
+	if (uriOf(before) === uriOf(after)) return { tags };
 
 	return {
 		tags: [...tags, cacheTags.uris()],
-		expiredTags: [cacheTags.node(id)],
+		path: uriOf(before) ?? undefined,
 	};
 }
 
 /**
  * The manual "Purge all" lever. Without a `type`, everything for the whole
- * site, with the cached 404s expired since any of them may now be a redirect
- * source; with one, that type's single pages and listings, and the term
- * listings of its taxonomies.
+ * site, with the cached 404s and redirects expired since any of them may now
+ * be a redirect source or redirect elsewhere; with one, that type's single
+ * pages and listings, and the term listings of its taxonomies.
  */
 function allInvalidation({ type, taxonomies }: Record<string, unknown>) {
 	if (typeof type !== 'string') {
@@ -143,8 +151,9 @@ function allInvalidation({ type, taxonomies }: Record<string, unknown>) {
 				cacheTags.nodes(),
 				cacheTags.settings(),
 				cacheTags.templates(),
+				cacheTags.uris(),
 			],
-			expiredTags: [cacheTags.uris()],
+			expiredTags: [cacheTags.redirects()],
 		};
 	}
 

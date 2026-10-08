@@ -12,7 +12,7 @@ import { cacheTags } from '@/lib/cache-tags';
 export default async function getRedirection(uri: string) {
 	'use cache';
 	cacheLife('max');
-	cacheTag(cacheTags.redirect(uri), cacheTags.nodes());
+	cacheTag(cacheTags.redirect(uri), cacheTags.redirects(), cacheTags.nodes());
 
 	const { redirections } = await fetchAPI(
 		gql`

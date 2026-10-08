@@ -31,6 +31,8 @@ export const cacheTags = {
 	redirect: (uri: string) => `redirect:${normalizeUri(uri)}`,
 	/** Public node reads that found no node (cached 404s). */
 	uris: () => 'uris',
+	/** Every redirect lookup, so every cached 404 and cached redirect. */
+	redirects: () => 'redirects',
 	/** Every cached read. Only cleared by a manual "Purge all". */
 	nodes: () => 'nodes',
 };
