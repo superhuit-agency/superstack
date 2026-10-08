@@ -105,7 +105,7 @@ flowchart TB
 
 **What it does:**
 
-1. Queries `allTemplateParts` — all template parts, including theme-file-based ones that are never stored as DB posts (WPGraphQL extension).
+1. Queries `allTemplateParts` — all template parts, including theme-file-based ones that are never stored as DB posts (WPGraphQL extension, see `register-fse-templates.php` in [Key Files](#key-files)).
 2. Queries `allTemplates` — all FSE templates (in the same request).
 3. For each template, parses its `blocksJSON` with `skipGetData: true` — this stores block structure only, without calling any `getData` function.
 4. Replaces every `core/template-part` block with the actual blocks from the matching template part (flattened inline).
