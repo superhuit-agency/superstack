@@ -107,7 +107,7 @@ const fetchTermArchiveContext = async (
 };
 
 export const usesBaseUri = (attrs: Pick<TermsQueryAttributes, 'termQuery'>) =>
-	attrs?.termQuery?.inherit === true;
+	!!attrs?.termQuery?.inherit;
 
 export const getData = async (
 	fetcher: FetchApiFuncType,
