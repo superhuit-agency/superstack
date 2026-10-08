@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import dynamic from 'next/dynamic';
 import { draftMode, cookies } from 'next/headers';
 import { notFound, permanentRedirect, redirect } from 'next/navigation';
+import { cache } from 'react';
 
 import Template from '@/components/global/Template';
 import { useCanonical as getCanonicalUrl } from '@/hooks/use-canonical';
@@ -90,7 +91,11 @@ export async function generateMetadata({
 		process.env.VERCEL_URL ??
 		'http://localhost:3000';
 
-	const node = await getPublicNodeByURI(uri, lang, routePage);
+	const { isEnabled: isDraftModeEnable } = await draftMode();
+
+	const node = isDraftModeEnable
+		? (await getPreviewNode(uri, lang, routePage)).node
+		: await getPublicNodeByURI(uri, lang, routePage);
 
 	const imageSEO =
 		node?.seo?.opengraphImage?.src ??
@@ -185,6 +190,47 @@ function parseRouteSegments(uriSegments: string[] | undefined) {
 	};
 }
 
+/**
+ * Preview read of a node in Draft Mode, with the user's auth from the preview
+ * cookies. Shared by the page and its metadata, so a request refreshes the
+ * auth token and reads the node once.
+ * Exits preview mode when the refresh token is invalid.
+ */
+const getPreviewNode = cache(
+	async (uri: string, lang: Locale, routePage: number) => {
+		// We are now in dynamic rendering
+
+		const cookieStore = await cookies();
+
+		const token = cookieStore.get('token')?.value ?? '';
+		const isDraft = cookieStore.get('preview-draft')?.value === 'true';
+
+		let auth: { authToken?: string } = {};
+
+		if (token) {
+			// Get a fresh auth token
+			auth = {
+				authToken: await getAuthToken(token),
+			};
+		}
+
+		if (!auth.authToken) {
+			// Exit preview mode if refresh token is invalid
+			redirect(`/api/preview-exit?redirect=${uri}`);
+		}
+
+		const node = await getPreviewNodeByURI(
+			uri,
+			lang,
+			routePage,
+			auth,
+			isDraft
+		);
+
+		return { node, isDraft };
+	}
+);
+
 const PreviewToolbar = dynamic(
 	() => import('@/components/admin/PreviewToolbar')
 );
@@ -201,38 +247,15 @@ export default async function Page({ params }: PageProps) {
 
 	const { isEnabled: isDraftModeEnable } = await draftMode();
 
-	let isDraft = false,
-		token = '';
-
 	const { uri, routePage } = parseRouteSegments(uriSegments);
 	baseUriContext(addLangPrefix(uri, lang));
 
-	let auth: { authToken?: string } = {};
-
-	if (isDraftModeEnable) {
-		// We are now in dynamic rendering
-
-		const cookieStore = await cookies();
-
-		token = cookieStore.get('token')?.value ?? '';
-		isDraft = cookieStore.get('preview-draft')?.value === 'true';
-
-		if (token) {
-			// Get a fresh auth token
-			auth = {
-				authToken: await getAuthToken(token),
+	const { node, isDraft } = isDraftModeEnable
+		? await getPreviewNode(uri, lang, routePage)
+		: {
+				node: await getPublicNodeByURI(uri, lang, routePage),
+				isDraft: false,
 			};
-		}
-
-		if (!auth.authToken) {
-			// Exit preview mode if refresh token is invalid
-			redirect(`/api/preview-exit?redirect=${uri}`);
-		}
-	}
-
-	const node = isDraftModeEnable
-		? await getPreviewNodeByURI(uri, lang, routePage, auth, isDraft)
-		: await getPublicNodeByURI(uri, lang, routePage);
 
 	if (!node || !node?.uri) {
 		// The lookup would be for the URI without its `/page/{n}`: once it's a
