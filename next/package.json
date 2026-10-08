@@ -33,6 +33,7 @@
 		"eslint-config-next": "16.2.3",
 		"eslint-plugin-storybook": "^10.3.5",
 		"graphql": "^16.13.2",
+		"happy-dom": "^20.14.5",
 		"postcss": "^8.5.9",
 		"postcss-extend-rule": "^4.0.0",
 		"postcss-gap-properties": "^7.0.0",
