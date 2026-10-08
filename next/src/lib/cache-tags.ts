@@ -113,13 +113,7 @@ const digest = (value: string): string => {
  * Lowercased because Redirection can match a source case-insensitively.
  */
 export function normalizeUri(uri: string): string {
-	let path = uri.split(/[?#]/)[0].trim();
-
-	try {
-		path = decodeURI(path);
-	} catch {
-		// Malformed escape sequence: keep the path as it came
-	}
+	let path = decodePath(uri.split(/[?#]/)[0].trim());
 
 	path = path.toLowerCase().replace(/\/{2,}/g, '/');
 
@@ -127,4 +121,19 @@ export function normalizeUri(uri: string): string {
 	if (!path.endsWith('/')) path = `${path}/`;
 
 	return path;
+}
+
+/**
+ * Decode a percent-encoded path, as Next does before naming a page's implicit
+ * tag. WordPress sends a non-ASCII slug encoded in lower case (`/caf%c3%a9/`),
+ * and `revalidatePath()` only encodes the non-ASCII characters it's given, so
+ * it needs `/café/` to find that page. Case is kept: it's part of the path.
+ */
+export function decodePath(path: string): string {
+	try {
+		return decodeURI(path);
+	} catch {
+		// Malformed escape sequence: keep the path as it came
+		return path;
+	}
 }
