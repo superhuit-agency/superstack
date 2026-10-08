@@ -5,7 +5,10 @@ import { baseUriContext } from '@/hooks/use-base-uri';
 import { fetchAPI, formatBlocksJSON } from '@/lib';
 import getBlockFinalComponentProps from '@/lib/get-block-final-component-props';
 import getFseTemplates from '@/lib/get-fse-templates';
-import { getPublicNodeByURI } from '@/lib/get-node-by-uri';
+import {
+	getPreviewNodeByURI,
+	getPublicNodeByURI,
+} from '@/lib/get-node-by-uri';
 
 const configs = vi.hoisted(() => ({
 	isMultilang: false,
@@ -44,6 +47,16 @@ function wordpressReturns(node: unknown) {
 		seo: {},
 		generalSettings: {},
 	});
+}
+
+/** The query and variables the node was read with. */
+function nodeRead() {
+	const [query, { variables }] = vi.mocked(fetchAPI).mock.calls[0] as [
+		string,
+		{ variables: Record<string, unknown> },
+	];
+
+	return { query, variables };
 }
 
 /** Every tag the cached read was given, sorted. */
@@ -450,5 +463,61 @@ describe('getPublicNodeByURI', () => {
 		await getPublicNodeByURI('/', 'de');
 
 		expect(vi.mocked(baseUriContext)).toHaveBeenLastCalledWith('/de/');
+	});
+});
+
+describe('reading a node by its database ID', () => {
+	const auth = { authToken: 'token' };
+
+	it.each(['/2024/05/my-post/', '/42/'])(
+		'reads the public %s by its URI',
+		async (uri) => {
+			wordpressReturns(null);
+
+			await getPublicNodeByURI(uri);
+
+			const { query, variables } = nodeRead();
+			expect(query).toContain('nodeByUri(uri: $uri)');
+			expect(variables).toEqual({
+				isPreview: false,
+				isPreviewDraft: false,
+				uri,
+			});
+		}
+	);
+
+	it('reads a preview of `/{id}/` by its ID', async () => {
+		wordpressReturns(null);
+
+		await getPreviewNodeByURI('/42/', null, 1, auth, true);
+
+		const { query, variables } = nodeRead();
+		expect(query).toContain('node(id: $id, idType: DATABASE_ID)');
+		expect(variables).toEqual({
+			isPreview: true,
+			isPreviewDraft: true,
+			id: 42,
+		});
+	});
+
+	it('reads a preview of `/{lang}/{id}/` by its ID', async () => {
+		configs.isMultilang = true;
+		wordpressReturns(null);
+
+		await getPreviewNodeByURI('/42/', 'fr', 1, auth, true);
+
+		expect(nodeRead().variables).toMatchObject({ id: 42 });
+	});
+
+	it('reads a preview of a date permalink by its URI', async () => {
+		wordpressReturns(null);
+
+		await getPreviewNodeByURI('/2024/05/my-post/', null, 1, auth, false);
+
+		expect(nodeRead().variables).toEqual({
+			isPreview: true,
+			isPreviewDraft: false,
+			uri: '/2024/05/my-post/',
+		});
 	});
 });

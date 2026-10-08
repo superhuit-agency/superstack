@@ -173,8 +173,8 @@ async function getNodeByURI(
 	baseUriContext(uri);
 
 	// The slug may be the id of an unpublished post
-	const [match, id] = uri.match(/^(?:\/?\w{2})?\/(\d+)\/?/) || [];
-	const isId = !!match;
+	const id = preview ? getPreviewId(uri, lang) : undefined;
+	const isId = id !== undefined;
 
 	const variables: {
 		isPreview: boolean;
@@ -186,7 +186,7 @@ async function getNodeByURI(
 		isPreviewDraft: previewDraft,
 	};
 
-	if (isId) variables.id = Number.parseInt(id);
+	if (isId) variables.id = id;
 	else variables.uri = uri;
 
 	const query = isId ? nodeByIdQuery(lang) : nodeByUriQuery(lang);
@@ -320,6 +320,19 @@ async function getNodeByURI(
 		siteSettings: generalSettings,
 	};
 }
+
+/**
+ * The database ID a preview URI stands for: an unpublished post has no URI
+ * yet, so the preview route sends `/{id}/`, after its language prefix on a
+ * multilingual site. Any other path, e.g. a date permalink, is a URI.
+ */
+const getPreviewId = (uri: string, lang: string | null) => {
+	const path =
+		lang && uri.startsWith(`/${lang}/`) ? uri.slice(lang.length + 1) : uri;
+	const [, id] = path.match(/^\/(\d+)\/?$/) ?? [];
+
+	return id ? Number.parseInt(id, 10) : undefined;
+};
 
 const commonFields = `
 	generalSettings {
