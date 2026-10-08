@@ -76,7 +76,14 @@ export async function GET(request: NextRequest) {
 	// Set cookies to pass token + preview-draft
 	// (Note: We used to pass these as search params but it wasn't working)
 	const cookieStore = await cookies();
-	cookieStore.set('token', token); // Expires when the browser closes (at the end of the session) -- same as Next.js draftMode cookie
+	// The WordPress refresh token: only the server reads it. `lax` is enough,
+	// as it's set and sent on top-level navigations from WordPress
+	cookieStore.set('token', token, {
+		httpOnly: true,
+		secure: process.env.NODE_ENV === 'production',
+		sameSite: 'lax',
+		path: '/',
+	}); // Expires when the browser closes (at the end of the session) -- same as Next.js draftMode cookie
 	cookieStore.set('preview-draft', draft ? 'true' : 'false'); // Expires when the browser closes (at the end of the session) -- same as Next.js draftMode cookie
 
 	return redirect(location);

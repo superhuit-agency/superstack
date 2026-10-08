@@ -6,10 +6,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { getAuthToken, getPreviewNode } from '@/lib';
 
 const enable = vi.fn();
+const cookieStore = vi.hoisted(() => ({ set: vi.fn() }));
 
 vi.mock('next/headers', () => ({
 	draftMode: vi.fn(async () => ({ enable })),
-	cookies: vi.fn(async () => ({ set: vi.fn() })),
+	cookies: vi.fn(async () => cookieStore),
 }));
 
 vi.mock('next/navigation', () => ({
@@ -58,6 +59,25 @@ describe('GET /api/preview', () => {
 		expect(vi.mocked(draftMode)).toHaveBeenCalled();
 		expect(enable).toHaveBeenCalled();
 		expect(vi.mocked(redirect)).toHaveBeenCalledWith('/42/');
+	});
+
+	it('keeps the refresh token away from page scripts', async () => {
+		vi.stubEnv('WORDPRESS_PREVIEW_SECRET', SECRET);
+		const route = await loadRoute();
+
+		await route.GET(preview(SECRET));
+
+		expect(cookieStore.set).toHaveBeenCalledWith(
+			'token',
+			'refresh-token',
+			expect.objectContaining({
+				httpOnly: true,
+				sameSite: 'lax',
+				path: '/',
+			})
+		);
+		// The preview toolbar toggles it
+		expect(cookieStore.set).toHaveBeenCalledWith('preview-draft', 'false');
 	});
 
 	it('refuses a wrong secret with a 401', async () => {
