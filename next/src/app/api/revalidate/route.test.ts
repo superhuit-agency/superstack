@@ -128,6 +128,33 @@ describe('POST /api/revalidate', () => {
 				'uris',
 			]);
 		});
+
+		it("clears a moved page's descendants, which the plugin reports as changes of their own", async () => {
+			await send([
+				{
+					subject: 'post',
+					id: 12,
+					type: 'page',
+					before: { uri: '/about/' },
+					after: { uri: '/company/' },
+				},
+				{
+					subject: 'post',
+					id: 13,
+					type: 'page',
+					before: { uri: '/about/team/' },
+					after: { uri: '/company/team/' },
+				},
+			]);
+
+			expect(tagsMarkedStale()).toEqual([
+				'content',
+				'node:12',
+				'node:13',
+				'type:page',
+				'uris',
+			]);
+		});
 	});
 
 	describe('a redirect change', () => {

@@ -64,6 +64,20 @@ export const termTags = (
 		.map(cacheTags.term);
 
 /**
+ * `node:` tags of a post's ancestors, whose titles and URIs its breadcrumbs
+ * display: renaming a parent page sends a change for the parent only.
+ *
+ * @param ancestors Ancestors carrying their `databaseId`
+ */
+export const ancestorTags = (
+	ancestors: Array<{ databaseId?: unknown } | null> | null | undefined
+): string[] =>
+	(ancestors ?? [])
+		.map((ancestor) => ancestor?.databaseId)
+		.filter((id): id is number => typeof id === 'number')
+		.map(cacheTags.node);
+
+/**
  * Normalise a URI so the redirect lookup and an incoming `redirect` change
  * agree on the tag: path only (no query or hash), decoded, lowercased, with a
  * leading and a trailing slash.

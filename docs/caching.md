@@ -25,7 +25,7 @@ Tag names are built by one helper module, `next/src/lib/cache-tags.ts`, used bot
 
 | Tag | Carried by | Cleared when |
 | --- | --- | --- |
-| `node:{databaseId}` | the public node read; block data rendering one post; Navigation block data, for each link bound to a post (the theme resolves its URL to the post's current one) | a `post` change for that ID |
+| `node:{databaseId}` | the public node read of that post, and of each of its descendants, whose breadcrumbs show its title and URI; block data rendering one post; Navigation block data, for each link bound to a post (the theme resolves its URL to the post's current one) | a `post` change for that ID |
 | `nodes:{contentType}` | the public node read of a single post, page… of that type | a scoped `all` of that type. Editing one post clears only its `node:` tag |
 | `type:{contentType}` | listings (Query, Latest Posts), post type archives, next / previous post links, per-type sitemaps | a `post` change of that type |
 | `content` | listings with no type filter; the sitemap index; blocks that declare no tags | every `post` change |
@@ -44,7 +44,7 @@ Term tags use the term's database ID, not its slug, so a slug rename needs no ol
 
 | Read | File | Tags |
 | --- | --- | --- |
-| Public node read | `next/src/lib/get-node-by-uri.ts` (`getPublicNodeByURI`) | `node:{id}`, `nodes:{type}`, `settings`, the `term:` tags of its categories and tags; a post type archive gets `type:{type}`; `uris` on a multilingual site or when no node is found |
+| Public node read | `next/src/lib/get-node-by-uri.ts` (`getPublicNodeByURI`) | `node:{id}`, `nodes:{type}`, `settings`, the `term:` tags of its categories and tags, the `node:` tags of a page's ancestors; a post type archive gets `type:{type}`; `uris` on a multilingual site or when no node is found |
 | Redirect lookup | `next/src/lib/get-redirection.ts` | `redirect:{uri}` |
 | Locale list | `next/src/i18n/get-locales.ts` | `settings` |
 | FSE templates | `next/src/lib/get-fse-templates.ts` | `templates` (see [FSE Templating](./fse-templating.md#refreshing-templates)) |
@@ -97,6 +97,8 @@ How each change is mapped:
 | `all` | `nodes`, `settings`, `templates`, `uris`: everything |
 | `all` with `type` | `nodes:{type}`, `type:{type}`, and `taxonomy:{t}` for each of `taxonomies` |
 
+Renaming a parent page sends a `post` change for the parent only. Its descendants' node reads carry `node:{parent}` for their breadcrumbs, so they go stale too: one entry per descendant (and per paginated route), however small the edit. When the parent's slug or its own parent changes, the plugin also reports each descendant whose URI moved as a `post` change of its own, so its old URI stops serving.
+
 Responses:
 
 | Request | Response |
@@ -115,7 +117,9 @@ Term edits don't reach the site on their own yet. Renaming a category or tag, or
 
 Site settings aren't affected: the plugin sends a `settings` change from v2.0 ([nextjs-revalidate#171](https://github.com/superhuit-agency/nextjs-revalidate/issues/171)).
 
-**Workaround:** after a term edit, use **Purge all** in the plugin's wp-admin screen. It sends an `all` change, which marks every cached entry stale. Pages then refresh one by one as they're requested, each asking WordPress again, so avoid it on a busy site at peak time.
+A post's breadcrumbs can also show what its node read isn't tagged with: the parent categories of its category, and on a site with a static front page, the posts page. Renaming either leaves the trail as it was until the post itself changes. A page's ancestors are covered (see [The revalidate route](#the-revalidate-route)).
+
+**Workaround:** after a term edit or a posts page rename, use **Purge all** in the plugin's wp-admin screen. It sends an `all` change, which marks every cached entry stale. Pages then refresh one by one as they're requested, each asking WordPress again, so avoid it on a busy site at peak time.
 
 ---
 
@@ -181,6 +185,7 @@ Check the sequence for each of these:
 - [ ] Editing a post
 - [ ] Publishing a new post: it appears in listings
 - [ ] Changing a slug: the old URI stops serving, the new one works
+- [ ] Renaming a parent page: its child pages' breadcrumbs follow. Changing its slug: the children's old URIs stop serving
 - [ ] Publishing at a URI that used to 404
 - [ ] On a multilingual site, changing a translation's slug or publishing a new one: the other languages' hreflang and language switcher follow
 - [ ] Editing a template part in the Site Editor
