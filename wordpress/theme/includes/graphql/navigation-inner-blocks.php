@@ -39,6 +39,7 @@ function register_navigation_menu_blocks_json_field(): void {
 
 			$blocks = parse_blocks($content);
 			$blocks = filter_out_empty_blocks_recursive(is_array($blocks) ? $blocks : []);
+			prime_bound_post_caches($blocks);
 			$blocks = resolve_bound_urls($blocks);
 			$blocks = normalize_blocks_for_graphql_shape($blocks);
 
@@ -94,6 +95,38 @@ function resolve_bound_urls(array $blocks): array {
 	}
 
 	return $blocks;
+}
+
+/**
+ * Load the posts that links are bound to in one query, as WordPress does
+ * before rendering a navigation, instead of one query per link.
+ */
+function prime_bound_post_caches(array $blocks): void {
+	$ids = bound_post_ids($blocks);
+
+	if ($ids) {
+		_prime_post_caches($ids, true, false);
+	}
+}
+
+/**
+ * IDs of the posts whose link a block's `url` is bound to, nested blocks included.
+ */
+function bound_post_ids(array $blocks): array {
+	$ids = [];
+
+	foreach ($blocks as $block) {
+		$source = $block['attrs']['metadata']['bindings']['url']['source'] ?? null;
+		$id     = $block['attrs']['id'] ?? null;
+
+		if ('core/post-data' === $source && is_int($id)) {
+			$ids[] = $id;
+		}
+
+		$ids = array_merge($ids, bound_post_ids($block['innerBlocks']));
+	}
+
+	return array_values(array_unique($ids));
 }
 
 /**
