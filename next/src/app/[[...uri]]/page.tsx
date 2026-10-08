@@ -94,7 +94,7 @@ export async function generateMetadata({
 	const { isEnabled: isDraftModeEnable } = await draftMode();
 
 	const node = isDraftModeEnable
-		? (await getPreviewNode(uri, lang, routePage)).node
+		? (await getDraftModeNode(uri, lang, routePage)).node
 		: await getPublicNodeByURI(uri, lang, routePage);
 
 	const imageSEO =
@@ -196,7 +196,7 @@ function parseRouteSegments(uriSegments: string[] | undefined) {
  * auth token and reads the node once.
  * Exits preview mode when the refresh token is invalid.
  */
-const getPreviewNode = cache(
+const getDraftModeNode = cache(
 	async (uri: string, lang: Locale, routePage: number) => {
 		// We are now in dynamic rendering
 
@@ -251,7 +251,7 @@ export default async function Page({ params }: PageProps) {
 	baseUriContext(addLangPrefix(uri, lang));
 
 	const { node, isDraft } = isDraftModeEnable
-		? await getPreviewNode(uri, lang, routePage)
+		? await getDraftModeNode(uri, lang, routePage)
 		: {
 				node: await getPublicNodeByURI(uri, lang, routePage),
 				isDraft: false,
