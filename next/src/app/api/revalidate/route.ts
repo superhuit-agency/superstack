@@ -1,7 +1,7 @@
-import { createHash, timingSafeEqual } from 'node:crypto';
 import { revalidatePath, revalidateTag } from 'next/cache';
 
 import { cacheTags, decodePath } from '@/lib/cache-tags';
+import secretMatches from '@/lib/secret-matches';
 
 /** The nextjs-revalidate contract version this route speaks. */
 const CONTRACT_VERSION = 2;
@@ -188,20 +188,13 @@ function isAuthorized(headers: Headers): boolean {
 	if (!secret) return false;
 
 	const own = headers.get('X-Nextjs-Revalidate-Secret');
-	if (own !== null) return matches(own, secret);
+	if (own !== null) return secretMatches(own, secret);
 
 	const authorization = headers.get('Authorization');
-	return authorization !== null && matches(authorization, `Bearer ${secret}`);
-}
-
-function matches(given: string, expected: string): boolean {
-	// Hashed first: `timingSafeEqual` needs equal lengths, and checking them
-	// would leak the secret's
-	return timingSafeEqual(sha256(given), sha256(expected));
-}
-
-function sha256(value: string): Buffer {
-	return createHash('sha256').update(value).digest();
+	return (
+		authorization !== null &&
+		secretMatches(authorization, `Bearer ${secret}`)
+	);
 }
 
 function isId(value: unknown): value is number {
