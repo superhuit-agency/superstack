@@ -8,6 +8,7 @@ import {
 	throwIfBaseUriNotDeclared,
 } from '@/hooks/use-base-uri';
 import { fetchAPI, formatBlocksJSON } from '@/lib';
+import addLangPrefix from '@/lib/add-lang-prefix';
 import { cacheTags, termTags } from '@/lib/cache-tags';
 import {
 	enrichTemplateBlocks,
@@ -133,9 +134,12 @@ async function getNodeByURI(
 	lang: string | null = null
 ) {
 	// Ensure URI includes language prefix if multilang is enabled
-	if (configs.isMultilang && lang && !uri.startsWith(`/${lang}/`)) {
-		uri = `/${lang}${uri.startsWith('/') ? '' : '/'}${uri}`;
-	}
+	uri = addLangPrefix(uri, lang);
+
+	// The blocks read the node at the Base URI: without its language prefix,
+	// a path shared by two languages (e.g. the home, `/`) resolves to the
+	// default language's node.
+	baseUriContext(uri);
 
 	// The slug may be the id of an unpublished post
 	const [match, id] = uri.match(/^(?:\/?\w{2})?\/(\d+)\/?/) || [];
