@@ -143,7 +143,7 @@ export default async function getAllURIs() {
 			.slice(1), // remove first segment = lang prefix
 		lang: node.language
 			? node.language.code.toLowerCase()
-			: nodeCounts.defaultLanguage.slug,
+			: (nodeCounts?.defaultLanguage?.slug ?? configs.staticLang),
 	});
 
 	const mapForSingleLang = (node: { uri: string }) => ({
