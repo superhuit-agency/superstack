@@ -5,6 +5,8 @@ import { baseUriContext, guardBaseUri } from '@/hooks/use-base-uri';
 import { cacheTags } from '@/lib/cache-tags';
 import fetchAPI from '@/lib/fetch-api';
 
+const CACHE_TAG_MAX_ITEMS = 128;
+
 export type BlockData = Record<string, unknown> & { cacheTags?: string[] };
 
 export type BlockDataModule = {
@@ -72,7 +74,11 @@ export default async function getCachedBlockData(
 
 	// An empty list declares no dependency: only "Purge all" refreshes it
 	if (tags) {
-		if (tags.length) cacheTag(...tags);
+		// Next drops the tags past 128 in one `cacheTag()` call, not across
+		// calls: a menu can link to more posts than that
+		for (let i = 0; i < tags.length; i += CACHE_TAG_MAX_ITEMS) {
+			cacheTag(...tags.slice(i, i + CACHE_TAG_MAX_ITEMS));
+		}
 	} else {
 		// Covers what untagged blocks may read: posts and site settings
 		cacheTag(cacheTags.content(), cacheTags.settings());
