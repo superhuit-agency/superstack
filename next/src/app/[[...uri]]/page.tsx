@@ -235,6 +235,12 @@ export default async function Page({ params }: PageProps) {
 		: await getPublicNodeByURI(uri, lang, routePage);
 
 	if (!node || !node?.uri) {
+		// The lookup would be for the URI without its `/page/{n}`: once it's a
+		// redirect source, a stale `/page/{n}` entry would re-render in the
+		// background into a redirect, cached without its `Location` (see
+		// docs/caching.md). A 404 is safe to re-render in the background.
+		if (routePage > 1) notFound();
+
 		// Only URIs WordPress cannot resolve can be redirections, so the query
 		// stays out of the hot path of every rendered page.
 		// It also prevents infinite redirection loops (ex: /my-url -> /fr/my-url)
