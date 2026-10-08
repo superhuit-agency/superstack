@@ -1,8 +1,8 @@
 /**
  * Block data modules (`data.ts`) that read the Base URI must declare
- * `export const usesBaseUri = true;`, so the cached block-data wrapper adds
- * the Base URI to their cache key. See `docs/fse-templating.md`, "Caching
- * block data".
+ * `export const usesBaseUri = true;`, or a function of the block's attributes,
+ * so the cached block-data wrapper adds the Base URI to their cache key. See
+ * `docs/fse-templating.md`, "Caching block data".
  */
 
 const BASE_URI_MODULE = /(^|\/)use-base-uri$/;
@@ -17,16 +17,22 @@ const importsBaseUriContext = (node) =>
 				specifier.imported.name === 'baseUriContext')
 	);
 
+const isOptIn = (init) =>
+	(init?.type === 'Literal' && init.value === true) ||
+	init?.type === 'ArrowFunctionExpression' ||
+	init?.type === 'FunctionExpression';
+
 const declaresUsesBaseUri = (node) =>
 	node.type === 'ExportNamedDeclaration' &&
-	node.declaration?.type === 'VariableDeclaration' &&
-	node.declaration.declarations.some(
-		(declarator) =>
-			declarator.id.type === 'Identifier' &&
-			declarator.id.name === 'usesBaseUri' &&
-			declarator.init?.type === 'Literal' &&
-			declarator.init.value === true
-	);
+	((node.declaration?.type === 'FunctionDeclaration' &&
+		node.declaration.id?.name === 'usesBaseUri') ||
+		(node.declaration?.type === 'VariableDeclaration' &&
+			node.declaration.declarations.some(
+				(declarator) =>
+					declarator.id.type === 'Identifier' &&
+					declarator.id.name === 'usesBaseUri' &&
+					isOptIn(declarator.init)
+			)));
 
 /**
  * A rule reporting the first `reportOn` node of a module that has no
@@ -58,7 +64,8 @@ export const requireUsesBaseUri = createRule({
 		},
 		messages: {
 			missing:
-				'This block data reads the Base URI: add `export const usesBaseUri = true;`. ' +
+				'This block data reads the Base URI: add `export const usesBaseUri = true;`, ' +
+				"or a function of the block's attributes. " +
 				'Its data is otherwise cached once per site, so the page that fills ' +
 				'the cache would leak its content into every other page.',
 		},
