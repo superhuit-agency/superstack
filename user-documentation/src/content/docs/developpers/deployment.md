@@ -178,7 +178,7 @@ The front-end caches what it reads from WordPress until the nextjs-revalidate pl
 | Revalidate path   | `/api/revalidate/`. With its trailing slash, the request skips the 308 Next.js answers `/api/revalidate` with (`trailingSlash: true`).                                                      |
 | Revalidate secret | The `REVALIDATE_SECRET` of the front-end's environment (`shared/.env` on an SSH deployment, the project's environment variables on Vercel). Generate it with `openssl rand -hex 32`.         |
 
-Each environment has its own domain and secret. `provision.sh` doesn't set them: the secret lives only in the front-end's environment, not in the GitHub variables, and a domain carrying basic-auth credentials would be overwritten on every deploy. Check the result with the plugin's **Probe** tab.
+Each environment has its own domain and secret. `provision.sh` doesn't set them: the secret lives only in the front-end's environment, not in the GitHub variables, and a domain carrying basic-auth credentials would be overwritten on every deploy. Check the result with the plugin's **Probe** tab. How the front-end handles the changes it receives is described in the repository's `docs/caching.md`.
 
 ## 🔑 Configure preview
 

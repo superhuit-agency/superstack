@@ -172,12 +172,11 @@ function parseRouteSegments(uriSegments: string[] | undefined) {
 		rawSegments[rawSegments.length - 2] === 'page';
 
 	const pageRaw = isPagedRoute ? rawSegments[rawSegments.length - 1] : null;
-	const routePage = pageRaw ? Number.parseInt(pageRaw, 10) : null;
 
+	// Only a canonical page number: `2abc` or `02` would be other URLs for
+	// the same page
 	const normalizedRoutePage =
-		Number.isFinite(routePage) && (routePage as number) > 0
-			? (routePage as number)
-			: null;
+		pageRaw && /^[1-9]\d*$/.test(pageRaw) ? Number(pageRaw) : null;
 
 	const baseSegments = normalizedRoutePage
 		? rawSegments.slice(0, -2)
@@ -216,7 +215,9 @@ const getDraftModeNode = cache(
 
 		if (!auth.authToken) {
 			// Exit preview mode if refresh token is invalid
-			redirect(`/api/preview-exit?redirect=${uri}`);
+			redirect(
+				`/api/preview-exit?redirect=${encodeURIComponent(addLangPrefix(uri, lang))}`
+			);
 		}
 
 		const node = await getPreviewNodeByURI(
