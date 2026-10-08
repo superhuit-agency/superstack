@@ -27,7 +27,9 @@ function skip_block_menus($should_revalidate, $post_id) {
 
 /**
  * Report Settings › Reading's front page and posts page as a `settings`
- * change: every public node read carries the `settings` tag.
+ * change: every public node read that finds a node carries the `settings`
+ * tag, a cached 404 doesn't. A stopgap the plugin's ADR 0037 rules out,
+ * until nextjs-revalidate#172 (see docs/caching.md › Options that move URIs).
  *
  * @param string[] $options The site setting options.
  * @return string[]

@@ -94,13 +94,14 @@ Authorization: Basic <base64(user:pass)>
 X-Nextjs-Revalidate-Secret: <REVALIDATE_SECRET>
 ```
 
-The route reads `X-Nextjs-Revalidate-Secret` when the request has it, and `Authorization: Bearer` otherwise, both compared in constant time. Plugin 2.0 can't reach a front-end behind basic auth: its `Bearer` replaces the credentials. The starter pins 2.0.0 in `wordpress/composer.json`, in the `package` repository that defines the plugin: raise its `version` and `dist.url` to 2.1.0 for such a site.
+The route reads `X-Nextjs-Revalidate-Secret` when the request has it, and `Authorization: Bearer` otherwise, both compared in constant time. The starter ships nextjs-revalidate 2.1.0 (`wordpress/composer.json`), so a front-end behind basic auth works out of the box. Plugin 2.0 can't reach one: its `Bearer` replaces the credentials.
 
 How each change is mapped:
 
 | Change | Clears |
 | --- | --- |
-| `post` | `node:{id}`, `type:{type}`, `content`; plus `uris` when `before.uri !== after.uri` (a missing side counts as no URI), and then `revalidatePath(before.uri)` when there is one |
+| `post` | `node:{id}`, `type:{type}`, `content`; plus `uris` when `before.uri !== after.uri` (a missing side counts as no URI), and then `revalidatePath(before.uri)` when there is one. The post's `terms` on each side (2.1) are ignored until [#154](https://github.com/superhuit-agency/superstack/issues/154) |
+| `term` (2.1) | Nothing yet: ignored until [#154](https://github.com/superhuit-agency/superstack/issues/154) (see [Term changes](#term-changes)) |
 | `redirect` | `redirect:{uri}`, expired, the URI normalised by `normalizeUri` as in the lookup: path only, decoded, lowercased, with leading and trailing slashes; and `revalidatePath(uri)` |
 | `path` | `revalidatePath(uri)`: the path as the visitor sees it, not a rewritten route |
 | `menu` | `menu:{id}` (`locations` is ignored: nothing reads classic menus by location) |
@@ -143,7 +144,7 @@ The next request for each of these pages waits for WordPress (`x-nextjs-cache: M
 
 ### Term changes
 
-Term edits don't reach the site on their own yet. nextjs-revalidate 2.1 reports a `term` change when a category or tag is created, edited or deleted, but the route doesn't map it yet ([#154](https://github.com/superhuit-agency/superstack/issues/154)): it ignores it like any unknown subject. The `term:` and `taxonomy:` tags are already in place.
+Term edits don't reach the site on their own yet. The shipped plugin (2.1.0) sends them: a `term` change when a category or tag is created, edited or deleted, and the post's terms on both sides of a `post` change. The route maps neither yet ([#154](https://github.com/superhuit-agency/superstack/issues/154)): it ignores the `term` change like any unknown subject, and a post's `terms` like any unknown field, so a post change still clears only the post, its type and `content`. The `term:` and `taxonomy:` tags are already in place.
 
 Site settings aren't affected: the plugin sends a `settings` change from v2.0 ([nextjs-revalidate#171](https://github.com/superhuit-agency/nextjs-revalidate/issues/171)).
 
@@ -153,9 +154,20 @@ A post's breadcrumbs can also show what its node read isn't tagged with: the par
 
 ### Options that move URIs
 
-The permalink structure and the category and tag bases (**Settings › Permalinks**) move the URI of every post or term at once, and the plugin reports no change for them. Use **Purge all** after saving them.
+The permalink structure and the category and tag bases (**Settings › Permalinks**) move the URI of every post or term at once, and the plugin reports no change for them. Nor for Polylang's URL options (`hide_default`, `force_lang`, `rewrite`), which decide whether and how the language is in the URL. Use **Purge all** after saving them.
 
-The front page and the posts page (**Settings › Reading**) are reported: the theme adds `show_on_front`, `page_on_front` and `page_for_posts` to the plugin's site settings (`wordpress/theme/includes/admin/nextjs-revalidate.php`), so saving them sends a `settings` change. Every public node read carries `settings`, so the page at `/` and the posts page follow. What only shows a page's URI doesn't: listings and menu links still point to the old front page at `/`, and a cached 404 at a URI that now has content stays a 404, until their own change or a **Purge all**.
+The front page and the posts page (**Settings › Reading**) are reported, as a stopgap. The plugin deliberately leaves `show_on_front`, `page_on_front` and `page_for_posts` out of its site settings, since they move which content lives at which path, which expiring the tag every page carries doesn't fully fix ([nextjs-revalidate ADR 0037](https://github.com/superhuit-agency/nextjs-revalidate/blob/v2.1.0/docs/adr/0037-a-settings-change-reports-what-every-page-renders.md)). Reporting them properly is tracked in [nextjs-revalidate#172](https://github.com/superhuit-agency/nextjs-revalidate/issues/172). Until then, the theme adds the three options to the plugin's site settings (`wordpress/theme/includes/admin/nextjs-revalidate.php`), so saving them sends a `settings` change. It refreshes what is tagged `settings`:
+
+- every public node read that found a node (`getPublicNodeByURI`): the page at `/`, the old and the new posts page, the old and the new front page at their own URIs, and the breadcrumbs of every post and page, which come with that read;
+- the sitemaps;
+- the data of a block that returns no `cacheTags`, which falls back to `content` and `settings`.
+
+It doesn't refresh what isn't:
+
+- a cached 404: a read that found no node carries `uris`, not `settings`, so a URI the change gives content keeps answering 404;
+- listings and menu links, which show a page's URI: a Query Loop carries `type:{type}`, a menu `menu:{id}` and the `node:{id}` of the posts it links to, so they keep linking to the new front page's old URI, and to `/` for the old one.
+
+Use **Purge all** after saving **Settings › Reading** when one of these is involved. `posts_per_page` (**Blog pages show at most**) isn't reported either, but nothing in the front-end reads it: a Query Loop paginates by its own **Items per page**.
 
 ### Regex redirections
 
@@ -264,7 +276,7 @@ And:
 
 A project started before Cache Components (route-level `revalidate = 3600`, nextjs-revalidate 1.x) needs all of this in one deploy:
 
-1. **Deploy nextjs-revalidate ^2.0 together with this route.** Plugin 2.0 speaks contract version 2 (a `POST` with the secret in a header), which the old route doesn't understand, and this route rejects a 1.x request. In `wordpress/composer.json`, require `superhuit-agency/nextjs-revalidate` `^2.0` and point the `package` repository that defines it to the release (its `version` and `dist.url`, as this starter's): 2.1.0 for a front-end behind basic auth (see [The revalidate route](#the-revalidate-route)).
+1. **Deploy nextjs-revalidate 2.0 or later together with this route.** Plugin 2.0 speaks contract version 2 (a `POST` with the secret in a header), which the old route doesn't understand, and this route rejects a 1.x request. In `wordpress/composer.json`, require `superhuit-agency/nextjs-revalidate` `^2.1` and point the `package` repository that defines it to the 2.1.0 release (its `version` and `dist.url`), as this starter does: 2.0 can't reach a front-end behind basic auth (see [The revalidate route](#the-revalidate-route)).
 2. **Configure the plugin** in **Settings › Next.js Revalidate**: the revalidate domain is the front-end's URL (`NEXT_URL`), the secret is the front-end's `REVALIDATE_SECRET`, and the path is `/api/revalidate/`. With its trailing slash, the request skips the 308 that `trailingSlash: true` answers `/api/revalidate` with. The plugin splits a 1.x revalidate URL into a domain and a path on its first admin request after the upgrade: add the trailing slash to that path. See [Deployment](./setup/deployment.md#-configure-nextjs-revalidate).
 3. **Remove every `export const revalidate`, `dynamic` and `fetchCache`.** Next 16 fails the build on route segment config with `cacheComponents` on. On a multilingual site that includes `src/app/[lang]/layout.tsx`, generated by the lang migration: also port [#226](https://github.com/superhuit-agency/superstack/pull/226) into it (`notFound()` for a first segment `getLocales()` doesn't list, then `langContext(lang)`), and into `src/app/[lang]/not-found.tsx`, which reads the language back with `langContext()` and passes it to the template and breadcrumbs reads. Compare with `generators/templates/lang-migration/lang-layout.tsx` and `next/src/app/not-found.tsx`.
 4. **Update each custom block's `data.ts`** (see [Block data](#block-data)):
