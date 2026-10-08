@@ -100,15 +100,17 @@ How each change is mapped:
 
 | Change | Clears |
 | --- | --- |
-| `post` | `node:{id}`, `type:{type}`, `content`; plus `uris` when `before.uri !== after.uri` (a missing side counts as no URI), and then `revalidatePath(before.uri)` when there is one. The post's `terms` on each side (2.1) are ignored until [#154](https://github.com/superhuit-agency/superstack/issues/154) |
+| `post` | `node:{id}`, `type:{type}`, `content`; plus `uris` when `before.uri !== after.uri` (a missing side counts as no URI), and then `revalidatePath(before.uri)` when there is one, decoded. The post's `terms` on each side (2.1) are ignored until [#154](https://github.com/superhuit-agency/superstack/issues/154) |
 | `term` (2.1) | Nothing yet: ignored until [#154](https://github.com/superhuit-agency/superstack/issues/154) (see [Term changes](#term-changes)) |
-| `redirect` | `redirect:{uri}`, expired, the URI normalised by `normalizeUri` as in the lookup: path only, decoded, lowercased, with leading and trailing slashes; and `revalidatePath(uri)` |
-| `path` | `revalidatePath(uri)`: the path as the visitor sees it, not a rewritten route |
+| `redirect` | `redirect:{uri}`, expired, the URI normalised by `normalizeUri` as in the lookup: path only, decoded, lowercased, with leading and trailing slashes; and `revalidatePath(uri)`, decoded |
+| `path` | `revalidatePath(uri)`, decoded: the path as the visitor sees it, not a rewritten route |
 | `menu` | `menu:{id}` (`locations` is ignored: nothing reads classic menus by location) |
 | `templates` | `templates` |
 | `settings` | `settings` |
 | `all` | `nodes`, `settings`, `templates`, `uris`: everything; and `redirects`, expired |
 | `all` with `type` | `nodes:{type}`, `type:{type}`, and `taxonomy:{t}` for each of `taxonomies` |
+
+Every path given to `revalidatePath` is decoded first by `decodePath()` (`next/src/lib/cache-tags.ts`), keeping its case: Next tags a page by its decoded path, while WordPress sends a non-ASCII slug percent-encoded in lower case (`/caf%c3%a9/`), which would never match.
 
 Renaming a parent page sends a `post` change for the parent only. Its descendants' node reads carry `node:{parent}` for their breadcrumbs, so they go stale too: one entry per descendant (and per paginated route), however small the edit. When the parent's slug or its own parent changes, the plugin also reports each descendant whose URI moved as a `post` change of its own, so its old URI stops serving.
 
