@@ -1,5 +1,6 @@
 import { getWpGraphqlUrl } from '@/utils/node-utils';
 import { dedupeFragments, getQueryAttrs } from '@/utils';
+import { WordPressReadError } from '@/lib/wordpress-read-error';
 
 const WP_GRAPHQL_URL = getWpGraphqlUrl();
 
@@ -97,16 +98,23 @@ const fetchAPI: FetchApiFuncType = async (query, options) => {
 			);
 		}
 
-		// Make sure to return the data if any
-		// even if there are some errors
-		if (!!data) result = data;
-
+		// A field that failed resolves to `null` next to the data that didn't:
+		// returning that partial data would read as "nothing there", and be
+		// cached as such, so any error fails the whole read.
 		if (errors) {
 			const errs = errors
 				.map((e: any) => `\t- ${e.message} [${e.extensions?.category}]`)
 				.join('\n');
 
 			throw new Error(errs);
+		}
+
+		// Without `errors`, a GraphQL answer always has `data`: anything else
+		// isn't WordPress answering
+		if (!data) {
+			throw new Error(
+				`\t- The response has neither data nor errors.\n\t- Text response: \n\t${resText?.slice(0, 1000)}...`
+			);
 		}
 
 		result = data;
@@ -130,6 +138,15 @@ ${sep}
 ${err.message}
 ${limit}
 `)
+		);
+
+		// A failed read is never data: callers that turned `{}` into an empty
+		// result would cache it with `cacheLife('max')`. The digest survives a
+		// `use cache` boundary, so the public render fails and keeps serving the
+		// previous entry, while preview falls back to the block's attributes.
+		throw new WordPressReadError(
+			`the "${name || 'unnamed'}" query`,
+			name || 'query'
 		);
 	}
 

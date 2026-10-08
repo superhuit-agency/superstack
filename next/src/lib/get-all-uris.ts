@@ -13,6 +13,8 @@ type UriNode = {
 };
 
 export default async function getAllURIs() {
+	// Like the per-type reads below, a failed count skips its URIs instead of
+	// failing the build: they're rendered on their first request instead
 	const nodeCounts = await fetchAPI(
 		`query nodeCounts {
 			${POST_TYPES.map(
@@ -35,7 +37,7 @@ export default async function getAllURIs() {
 					: ''
 			}
 		}`
-	);
+	).catch(() => ({}));
 
 	const nodesPromises: Promise<any>[] = [];
 	POST_TYPES.forEach((postType) => {
