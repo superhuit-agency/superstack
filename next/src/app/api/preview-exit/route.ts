@@ -5,8 +5,8 @@ import { redirect } from 'next/navigation';
 export async function GET(request: NextRequest) {
 	const path = request.nextUrl.searchParams.get('redirect') ?? '/';
 
-	const { disable } = await draftMode();
-	disable();
+	// Not destructured: `disable()` reads `this`
+	(await draftMode()).disable();
 
 	// Delete preview-draft + token cookies
 	const cookieStore = await cookies();
