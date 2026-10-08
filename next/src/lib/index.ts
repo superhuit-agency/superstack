@@ -1,3 +1,4 @@
+import addLangPrefix from './add-lang-prefix';
 import fetchAPI from './fetch-api';
 import formatBlocksJSON from './format-blocks-json';
 
@@ -23,6 +24,7 @@ import injectBreadcrumbs from './inject-breadcrumbs';
 export const PREVIEW_STATI = ['PUBLISH', 'DRAFT', 'FUTURE', 'PRIVATE'];
 
 export {
+	addLangPrefix,
 	fetchAPI,
 	formatBlocksJSON,
 	getAllURIs,

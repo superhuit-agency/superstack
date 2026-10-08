@@ -16,26 +16,12 @@ export const getData = async (
 ) => {
 	const type = attrs?.type ?? 'archive';
 	const showPrefix = attrs?.showPrefix ?? true;
-	const showSearchTerm = attrs?.showSearchTerm ?? true;
+
+	// The search term is in the query string, which the Base URI doesn't
+	// carry and the cached block data can't read
+	if (type === 'search') return { content: 'Search results', cacheTags: [] };
 
 	const uri = baseUriContext();
-
-	if (type === 'search') {
-		let searchTerm;
-
-		if (uri && typeof uri === 'string') {
-			const url = new URL(uri);
-			searchTerm = url.searchParams.get('s') ?? '';
-		}
-
-		return {
-			content:
-				showSearchTerm && searchTerm
-					? `Search results for: "${searchTerm}"`
-					: 'Search results',
-			cacheTags: [],
-		};
-	}
 
 	const query = gql`
 		query QueryTitleData($uri: String!) {

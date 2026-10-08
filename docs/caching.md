@@ -25,17 +25,17 @@ Tag names are built by one helper module, `next/src/lib/cache-tags.ts`, used bot
 
 | Tag | Carried by | Cleared when |
 | --- | --- | --- |
-| `node:{databaseId}` | the public node read of that post, and of each of its descendants, whose breadcrumbs show its title and URI; block data rendering one post | a `post` change for that ID |
+| `node:{databaseId}` | the public node read of that post, and of each of its descendants, whose breadcrumbs show its title and URI; block data rendering one post; Navigation block data, for each link bound to a post (the theme resolves its URL to the post's current one) | a `post` change for that ID |
 | `nodes:{contentType}` | the public node read of a single post, page… of that type | a scoped `all` of that type. Editing one post clears only its `node:` tag |
 | `type:{contentType}` | listings (Query, Latest Posts), post type archives, next / previous post links, per-type sitemaps | a `post` change of that type |
 | `content` | listings with no type filter; the sitemap index; blocks that declare no tags | every `post` change |
-| `term:{databaseId}` | reads that display a term: post terms, the public node read, term archives | a term change (not mapped yet, see [Known gaps](#known-gaps-until-plugin-v21)) |
+| `term:{databaseId}` | reads that display a term: post terms, the public node read, term archives, Navigation block data for each link bound to a term | a term change (not mapped yet, see [Known gaps](#known-gaps-until-plugin-v21)) |
 | `taxonomy:{taxonomy}` | term listings | a scoped `all` of a type using that taxonomy; a term change once mapped |
 | `menu:{id}` | Navigation block data (block menu ID) | a `menu` change for that ID |
 | `settings` | the public node read (it also returns Site settings: SEO defaults, site title), site title / tagline / logo / date blocks, the locale list, sitemaps, blocks that declare no tags | a `settings` change, or `all` |
 | `templates` | the FSE template read | a `templates` change, or `all` |
 | `redirect:{uri}` | the redirect lookup for that URI, including a "no redirect" result | a `redirect` change for that URI |
-| `uris` | public node reads that found **no** node (cached 404s); Page-dependent blocks that found no post at the Base URI | a `post` change whose URI changed (publish, unpublish, trash, delete, slug change), or `all` |
+| `uris` | public node reads that found **no** node (cached 404s); on a multilingual site, every public node read, since it links to its translations (hreflang, language switcher); Page-dependent blocks that found no post at the Base URI | a `post` change whose URI changed (publish, unpublish, trash, delete, slug change), or `all` |
 | `nodes` | every cached read | `all` only: the manual lever |
 
 Term tags use the term's database ID, not its slug, so a slug rename needs no old slug. Queries that render terms must fetch `databaseId`.
@@ -44,7 +44,7 @@ Term tags use the term's database ID, not its slug, so a slug rename needs no ol
 
 | Read | File | Tags |
 | --- | --- | --- |
-| Public node read | `next/src/lib/get-node-by-uri.ts` (`getPublicNodeByURI`) | `node:{id}`, `nodes:{type}`, `settings`, the `term:` tags of its categories and tags, the `node:` tags of a page's ancestors; a post type archive gets `type:{type}`; no node found → `uris` |
+| Public node read | `next/src/lib/get-node-by-uri.ts` (`getPublicNodeByURI`) | `node:{id}`, `nodes:{type}`, `settings`, the `term:` tags of its categories and tags, the `node:` tags of a page's ancestors; a post type archive gets `type:{type}`; `uris` on a multilingual site or when no node is found |
 | Redirect lookup | `next/src/lib/get-redirection.ts` | `redirect:{uri}` |
 | Locale list | `next/src/i18n/get-locales.ts` | `settings` |
 | FSE templates | `next/src/lib/get-fse-templates.ts` | `templates` (see [FSE Templating](./fse-templating.md#refreshing-templates)) |
@@ -146,9 +146,11 @@ Never measure with `next dev`: it adds a hash to cache keys, so entries aren't r
 ## Known risks
 
 - **PM2 cluster mode silently breaks tag revalidation.** The cache lives in each process, and a revalidation reaches only the process that received it. The shipped `next/ecosystem.config.js.example` runs a single process. Adding `instances: 'max'` or `exec_mode: 'cluster'` would make invalidation intermittent, with no error. Running several instances needs a shared cache handler (e.g. Redis), which this starter doesn't include.
+- **Bursts of WordPress reads.** A change can mark every page stale, and each re-render sends all its block reads at once. `fetchAPI` keeps at most `WORDPRESS_FETCH_CONCURRENCY` (6) requests in flight per process, and retries a refused or dropped read (408, 425, 429, 5xx, network errors, a 15 s timeout) with a jittered backoff, honouring `Retry-After`. It stops after 45 s, waiting for a slot included, before Next's 50 s limit to fill a cache entry during a prerender, so a read fails with its own cause rather than a cache timeout. A cache entry that makes several reads in a row can still reach that limit when WordPress is that slow. Mutations get one attempt. See `next/.env.example`.
+  - **Sizing the cap for builds.** `next build` prerenders up to 8 pages at once per worker (`experimental.staticGenerationMaxConcurrency`), and all their reads queue behind that worker's cap. A batch takes about 8 pages × uncached reads per page × WordPress's answer time ÷ the cap: 8 × 30 × 0.3 s ÷ 6 = 12 s, and 32 s at 0.8 s a read (48 s with a cap of 4). A read still waiting for a slot after 45 s fails with `No free slot before the 45000 ms budget ran out`. Then raise `WORDPRESS_FETCH_CONCURRENCY` if WordPress has the PHP workers for it (each build worker gets its own cap), or lower `staticGenerationMaxConcurrency`.
 - **No persistence.** The cache is in memory: a restart or a deploy starts it empty, and the first visitors after it wait for WordPress. On serverless, entries may not survive between requests.
 - **Preview is slower.** Draft Mode re-runs every cached function and writes nothing, so every block's data is fetched from WordPress on every preview load. That's correct, but editors will notice.
-- **`<Activity>` ships with Cache Components.** Component state (dropdowns, dialogs, form inputs) now survives client-side navigation. This will likely be reported as a component bug: reset state on navigation where it matters.
+- **`<Activity>` ships with Cache Components.** Component state (dropdowns, dialogs, form inputs) now survives client-side navigation. This will likely be reported as a component bug: reset state on navigation where it matters, in a `useLayoutEffect` on `usePathname()`, which re-runs when `<Activity>` shows the page again (see `NavigationSubmenu`). A page left also stays in the document, hidden: build element IDs with `useId()`, never fixed or from a label, or they appear twice.
 - **Floods of random URLs.** Each URL that finds no post is cached as a small 404, and the LRU doesn't count key overhead against its limit. A flood of random URLs (e.g. a bot scan) creates many small entries that use more memory than the 50 MB limit implies. It's still much better than each one reaching WordPress.
 - **Sizing.** Hot entries evicted by a too-small `cacheMaxMemorySize` show up as misses, not errors. See [Sizing the cache](#sizing-the-cache).
 
@@ -170,6 +172,14 @@ After a change, a page should go **HIT → STALE → HIT**, with the new content
 
 Read it from the `x-nextjs-cache` response header (e.g. `curl -sI http://localhost:3000/hello/ | grep -i x-nextjs-cache`). Next doesn't set that header on a response that streams dynamic holes into the static shell, so when it's missing, follow the entries in the `NEXT_PRIVATE_DEBUG_CACHE` log instead.
 
+To see which reads actually reach WordPress, add `DEBUG_PERFS=1`. `fetchAPI` then prints a table of its WordPress requests (count, total, average and max duration per query) once a burst of requests settles:
+
+```bash
+DEBUG_PERFS=1 NEXT_PRIVATE_DEBUG_CACHE=1 npm run start
+```
+
+Since `fetchAPI` only runs on a cache miss, reloading a cached page should print nothing, and after a change only the reads carrying the changed tag should show up. The table is per process, and a build worker may exit before printing its own, so read it on `npm run start` rather than during `npm run build`.
+
 Check the sequence for each of these:
 
 - [ ] Editing a post
@@ -177,8 +187,10 @@ Check the sequence for each of these:
 - [ ] Changing a slug: the old URI stops serving, the new one works
 - [ ] Renaming a parent page: its child pages' breadcrumbs follow. Changing its slug: the children's old URIs stop serving
 - [ ] Publishing at a URI that used to 404
+- [ ] On a multilingual site, changing a translation's slug or publishing a new one: the other languages' hreflang and language switcher follow
 - [ ] Editing a template part in the Site Editor
 - [ ] Editing a block menu in the Site Editor
+- [ ] Moving a page a block menu links to (new slug or parent): the menu links to its new URI
 - [ ] Adding a redirect
 - [ ] Purge all
 
