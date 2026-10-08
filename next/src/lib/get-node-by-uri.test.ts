@@ -104,6 +104,38 @@ describe('getPublicNodeByURI', () => {
 		]);
 	});
 
+	it('tags a child page with its ancestors, whose titles and URIs its breadcrumbs display', async () => {
+		wordpressReturns({
+			__typename: 'Page',
+			contentTypeName: 'page',
+			id: 14,
+			uri: '/about/team/jobs/',
+			ancestors: { nodes: [{ databaseId: 13 }, { databaseId: 12 }] },
+		});
+
+		await getPublicNodeByURI('/about/team/jobs/');
+
+		expect(cacheTagsGiven()).toEqual([
+			'node:12',
+			'node:13',
+			'node:14',
+			'nodes',
+			'nodes:page',
+			'settings',
+		]);
+	});
+
+	it("queries a page's ancestors", async () => {
+		wordpressReturns(null);
+
+		await getPublicNodeByURI('/about/team/');
+
+		const [query] = vi.mocked(fetchAPI).mock.calls[0];
+		expect(query.replace(/\s+/g, ' ')).toContain(
+			'ancestors(first: 100) { nodes { databaseId } }'
+		);
+	});
+
 	it('renders a category archive, tagged with its term, its listing and settings', async () => {
 		wordpressReturns(category);
 
@@ -211,7 +243,9 @@ describe('getPublicNodeByURI', () => {
 
 		expect(vi.mocked(formatBlocksJSON)).toHaveBeenCalledWith(
 			'',
-			expect.objectContaining({ context: { page: 3, baseUri: '/hello/' } })
+			expect.objectContaining({
+				context: { page: 3, baseUri: '/hello/' },
+			})
 		);
 	});
 

@@ -8,7 +8,7 @@ import {
 	throwIfBaseUriNotDeclared,
 } from '@/hooks/use-base-uri';
 import { fetchAPI, formatBlocksJSON } from '@/lib';
-import { cacheTags, termTags } from '@/lib/cache-tags';
+import { ancestorTags, cacheTags, termTags } from '@/lib/cache-tags';
 import {
 	enrichTemplateBlocks,
 	getTemplateBlocks,
@@ -62,7 +62,8 @@ export async function getPublicNodeByURI(
 		...nodeTags(node),
 		cacheTags.settings(), // The same query returns site SEO and general settings
 		...termTags(node.categories?.nodes),
-		...termTags(node.tags?.nodes)
+		...termTags(node.tags?.nodes),
+		...ancestorTags(node.ancestors?.nodes)
 	);
 
 	return node;
