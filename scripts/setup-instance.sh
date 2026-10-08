@@ -58,6 +58,7 @@ cat > next/.env <<EOF
 WORDPRESS_URL=http://localhost:$WP_PORT
 NEXT_URL=http://localhost:$NEXT_PORT
 REVALIDATE_SECRET=$(openssl rand -hex 16)
+WORDPRESS_PREVIEW_SECRET=spck
 EOF
 
 echo "Instance $N configured in $(pwd)"
