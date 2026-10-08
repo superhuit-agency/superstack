@@ -43,6 +43,11 @@ const paths = {
 	langLayout: path.join(rootDir, 'next/src/app/[lang]/layout.tsx'),
 	notFound: path.join(rootDir, 'next/src/app/not-found.tsx'),
 	langNotFound: path.join(rootDir, 'next/src/app/[lang]/not-found.tsx'),
+	notFoundTest: path.join(rootDir, 'next/src/app/not-found.test.tsx'),
+	langNotFoundTest: path.join(
+		rootDir,
+		'next/src/app/[lang]/not-found.test.tsx'
+	),
 	configsJson: path.join(rootDir, 'next/src/configs.json'),
 	proxy: path.join(rootDir, 'next/src/proxy.ts'),
 	typings: path.join(rootDir, 'next/src/i18n/typings.d.ts'),
@@ -282,6 +287,11 @@ function toMultilang(defaultLocale, additionalLocales) {
 		paths.langNotFound,
 		'Moved not-found.tsx into [lang] folder'
 	);
+	moveDir(
+		paths.notFoundTest,
+		paths.langNotFoundTest,
+		'Moved not-found.test.tsx into [lang] folder'
+	);
 
 	if (fs.existsSync(paths.rootLayout)) {
 		fs.rmSync(paths.rootLayout);
@@ -316,6 +326,11 @@ function toSinglelang(defaultLocale) {
 		paths.langNotFound,
 		paths.notFound,
 		'Moved not-found.tsx out of [lang] folder'
+	);
+	moveDir(
+		paths.langNotFoundTest,
+		paths.notFoundTest,
+		'Moved not-found.test.tsx out of [lang] folder'
 	);
 
 	if (fs.existsSync(paths.langDir)) {

@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from 'next/font/google';
 
 import { getDictionary } from '@/i18n/dictionaries';
 import { LocaleProvider } from '@/contexts/locale-context';
+import { langContext } from '@/hooks/use-lang';
 
 import '@/css/base/index.css';
 
@@ -38,6 +39,8 @@ export default async function RootLayout({
 	params: Promise<{ lang: string }>;
 }) {
 	const { lang } = await params;
+	// Lets `not-found.tsx`, which gets no params, render in this language
+	langContext(lang);
 	const dictionary = await getDictionary(lang as Locale);
 
 	return (
