@@ -14,10 +14,12 @@ function request(
 	body: unknown,
 	{
 		authorization = `Bearer ${SECRET}`,
-	}: { authorization?: string | null } = {}
+		secret = null,
+	}: { authorization?: string | null; secret?: string | null } = {}
 ) {
 	const headers = new Headers({ 'Content-Type': 'application/json' });
 	if (authorization !== null) headers.set('Authorization', authorization);
+	if (secret !== null) headers.set('X-Nextjs-Revalidate-Secret', secret);
 
 	return new Request('http://localhost:3000/api/revalidate', {
 		method: 'POST',
@@ -368,7 +370,7 @@ describe('POST /api/revalidate', () => {
 			expect(tagsMarkedStale()).toEqual(['menu:7']);
 		});
 
-		// Mapped once the plugin reports term changes (nextjs-revalidate#55)
+		// The plugin reports them from 2.1.0, but they're not mapped yet (#154)
 		it('a term change', async () => {
 			const response = await send([
 				{ subject: 'term', id: 5, taxonomy: 'category' },
@@ -379,15 +381,65 @@ describe('POST /api/revalidate', () => {
 		});
 	});
 
+	// The plugin sends the secret in its own header when the revalidate domain
+	// has basic-auth credentials (nextjs-revalidate 2.1+)
+	describe('accepts the secret in X-Nextjs-Revalidate-Secret', () => {
+		it.each([
+			['next to basic-auth credentials', 'Basic dXNlcjpwYXNz'],
+			['without an Authorization header', null],
+		])('%s', async (_, authorization) => {
+			const response = await route.POST(
+				request(body([{ subject: 'templates' }]), {
+					authorization,
+					secret: SECRET,
+				})
+			);
+
+			expect(response.status).toBe(200);
+			expect(tagsMarkedStale()).toEqual(['templates']);
+		});
+	});
+
 	describe('rejects', () => {
 		it.each([
 			['a missing secret', null],
 			['a wrong secret', 'Bearer wrong-secret'],
 			['a wrong secret of the same length', 'Bearer test-secreT'],
 			['the secret without the Bearer scheme', SECRET],
+			['basic-auth credentials alone', 'Basic dXNlcjpwYXNz'],
 		])('%s with a 401', async (_, authorization) => {
 			const response = await route.POST(
 				request(body([{ subject: 'templates' }]), { authorization })
+			);
+
+			expect(response.status).toBe(401);
+			expect(revalidateTag).not.toHaveBeenCalled();
+		});
+
+		it.each([
+			['a wrong secret', 'wrong-secret'],
+			['a wrong secret of the same length', 'test-secreT'],
+			['the secret with the Bearer scheme', `Bearer ${SECRET}`],
+			['an empty secret', ''],
+		])('%s in X-Nextjs-Revalidate-Secret with a 401', async (_, secret) => {
+			const response = await route.POST(
+				request(body([{ subject: 'templates' }]), {
+					authorization: 'Basic dXNlcjpwYXNz',
+					secret,
+				})
+			);
+
+			expect(response.status).toBe(401);
+			expect(revalidateTag).not.toHaveBeenCalled();
+		});
+
+		// The secret is in exactly one of the two headers: the plugin's own
+		// wins, so a valid Bearer can't make up for a wrong one there
+		it('a wrong X-Nextjs-Revalidate-Secret next to a valid Bearer', async () => {
+			const response = await route.POST(
+				request(body([{ subject: 'templates' }]), {
+					secret: 'wrong-secret',
+				})
 			);
 
 			expect(response.status).toBe(401);
@@ -400,6 +452,7 @@ describe('POST /api/revalidate', () => {
 			const response = await route.POST(
 				request(body([{ subject: 'templates' }]), {
 					authorization: 'Bearer ',
+					secret: '',
 				})
 			);
 
