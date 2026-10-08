@@ -24,6 +24,18 @@ on:
 [...]
 ```
 
+## ✅ Pull request checks
+
+`.github/workflows/checks.yml` runs on every pull request, whatever its base branch, and can be started by hand from the Actions tab. It installs the `next/` dependencies and runs, without WordPress:
+
+- the Vitest suite (`npm test`)
+- the type check (`npx tsc --noEmit`)
+- ESLint (`npm run lint`)
+
+ESLint errors that predate this check are baselined in `next/eslint-suppressions.json`, so only new errors fail. Once you fix baselined errors, run `npx eslint . --prune-suppressions` in `next/` to shrink the baseline.
+
+The deploy workflows also run the Vitest suite before shipping Next.js, on both the Vercel and the SSH path.
+
 ## 🎨 Automatic Theme CSS Generation
 
 The Next.js app requires `next/public/css/theme-generated.css` before its build runs. See [`./theme-css.md`](./theme-css.md) for the full how-to (what the file is, local-dev usage, troubleshooting). This section covers the CI integration only.
