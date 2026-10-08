@@ -309,6 +309,47 @@ describe('POST /api/revalidate', () => {
 		expect(revalidateTag).not.toHaveBeenCalled();
 	});
 
+	describe('a non-ASCII URI, which WordPress sends percent-encoded', () => {
+		it.each([
+			[
+				"a post's old URI",
+				{
+					subject: 'post',
+					id: 42,
+					type: 'post',
+					before: { uri: '/caf%c3%a9/' },
+					after: { uri: '/cafe-2/' },
+				},
+			],
+			['a redirect', { subject: 'redirect', uri: '/caf%c3%a9/' }],
+			['a path', { subject: 'path', uri: '/caf%c3%a9/' }],
+		])(
+			'is revalidated decoded for %s, as Next tags the page',
+			async (_, change) => {
+				await send([change]);
+
+				expect(revalidatePath).toHaveBeenCalledExactlyOnceWith(
+					'/café/'
+				);
+			}
+		);
+
+		it('is revalidated once, encoded or not', async () => {
+			await send([
+				{ subject: 'path', uri: '/caf%c3%a9/' },
+				{ subject: 'path', uri: '/café/' },
+			]);
+
+			expect(revalidatePath).toHaveBeenCalledExactlyOnceWith('/café/');
+		});
+
+		it('is kept as it came when malformed', async () => {
+			await send([{ subject: 'path', uri: '/100%/' }]);
+
+			expect(revalidatePath).toHaveBeenCalledExactlyOnceWith('/100%/');
+		});
+	});
+
 	it('never marks stale a tag it expires, which would cancel the expiry', async () => {
 		const stale = new Set<string>();
 		const expired = new Set<string>();

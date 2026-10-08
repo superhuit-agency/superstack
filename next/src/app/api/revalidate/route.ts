@@ -1,7 +1,7 @@
 import { createHash, timingSafeEqual } from 'node:crypto';
 import { revalidatePath, revalidateTag } from 'next/cache';
 
-import { cacheTags } from '@/lib/cache-tags';
+import { cacheTags, decodePath } from '@/lib/cache-tags';
 
 /** The nextjs-revalidate contract version this route speaks. */
 const CONTRACT_VERSION = 2;
@@ -41,7 +41,9 @@ export async function POST(request: Request) {
 		const invalidation = invalidationOf(change);
 		invalidation.tags?.forEach((tag) => tags.add(tag));
 		invalidation.expiredTags?.forEach((tag) => expiredTags.add(tag));
-		if (invalidation.path) paths.add(invalidation.path);
+		// Decoded: Next tags a page by its decoded path, WordPress sends it
+		// percent-encoded
+		if (invalidation.path) paths.add(decodePath(invalidation.path));
 	}
 
 	// Marked stale only: the next visitor gets the stale entry while a fresh
