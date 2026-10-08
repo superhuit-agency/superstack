@@ -9,7 +9,7 @@ export default function Avatar({
 	size,
 	className,
 }: AvatarProps) {
-	if (!data.url) return null;
+	if (!data?.url) return null;
 
 	if (isLink && data.uri) {
 		return (

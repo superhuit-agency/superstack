@@ -7,7 +7,7 @@ interface AvatarAttributes extends BlockAttributes {
 }
 
 interface AvatarProps extends HTMLProps<HTMLDivElement>, AvatarAttributes {
-	data: {
+	data?: {
 		uri: string;
 		url: string;
 		alt: string;
