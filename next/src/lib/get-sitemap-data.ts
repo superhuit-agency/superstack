@@ -290,7 +290,7 @@ async function getContentType(
 ): Promise<{ name: string } | null> {
 	const data = await fetchAPI(
 		`query SitemapContentType {
-			contentTypes {
+			contentTypes(first: 100) {
 				nodes {
 					name
 					graphqlSingleName
