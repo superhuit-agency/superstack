@@ -25,11 +25,11 @@ Tag names are built by one helper module, `next/src/lib/cache-tags.ts`, used bot
 
 | Tag | Carried by | Cleared when |
 | --- | --- | --- |
-| `node:{databaseId}` | the public node read; block data rendering one post | a `post` change for that ID |
+| `node:{databaseId}` | the public node read; block data rendering one post; Navigation block data, for each link bound to a post (the theme resolves its URL to the post's current one) | a `post` change for that ID |
 | `nodes:{contentType}` | the public node read of a single post, page… of that type | a scoped `all` of that type. Editing one post clears only its `node:` tag |
 | `type:{contentType}` | listings (Query, Latest Posts), post type archives, next / previous post links, per-type sitemaps | a `post` change of that type |
 | `content` | listings with no type filter; the sitemap index; blocks that declare no tags | every `post` change |
-| `term:{databaseId}` | reads that display a term: post terms, the public node read, term archives | a term change (not mapped yet, see [Known gaps](#known-gaps-until-plugin-v21)) |
+| `term:{databaseId}` | reads that display a term: post terms, the public node read, term archives, Navigation block data for each link bound to a term | a term change (not mapped yet, see [Known gaps](#known-gaps-until-plugin-v21)) |
 | `taxonomy:{taxonomy}` | term listings | a scoped `all` of a type using that taxonomy; a term change once mapped |
 | `menu:{id}` | Navigation block data (block menu ID) | a `menu` change for that ID |
 | `settings` | the public node read (it also returns Site settings: SEO defaults, site title), site title / tagline / logo / date blocks, the locale list, sitemaps, blocks that declare no tags | a `settings` change, or `all` |
@@ -176,6 +176,7 @@ Check the sequence for each of these:
 - [ ] Publishing at a URI that used to 404
 - [ ] Editing a template part in the Site Editor
 - [ ] Editing a block menu in the Site Editor
+- [ ] Moving a page a block menu links to (new slug or parent): the menu links to its new URI
 - [ ] Adding a redirect
 - [ ] Purge all
 
