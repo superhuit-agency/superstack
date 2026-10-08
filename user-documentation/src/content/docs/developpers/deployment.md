@@ -162,7 +162,7 @@ The front-end caches what it reads from WordPress until the nextjs-revalidate pl
 
 | Setting           | Value                                                                                                                                                                                       |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Revalidate domain | The front-end's public URL, `NEXT_URL` (e.g. `https://yourdomain.com`). Behind basic auth, with its credentials: `https://user:pass@staging.yourdomain.com` (needs nextjs-revalidate 2.1+). |
+| Revalidate domain | The front-end's public URL, `NEXT_URL` (e.g. `https://yourdomain.com`). Behind basic auth, with its credentials: `https://user:pass@staging.yourdomain.com` (nextjs-revalidate 2.1+, which the starter ships). |
 | Revalidate path   | `/api/revalidate/`. With its trailing slash, the request skips the 308 Next.js answers `/api/revalidate` with (`trailingSlash: true`).                                                      |
 | Revalidate secret | The `REVALIDATE_SECRET` of the front-end's environment (`shared/.env` on an SSH deployment, the project's environment variables on Vercel). Generate it with `openssl rand -hex 32`.         |
 
