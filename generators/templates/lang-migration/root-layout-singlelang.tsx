@@ -29,8 +29,6 @@ export const metadata: Metadata = {
 	manifest: '/manifest.webmanifest',
 };
 
-export const revalidate = 3600;
-
 export default async function RootLayout({
 	children,
 }: Readonly<{
