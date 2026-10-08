@@ -3,7 +3,7 @@ import './styles.css';
 
 export default function Quote(props: QuoteProps) {
 	return (
-		<blockquote className="supt-quote">
+		<blockquote className="wp-block-quote">
 			{props.children}
 			<cite>{props.citation}</cite>
 		</blockquote>
