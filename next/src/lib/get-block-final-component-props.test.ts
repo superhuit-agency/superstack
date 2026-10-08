@@ -1,12 +1,15 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import * as termsQuery from '@/components/core/TermsQuery/data';
+import { baseUriContext } from '@/hooks/use-base-uri';
 import getBlockFinalComponentProps from '@/lib/get-block-final-component-props';
 import getCachedBlockData, {
 	getBlockDataModule,
 	type BlockDataModule,
 } from '@/lib/get-cached-block-data';
 
-vi.mock('@/lib/get-cached-block-data', () => ({
+vi.mock('@/lib/get-cached-block-data', async (importOriginal) => ({
+	...(await importOriginal<typeof import('@/lib/get-cached-block-data')>()),
 	default: vi.fn(async () => ({})),
 	getBlockDataModule: vi.fn(),
 }));
@@ -93,6 +96,31 @@ describe('getBlockFinalComponentProps', () => {
 			undefined
 		);
 	});
+
+	it.each([
+		[true, '/category/news/'],
+		[false, null],
+	])(
+		'keys a terms query by the Base URI only when it inherits (inherit: %s)',
+		async (inherit, baseUri) => {
+			blockModuleIs(termsQuery);
+			baseUriContext('/category/news/');
+			const attributes = { termQuery: { inherit } };
+
+			await getBlockFinalComponentProps(
+				{ name: 'core/terms-query', attributes, innerBlocks: [] },
+				{ lang: null }
+			);
+
+			expect(vi.mocked(getCachedBlockData)).toHaveBeenCalledWith(
+				'core/terms-query',
+				attributes,
+				null,
+				baseUri,
+				undefined
+			);
+		}
+	);
 
 	it('gives the archive to a block using it in preview', async () => {
 		const getData = vi.fn(async () => ({}));
