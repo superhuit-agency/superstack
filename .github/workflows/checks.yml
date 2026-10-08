@@ -1,0 +1,53 @@
+name: Checks
+description: This workflow runs the Next.js tests, type check and lint on pull requests.
+on:
+  pull_request:
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Cancel superseded runs of the same pull request
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  next:
+    name: Next.js checks
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: next
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Install node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: 'npm'
+          cache-dependency-path: |
+            next/package-lock.json
+
+      - name: Install node dependencies
+        id: install
+        run: npm ci
+
+      # The checks below run even if a previous one failed, so a single run reports all of them
+      - name: Test Next
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: npm test
+
+      - name: Type check
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: npx tsc --noEmit
+
+      # Pre-existing errors are baselined in next/eslint-suppressions.json, so only new ones fail
+      - name: Lint
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: npm run lint -- --pass-on-unpruned-suppressions
