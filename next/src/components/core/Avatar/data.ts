@@ -4,6 +4,10 @@ export const getData = async (
 	fetcher: FetchApiFuncType,
 	attrs: AvatarAttributes | null = null
 ) => {
+	// Without a user, WordPress shows the post author's avatar, which this
+	// block doesn't read: `$userId` is required, so the query would only fail.
+	if (!attrs?.userId) return { data: {}, cacheTags: [] };
+
 	const query = gql`
 		query AvatarData($userId: ID!) {
 			user(id: $userId, idType: DATABASE_ID) {
