@@ -19,7 +19,7 @@ vi.mock('@/hooks/use-base-uri', () => ({
 }));
 
 type DataModule = {
-	getData: (fetcher: FetchApiFuncType, attrs?: any) => Promise<unknown>;
+	getData: (fetcher: FetchApiFuncType, attrs: never) => Promise<unknown>;
 };
 
 const blocks: Array<[string, DataModule, object]> = [
@@ -44,7 +44,7 @@ describe('Page-dependent blocks without a Base URI', () => {
 
 			const data = await getData(
 				fetcher as unknown as FetchApiFuncType,
-				attrs
+				attrs as never
 			);
 
 			expect(fetcher).not.toHaveBeenCalled();
