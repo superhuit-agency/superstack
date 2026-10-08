@@ -1,5 +1,6 @@
 import { cacheLife, cacheTag } from 'next/cache';
 
+import configs from '@/configs.json';
 import { gql } from '@/utils';
 import { fetchAPI } from '@/lib';
 import { cacheTags } from '@/lib/cache-tags';
@@ -13,11 +14,13 @@ import { cacheTags } from '@/lib/cache-tags';
  *
  * Cached until the site settings change.
  *
+ * @param {string|null} lang - The language code
+ *
  * @returns {Promise<Array<{ text: string; url: string }>>}
  */
-export default async function getNotFoundBreadcrumbs(): Promise<
-	Array<{ text: string; url: string }>
-> {
+export default async function getNotFoundBreadcrumbs(
+	lang: string | null = null
+): Promise<Array<{ text: string; url: string }>> {
 	'use cache';
 	cacheLife('max');
 	cacheTag(cacheTags.settings(), cacheTags.nodes());
@@ -38,8 +41,10 @@ export default async function getNotFoundBreadcrumbs(): Promise<
 
 	if (!enabled) return [];
 
+	const homeUrl = configs.isMultilang && lang ? `/${lang}/` : '/';
+
 	return [
-		...(homeText ? [{ text: homeText, url: '/' }] : []),
+		...(homeText ? [{ text: homeText, url: homeUrl }] : []),
 		...(notFoundText ? [{ text: notFoundText, url: '' }] : []),
 	];
 }

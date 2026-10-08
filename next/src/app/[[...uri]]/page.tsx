@@ -7,6 +7,7 @@ import Template from '@/components/global/Template';
 import { useCanonical as getCanonicalUrl } from '@/hooks/use-canonical';
 import { getLocales } from '@/i18n/get-locales';
 import {
+	addLangPrefix,
 	getAllURIs,
 	getAuthToken,
 	getPreviewNodeByURI,
@@ -81,14 +82,15 @@ export async function generateMetadata({
 	const { uri: uriSegments, lang } = await params;
 	const { uri, routePage } = parseRouteSegments(uriSegments);
 
+	const { locales, defaultLocale } = await getLocales();
+	if (configs.isMultilang && !locales.includes(lang)) notFound();
+
 	const baseUrl =
 		process.env.NEXT_URL ??
 		process.env.VERCEL_URL ??
 		'http://localhost:3000';
 
 	const node = await getPublicNodeByURI(uri, lang, routePage);
-
-	const { defaultLocale } = await getLocales();
 
 	const imageSEO =
 		node?.seo?.opengraphImage?.src ??
@@ -189,13 +191,21 @@ const PreviewToolbar = dynamic(
 
 export default async function Page({ params }: PageProps) {
 	const { uri: uriSegments, lang } = await params;
+
+	// Paths with an extension skip the locale proxy, so the first segment
+	// may not be a locale (ex: `/llms.txt`)
+	if (configs.isMultilang) {
+		const { locales } = await getLocales();
+		if (!locales.includes(lang)) notFound();
+	}
+
 	const { isEnabled: isDraftModeEnable } = await draftMode();
 
 	let isDraft = false,
 		token = '';
 
 	const { uri, routePage } = parseRouteSegments(uriSegments);
-	baseUriContext(uri);
+	baseUriContext(addLangPrefix(uri, lang));
 
 	let auth: { authToken?: string } = {};
 

@@ -54,7 +54,6 @@ export default function PreviewToolbar({
 			<label className="supt-preview-toolbar__checkbox">
 				<input
 					type="checkbox"
-					id="preview_current_page"
 					checked={!isDraftPreview}
 					onChange={toggleIsDraftPreview}
 				/>

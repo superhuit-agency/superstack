@@ -1,4 +1,6 @@
 // import * as blocksData from '@/components/data';
+import { cache } from 'react';
+
 import {
 	baseUriContext,
 	throwIfBaseUriNotDeclared,
@@ -30,6 +32,33 @@ type BlockPropsOptions = {
 //     }
 //   }
 // }
+
+/**
+ * The block data reads in flight in the current render, by cache key.
+ *
+ * `'use cache'` doesn't share a miss in progress: a block used twice with the
+ * same attributes (the site title in the header and in the footer) would read
+ * WordPress twice on a cold cache. Kept to one render, so both calls belong to
+ * the cache scope the entry's tags propagate to.
+ */
+const blockDataReads = cache(
+	() => new Map<string, ReturnType<typeof getCachedBlockData>>()
+);
+
+const getBlockDataOnce = (
+	...args: Parameters<typeof getCachedBlockData>
+): ReturnType<typeof getCachedBlockData> => {
+	const reads = blockDataReads();
+	const key = JSON.stringify(args);
+
+	let read = reads.get(key);
+	if (!read) {
+		read = getCachedBlockData(...args);
+		reads.set(key, read);
+	}
+
+	return read;
+};
 
 /**
  * Get a lightweight version of a block's data.
@@ -148,7 +177,7 @@ const getAttributes = async (
 		delete liveData.cacheTags;
 		data = liveData;
 	} else {
-		data = await getCachedBlockData(
+		data = await getBlockDataOnce(
 			name,
 			attributes,
 			lang,
