@@ -1,5 +1,5 @@
 import { getWpGraphqlUrl } from '@/utils/node-utils';
-import { dedupeFragments, getQueryAttrs } from '@/utils';
+import { dedupeFragments, getQueryAttrs, PerfsTester } from '@/utils';
 import { WordPressReadError } from '@/lib/wordpress-read-error';
 
 const WP_GRAPHQL_URL = getWpGraphqlUrl();
@@ -117,8 +117,8 @@ type Attempt =
 	| { text: string }
 	| { failure: string; retryAfter?: number | null };
 
-// // Debug performances
-// export const fetchAPITester = PerfsTester();
+// Debug performances: set `DEBUG_PERFS=1` to log every WordPress round-trip
+export const fetchAPITester = PerfsTester('fetchAPI');
 
 /**
  * Variable names whose values must never reach the logs. GraphQL variables are
@@ -177,10 +177,10 @@ const fetchAPI: FetchApiFuncType = async (query, options) => {
 
 	let result: any = {};
 
-	const { name } = getQueryAttrs(query);
+	const { type, name } = getQueryAttrs(query);
 	// console.debug('== fetchAPI %s - %s', name, type);
-	// // Debug performances
-	// const perfsId = fetchAPITester.markStart(`${type} - ${name}`);
+	// Debug performances
+	const perfsId = fetchAPITester.markStart(`${type} - ${name}`);
 
 	let dedupedQuery = dedupeFragments(query);
 
@@ -336,10 +336,10 @@ ${limit}
 			`the "${name || 'unnamed'}" query`,
 			name || 'query'
 		);
+	} finally {
+		// Debug performances
+		fetchAPITester.markEnd(perfsId);
 	}
-
-	// // Debug performances
-	// fetchAPITester.markEnd(perfsId);
 
 	return result;
 };

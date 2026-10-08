@@ -168,6 +168,14 @@ After a change, a page should go **HIT → STALE → HIT**, with the new content
 
 Read it from the `x-nextjs-cache` response header (e.g. `curl -sI http://localhost:3000/hello/ | grep -i x-nextjs-cache`). Next doesn't set that header on a response that streams dynamic holes into the static shell, so when it's missing, follow the entries in the `NEXT_PRIVATE_DEBUG_CACHE` log instead.
 
+To see which reads actually reach WordPress, add `DEBUG_PERFS=1`. `fetchAPI` then prints a table of its WordPress requests (count, total, average and max duration per query) once a burst of requests settles:
+
+```bash
+DEBUG_PERFS=1 NEXT_PRIVATE_DEBUG_CACHE=1 npm run start
+```
+
+Since `fetchAPI` only runs on a cache miss, reloading a cached page should print nothing, and after a change only the reads carrying the changed tag should show up. The table is per process, and a build worker may exit before printing its own, so read it on `npm run start` rather than during `npm run build`.
+
 Check the sequence for each of these:
 
 - [ ] Editing a post
