@@ -424,5 +424,19 @@ describe('fetchAPI', () => {
 			// 4 s would end past 45 s
 			expect(fetchMock).toHaveBeenCalledTimes(CAP + 3);
 		});
+
+		it('keeps an attempt within its 45 s, whatever WORDPRESS_FETCH_TIMEOUT', async () => {
+			vi.stubEnv('WORDPRESS_FETCH_TIMEOUT', '60000');
+			vi.resetModules();
+			const { default: fetchWithLongTimeout } =
+				await import('@/lib/fetch-api');
+			const timeout = vi.spyOn(AbortSignal, 'timeout');
+			respond(data);
+
+			await fetchWithLongTimeout(query);
+
+			expect(timeout.mock.calls[0][0]).toBeLessThanOrEqual(45000);
+			vi.unstubAllEnvs();
+		});
 	});
 });

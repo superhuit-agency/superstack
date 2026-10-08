@@ -23,6 +23,8 @@ export const getData = async (
 
 	const uri = baseUriContext();
 
+	if (!uri) return { content: '', cacheTags: [] };
+
 	const query = gql`
 		query QueryTitleData($uri: String!) {
 			nodeByUri(uri: $uri) {

@@ -234,8 +234,10 @@ export const getData = async (
 			}
 		`;
 		const uri = baseUriContext();
-		const byUriData = await fetcher(byUriQuery, { variables: { uri } });
-		bundle = byUriData?.nodeByUri ?? null;
+		if (uri) {
+			const byUriData = await fetcher(byUriQuery, { variables: { uri } });
+			bundle = byUriData?.nodeByUri ?? null;
+		}
 	}
 
 	const textSource = pickTextForWordCount(bundle, wordCountType);

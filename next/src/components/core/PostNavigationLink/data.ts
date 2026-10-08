@@ -110,6 +110,9 @@ export const getData = async (
 	`;
 
 	const uri = baseUriContext();
+
+	if (!uri) return { navigationPost: null, cacheTags: [] };
+
 	const contextData = await fetcher(postContextQuery, {
 		variables: { uri },
 	});

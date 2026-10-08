@@ -36,7 +36,7 @@ Tag names are built by one helper module, `next/src/lib/cache-tags.ts`, used bot
 | `settings` | the public node read (it also returns Site settings: SEO defaults, site title), site title / tagline / logo / date blocks, the locale list, the 404 breadcrumbs, sitemaps, blocks that declare no tags | a `settings` change, or `all` |
 | `templates` | the FSE template read | a `templates` change, or `all` |
 | `redirects` | every redirect lookup, so every cached 404 and cached redirect | `all` only |
-| `redirect:{uri}` | the redirect lookup for that URI, including a "no redirect" result | a `redirect` change for that URI |
+| `redirect:{uri}` | the redirect lookup for that URI, including a "no redirect" result. Past Next's 256-character limit, the tag is cut and ends with a digest of the whole tag (`cacheTags.redirect`), so the lookup and the route still agree | a `redirect` change for that URI |
 | `uris` | public node reads that found **no** node (cached 404s); on a multilingual site, every public node read, since it links to its translations (hreflang, language switcher); Page-dependent blocks that found no post at the Base URI | a `post` change whose URI changed (publish, unpublish, trash, delete, slug change), or `all` |
 | `nodes` | every cached read | `all` only: the manual lever |
 
@@ -46,7 +46,7 @@ Term tags use the term's database ID, not its slug, so a slug rename needs no ol
 
 | Read | File | Tags |
 | --- | --- | --- |
-| Public node read | `next/src/lib/get-node-by-uri.ts` (`getPublicNodeByURI`) | `node:{id}`, `nodes:{type}`, `settings`, the `term:` tags of its categories and tags, the `node:` tags of a page's ancestors; a post type archive gets `type:{type}`; `uris` on a multilingual site or when no node is found |
+| Public node read | `next/src/lib/get-node-by-uri.ts` (`getPublicNodeByURI`) | `node:{id}`, `nodes:{type}`, `settings`, the `term:` tags of its categories and tags, the `node:` tags of a page's ancestors; a post type archive gets `type:{type}`; `uris` on a multilingual site or when no node is found. A `/page/{n}` the node doesn't have (no loop inheriting the template query, or past its last page) is a cached 404 carrying the node's tags and its loops', so a new post can bring it back |
 | Redirect lookup | `next/src/lib/get-redirection.ts` | `redirect:{uri}`, `redirects` |
 | Locale list | `next/src/i18n/get-locales.ts` | `settings` |
 | 404 breadcrumbs | `next/src/lib/get-not-found-breadcrumbs.ts` | `settings` |
@@ -125,6 +125,8 @@ Unknown subjects and unknown fields are ignored, so a minor plugin release never
 
 The catch-all page looks a redirect up only for a URI that has no node, and calls `permanentRedirect()` or `redirect()` when it finds one. When a stale entry is re-rendered in the background and that render ends in a redirect, Next 16.2 caches the response as a 308 (or 307) **without its `Location` header**, and serves it as a HIT until the next invalidation. Clients without JavaScript (crawlers, `curl`, link checkers) can't follow it. A blocking render caches the redirect correctly.
 
+A URI with no node is looked up only on its first page: a `/page/{n}` with no node answers 404 without a redirect lookup, since the lookup would be for the URI without its page. So `/old/page/2/` doesn't follow the redirect of `/old/`.
+
 So every change that can turn a cached page into a redirect expires that page rather than marking it stale:
 
 - a `redirect` change: `redirect:{uri}`, which a cached 404 at that URI carries, and the page at the path (`revalidatePath`), which may be a page rather than a 404, e.g. a post's old URI once Redirection's slug monitor redirects it;
@@ -200,7 +202,7 @@ Never measure with `next dev`: it adds a hash to cache keys, so entries aren't r
 ## Known risks
 
 - **PM2 cluster mode silently breaks tag revalidation.** The cache lives in each process, and a revalidation reaches only the process that received it. The shipped `next/ecosystem.config.js.example` runs a single process. Adding `instances: 'max'` or `exec_mode: 'cluster'` would make invalidation intermittent, with no error. Running several instances needs a shared cache handler (e.g. Redis), which this starter doesn't include.
-- **Bursts of WordPress reads.** A change can mark every page stale, and each re-render sends all its block reads at once. `fetchAPI` keeps at most `WORDPRESS_FETCH_CONCURRENCY` (6) requests in flight per process, and retries a refused or dropped read (408, 425, 429, 5xx, network errors, a 15 s timeout) with a jittered backoff, honouring `Retry-After`. It stops after 45 s, waiting for a slot included, before Next's 50 s limit to fill a cache entry during a prerender, so a read fails with its own cause rather than a cache timeout. A cache entry that makes several reads in a row can still reach that limit when WordPress is that slow. Mutations get one attempt. See `next/.env.example`.
+- **Bursts of WordPress reads.** A change can mark every page stale, and each re-render sends all its block reads at once. `fetchAPI` keeps at most `WORDPRESS_FETCH_CONCURRENCY` (6) requests in flight per process, and retries a refused or dropped read (408, 425, 429, 5xx, network errors, a 15 s timeout) with a jittered backoff, honouring `Retry-After`. It stops after 45 s, waiting for a slot included, before Next's 50 s limit to fill a cache entry during a prerender, so a read fails with its own cause rather than a cache timeout. `WORDPRESS_FETCH_TIMEOUT` can't extend that budget: an attempt is cut at the time left. A cache entry that makes several reads in a row can still reach that limit when WordPress is that slow. Mutations get one attempt. See `next/.env.example`.
   - **Sizing the cap for builds.** `next build` prerenders up to 8 pages at once per worker (`experimental.staticGenerationMaxConcurrency`), and all their reads queue behind that worker's cap. A batch takes about 8 pages × uncached reads per page × WordPress's answer time ÷ the cap: 8 × 30 × 0.3 s ÷ 6 = 12 s, and 32 s at 0.8 s a read (48 s with a cap of 4). A read still waiting for a slot after 45 s fails with `No free slot before the 45000 ms budget ran out`. Then raise `WORDPRESS_FETCH_CONCURRENCY` if WordPress has the PHP workers for it (each build worker gets its own cap), or lower `staticGenerationMaxConcurrency`.
 - **No persistence.** The cache is in memory: a restart or a deploy starts it empty, and the first visitors after it wait for WordPress. On serverless, entries may not survive between requests.
 - **Preview is slower.** Draft Mode re-runs every cached function and writes nothing, so every block's data is fetched from WordPress on every preview load. That's correct, but editors will notice.

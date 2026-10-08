@@ -24,7 +24,7 @@ const TIMEOUT = envNumber('WORDPRESS_FETCH_TIMEOUT', 15000, 1);
 // Next gives a `'use cache'` entry 50 s to fill during a prerender, counted
 // from when it starts, waiting for a slot included: stop before that, so the
 // read fails with its own cause.
-const BUDGET = Math.max(45000, TIMEOUT);
+const BUDGET = 45000;
 
 // WordPress requests in flight at once, per process. Each `next build` worker
 // prerenders up to 8 pages behind its own cap: 6 keeps a batch well under the

@@ -27,8 +27,11 @@ export const cacheTags = {
 	settings: () => 'settings',
 	/** FSE templates and template parts. */
 	templates: () => 'templates',
-	/** The redirect lookup for one URI, including a "no redirect" result. */
-	redirect: (uri: string) => `redirect:${normalizeUri(uri)}`,
+	/**
+	 * The redirect lookup for one URI, including a "no redirect" result.
+	 * Next drops a tag over 256 characters: a longer one ends in a digest.
+	 */
+	redirect: (uri: string) => maxLength(`redirect:${normalizeUri(uri)}`),
 	/**
 	 * Reads that depend on which post is at which URI: cached 404s,
 	 * Page-dependent blocks that found no post, and on a multilingual site
@@ -78,6 +81,29 @@ export const ancestorTags = (
 		.map((ancestor) => ancestor?.databaseId)
 		.filter((id): id is number => typeof id === 'number')
 		.map(cacheTags.node);
+
+const TAG_MAX_LENGTH = 256;
+
+/**
+ * A tag within Next's length limit: past it, cut and ended with a digest of
+ * the whole tag, so that tags differing past the cut stay apart.
+ */
+const maxLength = (tag: string): string =>
+	tag.length <= TAG_MAX_LENGTH
+		? tag
+		: `${tag.slice(0, TAG_MAX_LENGTH - 9)}#${digest(tag)}`;
+
+/** A stable digest of a string, in 8 hex digits (32-bit FNV-1a). */
+const digest = (value: string): string => {
+	let hash = 0x811c9dc5;
+
+	for (let i = 0; i < value.length; i++) {
+		hash ^= value.charCodeAt(i);
+		hash = Math.imul(hash, 0x01000193);
+	}
+
+	return (hash >>> 0).toString(16).padStart(8, '0');
+};
 
 /**
  * Normalise a URI so the redirect lookup and an incoming `redirect` change

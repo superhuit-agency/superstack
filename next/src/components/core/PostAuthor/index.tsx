@@ -3,6 +3,8 @@ import PostAuthorName from '../PostAuthorName';
 import './styles.css';
 
 export default function PostAuthor(props: PostAuthorProps) {
+	if (!props.author) return null;
+
 	return (
 		<div className="wp-block-post-author">
 			{props.showAvatar && (
