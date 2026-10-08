@@ -144,7 +144,7 @@ The next request for each of these pages waits for WordPress (`x-nextjs-cache: M
 
 ### Term changes
 
-Term edits don't reach the site on their own yet. The shipped plugin (2.1.0) sends them: a `term` change when a category or tag is created, edited or deleted, and the post's terms on both sides of a `post` change. The route maps neither yet ([#154](https://github.com/superhuit-agency/superstack/issues/154)): it ignores the `term` change like any unknown subject, and a post's `terms` like any unknown field, so a post change still clears only the post, its type and `content`. The `term:` and `taxonomy:` tags are already in place.
+Term edits don't reach the site on their own yet. The shipped plugin (2.1.0) sends them: a `term` change when a category or tag is created, edited or deleted, and the post's terms on both sides of a `post` change. The route maps neither yet ([#154](https://github.com/superhuit-agency/superstack/issues/154)): it ignores the `term` change like any unknown subject, and a post's `terms` like any unknown field, so a post change clears the same as with 2.0, and none of its terms' archives. The `term:` and `taxonomy:` tags are already in place.
 
 Site settings aren't affected: the plugin sends a `settings` change from v2.0 ([nextjs-revalidate#171](https://github.com/superhuit-agency/nextjs-revalidate/issues/171)).
 
@@ -167,7 +167,7 @@ It doesn't refresh what isn't:
 - a cached 404: a read that found no node carries `uris`, not `settings`, so a URI the change gives content keeps answering 404;
 - listings and menu links, which show a page's URI: a Query Loop carries `type:{type}`, a menu `menu:{id}` and the `node:{id}` of the posts it links to, so they keep linking to the new front page's old URI, and to `/` for the old one.
 
-Use **Purge all** after saving **Settings › Reading** when one of these is involved. `posts_per_page` (**Blog pages show at most**) isn't reported either, but nothing in the front-end reads it: a Query Loop paginates by its own **Items per page**.
+Use **Purge all** after saving **Settings › Reading** when one of these is involved. `posts_per_page` (**Blog pages show at most**) isn't reported either, and nothing in the front-end reads it: a Query Loop paginates by the `perPage` saved in the block. A loop that inherits the template's query has no **Items per page** of its own: the block editor sets its `perPage` to `posts_per_page`, so a new value reaches it once the template or page holding it is opened in the editor and saved again. Until then, the theme's `archive.html` lists 10 posts per page.
 
 ### Regex redirections
 
