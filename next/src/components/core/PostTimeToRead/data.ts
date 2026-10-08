@@ -240,6 +240,11 @@ export const getData = async (
 		}
 	}
 
+	// No post to count: WordPress renders nothing without a `postId` either
+	if (typeof bundle?.databaseId !== 'number') {
+		return { cacheTags: nodeAtUriTags(bundle?.databaseId) };
+	}
+
 	const textSource = pickTextForWordCount(bundle, wordCountType);
 
 	const totalUnits = blockCorePostTimeToReadWordCount(
@@ -250,7 +255,7 @@ export const getData = async (
 	const base = {
 		wordCountType,
 		totalUnits,
-		cacheTags: nodeAtUriTags(bundle?.databaseId),
+		cacheTags: nodeAtUriTags(bundle.databaseId),
 	};
 
 	if (displayMode !== 'time') {
