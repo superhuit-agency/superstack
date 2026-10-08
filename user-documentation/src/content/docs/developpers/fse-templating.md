@@ -32,13 +32,15 @@ Template read (getFseTemplates)  ← one cache entry, tagged `templates` + `node
   └─ inlines template parts into parent templates (replaces core/template-part blocks)
   └─ returns the block structure only, no dynamic data
 
-Page render (getNodeByURI)
+Page render (getPublicNodeByURI, or getPreviewNodeByURI in preview)
   ├─ fetches page's own blocksJSON
   ├─ resolves the page's FSE template slug (via fseTemplate GraphQL field)
   ├─ loads template blocks from the template read
   ├─ enriches template blocks via getData calls (navigation links, logos, …)
   └─ injects page blocks into the template's core/post-content block
 ```
+
+The `fseTemplate` field follows the WordPress template hierarchy. A post type archive resolves `archive-{postType}` → `archive`. A category archive resolves `category-{slug}` → `category-{id}` → `category` → `archive`, and a tag archive `tag-{slug}` → `tag-{id}` → `tag` → `archive`.
 
 ### Visual Schema
 
@@ -52,7 +54,7 @@ flowchart TB
         B1 --> B2 --> CACHE
     end
 
-    subgraph RequestTime["🌐 Page Render — getNodeByURI"]
+    subgraph RequestTime["🌐 Page Render — getPublicNodeByURI"]
         direction TB
         R1["Template blocks<br/>+ page's own blocksJSON"]
         R2["✅ dynamic attributes (getData)<br/>✅ dynamic innerBlocks (getData)<br/>   e.g. navigation menu items<br/>✅ page blocks injected into<br/>   core/post-content"]
@@ -86,10 +88,11 @@ flowchart TB
 ## Key Files
 
 | File                                                           | Role                                                                  |
-| --------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| -------------------------------------------------------------- | --------------------------------------------------------------------- |
 | `next/src/lib/get-fse-templates.ts`                            | Cached template read: fetches templates + parts, inlines the parts    |
 | `next/src/lib/format-blocks-json.ts`                           | Parses & normalises a `blocksJSON` string                             |
 | `next/src/lib/get-block-final-component-props.ts`              | Enriches one block (calls `getData`, recurses into `innerBlocks`)     |
+| `next/src/lib/get-cached-block-data.ts`                        | Cached block-data wrapper: runs `getData` in its own cache entry      |
 | `next/src/lib/get-node-by-uri.ts`                              | Page render orchestration; calls `enrichTemplateBlocks`               |
 | `wordpress/theme/includes/graphql/register-fse-templates.php`  | Exposes templates + parts via WPGraphQL                               |
 | `wordpress/theme/includes/graphql/navigation-inner-blocks.php` | Exposes `wp_navigation` as `NavigationMenu` with a `blocksJSON` field |
@@ -118,7 +121,7 @@ flowchart TB
 
 ## Page Render Flow
 
-Inside `getNodeByURI`, after the WP node is fetched, three async operations run in parallel:
+Inside `getPublicNodeByURI` (or `getPreviewNodeByURI` in preview), after the WP node is fetched, three async operations run in parallel:
 
 ```typescript
 const [templateBlocks, { blocksJSON, templateData }] = await Promise.all([
@@ -152,19 +155,29 @@ As an example, this pattern is used for `core/navigation`:
 
 ```typescript
 // Navigation/data.ts
+import { cacheTags } from '@/lib/cache-tags';
+import { WordPressReadError } from '@/lib/wordpress-read-error';
+
 export const getData = async (fetcher, attrs) => {
 	// Fetch the wp_navigation post by DATABASE_ID and parse its blocks
 	const data = await fetcher(navigationMenuQuery, {
 		variables: { id: String(attrs.ref) },
 	});
-	const innerBlocks = data?.navigationMenu?.blocksJSON
+	// `null`: no such menu. Missing: the read failed, which mustn't be cached
+	if (data?.navigationMenu === undefined) {
+		throw new WordPressReadError(
+			`the navigation menu ${attrs.ref}`,
+			cacheTags.menu(attrs.ref)
+		);
+	}
+	const innerBlocks = data.navigationMenu?.blocksJSON
 		? JSON.parse(data.navigationMenu.blocksJSON)
 		: [];
 	return { innerBlocks }; // innerBlocks overrides the static template blocks
 };
 ```
 
-> The `wp_navigation` post type is exposed in WPGraphQL as `NavigationMenu` via `navigation-inner-blocks.php`, which also registers the `blocksJSON` field (parsed + normalised to the `{ name, attributes, innerBlocks }` shape expected by the frontend).
+> The `wp_navigation` post type is exposed in WPGraphQL as `NavigationMenu` via `navigation-inner-blocks.php`, which also registers the `blocksJSON` field (parsed + normalised to the `{ name, attributes, innerBlocks }` shape expected by the frontend). A link whose `url` is bound (e.g. to its page's `core/post-data` link) gets the bound value, as WordPress renders it, instead of the URL stored when the link was added.
 
 `get-block-final-component-props.ts` handles this by checking whether `getData` returned `innerBlocks`:
 
@@ -177,6 +190,39 @@ if (dataInnerBlocks !== undefined) {
 ```
 
 > Use this pattern for any block whose `innerBlocks` can change independently of template structure — i.e. content managed outside the template editor.
+
+### Caching block data
+
+Outside preview, `getData` runs inside `getCachedBlockData`, in a cache entry of its own keyed by the block's name, attributes and language. `data.ts` itself never imports `next/cache`, since it's also bundled into the WordPress block editor.
+
+- **`cacheTags`.** Return the tags the data depends on next to it, built with `next/src/lib/cache-tags.ts` (e.g. `{ content, cacheTags: [cacheTags.settings()] }`). The wrapper applies them and strips the key. A block returning none falls back to `content` and `settings`, and logs a development warning. Return `cacheTags: []` when the data depends on nothing WordPress reports a change for (e.g. a user's avatar): only "Purge all" then refreshes it.
+
+  Declare what the data *depends on*, not what it is about:
+
+  | The data renders… | Tags |
+  | --- | --- |
+  | the post at the Base URI | `nodeAtUriTags(databaseId)`: `node:{id}`, or `uris` when no post was found. Never `type:` |
+  | a listing, a query, latest posts, next/previous links | `type:{contentType}`, or `content` with no type filter. A `core/query` loop always has a type: it defaults to `post` |
+  | terms | `termTags(terms)`: `term:{databaseId}` for each, so query their `databaseId` |
+  | a term listing | `taxonomy:{taxonomy}` and its terms' tags, plus `content` when it shows post counts or hides empty terms |
+  | a block menu | `menu:{id}`, plus `node:{id}` or `term:{id}` for each link bound to a post or term, since its URL follows them |
+  | the site title, tagline, logo or date format | `settings` |
+
+  The public node read tags the post's own `categories` and `tags`. On a term archive, it's tagged `term:{databaseId}` and the `type:` of the post type the archive lists, not `node:`.
+- **Failed reads.** When WordPress doesn't answer, answers with a GraphQL error (even next to data that resolved), or answers without data, `fetchAPI` logs it and throws a `WordPressReadError` (`next/src/lib/wordpress-read-error.ts`), so a `getData` never sees a failure as empty data. Let it propagate: catching it and returning an empty result would have that cached until its tags are revalidated. Keep `null` for "nothing there", and throw a `WordPressReadError` yourself if a field you need is missing (`undefined`) all the same. It isn't settled into the block's fallback like other `getData` errors: it fails the public page render, so the stale page keeps being served, or the request errors, and nothing wrong is cached. In preview, where nothing is cached, the block renders with its own attributes instead.
+
+  Every block reading through `fetchAPI` gets this without doing anything. `core/navigation` also checks for its missing field.
+- **`usesBaseUri`.** A Page-dependent block, one that reads `baseUriContext()`, must declare `export const usesBaseUri = true;` in its `data.ts`. The Base URI is then added to its cache key. Any other block gets one entry per site, and reading the Base URI throws a `BaseUriNotDeclaredError`, which fails `next build`.
+
+  The opt-in exists for two reasons. Without it, the page that fills a Page-dependent block's cache entry leaks its content into every other page. With it on a block that doesn't need it, the block gets one entry per page instead of one per site, each fetched again from WordPress.
+
+  ESLint checks it as the block is written, on every `data.ts` under `next/src/components/{core,custom}` (rules in `next/eslint-rules/`):
+
+  - `superstack/require-uses-base-uri` (**error**): the module imports `baseUriContext` but doesn't declare `usesBaseUri`.
+  - `superstack/no-unused-uses-base-uri` (**warning**): the module declares `usesBaseUri` but never imports `baseUriContext`.
+
+  ESLint only sees imports in `data.ts` itself. The build-time guard above stays the backstop for a Base URI read through a helper module. A block that reads it that way and declares `usesBaseUri` gets a false warning: disable `superstack/no-unused-uses-base-uri` on that line.
+- **`usesArchiveContext`.** A block whose data changes with the archive being viewed declares `export const usesArchiveContext = true;`. Its `getData` then gets a fourth argument, the `BlockDataContext`: the current `page` from the `/page/{n}` route, the node's `baseUri`, the block's own `innerBlocks`, the archive's `term` (`{ taxonomy, databaseId }`) on a term archive, and the post type it lists (`archive.postType`) on a term or post type archive. The context is added to the block's cache key. Other blocks get no context, so they keep one entry per site. `usesArchiveContext` can also be a function of the block's attributes, when only some of them depend on the archive. `core/query` uses it that way: only a loop with `inherit: true` gets the context. It lists the archive's post type and, on a term archive, only that term's posts; it follows the `/page/{n}` route, and returns its `innerBlocks` with the pagination links filled in. A custom loop keeps one entry per site and stays on its first page.
 
 ---
 
@@ -234,3 +280,4 @@ To fetch a template block's data when each page is rendered:
 1. Create (or update) `src/components/<category>/<BlockName>/data.ts` and export a `getData` function.
 2. Register the block in `src/components/global/blockRegistry.ts` so `get-block-final-component-props.ts` can find it.
 3. If the dynamic data lives in `innerBlocks`, return `{ innerBlocks: [...] }` from `getData` — this overrides the static template blocks.
+4. Return the data's `cacheTags`, and declare `usesBaseUri` if the block reads the Base URI (see [Caching block data](#caching-block-data)).

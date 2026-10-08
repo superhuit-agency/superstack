@@ -26,7 +26,7 @@ Template read (getFseTemplates)  ← one cache entry, tagged `templates` + `node
   └─ inlines template parts into parent templates (replaces core/template-part blocks)
   └─ returns the block structure only, no dynamic data
 
-Page render (getNodeByURI)
+Page render (getPublicNodeByURI, or getPreviewNodeByURI in preview)
   ├─ fetches page's own blocksJSON
   ├─ resolves the page's FSE template slug (via fseTemplate GraphQL field)
   ├─ loads template blocks from the template read
@@ -48,7 +48,7 @@ flowchart TB
         B1 --> B2 --> CACHE
     end
 
-    subgraph RequestTime["🌐 Page Render — getNodeByURI"]
+    subgraph RequestTime["🌐 Page Render — getPublicNodeByURI"]
         direction TB
         R1["Template blocks<br/>+ page's own blocksJSON"]
         R2["✅ dynamic attributes (getData)<br/>✅ dynamic innerBlocks (getData)<br/>   e.g. navigation menu items<br/>✅ page blocks injected into<br/>   core/post-content"]
@@ -115,7 +115,7 @@ flowchart TB
 
 ## Page Render Flow
 
-Inside `getNodeByURI`, after the WP node is fetched, three async operations run in parallel:
+Inside `getPublicNodeByURI` (or `getPreviewNodeByURI` in preview), after the WP node is fetched, three async operations run in parallel:
 
 ```typescript
 const [templateBlocks, { blocksJSON, templateData }] = await Promise.all([

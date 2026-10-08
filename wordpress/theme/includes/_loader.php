@@ -50,6 +50,7 @@ require_once __DIR__ . '/admin/index.php';
 require_once __DIR__ . '/admin/font-mime-types.php';
 require_once __DIR__ . '/admin/hide-update-notice.php';
 require_once __DIR__ . '/admin/next-url-option.php';
+require_once __DIR__ . '/admin/nextjs-revalidate.php';
 require_once __DIR__ . '/admin/polylang-defaults.php';
 require_once __DIR__ . '/admin/sitemap-exclude-user.php';
 require_once __DIR__ . '/admin/template-redirect-preview.php';

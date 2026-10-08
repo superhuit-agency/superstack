@@ -8,7 +8,7 @@ const CONTRACT_VERSION = 2;
 
 export async function POST(request: Request) {
 	// Check for secret to confirm this is a valid request
-	if (!isAuthorized(request.headers.get('Authorization'))) {
+	if (!isAuthorized(request.headers)) {
 		return Response.json({ message: 'Invalid request' }, { status: 401 });
 	}
 
@@ -174,16 +174,28 @@ function uriOf(side: unknown): string | null {
 }
 
 /**
- * Whether the `Authorization` header carries the secret, compared in constant
- * time. With no secret configured, nothing is authorized.
+ * Whether the request carries the secret, compared in constant time. With no
+ * secret configured, nothing is authorized.
+ *
+ * `X-Nextjs-Revalidate-Secret` first, holding the bare secret: the plugin
+ * (2.1+) sends it there when its revalidate domain has basic-auth credentials,
+ * which take `Authorization`. Otherwise `Authorization: Bearer <secret>`.
  */
-function isAuthorized(header: string | null): boolean {
+function isAuthorized(headers: Headers): boolean {
 	const secret = process.env.REVALIDATE_SECRET;
-	if (!secret || header === null) return false;
+	if (!secret) return false;
 
+	const own = headers.get('X-Nextjs-Revalidate-Secret');
+	if (own !== null) return matches(own, secret);
+
+	const authorization = headers.get('Authorization');
+	return authorization !== null && matches(authorization, `Bearer ${secret}`);
+}
+
+function matches(given: string, expected: string): boolean {
 	// Hashed first: `timingSafeEqual` needs equal lengths, and checking them
 	// would leak the secret's
-	return timingSafeEqual(sha256(header), sha256(`Bearer ${secret}`));
+	return timingSafeEqual(sha256(given), sha256(expected));
 }
 
 function sha256(value: string): Buffer {
