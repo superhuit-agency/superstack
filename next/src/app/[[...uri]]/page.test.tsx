@@ -1,5 +1,5 @@
 import { cookies, draftMode } from 'next/headers';
-import { notFound, permanentRedirect } from 'next/navigation';
+import { notFound, permanentRedirect, redirect } from 'next/navigation';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { getLocales } from '@/i18n/get-locales';
@@ -136,5 +136,17 @@ describe('generateMetadata', () => {
 			true
 		);
 		expect(vi.mocked(getPublicNodeByURI)).not.toHaveBeenCalled();
+	});
+
+	it('exits preview in Draft Mode when the refresh token is invalid', async () => {
+		enableDraftMode();
+		vi.mocked(getAuthToken).mockResolvedValueOnce(false as never);
+
+		await expect(metadata(['37'])).rejects.toThrow('NEXT_REDIRECT');
+
+		expect(vi.mocked(redirect)).toHaveBeenCalledWith(
+			'/api/preview-exit?redirect=/37/'
+		);
+		expect(vi.mocked(getPreviewNodeByURI)).not.toHaveBeenCalled();
 	});
 });
