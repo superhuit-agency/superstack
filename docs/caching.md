@@ -256,7 +256,7 @@ Check the sequence for each of these:
 - [ ] Publishing a new post: it appears in listings
 - [ ] Changing a slug: the old URI stops serving, the new one works
 - [ ] Renaming a parent page: its child pages' breadcrumbs follow. Changing its slug: the children's old URIs stop serving
-- [ ] Publishing at a URI that used to 404
+- [ ] Publishing at a URI that used to 404: **STALE → HIT**, so the cached 404 is served once more before the new page. That's by design: `uris` goes stale, it isn't expired
 - [ ] On a multilingual site, changing a translation's slug or publishing a new one: the other languages' hreflang and language switcher follow
 - [ ] Editing a template part in the Site Editor
 - [ ] Editing a block menu in the Site Editor
