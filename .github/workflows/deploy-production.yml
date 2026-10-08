@@ -125,6 +125,20 @@ jobs:
           VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
 
+      - name: Install node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: 'npm'
+          cache-dependency-path: |
+            next/package-lock.json
+
+      - name: Install node dependencies
+        run: npm --prefix next ci
+
+      - name: Test Next
+        run: npm --prefix next test
+
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
 
