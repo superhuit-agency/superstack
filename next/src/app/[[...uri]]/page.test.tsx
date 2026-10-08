@@ -1,8 +1,15 @@
-import { notFound, permanentRedirect } from 'next/navigation';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { cookies, draftMode } from 'next/headers';
+import { notFound, permanentRedirect, redirect } from 'next/navigation';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { getPublicNodeByURI, getRedirection } from '@/lib';
-import Page from './page';
+import { getLocales } from '@/i18n/get-locales';
+import {
+	getAuthToken,
+	getPreviewNodeByURI,
+	getPublicNodeByURI,
+	getRedirection,
+} from '@/lib';
+import Page, { generateMetadata } from './page';
 
 vi.mock('next/dynamic', () => ({ default: () => () => null }));
 
@@ -70,5 +77,76 @@ describe('Page', () => {
 		);
 		expect(vi.mocked(getRedirection)).not.toHaveBeenCalled();
 		expect(vi.mocked(notFound)).toHaveBeenCalled();
+	});
+});
+
+describe('generateMetadata', () => {
+	const metadata = (uri: string[]) =>
+		generateMetadata({
+			params: Promise.resolve({ uri, lang: 'fr' as Locale }),
+		});
+
+	const enableDraftMode = () => {
+		vi.mocked(draftMode).mockResolvedValueOnce({
+			isEnabled: true,
+		} as never);
+		vi.mocked(cookies).mockResolvedValueOnce({
+			get: (name: string) =>
+				({
+					token: { value: 'refresh' },
+					'preview-draft': { value: 'true' },
+				})[name],
+		} as never);
+	};
+
+	beforeEach(() => {
+		vi.mocked(getLocales).mockResolvedValue({
+			locales: ['fr'],
+			defaultLocale: 'fr',
+		} as never);
+	});
+
+	it('reads the public node outside Draft Mode', async () => {
+		vi.mocked(getPublicNodeByURI).mockResolvedValueOnce({
+			title: 'Public',
+		} as never);
+
+		const { title } = await metadata(['hello']);
+
+		expect(title).toBe('Public');
+		expect(vi.mocked(getPreviewNodeByURI)).not.toHaveBeenCalled();
+	});
+
+	it('reads the preview node, with auth, in Draft Mode', async () => {
+		enableDraftMode();
+		vi.mocked(getAuthToken).mockResolvedValueOnce('auth');
+		vi.mocked(getPreviewNodeByURI).mockResolvedValueOnce({
+			title: 'Draft',
+		} as never);
+
+		// A never-published draft is previewed at its ID
+		const { title } = await metadata(['37']);
+
+		expect(title).toBe('Draft');
+		expect(vi.mocked(getPreviewNodeByURI)).toHaveBeenCalledWith(
+			'/37/',
+			'fr',
+			1,
+			{ authToken: 'auth' },
+			true
+		);
+		expect(vi.mocked(getPublicNodeByURI)).not.toHaveBeenCalled();
+	});
+
+	it('exits preview in Draft Mode when the refresh token is invalid', async () => {
+		enableDraftMode();
+		vi.mocked(getAuthToken).mockResolvedValueOnce(false as never);
+
+		await expect(metadata(['37'])).rejects.toThrow('NEXT_REDIRECT');
+
+		expect(vi.mocked(redirect)).toHaveBeenCalledWith(
+			'/api/preview-exit?redirect=/37/'
+		);
+		expect(vi.mocked(getPreviewNodeByURI)).not.toHaveBeenCalled();
 	});
 });
