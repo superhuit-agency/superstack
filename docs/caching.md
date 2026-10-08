@@ -35,7 +35,7 @@ Tag names are built by one helper module, `next/src/lib/cache-tags.ts`, used bot
 | `settings` | the public node read (it also returns Site settings: SEO defaults, site title), site title / tagline / logo / date blocks, the locale list, sitemaps, blocks that declare no tags | a `settings` change, or `all` |
 | `templates` | the FSE template read | a `templates` change, or `all` |
 | `redirect:{uri}` | the redirect lookup for that URI, including a "no redirect" result | a `redirect` change for that URI |
-| `uris` | public node reads that found **no** node (cached 404s); Page-dependent blocks that found no post at the Base URI | a `post` change whose URI changed (publish, unpublish, trash, delete, slug change), or `all` |
+| `uris` | public node reads that found **no** node (cached 404s); on a multilingual site, every public node read, since it links to its translations (hreflang, language switcher); Page-dependent blocks that found no post at the Base URI | a `post` change whose URI changed (publish, unpublish, trash, delete, slug change), or `all` |
 | `nodes` | every cached read | `all` only: the manual lever |
 
 Term tags use the term's database ID, not its slug, so a slug rename needs no old slug. Queries that render terms must fetch `databaseId`.
@@ -44,7 +44,7 @@ Term tags use the term's database ID, not its slug, so a slug rename needs no ol
 
 | Read | File | Tags |
 | --- | --- | --- |
-| Public node read | `next/src/lib/get-node-by-uri.ts` (`getPublicNodeByURI`) | `node:{id}`, `nodes:{type}`, `settings`, the `term:` tags of its categories and tags; a post type archive gets `type:{type}`; no node found → `uris` |
+| Public node read | `next/src/lib/get-node-by-uri.ts` (`getPublicNodeByURI`) | `node:{id}`, `nodes:{type}`, `settings`, the `term:` tags of its categories and tags; a post type archive gets `type:{type}`; `uris` on a multilingual site or when no node is found |
 | Redirect lookup | `next/src/lib/get-redirection.ts` | `redirect:{uri}` |
 | Locale list | `next/src/i18n/get-locales.ts` | `settings` |
 | FSE templates | `next/src/lib/get-fse-templates.ts` | `templates` (see [FSE Templating](./fse-templating.md#refreshing-templates)) |
@@ -182,6 +182,7 @@ Check the sequence for each of these:
 - [ ] Publishing a new post: it appears in listings
 - [ ] Changing a slug: the old URI stops serving, the new one works
 - [ ] Publishing at a URI that used to 404
+- [ ] On a multilingual site, changing a translation's slug or publishing a new one: the other languages' hreflang and language switcher follow
 - [ ] Editing a template part in the Site Editor
 - [ ] Editing a block menu in the Site Editor
 - [ ] Moving a page a block menu links to (new slug or parent): the menu links to its new URI

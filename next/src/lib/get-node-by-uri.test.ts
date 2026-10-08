@@ -249,6 +249,59 @@ describe('getPublicNodeByURI', () => {
 		expect(cacheTagsGiven()).toEqual(['nodes', 'uris']);
 	});
 
+	it('tags a translated node `uris`, since it links to its translations', async () => {
+		configs.isMultilang = true;
+		wordpressReturns({
+			__typename: 'Page',
+			contentTypeName: 'page',
+			translation: {
+				id: 12,
+				uri: '/en/about/',
+				language: { code: 'EN', locale: 'en_US' },
+				translations: [
+					{
+						uri: '/fr/a-propos/',
+						language: { code: 'FR', locale: 'fr_FR' },
+					},
+				],
+			},
+		});
+
+		const node = await getPublicNodeByURI('/about/', 'en');
+
+		expect(node?.translations).toEqual([
+			{
+				uri: '/fr/a-propos/',
+				language: { code: 'FR', locale: 'fr_FR' },
+			},
+		]);
+		expect(cacheTagsGiven()).toEqual([
+			'node:12',
+			'nodes',
+			'nodes:page',
+			'settings',
+			'uris',
+		]);
+	});
+
+	it('tags a node with no translation yet `uris`, since publishing one adds a link', async () => {
+		configs.isMultilang = true;
+		wordpressReturns({
+			__typename: 'Page',
+			contentTypeName: 'page',
+			translation: {
+				id: 12,
+				uri: '/en/about/',
+				language: { code: 'EN', locale: 'en_US' },
+				translations: [],
+			},
+		});
+
+		await getPublicNodeByURI('/about/', 'en');
+
+		expect(cacheTagsGiven()).toContain('uris');
+	});
+
 	it('gives the blocks the Base URI with its language prefix', async () => {
 		configs.isMultilang = true;
 		wordpressReturns({
