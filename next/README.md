@@ -9,10 +9,11 @@ Frontend application for the Superstack project (headless WordPress + Next.js).
 
 ## Getting Started
 
-Install dependencies:
+Install dependencies and create your environment file:
 
 ```bash
 npm install
+cp .env.example .env # preview is refused without WORDPRESS_PREVIEW_SECRET
 ```
 
 Start development:
@@ -48,7 +49,7 @@ npm run dev
 
 Adding a new CPT requires changes on both the WordPress and Next.js sides:
 
-- [docs/custom-post-types.md](/docs/custom-post-types.md)
+- [.claude/skills/add-custom-post-type/SKILL.md](/.claude/skills/add-custom-post-type/SKILL.md)
 
 ## Deployment
 

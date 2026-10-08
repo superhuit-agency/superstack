@@ -99,7 +99,7 @@ flowchart TB
 
 **What it does:**
 
-1. Queries `allTemplateParts` — all template parts, including theme-file-based ones that are never stored as DB posts (see [WPGraphQL extension](#wpgraphql-extensions) below).
+1. Queries `allTemplateParts` — all template parts, including theme-file-based ones that are never stored as DB posts (WPGraphQL extension, see `register-fse-templates.php` in [Key Files](#key-files)).
 2. Queries `allTemplates` — all FSE templates (in the same request).
 3. For each template, parses its `blocksJSON` with `skipGetData: true` — this stores block structure only, without calling any `getData` function.
 4. Replaces every `core/template-part` block with the actual blocks from the matching template part (flattened inline).
@@ -120,10 +120,10 @@ Inside `getPublicNodeByURI` (or `getPreviewNodeByURI` in preview), after the WP 
 ```typescript
 const [templateBlocks, { blocksJSON, templateData }] = await Promise.all([
 	getTemplateBlocks(node?.fseTemplate?.slug, lang).then((blocks) =>
-		enrichTemplateBlocks(blocks, lang)
+		enrichTemplateBlocks(blocks, { lang, preview, context })
 	), // FSE template
 	Promise.allSettled([
-		formatBlocksJSON(node?.blocksJSON ?? '', { lang }), // page's own blocks
+		formatBlocksJSON(node?.blocksJSON ?? '', { lang, preview, context }), // page's own blocks (the draft's in preview)
 		getTemplateData(node), // template-level extra data
 	]).then(/* … */),
 ]);
@@ -233,6 +233,8 @@ The template read is refreshed by revalidating the `templates` tag. The revalida
 The read is also refreshed by a **Purge all** (the `all` change clears `templates` too). Pages that were rendered with a template carry its `templates` tag, so they are refreshed along with it, on their next request. No rebuild or restart is needed.
 
 Menu links and any other block that returns `innerBlocks` from `getData` aren't part of the template read, so a `templates` change isn't needed for them.
+
+The theme makes templates, template parts and block menus (`wp_navigation`) public to expose them to WPGraphQL, so the plugin would also report each save as a `post` change, which clears every listing. Its `skip_theme_post_types` filter (`wordpress/theme/includes/admin/nextjs-revalidate.php`) drops those: a template save sends a `templates` change only, a menu save a `menu` change only. Add any other internal post type you expose to WPGraphQL to it.
 
 ---
 
