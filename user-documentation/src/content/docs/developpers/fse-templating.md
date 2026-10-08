@@ -214,6 +214,8 @@ Outside preview, `getData` runs inside `getCachedBlockData`, in a cache entry of
   Every block reading through `fetchAPI` gets this without doing anything. `core/navigation` also checks for its missing field.
 - **`usesBaseUri`.** A Page-dependent block, one that reads `baseUriContext()`, must declare `export const usesBaseUri = true;` in its `data.ts`. The Base URI is then added to its cache key. Any other block gets one entry per site, and reading the Base URI throws a `BaseUriNotDeclaredError`, which fails `next build`.
 
+  `usesBaseUri` can also be a function of the block's attributes, like `usesArchiveContext`, when the block reads the Base URI with some attributes only. `core/terms-query` uses it that way: only a list with `inherit: true` reads the term archive at the Base URI, so a list that doesn't inherit keeps one entry per site. Reading the Base URI with attributes the function returns false for throws the same `BaseUriNotDeclaredError`.
+
   The opt-in exists for two reasons. Without it, the page that fills a Page-dependent block's cache entry leaks its content into every other page. With it on a block that doesn't need it, the block gets one entry per page instead of one per site, each fetched again from WordPress.
 
   ESLint checks it as the block is written, on every `data.ts` under `next/src/components/{core,custom}` (rules in `next/eslint-rules/`):
