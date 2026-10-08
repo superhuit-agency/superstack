@@ -175,7 +175,7 @@ WordPress sends logged-in users to the front-end's `/api/preview/` route with a 
 | Next.js   | `WORDPRESS_PREVIEW_SECRET` in the front-end's environment (`shared/.env` on an SSH deployment, the project's environment variables on Vercel). **Required**: without it, every preview is refused with a `401`. |
 | WordPress | A `WORDPRESS_PREVIEW_SECRET` constant in `wp-config.php` (`wp config set WORDPRESS_PREVIEW_SECRET <secret>`), or an environment variable of that name. Without it, the theme sends `spck`, the local development default, which a front-end with a secret of its own refuses. |
 
-`provision.sh` sets neither.
+`provision.sh` sets neither. The first SSH deployment copies `next/.env.example` to `shared/.env`, so it starts with `spck`: replace it.
 
 ## 🚀 Production deployments
 
