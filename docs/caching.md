@@ -124,7 +124,9 @@ Unknown subjects and unknown fields are ignored, so a minor plugin release never
 
 ### Redirects are never re-rendered in the background
 
-The catch-all page looks a redirect up only for a URI that has no node, and calls `permanentRedirect()` or `redirect()` when it finds one. When a stale entry is re-rendered in the background and that render ends in a redirect, Next 16.2 caches the response as a 308 (or 307) **without its `Location` header**, and serves it as a HIT until the next invalidation. Clients without JavaScript (crawlers, `curl`, link checkers) can't follow it. A blocking render caches the redirect correctly.
+The catch-all page looks a redirect up only for a URI that has no node, and calls `permanentRedirect()` or `redirect()` when it finds one. When a stale entry is re-rendered in the background and that render ends in a redirect, Next 16 caches the response as a 308 (or 307) **without its `Location` header**, and serves it as a HIT until the next invalidation. Clients without JavaScript (crawlers, `curl`, link checkers) can't follow it. A blocking render caches the redirect correctly.
+
+This is a Next.js bug, reproduced from 16.2.3 to 16.5.0-canary.3 ([repro](https://github.com/kuuak/next-swr-redirect-location-repro)). Its root cause is [vercel/next.js#98600](https://github.com/vercel/next.js/issues/98600), and [vercel/next.js#99220](https://github.com/vercel/next.js/pull/99220) fixes it. Once a Next release includes that fix, the expiries below can go back to stale-while-revalidate.
 
 A URI with no node is looked up only on its first page: a `/page/{n}` with no node answers 404 without a redirect lookup, since the lookup would be for the URI without its page. So `/old/page/2/` doesn't follow the redirect of `/old/`.
 
@@ -134,7 +136,7 @@ So every change that can turn a cached page into a redirect expires that page ra
 - a `post` change whose URI changed: the page at its old URI (`revalidatePath(before.uri)`), which an existing redirect from that URI now applies to. Its descendants' old URIs too: the plugin sends a change for each of them;
 - `all`: `redirects`, which every cached 404 and cached redirect carries (only a URI with no node looks a redirect up), so a URI that is now a redirect source, or a redirect to another target, renders it. This is what makes Purge all a workaround for [regex redirections](#regex-redirections).
 
-Only tags that no change marks stale are expired: a later `revalidateTag(tag, 'max')` on an expired tag replaces its expiry, and the page would be re-rendered in the background after all. That's why the post's `node:{id}` and `uris` stay stale-while-revalidate, and the old URI is expired by path instead.
+Only tags that no change marks stale are expired: a later `revalidateTag(tag, 'max')` on an expired tag replaces its expiry, and the page would be re-rendered in the background after all ([vercel/next.js#99862](https://github.com/vercel/next.js/issues/99862)). That's why the post's `node:{id}` and `uris` stay stale-while-revalidate, and the old URI is expired by path instead.
 
 The next request for each of these pages waits for WordPress (`x-nextjs-cache: MISS`). They are rare changes, and only those pages pay for it: one page per redirect or moved post, and every cached 404 and cached redirect on Purge all.
 
