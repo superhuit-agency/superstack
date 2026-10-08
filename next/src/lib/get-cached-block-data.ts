@@ -16,8 +16,11 @@ export type BlockDataModule = {
 		lang?: string | null,
 		context?: BlockDataContext
 	) => Promise<BlockData | undefined>;
-	/** Set by Page-dependent blocks: their data changes with the Base URI. */
-	usesBaseUri?: boolean;
+	/**
+	 * Set by Page-dependent blocks, whose data changes with the Base URI, or
+	 * by the attributes they do for.
+	 */
+	usesBaseUri?: boolean | ((attrs: object) => boolean);
 	/**
 	 * Set by blocks whose data changes with the archive being viewed, or by
 	 * the attributes they do for.
@@ -31,6 +34,17 @@ export const getBlockDataModule = async (
 	((await blocksDataList[name as keyof typeof blocksDataList]?.()) as
 		| BlockDataModule
 		| undefined) ?? null;
+
+/**
+ * Whether a block's data changes with the Base URI, for these attributes
+ */
+export const blockUsesBaseUri = (
+	blockModule: BlockDataModule | null,
+	attributes: object
+) =>
+	typeof blockModule?.usesBaseUri === 'function'
+		? blockModule.usesBaseUri(attributes)
+		: !!blockModule?.usesBaseUri;
 
 /**
  * A block's data, cached until one of its tags is revalidated.
@@ -65,7 +79,7 @@ export default async function getCachedBlockData(
 	const blockModule = await getBlockDataModule(name);
 
 	// The request-scoped Base URI doesn't cross into a cached scope
-	if (!blockModule?.usesBaseUri) guardBaseUri(name);
+	if (!blockUsesBaseUri(blockModule, attributes)) guardBaseUri(name);
 	else if (baseUri) baseUriContext(baseUri);
 
 	const { cacheTags: tags, ...data } =
