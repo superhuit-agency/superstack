@@ -554,17 +554,17 @@
 			"source": {
 				"type": "git",
 				"url": "https://github.com/superhuit-agency/wp-graphql-gutenberg.git",
-				"reference": "2c1aa4604e33cf9b448fe8433dfb496a7b40ed57"
+				"reference": "d80cef61c18678098c2c2cc73f80369d53988f93"
 			},
 			"dist": {
 				"type": "zip",
-				"url": "https://api.github.com/repos/superhuit-agency/wp-graphql-gutenberg/zipball/2c1aa4604e33cf9b448fe8433dfb496a7b40ed57",
-				"reference": "2c1aa4604e33cf9b448fe8433dfb496a7b40ed57",
+				"url": "https://api.github.com/repos/superhuit-agency/wp-graphql-gutenberg/zipball/d80cef61c18678098c2c2cc73f80369d53988f93",
+				"reference": "d80cef61c18678098c2c2cc73f80369d53988f93",
 				"shasum": ""
 			},
 			"require": {
 				"opis/json-schema": "^1.0",
-				"voku/simple_html_dom": "~4.7.17"
+				"voku/simple_html_dom": "~4.8.10"
 			},
 			"require-dev": {
 				"automattic/vipwpcs": "^2.2",
@@ -594,7 +594,7 @@
 			"support": {
 				"source": "https://github.com/superhuit-agency/wp-graphql-gutenberg/tree/master"
 			},
-			"time": "2026-04-28T09:07:58+00:00"
+			"time": "2026-07-22T14:19:25+00:00"
 		},
 		{
 			"name": "squizlabs/php_codesniffer",
@@ -921,16 +921,16 @@
 		},
 		{
 			"name": "voku/simple_html_dom",
-			"version": "4.7.31",
+			"version": "4.8.10",
 			"source": {
 				"type": "git",
 				"url": "https://github.com/voku/simple_html_dom.git",
-				"reference": "2bc2f89d9124bd2fd4817c73facf29a8b5be3c97"
+				"reference": "716822ed52ed3a1881542be07a786270de390e99"
 			},
 			"dist": {
 				"type": "zip",
-				"url": "https://api.github.com/repos/voku/simple_html_dom/zipball/2bc2f89d9124bd2fd4817c73facf29a8b5be3c97",
-				"reference": "2bc2f89d9124bd2fd4817c73facf29a8b5be3c97",
+				"url": "https://api.github.com/repos/voku/simple_html_dom/zipball/716822ed52ed3a1881542be07a786270de390e99",
+				"reference": "716822ed52ed3a1881542be07a786270de390e99",
 				"shasum": ""
 			},
 			"require": {
@@ -938,7 +938,7 @@
 				"ext-libxml": "*",
 				"ext-simplexml": "*",
 				"php": ">=7.0.0",
-				"symfony/css-selector": "~3.0 || ~4.0 || ~5.0 || ~6.0"
+				"symfony/css-selector": "~3.0 || ~4.0 || ~5.0 || ~6.0 || ~7.0"
 			},
 			"require-dev": {
 				"phpunit/phpunit": "~6.0 || ~7.0 || ~9.0"
@@ -960,17 +960,17 @@
 				{
 					"name": "dimabdc",
 					"email": "support@titor.ru",
-					"homepage": "http://github.com/dimabdc",
+					"homepage": "https://github.com/dimabdc",
 					"role": "Developer"
 				},
 				{
 					"name": "Lars Moelleken",
-					"homepage": "http://www.moelleken.org/",
-					"role": "Developer"
+					"homepage": "https://www.moelleken.org/",
+					"role": "Fork-Maintainer"
 				}
 			],
 			"description": "Simple HTML DOM package.",
-			"homepage": "http://simplehtmldom.sourceforge.net/",
+			"homepage": "https://github.com/voku/simple_html_dom",
 			"keywords": [
 				"HTML Parser",
 				"dom",
@@ -978,7 +978,7 @@
 			],
 			"support": {
 				"issues": "https://github.com/voku/simple_html_dom/issues",
-				"source": "https://github.com/voku/simple_html_dom/tree/4.7.31"
+				"source": "https://github.com/voku/simple_html_dom/tree/4.8.10"
 			},
 			"funding": [
 				{
@@ -998,7 +998,7 @@
 					"type": "tidelift"
 				}
 			],
-			"time": "2021-12-15T10:38:11+00:00"
+			"time": "2024-07-03T16:05:14+00:00"
 		},
 		{
 			"name": "wp-graphql/wp-graphql-jwt-authentication",
@@ -1338,6 +1338,6 @@
 	"platform": {
 		"php": "^8.3"
 	},
-	"platform-dev": {},
+	"platform-dev": [],
 	"plugin-api-version": "2.6.0"
 }

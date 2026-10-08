@@ -31,7 +31,7 @@ Tag names are built by one helper module, `next/src/lib/cache-tags.ts`, used bot
 | `type:{contentType}` | listings (Query, Latest Posts), post type archives, next / previous post links, per-type sitemaps | a `post` change of that type |
 | `content` | listings with no type filter; the sitemap index; blocks that declare no tags | every `post` change |
 | `term:{databaseId}` | reads that display a term: post terms, the public node read, term archives, Navigation block data for each link bound to a term | a term change (not mapped yet, see [Known gaps](#known-gaps-until-plugin-v21)) |
-| `taxonomy:{taxonomy}` | term listings | a scoped `all` of a type using that taxonomy; a term change once mapped |
+| `taxonomy:{taxonomy}` | term listings, term sitemaps and the sitemap index | a scoped `all` of a type using that taxonomy; a term change once mapped |
 | `menu:{id}` | Navigation block data (block menu ID) | a `menu` change for that ID |
 | `settings` | the public node read (it also returns Site settings: SEO defaults, site title), site title / tagline / logo / date blocks, the locale list, sitemaps, blocks that declare no tags | a `settings` change, or `all` |
 | `templates` | the FSE template read | a `templates` change, or `all` |
@@ -50,7 +50,7 @@ Term tags use the term's database ID, not its slug, so a slug rename needs no ol
 | Redirect lookup | `next/src/lib/get-redirection.ts` | `redirect:{uri}`, `redirects` |
 | Locale list | `next/src/i18n/get-locales.ts` | `settings` |
 | FSE templates | `next/src/lib/get-fse-templates.ts` | `templates` (see [FSE Templating](./fse-templating.md#refreshing-templates)) |
-| Sitemap | `next/src/lib/get-sitemap-data.ts` | index: `content` + `settings`; per type: `type:{type}` + `settings` |
+| Sitemap | `next/src/lib/get-sitemap-data.ts` | index: `content` + `settings` + `taxonomy:{taxonomy}` of each taxonomy; per type: `type:{type}` + `settings`; per taxonomy (term archives): `taxonomy:{taxonomy}` + `content` + `settings` |
 | Block data | `next/src/lib/get-cached-block-data.ts` | the block's own `cacheTags` |
 
 All of them also carry `nodes`. The build-time URI list (`get-all-uris.ts`, used by `generateStaticParams`) is not cached: it only runs during the build.

@@ -24,6 +24,29 @@ const contentTypes = {
 	],
 };
 
+const taxonomies = {
+	nodes: [
+		{ name: 'category', graphqlPluralName: 'categories' },
+		{ name: 'post_format', graphqlPluralName: 'postFormats' },
+	],
+};
+
+const categories = {
+	pageInfo: { hasNextPage: false, endCursor: null },
+	nodes: [
+		{
+			uri: '/category/news/',
+			seo: { metaRobotsNoindex: 'index' },
+			contentNodes: { nodes: [{ modified: '2026-09-30T10:00:00' }] },
+		},
+		{
+			uri: '/category/hidden/',
+			seo: { metaRobotsNoindex: 'noindex' },
+			contentNodes: { nodes: [{ modified: '2026-09-29T10:00:00' }] },
+		},
+	],
+};
+
 const featuredImage = {
 	node: { sourceUrl: 'https://wp.test/wp-content/uploads/a.jpg', title: 'A' },
 };
@@ -38,6 +61,12 @@ function wordpressWithoutIntrospection() {
 			throw new Error(
 				'GraphQL introspection is not allowed for public requests'
 			);
+		}
+		if (query.includes('query SitemapTaxonomies')) {
+			return { taxonomies };
+		}
+		if (query.includes('query SitemapTaxonomyUrls')) {
+			return { categories };
 		}
 		if (query.includes('query SitemapTypeUrls')) {
 			const type = query.includes('posts(') ? 'posts' : 'features';
@@ -103,5 +132,60 @@ describe('getSitemapData', () => {
 		expect(urlsQuery).toMatch(
 			/\.\.\. on ContentNode \{\s*\.\.\. on NodeWithFeaturedImage \{\s*featuredImage/
 		);
+	});
+
+	it('lists the indexable terms of a taxonomy, tagged with it', async () => {
+		wordpressWithoutIntrospection();
+
+		const urls = await getSitemapData('categories', 1, 100);
+
+		expect(urls).toEqual([
+			{ uri: '/category/news/', modified: '2026-09-30' },
+		]);
+		expect(vi.mocked(cacheTag).mock.calls.flat()).toEqual(
+			expect.arrayContaining(['taxonomy:category', 'content'])
+		);
+	});
+
+	it('lists the taxonomies with indexable terms in the index', async () => {
+		wordpressWithoutIntrospection();
+		vi.mocked(fetchAPI).mockImplementation(async (query: string) => {
+			if (query.includes('query SitemapTaxonomies'))
+				return { taxonomies };
+			if (query.includes('query SitemapTaxonomyUrls'))
+				return { categories };
+			if (query.includes('query TypesNoIndex')) {
+				return { seo: { contentTypes: {} } };
+			}
+			return { contentTypes: { nodes: [] } };
+		});
+
+		const index = await getSitemapData('all');
+
+		expect(index).toEqual([
+			{ name: 'categories', total: 1, lastModified: '2026-09-30' },
+		]);
+		expect(vi.mocked(cacheTag).mock.calls.flat()).toContain(
+			'taxonomy:category'
+		);
+	});
+
+	it("doesn't answer an empty taxonomy sitemap when WordPress fails", async () => {
+		wordpressWithoutIntrospection();
+		const consoleError = vi
+			.spyOn(console, 'error')
+			.mockImplementation(() => {});
+		vi.mocked(fetchAPI).mockImplementation(async (query: string) => {
+			if (query.includes('query SitemapTaxonomies'))
+				return { taxonomies };
+			if (query.includes('query SitemapTaxonomyUrls')) {
+				throw new Error('503 Service Unavailable');
+			}
+			return { contentTypes };
+		});
+
+		expect(await getSitemapData('categories', 1, 100)).toBeNull();
+
+		consoleError.mockRestore();
 	});
 });

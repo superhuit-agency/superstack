@@ -14,7 +14,7 @@
 	&.has-aspect-ratio {
 		img {
 			position: static !important;
-			width: auto !important;
+			width: 100% !important;
 			height: auto !important;
 		}
 	}
