@@ -255,6 +255,106 @@ describe('getPublicNodeByURI', () => {
 		);
 	});
 
+	describe('on a `/page/{n}` route', () => {
+		const inheritingLoop = (totalPages: number | null) => ({
+			name: 'core/query',
+			attributes: {
+				query: { inherit: true },
+				pagination: { totalPages },
+			},
+			innerBlocks: [],
+		});
+
+		/** A template whose content area holds `blocks`. */
+		const templateWith = (...blocks: unknown[]) =>
+			vi.mocked(getFseTemplates).mockResolvedValue([
+				{
+					slug: 'category',
+					blocks: [
+						{
+							name: 'core/group',
+							attributes: {},
+							innerBlocks: blocks,
+						},
+					],
+				},
+			] as Awaited<ReturnType<typeof getFseTemplates>>);
+
+		afterEach(() => {
+			vi.mocked(getFseTemplates).mockResolvedValue([]);
+		});
+
+		it('renders a page of the loop inheriting the template query', async () => {
+			wordpressReturns(category);
+			templateWith(inheritingLoop(3));
+
+			const node = await getPublicNodeByURI('/category/news/', null, 3);
+
+			expect(node?.uri).toBe('/category/news/');
+		});
+
+		it('renders a page of a loop whose total is unknown', async () => {
+			wordpressReturns(category);
+			templateWith(inheritingLoop(null));
+
+			expect(
+				await getPublicNodeByURI('/category/news/', null, 9)
+			).not.toBeNull();
+		});
+
+		it('caches a page past the last one as a 404, tagged with the archive', async () => {
+			wordpressReturns(category);
+			templateWith(inheritingLoop(3));
+
+			expect(
+				await getPublicNodeByURI('/category/news/', null, 4)
+			).toBeNull();
+			expect(cacheTagsGiven()).toEqual([
+				'nodes',
+				'settings',
+				'term:7',
+				'type:post',
+			]);
+		});
+
+		it('caches a page of a node with no inheriting loop as a 404, tagged with the node', async () => {
+			wordpressReturns({
+				__typename: 'Post',
+				contentTypeName: 'post',
+				id: 42,
+				uri: '/hello/',
+				fseTemplate: { slug: 'category' },
+			});
+			templateWith({
+				name: 'core/query',
+				attributes: {
+					query: { inherit: false },
+					pagination: { totalPages: 5 },
+				},
+				innerBlocks: [],
+			});
+
+			expect(await getPublicNodeByURI('/hello/', null, 2)).toBeNull();
+			expect(cacheTagsGiven()).toEqual([
+				'node:42',
+				'nodes',
+				'nodes:post',
+				'settings',
+			]);
+		});
+
+		it('renders the first page of a node with no loop', async () => {
+			wordpressReturns({
+				__typename: 'Post',
+				contentTypeName: 'post',
+				id: 42,
+				uri: '/hello/',
+			});
+
+			expect(await getPublicNodeByURI('/hello/', null, 1)).not.toBeNull();
+		});
+	});
+
 	it('caches a URI with no node as a 404 tagged `uris`', async () => {
 		wordpressReturns(null);
 

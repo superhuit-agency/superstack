@@ -69,8 +69,36 @@ export async function getPublicNodeByURI(
 		...ancestorTags(node.ancestors?.nodes)
 	);
 
+	// A page the node doesn't have is a cached 404, with the node's tags and
+	// its loops': a new post can add it
+	if (routePage > 1 && !hasRoutePage(node.blocks, routePage)) return null;
+
 	return node;
 }
+
+/**
+ * Whether the `/page/{n}` route exists: only a loop inheriting the template
+ * query follows it, up to its last page when its total is known.
+ */
+const hasRoutePage = (
+	blocks: Array<BlockPropsType | null> | undefined,
+	page: number
+): boolean =>
+	(blocks ?? []).some((block) => {
+		if (!block) return false;
+
+		const { query, pagination } = (block.attributes ?? {}) as {
+			query?: { inherit?: boolean };
+			pagination?: { totalPages?: unknown };
+		};
+
+		if (block.name === 'core/query' && query?.inherit === true) {
+			const totalPages = pagination?.totalPages;
+			return typeof totalPages !== 'number' || page <= totalPages;
+		}
+
+		return hasRoutePage(block.innerBlocks, page);
+	});
 
 /**
  * Tags of what a node read renders itself: the post or page, or what an
