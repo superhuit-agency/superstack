@@ -25,6 +25,12 @@ describe('getWpUriFromNextPath', () => {
 		);
 	});
 
+	it('keeps an encoded `/`, `?` or `#` encoded, as WordPress would split the URI on it', () => {
+		expect(
+			getWpUriFromNextPath(['blog%2Fhello-world', 'a%3Fb', 'c%23d'])
+		).toBe('/blog%2Fhello-world/a%3Fb/c%23d/');
+	});
+
 	it('keeps a segment with a malformed escape sequence as it came', () => {
 		expect(getWpUriFromNextPath(['100%', '%D0%BF'])).toBe('/100%/п/');
 	});

@@ -1,23 +1,19 @@
-/**
- * Decode a route segment: Next passes the page its params percent-encoded
- * (e.g. `%D0%BF…` for `п…`), while its metadata and `generateStaticParams`
- * get them decoded, and WordPress resolves only the decoded URI.
- * A malformed escape sequence is kept as it came.
- */
-const decodeSegment = (segment: string) => {
-	try {
-		return decodeURIComponent(segment);
-	} catch {
-		return segment;
-	}
-};
+import { decodePath } from '@/lib/cache-tags';
 
+/**
+ * Next passes the page its params percent-encoded (e.g. `%D0%BF…` for `п…`),
+ * and WordPress resolves only the decoded URI. Each segment is decoded like
+ * `decodePath()`: an encoded `/`, `?` or `#` stays encoded, so it can't split
+ * the segment or cut the URI short for WordPress (`/company%3Fx/` would
+ * otherwise resolve to `/company/`). A malformed escape sequence is kept as it
+ * came.
+ */
 export default function getWpUriFromNextPath(
 	path: Array<string>
 	// lang?: string,
 	// defaultLocale?: string
 ) {
-	let uri = path?.length ? `/${path.map(decodeSegment).join('/')}/` : `/`;
+	let uri = path?.length ? `/${path.map(decodePath).join('/')}/` : `/`;
 
 	// if (lang) uri = '/' + lang + uri;
 

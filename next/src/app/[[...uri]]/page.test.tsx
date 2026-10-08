@@ -112,6 +112,29 @@ describe('Page', () => {
 		expect(vi.mocked(notFound)).not.toHaveBeenCalled();
 	});
 
+	it.each([
+		// An encoded `?` would cut the URI short for WordPress
+		['company%3Fx', 'company?x', '/company%3Fx/'],
+		// Next decodes the metadata params once already
+		['%2541', '%41', '/%41/'],
+	])(
+		'reads the same URI for %s in the page and its metadata',
+		async (pageSegment, metadataSegment, uri) => {
+			await expect(render([pageSegment])).rejects.toThrow();
+			await generateMetadata({
+				params: Promise.resolve({
+					uri: [metadataSegment],
+					lang: 'fr' as Locale,
+				}),
+			});
+
+			expect(vi.mocked(getPublicNodeByURI).mock.calls).toEqual([
+				[uri, 'fr', 1],
+				[uri, 'fr', 1],
+			]);
+		}
+	);
+
 	it('reads the query loop page of a non-ASCII URI', async () => {
 		await expect(
 			render(['%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82', 'page', '2'])
