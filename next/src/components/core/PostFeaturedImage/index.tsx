@@ -16,7 +16,7 @@ export default function PostFeaturedImage(props: PostFeaturedImageProps) {
 				};
 
 	return (
-		<div className="wp-block-post-feature-image">
+		<div className="wp-block-post-featured-image">
 			<NextImage
 				src={props.featuredImage.sourceUrl}
 				alt={props.featuredImage.altText}
