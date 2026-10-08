@@ -78,14 +78,14 @@ describe('GET /api/preview-exit', () => {
 		expect(draft.isEnabled).toBe(false);
 	});
 
-	it.each(['//evil.example', '/\\evil.example', 'https://evil.example/x'])(
-		'redirects to the home page instead of "%s"',
-		async (target) => {
-			const { url } = await exit(
-				`?redirect=${encodeURIComponent(target)}`
-			);
+	it.each([
+		'//evil.example',
+		'/\\evil.example',
+		'/.//evil.example',
+		'https://evil.example/x',
+	])('redirects to the home page instead of "%s"', async (target) => {
+		const { url } = await exit(`?redirect=${encodeURIComponent(target)}`);
 
-			expect(url).toBe('/');
-		}
-	);
+		expect(url).toBe('/');
+	});
 });

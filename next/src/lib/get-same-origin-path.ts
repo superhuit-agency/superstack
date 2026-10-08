@@ -19,7 +19,9 @@ export default function getSameOriginPath(
 		return '/';
 	}
 
-	if (url.origin !== origin) return '/';
+	// Once resolved, `/.//evil.example` has the pathname `//evil.example`,
+	// which a browser reads as another host
+	if (url.origin !== origin || url.pathname.startsWith('//')) return '/';
 
 	return `${url.pathname}${url.search}`;
 }
