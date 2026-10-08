@@ -171,7 +171,7 @@ export const getData = async (fetcher, attrs) => {
 };
 ```
 
-> The `wp_navigation` post type is exposed in WPGraphQL as `NavigationMenu` via `navigation-inner-blocks.php`, which also registers the `blocksJSON` field (parsed + normalised to the `{ name, attributes, innerBlocks }` shape expected by the frontend).
+> The `wp_navigation` post type is exposed in WPGraphQL as `NavigationMenu` via `navigation-inner-blocks.php`, which also registers the `blocksJSON` field (parsed + normalised to the `{ name, attributes, innerBlocks }` shape expected by the frontend). A link whose `url` is bound (e.g. to its page's `core/post-data` link) gets the bound value, as WordPress renders it, instead of the URL stored when the link was added.
 
 `get-block-final-component-props.ts` handles this by checking whether `getData` returned `innerBlocks`:
 
@@ -199,7 +199,7 @@ Outside preview, `getData` runs inside `getCachedBlockData`, in a cache entry of
   | a listing, a query, latest posts, next/previous links | `type:{contentType}`, or `content` with no type filter. A `core/query` loop always has a type: it defaults to `post` |
   | terms | `termTags(terms)`: `term:{databaseId}` for each, so query their `databaseId` |
   | a term listing | `taxonomy:{taxonomy}` and its terms' tags, plus `content` when it shows post counts or hides empty terms |
-  | a block menu | `menu:{id}` |
+  | a block menu | `menu:{id}`, plus `node:{id}` or `term:{id}` for each link bound to a post or term, since its URL follows them |
   | the site title, tagline, logo or date format | `settings` |
 
   The public node read tags the post's own `categories` and `tags`. On a term archive, it's tagged `term:{databaseId}` and the `type:` of the post type the archive lists, not `node:`.

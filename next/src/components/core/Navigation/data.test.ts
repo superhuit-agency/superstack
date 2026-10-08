@@ -50,4 +50,78 @@ describe('Navigation getData', () => {
 		});
 		expect(fetcher).not.toHaveBeenCalled();
 	});
+
+	it('is tagged with the posts and terms its links are bound to, nested ones included', async () => {
+		const boundTo = (source: string) => ({
+			bindings: { url: { source, args: { field: 'link' } } },
+		});
+		const items = [
+			{
+				name: 'core/navigation-link',
+				attributes: {
+					kind: 'post-type',
+					id: 243,
+					metadata: boundTo('core/post-data'),
+				},
+				innerBlocks: [],
+			},
+			{
+				name: 'core/navigation-submenu',
+				attributes: {
+					kind: 'post-type',
+					id: 7,
+					metadata: boundTo('core/post-data'),
+				},
+				innerBlocks: [
+					{
+						name: 'core/navigation-link',
+						attributes: {
+							kind: 'taxonomy',
+							id: 5,
+							metadata: boundTo('core/term-data'),
+						},
+						innerBlocks: [],
+					},
+					{
+						name: 'core/navigation-link',
+						attributes: {
+							kind: 'post-type',
+							id: 243,
+							metadata: boundTo('core/post-data'),
+						},
+						innerBlocks: [],
+					},
+				],
+			},
+		];
+		const fetcher = fetcherReturning({
+			navigationMenu: { blocksJSON: JSON.stringify(items) },
+		});
+
+		const { cacheTags } = await getData(fetcher, { ref: 12 });
+
+		expect(cacheTags).toEqual(['menu:12', 'node:243', 'node:7', 'term:5']);
+	});
+
+	it('is not tagged with the post of a link whose URL is not bound to it', async () => {
+		const items = [
+			{
+				name: 'core/navigation-link',
+				attributes: { kind: 'post-type', id: 243, url: '/stored/' },
+				innerBlocks: [],
+			},
+			{
+				name: 'core/navigation-link',
+				attributes: { kind: 'custom', url: 'https://example.com/' },
+				innerBlocks: [],
+			},
+		];
+		const fetcher = fetcherReturning({
+			navigationMenu: { blocksJSON: JSON.stringify(items) },
+		});
+
+		const { cacheTags } = await getData(fetcher, { ref: 12 });
+
+		expect(cacheTags).toEqual(['menu:12']);
+	});
 });

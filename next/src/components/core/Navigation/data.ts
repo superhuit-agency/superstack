@@ -11,6 +11,28 @@ const getSubmenuVisibility = (attrs: NavigationAttributes | null) => {
 	return attrs?.submenuVisibility ?? 'hover';
 };
 
+/**
+ * Tags of the posts and terms whose link a menu item's URL is bound to:
+ * WordPress resolves the URL to their current one, so it changes when they move.
+ */
+const boundEntityTags = (blocks: BlockPropsType[] = []): string[] =>
+	blocks.flatMap(({ attributes, innerBlocks }) => [
+		...boundEntityTag(attributes ?? {}),
+		...boundEntityTags(innerBlocks),
+	]);
+
+const boundEntityTag = ({ id, metadata }: Record<string, unknown>) => {
+	const source = (metadata as BoundMetadata | undefined)?.bindings?.url
+		?.source;
+
+	if (typeof id !== 'number') return [];
+	if (source === 'core/post-data') return [cacheTags.node(id)];
+	if (source === 'core/term-data') return [cacheTags.term(id)];
+	return [];
+};
+
+type BoundMetadata = { bindings?: { url?: { source?: unknown } } };
+
 const navigationMenuQuery = gql`
 	query NavigationMenuBlocks($id: ID!) {
 		navigationMenu(id: $id, idType: DATABASE_ID) {
@@ -51,7 +73,11 @@ export const getData = async (
 		const innerBlocks: BlockPropsType[] = blocksJSON
 			? JSON.parse(blocksJSON)
 			: [];
-		return { submenuVisibility, innerBlocks, cacheTags: tags };
+		return {
+			submenuVisibility,
+			innerBlocks,
+			cacheTags: [...new Set([...tags, ...boundEntityTags(innerBlocks)])],
+		};
 	} catch {
 		return { submenuVisibility, innerBlocks: [], cacheTags: tags };
 	}
