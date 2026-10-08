@@ -12,7 +12,7 @@ import { cacheTags } from '@/lib/cache-tags';
 export default async function getRedirection(uri: string) {
 	'use cache';
 	cacheLife('max');
-	cacheTag(cacheTags.redirect(uri), cacheTags.nodes());
+	cacheTag(cacheTags.redirect(uri), cacheTags.redirects(), cacheTags.nodes());
 
 	const { redirections } = await fetchAPI(
 		gql`
@@ -41,6 +41,6 @@ export default async function getRedirection(uri: string) {
 		? null
 		: {
 				destination: redirections[0].target,
-				isPermanent: redirections[0].code === 301,
+				isPermanent: [301, 308].includes(redirections[0].code),
 			};
 }

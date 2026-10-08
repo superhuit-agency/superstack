@@ -10,6 +10,7 @@ The app uses Next.js 16 [Cache Components](https://nextjs.org/docs/app/api-refer
 - Each cached entry carries **cache tags** naming what it depends on.
 - When an editor changes something, the [nextjs-revalidate](https://github.com/superhuit-agency/nextjs-revalidate) plugin sends a **Change** to `POST /api/revalidate`. The route turns it into `revalidateTag(tag, 'max')` calls.
 - `'max'` means stale-while-revalidate: the entry is marked stale, not deleted. The next visitor gets the stale page while a fresh one is generated, and the visitor after that gets the new content.
+- A change that may turn a cached page into a redirect **expires** that page instead (`revalidateTag(tag, { expire: 0 })` or `revalidatePath`): the next visitor waits for a fresh render. See [Redirects are never re-rendered in the background](#redirects-are-never-re-rendered-in-the-background).
 - Public pages are served from a prerendered static shell. WordPress is only asked again for what changed, and only when someone next requests it.
 - Preview never reads or writes the cache.
 
@@ -34,6 +35,7 @@ Tag names are built by one helper module, `next/src/lib/cache-tags.ts`, used bot
 | `menu:{id}` | Navigation block data (block menu ID) | a `menu` change for that ID |
 | `settings` | the public node read (it also returns Site settings: SEO defaults, site title), site title / tagline / logo / date blocks, the locale list, sitemaps, blocks that declare no tags | a `settings` change, or `all` |
 | `templates` | the FSE template read | a `templates` change, or `all` |
+| `redirects` | every redirect lookup, so every cached 404 and cached redirect | `all` only |
 | `redirect:{uri}` | the redirect lookup for that URI, including a "no redirect" result | a `redirect` change for that URI |
 | `uris` | public node reads that found **no** node (cached 404s); on a multilingual site, every public node read, since it links to its translations (hreflang, language switcher); Page-dependent blocks that found no post at the Base URI | a `post` change whose URI changed (publish, unpublish, trash, delete, slug change), or `all` |
 | `nodes` | every cached read | `all` only: the manual lever |
@@ -45,7 +47,7 @@ Term tags use the term's database ID, not its slug, so a slug rename needs no ol
 | Read | File | Tags |
 | --- | --- | --- |
 | Public node read | `next/src/lib/get-node-by-uri.ts` (`getPublicNodeByURI`) | `node:{id}`, `nodes:{type}`, `settings`, the `term:` tags of its categories and tags, the `node:` tags of a page's ancestors; a post type archive gets `type:{type}`; `uris` on a multilingual site or when no node is found |
-| Redirect lookup | `next/src/lib/get-redirection.ts` | `redirect:{uri}` |
+| Redirect lookup | `next/src/lib/get-redirection.ts` | `redirect:{uri}`, `redirects` |
 | Locale list | `next/src/i18n/get-locales.ts` | `settings` |
 | FSE templates | `next/src/lib/get-fse-templates.ts` | `templates` (see [FSE Templating](./fse-templating.md#refreshing-templates)) |
 | Sitemap | `next/src/lib/get-sitemap-data.ts` | index: `content` + `settings`; per type: `type:{type}` + `settings` |
@@ -88,13 +90,13 @@ How each change is mapped:
 
 | Change | Clears |
 | --- | --- |
-| `post` | `node:{id}`, `type:{type}`, `content`; plus `uris` when `before.uri !== after.uri` (a missing side counts as no URI) |
-| `redirect` | `redirect:{uri}`, the URI normalised by `normalizeUri` as in the lookup: path only, decoded, lowercased, with leading and trailing slashes |
+| `post` | `node:{id}`, `type:{type}`, `content`; plus `uris` when `before.uri !== after.uri` (a missing side counts as no URI), and then `revalidatePath(before.uri)` when there is one |
+| `redirect` | `redirect:{uri}`, expired, the URI normalised by `normalizeUri` as in the lookup: path only, decoded, lowercased, with leading and trailing slashes; and `revalidatePath(uri)` |
 | `path` | `revalidatePath(uri)`: the path as the visitor sees it, not a rewritten route |
 | `menu` | `menu:{id}` (`locations` is ignored: nothing reads classic menus by location) |
 | `templates` | `templates` |
 | `settings` | `settings` |
-| `all` | `nodes`, `settings`, `templates`, `uris`: everything |
+| `all` | `nodes`, `settings`, `templates`, `uris`: everything; and `redirects`, expired |
 | `all` with `type` | `nodes:{type}`, `type:{type}`, and `taxonomy:{t}` for each of `taxonomies` |
 
 Renaming a parent page sends a `post` change for the parent only. Its descendants' node reads carry `node:{parent}` for their breadcrumbs, so they go stale too: one entry per descendant (and per paginated route), however small the edit. When the parent's slug or its own parent changes, the plugin also reports each descendant whose URI moved as a `post` change of its own, so its old URI stops serving.
@@ -105,9 +107,23 @@ Responses:
 | --- | --- |
 | Missing or wrong secret | `401` |
 | Body isn't JSON, `version` isn't `2`, or `changes` is missing | `400`, so the plugin reports a failure in wp-admin |
-| Anything else | `200` as soon as the tags are marked stale |
+| Anything else | `200` as soon as the tags are marked stale or expired |
 
 Unknown subjects and unknown fields are ignored, so a minor plugin release never breaks the site. The contract is covered by `route.test.ts` (`npm --prefix ./next test`). If you change the route, change the tests with it.
+
+### Redirects are never re-rendered in the background
+
+The catch-all page looks a redirect up only for a URI that has no node, and calls `permanentRedirect()` or `redirect()` when it finds one. When a stale entry is re-rendered in the background and that render ends in a redirect, Next 16.2 caches the response as a 308 (or 307) **without its `Location` header**, and serves it as a HIT until the next invalidation. Clients without JavaScript (crawlers, `curl`, link checkers) can't follow it. A blocking render caches the redirect correctly.
+
+So every change that can turn a cached page into a redirect expires that page rather than marking it stale:
+
+- a `redirect` change: `redirect:{uri}`, which a cached 404 at that URI carries, and the page at the path (`revalidatePath`), which may be a page rather than a 404, e.g. a post's old URI once Redirection's slug monitor redirects it;
+- a `post` change whose URI changed: the page at its old URI (`revalidatePath(before.uri)`), which an existing redirect from that URI now applies to. Its descendants' old URIs too: the plugin sends a change for each of them;
+- `all`: `redirects`, which every cached 404 and cached redirect carries (only a URI with no node looks a redirect up), so a URI that is now a redirect source, or a redirect to another target, renders it. This is what makes Purge all a workaround for [regex redirections](#regex-redirections).
+
+Only tags that no change marks stale are expired: a later `revalidateTag(tag, 'max')` on an expired tag replaces its expiry, and the page would be re-rendered in the background after all. That's why the post's `node:{id}` and `uris` stay stale-while-revalidate, and the old URI is expired by path instead.
+
+The next request for each of these pages waits for WordPress (`x-nextjs-cache: MISS`). They are rare changes, and only those pages pay for it: one page per redirect or moved post, and every cached 404 and cached redirect on Purge all.
 
 ---
 
@@ -120,6 +136,18 @@ Site settings aren't affected: the plugin sends a `settings` change from v2.0 ([
 A post's breadcrumbs can also show what its node read isn't tagged with: the parent categories of its category, and on a site with a static front page, the posts page. Renaming either leaves the trail as it was until the post itself changes. A page's ancestors are covered (see [The revalidate route](#the-revalidate-route)).
 
 **Workaround:** after a term edit or a posts page rename, use **Purge all** in the plugin's wp-admin screen. It sends an `all` change, which marks every cached entry stale. Pages then refresh one by one as they're requested, each asking WordPress again, so avoid it on a busy site at peak time.
+
+---
+
+## Regex redirections
+
+A Redirection rule whose source is a regular expression (e.g. `^/old-blog/(.*)` → `/blog/$1`) doesn't reach the site on its own. The redirect lookup caches its answer per URI, "no redirect" included, and the plugin sends no change for a regex rule since it names no single path (nextjs-revalidate 2.0 and 2.1, `Integrations/Redirection.php`). Every URI the rule covers that was already looked up keeps answering 404, and editing or deleting the rule leaves the URIs it redirected redirecting.
+
+No tag can cover it from the Next side: the route never hears of the rule.
+
+**Workaround:** after adding, editing, enabling, disabling or deleting a regex rule, use **Purge all**. It expires the cached 404s and cached redirects (see [Redirects are never re-rendered in the background](#redirects-are-never-re-rendered-in-the-background)), so each URI the rule covers, or used to cover, renders its new answer on its next request.
+
+Closing the gap needs the plugin to send a change for a regex rule, e.g. a `redirect` change with no `uri`, which the route would map to the `redirects` tag.
 
 ---
 
@@ -191,7 +219,7 @@ Check the sequence for each of these:
 - [ ] Editing a template part in the Site Editor
 - [ ] Editing a block menu in the Site Editor
 - [ ] Moving a page a block menu links to (new slug or parent): the menu links to its new URI
-- [ ] Adding a redirect
+- [ ] Adding a redirect, from a cached 404 and from a slug change: the source goes **HIT → MISS → HIT**, a 308 with a `Location` header on both
 - [ ] Purge all
 
 And:

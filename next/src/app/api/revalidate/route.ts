@@ -33,41 +33,58 @@ export async function POST(request: Request) {
 	}
 
 	const tags = new Set<string>();
+	const expiredTags = new Set<string>();
 	const paths = new Set<string>();
 	for (const change of body.changes) {
 		if (!isObject(change)) continue;
 
 		const invalidation = invalidationOf(change);
 		invalidation.tags?.forEach((tag) => tags.add(tag));
+		invalidation.expiredTags?.forEach((tag) => expiredTags.add(tag));
 		if (invalidation.path) paths.add(invalidation.path);
 	}
 
 	// Marked stale only: the next visitor gets the stale entry while a fresh
 	// one is generated
-	for (const tag of tags) revalidateTag(tag, 'max');
+	for (const tag of tags) {
+		if (!expiredTags.has(tag)) revalidateTag(tag, 'max');
+	}
 
+	// Expired: the next visitor waits for a fresh render. A page that may turn
+	// into a redirect can't be re-rendered in the background, which Next
+	// caches as a 308 without its Location header (#207). Only tags no change
+	// marks stale: a later `'max'` on a tag replaces its expiry
+	for (const tag of expiredTags) revalidateTag(tag, { expire: 0 });
+
+	// Expired too: the page at that path
 	for (const path of paths) revalidatePath(path);
 
 	return Response.json({ revalidated: true, now: Date.now() });
 }
 
 /**
- * What one change clears: cache tags, or a path. A subject or a field this
- * route doesn't know is ignored, so a minor plugin release never breaks the
- * site.
+ * What one change clears: cache tags to mark stale or to expire, or a path. A
+ * subject or a field this route doesn't know is ignored, so a minor plugin
+ * release never breaks the site.
  */
 function invalidationOf(change: Record<string, unknown>): {
 	tags?: string[];
+	expiredTags?: string[];
 	path?: string;
 } {
 	switch (change.subject) {
 		case 'post':
-			return { tags: postTags(change) };
+			return postInvalidation(change);
 
-		// Normalised by the helper, the same way as the redirect lookup's tag
+		// Normalised by the helper, the same way as the redirect lookup's tag.
+		// The page at the source path too: it may be a page, not a cached 404,
+		// e.g. a post's old URI after Redirection's slug monitor
 		case 'redirect':
 			return typeof change.uri === 'string'
-				? { tags: [cacheTags.redirect(change.uri)] }
+				? {
+						expiredTags: [cacheTags.redirect(change.uri)],
+						path: change.uri,
+					}
 				: {};
 
 		// this should be the actual path not a rewritten path
@@ -86,7 +103,7 @@ function invalidationOf(change: Record<string, unknown>): {
 			return { tags: [cacheTags.settings()] };
 
 		case 'all':
-			return { tags: allTags(change) };
+			return allInvalidation(change);
 
 		default:
 			return {};
@@ -96,10 +113,16 @@ function invalidationOf(change: Record<string, unknown>): {
 /**
  * A post's own entry, its type's listings and the untyped listings. When its
  * URI changed (a publish, an unpublish, a trash, a delete or a slug change),
- * also the cached 404s, so a URI that now has content stops answering 404.
+ * also the cached 404s, so a URI that now has content stops answering 404,
+ * and the page at its old URI, expired: that URI may now be a redirect source.
  */
-function postTags({ id, type, before, after }: Record<string, unknown>) {
-	if (!isId(id) || typeof type !== 'string') return [];
+function postInvalidation({
+	id,
+	type,
+	before,
+	after,
+}: Record<string, unknown>) {
+	if (!isId(id) || typeof type !== 'string') return {};
 
 	const tags = [
 		cacheTags.node(id),
@@ -107,33 +130,42 @@ function postTags({ id, type, before, after }: Record<string, unknown>) {
 		cacheTags.content(),
 	];
 
-	if (uriOf(before) !== uriOf(after)) tags.push(cacheTags.uris());
+	if (uriOf(before) === uriOf(after)) return { tags };
 
-	return tags;
+	return {
+		tags: [...tags, cacheTags.uris()],
+		path: uriOf(before) ?? undefined,
+	};
 }
 
 /**
  * The manual "Purge all" lever. Without a `type`, everything for the whole
- * site; with one, that type's single pages and listings, and the term listings
- * of its taxonomies.
+ * site, with the cached 404s and redirects expired since any of them may now
+ * be a redirect source or redirect elsewhere; with one, that type's single
+ * pages and listings, and the term listings of its taxonomies.
  */
-function allTags({ type, taxonomies }: Record<string, unknown>) {
+function allInvalidation({ type, taxonomies }: Record<string, unknown>) {
 	if (typeof type !== 'string') {
-		return [
-			cacheTags.nodes(),
-			cacheTags.settings(),
-			cacheTags.templates(),
-			cacheTags.uris(),
-		];
+		return {
+			tags: [
+				cacheTags.nodes(),
+				cacheTags.settings(),
+				cacheTags.templates(),
+				cacheTags.uris(),
+			],
+			expiredTags: [cacheTags.redirects()],
+		};
 	}
 
-	return [
-		cacheTags.nodesOfType(type),
-		cacheTags.type(type),
-		...(Array.isArray(taxonomies) ? taxonomies : [])
-			.filter((taxonomy) => typeof taxonomy === 'string')
-			.map(cacheTags.taxonomy),
-	];
+	return {
+		tags: [
+			cacheTags.nodesOfType(type),
+			cacheTags.type(type),
+			...(Array.isArray(taxonomies) ? taxonomies : [])
+				.filter((taxonomy) => typeof taxonomy === 'string')
+				.map(cacheTags.taxonomy),
+		],
+	};
 }
 
 /** The URI of one side of a post change, `null` when it's not on the site. */

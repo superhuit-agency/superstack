@@ -35,6 +35,8 @@ export const cacheTags = {
 	 * every public node read, since it links to its translations.
 	 */
 	uris: () => 'uris',
+	/** Every redirect lookup, so every cached 404 and cached redirect. */
+	redirects: () => 'redirects',
 	/** Every cached read. Only cleared by a manual "Purge all". */
 	nodes: () => 'nodes',
 };
