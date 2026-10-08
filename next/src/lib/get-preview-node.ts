@@ -21,6 +21,8 @@ export default async function getPreviewNode({
 		);
 	}
 
+	// A failed read answers as "no node", as before `fetchAPI` threw: the
+	// preview route then responds 404 instead of crashing
 	const findNode = await fetchAPI(
 		`query findNode($id: ID, $idType: ContentNodeIdTypeEnum, $stati: [PostStatusEnum]) {
 			node(id: $id, idType: $idType, stati: $stati) {
@@ -50,7 +52,7 @@ export default async function getPreviewNode({
 			},
 			auth,
 		}
-	);
+	).catch(() => undefined);
 
 	return findNode?.node ?? undefined;
 }

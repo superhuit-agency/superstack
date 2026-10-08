@@ -171,7 +171,7 @@ export const getData = async (fetcher, attrs) => {
 };
 ```
 
-> The `wp_navigation` post type is exposed in WPGraphQL as `NavigationMenu` via `navigation-inner-blocks.php`, which also registers the `blocksJSON` field (parsed + normalised to the `{ name, attributes, innerBlocks }` shape expected by the frontend).
+> The `wp_navigation` post type is exposed in WPGraphQL as `NavigationMenu` via `navigation-inner-blocks.php`, which also registers the `blocksJSON` field (parsed + normalised to the `{ name, attributes, innerBlocks }` shape expected by the frontend). A link whose `url` is bound (e.g. to its page's `core/post-data` link) gets the bound value, as WordPress renders it, instead of the URL stored when the link was added.
 
 `get-block-final-component-props.ts` handles this by checking whether `getData` returned `innerBlocks`:
 
@@ -199,13 +199,13 @@ Outside preview, `getData` runs inside `getCachedBlockData`, in a cache entry of
   | a listing, a query, latest posts, next/previous links | `type:{contentType}`, or `content` with no type filter. A `core/query` loop always has a type: it defaults to `post` |
   | terms | `termTags(terms)`: `term:{databaseId}` for each, so query their `databaseId` |
   | a term listing | `taxonomy:{taxonomy}` and its terms' tags, plus `content` when it shows post counts or hides empty terms |
-  | a block menu | `menu:{id}` |
+  | a block menu | `menu:{id}`, plus `node:{id}` or `term:{id}` for each link bound to a post or term, since its URL follows them |
   | the site title, tagline, logo or date format | `settings` |
 
   The public node read tags the post's own `categories` and `tags`. On a term archive, it's tagged `term:{databaseId}` and the `type:` of the post type the archive lists, not `node:`.
-- **Failed reads.** `fetchAPI` never throws: when WordPress doesn't answer, it logs the error and returns `{}`. A `getData` that returned its empty result then would have it cached until its tags are revalidated. Tell "nothing there" (the field is `null`) apart from "the read failed" (the field is missing), and throw a `WordPressReadError` (`next/src/lib/wordpress-read-error.ts`) on a failure. It isn't settled into the block's fallback like other `getData` errors: it fails the public page render, so the stale page keeps being served, or the request errors, and nothing wrong is cached. In preview, where nothing is cached, the block renders with its own attributes instead.
+- **Failed reads.** When WordPress doesn't answer, answers with a GraphQL error (even next to data that resolved), or answers without data, `fetchAPI` logs it and throws a `WordPressReadError` (`next/src/lib/wordpress-read-error.ts`), so a `getData` never sees a failure as empty data. Let it propagate: catching it and returning an empty result would have that cached until its tags are revalidated. Keep `null` for "nothing there", and throw a `WordPressReadError` yourself if a field you need is missing (`undefined`) all the same. It isn't settled into the block's fallback like other `getData` errors: it fails the public page render, so the stale page keeps being served, or the request errors, and nothing wrong is cached. In preview, where nothing is cached, the block renders with its own attributes instead.
 
-  Only `core/navigation` does this for now, since it sits on every page. Any other block with data can opt in the same way.
+  Every block reading through `fetchAPI` gets this without doing anything. `core/navigation` also checks for its missing field.
 - **`usesBaseUri`.** A Page-dependent block, one that reads `baseUriContext()`, must declare `export const usesBaseUri = true;` in its `data.ts`. The Base URI is then added to its cache key. Any other block gets one entry per site, and reading the Base URI throws a `BaseUriNotDeclaredError`, which fails `next build`.
 
   The opt-in exists for two reasons. Without it, the page that fills a Page-dependent block's cache entry leaks its content into every other page. With it on a block that doesn't need it, the block gets one entry per page instead of one per site, each fetched again from WordPress.

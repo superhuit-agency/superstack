@@ -1,6 +1,7 @@
 import { cacheTag } from 'next/cache';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { baseUriContext } from '@/hooks/use-base-uri';
 import { fetchAPI, formatBlocksJSON } from '@/lib';
 import getBlockFinalComponentProps from '@/lib/get-block-final-component-props';
 import getFseTemplates from '@/lib/get-fse-templates';
@@ -25,6 +26,11 @@ vi.mock('@/lib', () => ({
 
 vi.mock('@/lib/get-fse-templates', () => ({
 	default: vi.fn(async () => []),
+}));
+
+vi.mock('@/hooks/use-base-uri', async (importOriginal) => ({
+	...(await importOriginal<typeof import('@/hooks/use-base-uri')>()),
+	baseUriContext: vi.fn(),
 }));
 
 vi.mock('@/lib/get-block-final-component-props', () => ({
@@ -294,5 +300,23 @@ describe('getPublicNodeByURI', () => {
 		await getPublicNodeByURI('/about/', 'en');
 
 		expect(cacheTagsGiven()).toContain('uris');
+	});
+
+	it('gives the blocks the Base URI with its language prefix', async () => {
+		configs.isMultilang = true;
+		wordpressReturns({
+			__typename: 'Page',
+			contentTypeName: 'page',
+			translation: {
+				id: 582,
+				uri: '/de/',
+				language: { code: 'DE', locale: 'de_CH' },
+				fseTemplate: { slug: 'front-page' },
+			},
+		});
+
+		await getPublicNodeByURI('/', 'de');
+
+		expect(vi.mocked(baseUriContext)).toHaveBeenLastCalledWith('/de/');
 	});
 });

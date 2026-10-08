@@ -1,13 +1,13 @@
 const WORDPRESS_READ_FAILED = 'WORDPRESS_READ_FAILED';
 
 /**
- * Thrown by a block's `getData` when WordPress didn't answer its read, as
- * opposed to answering that there's nothing to show.
+ * Thrown by `fetchAPI`, or by a block's `getData`, when WordPress didn't
+ * answer a read, as opposed to answering that there's nothing to show.
  *
  * Carries a `digest`, which Next keeps when the error crosses a `use cache`
  * boundary (the message and class don't survive it in production). Next also
  * shows it on the public error page: `key` is a short identifier without
- * spaces, e.g. the cache tag of what failed to read.
+ * spaces, e.g. the query name or the cache tag of what failed to read.
  */
 export class WordPressReadError extends Error {
 	digest: string;

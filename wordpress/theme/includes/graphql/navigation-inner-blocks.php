@@ -39,6 +39,8 @@ function register_navigation_menu_blocks_json_field(): void {
 
 			$blocks = parse_blocks($content);
 			$blocks = filter_out_empty_blocks_recursive(is_array($blocks) ? $blocks : []);
+			prime_bound_post_caches($blocks);
+			$blocks = resolve_bound_urls($blocks);
 			$blocks = normalize_blocks_for_graphql_shape($blocks);
 
 			return wp_json_encode($blocks);
@@ -67,6 +69,73 @@ function normalize_blocks_for_graphql_shape(array $blocks): array {
 	}
 
 	return $blocks;
+}
+
+/**
+ * Replace the stored `url` of blocks whose `url` is bound (e.g. a link to a
+ * page, bound to its `core/post-data` link) with the bound value, as WordPress
+ * does when it renders them, so a link follows the page when it moves.
+ */
+function resolve_bound_urls(array $blocks): array {
+	foreach ($blocks as $index => $block) {
+		$binding = $block['attrs']['metadata']['bindings']['url'] ?? null;
+		$source  = is_array($binding) && is_string($binding['source'] ?? null) && function_exists('get_block_bindings_source')
+			? get_block_bindings_source($binding['source'])
+			: null;
+
+		if ($source) {
+			$url = $source->get_value((array) ($binding['args'] ?? []), new \WP_Block($block), 'url');
+
+			if (is_string($url) && '' !== $url) {
+				$blocks[$index]['attrs']['url'] = relative_if_internal(html_entity_decode($url, ENT_QUOTES));
+			}
+		}
+
+		$blocks[$index]['innerBlocks'] = resolve_bound_urls($block['innerBlocks']);
+	}
+
+	return $blocks;
+}
+
+/**
+ * Load the posts that links are bound to in one query, as WordPress does
+ * before rendering a navigation, instead of one query per link.
+ */
+function prime_bound_post_caches(array $blocks): void {
+	$ids = bound_post_ids($blocks);
+
+	if ($ids) {
+		_prime_post_caches($ids, true, false);
+	}
+}
+
+/**
+ * IDs of the posts whose link a block's `url` is bound to, nested blocks included.
+ */
+function bound_post_ids(array $blocks): array {
+	$ids = [];
+
+	foreach ($blocks as $block) {
+		$source = $block['attrs']['metadata']['bindings']['url']['source'] ?? null;
+		$id     = $block['attrs']['id'] ?? null;
+
+		if ('core/post-data' === $source && is_int($id)) {
+			$ids[] = $id;
+		}
+
+		$ids = array_merge($ids, bound_post_ids($block['innerBlocks']));
+	}
+
+	return array_values(array_unique($ids));
+}
+
+/**
+ * Make a URL of this site relative, as the front end links to it.
+ */
+function relative_if_internal(string $url): string {
+	return wp_parse_url($url, PHP_URL_HOST) === wp_parse_url(home_url(), PHP_URL_HOST)
+		? wp_make_link_relative($url)
+		: $url;
 }
 
 /**
