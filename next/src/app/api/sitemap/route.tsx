@@ -22,6 +22,8 @@ type DataType = {
 const MAX_NB_URLS = 1000;
 // 1 hour * 60 minutes * 60 seconds
 const HOUR_IN_SECONDS = 1 * 60 * 60;
+// 10 minutes * 60 seconds
+const RETRY_AFTER_SECONDS = 10 * 60;
 // // 1 year * 365 days * 24 hours * 1 HOUR
 // const YEAR_IN_SECONDS = 1 * 365 * 24 * HOUR_IN_SECONDS;
 
@@ -111,8 +113,21 @@ export async function GET(request: NextRequest) {
 		return new Response('Missing NEXT_URL env var', { status: 500 });
 	}
 
-	const data =
-		(await getSitemapData(type, parseInt(page), MAX_NB_URLS)) ?? [];
+	const data = await getSitemapData(type, parseInt(page), MAX_NB_URLS);
+
+	// WordPress could not be read: an empty sitemap would tell crawlers the
+	// URLs are gone, a 503 makes them retry later and keep what they had.
+	if (data === null) {
+		return new Response('Sitemap temporarily unavailable', {
+			status: 503,
+			headers: {
+				'Content-Type': 'text/plain; charset=UTF-8',
+				'X-Robots-Tag': 'noindex, follow',
+				'Retry-After': `${RETRY_AFTER_SECONDS}`,
+				'Cache-Control': 'no-store',
+			},
+		});
+	}
 
 	return new Response(
 		match
