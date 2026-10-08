@@ -3,6 +3,8 @@ import { draftMode, cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 import { getAuthToken, getPreviewNode } from '@/lib';
+import getSameOriginPath from '@/lib/get-same-origin-path';
+import secretMatches from '@/lib/secret-matches';
 
 let hasLoggedMissingSecret = false;
 
@@ -26,7 +28,7 @@ export async function GET(request: NextRequest) {
 	// This secret should only be known by this API route
 	if (
 		!WORDPRESS_PREVIEW_SECRET ||
-		secret !== WORDPRESS_PREVIEW_SECRET ||
+		!secretMatches(secret ?? '', WORDPRESS_PREVIEW_SECRET) ||
 		(!id && !slug && !uri)
 	) {
 		return NextResponse.json(
@@ -86,7 +88,7 @@ export async function GET(request: NextRequest) {
 	}); // Expires when the browser closes (at the end of the session) -- same as Next.js draftMode cookie
 	cookieStore.set('preview-draft', draft ? 'true' : 'false'); // Expires when the browser closes (at the end of the session) -- same as Next.js draftMode cookie
 
-	return redirect(location);
+	return redirect(getSameOriginPath(location, request.nextUrl.origin));
 }
 
 const getUriPrefix = (node: any) => {
