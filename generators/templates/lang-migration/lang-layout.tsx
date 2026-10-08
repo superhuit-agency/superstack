@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
+import { notFound } from 'next/navigation';
 
 import { getDictionary } from '@/i18n/dictionaries';
+import { getLocales } from '@/i18n/get-locales';
 import { LocaleProvider } from '@/contexts/locale-context';
 import { langContext } from '@/hooks/use-lang';
 
@@ -39,6 +41,12 @@ export default async function RootLayout({
 	params: Promise<{ lang: string }>;
 }) {
 	const { lang } = await params;
+
+	// Paths with an extension skip the locale proxy, so the first segment
+	// may not be a locale (ex: `/llms.txt`)
+	const { locales } = await getLocales();
+	if (!locales.includes(lang as Locale)) notFound();
+
 	// Lets `not-found.tsx`, which gets no params, render in this language
 	langContext(lang);
 	const dictionary = await getDictionary(lang as Locale);
