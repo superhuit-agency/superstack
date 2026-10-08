@@ -7,7 +7,7 @@ export default function PostAuthor(props: PostAuthorProps) {
 
 	return (
 		<div className="wp-block-post-author">
-			{props.showAvatar && (
+			{props.showAvatar && props.author.avatar && (
 				<Avatar
 					className="wp-block-post-author__avatar"
 					data={{

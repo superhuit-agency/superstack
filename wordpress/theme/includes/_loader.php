@@ -32,6 +32,7 @@ require_once __DIR__ . '/helpers/build-blocks-json.php';
 require_once __DIR__ . '/helpers/get-remote-json.php';
 require_once __DIR__ . '/helpers/relative-site-urls.php';
 require_once __DIR__ . '/helpers/get-next-url.php';
+require_once __DIR__ . '/helpers/get-preview-secret.php';
 require_once __DIR__ . '/helpers/get-image-attr.php';
 require_once __DIR__ . '/helpers/get-primary-term.php';
 require_once __DIR__ . '/helpers/get-rewrite-query.php';

@@ -4,6 +4,8 @@ import { redirect } from 'next/navigation';
 
 import { getAuthToken, getPreviewNode } from '@/lib';
 
+let hasLoggedMissingSecret = false;
+
 export async function GET(request: NextRequest) {
 	// pass an id or slug for page/post
 	// OR pass a uri for terms archives (category, tag)
@@ -11,8 +13,14 @@ export async function GET(request: NextRequest) {
 		request.nextUrl.searchParams
 	);
 
-	const WORDPRESS_PREVIEW_SECRET =
-		process.env.WORDPRESS_PREVIEW_SECRET ?? 'spck';
+	const WORDPRESS_PREVIEW_SECRET = process.env.WORDPRESS_PREVIEW_SECRET;
+
+	if (!WORDPRESS_PREVIEW_SECRET && !hasLoggedMissingSecret) {
+		hasLoggedMissingSecret = true;
+		console.error(
+			'WORDPRESS_PREVIEW_SECRET is not set: every preview is refused (see next/.env.example)'
+		);
+	}
 
 	// Check the secret and next parameters
 	// This secret should only be known by this API route

@@ -85,6 +85,7 @@ For more details, see the [WordPress README](wordpress/README.md).
 ```bash
 cd next
 npm install
+cp .env.example .env # preview is refused without WORDPRESS_PREVIEW_SECRET
 ```
 
 ## Development

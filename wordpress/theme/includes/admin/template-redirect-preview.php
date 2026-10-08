@@ -4,6 +4,7 @@ namespace Superstack\PreviewRedirect;
 
 use WPGraphQL\JWT_Authentication\Auth;
 use function Superstack\get_next_url;
+use function Superstack\get_preview_secret;
 
 add_action('template_redirect', __NAMESPACE__ . '\redirect_preview_to_next', 1);
 
@@ -22,7 +23,7 @@ function redirect_preview_to_next() {
 
         if (empty($uri)) return;
 
-        wp_safe_redirect(add_query_arg(['secret' => 'spck', 'uri' => $uri, 'token' => $token], $next_url . "/api/preview/"));
+        wp_safe_redirect(add_query_arg(['secret' => rawurlencode(get_preview_secret()), 'uri' => $uri, 'token' => $token], $next_url . "/api/preview/"));
         exit;
     }
 
@@ -37,6 +38,8 @@ function redirect_preview_to_next() {
 
     $draft_preview = (true == get_query_var('preview'));
 
-    wp_safe_redirect($next_url . "/api/preview/?secret=spck&id=$id&token=$token&nonce=$rest_nonce" . ($draft_preview ? "&draft=true" : ""));
+    $secret = rawurlencode(get_preview_secret());
+
+    wp_safe_redirect($next_url . "/api/preview/?secret=$secret&id=$id&token=$token&nonce=$rest_nonce" . ($draft_preview ? "&draft=true" : ""));
     exit;
 }
