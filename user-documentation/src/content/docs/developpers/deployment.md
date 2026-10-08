@@ -156,6 +156,18 @@ Notes:
 2. Rollback is done by repointing `next` to an older release still present in `releases/`.
 3. Cleanup keeps the latest `KEEP_RELEASES` folders (default: 5).
 
+## 🔁 Configure nextjs-revalidate
+
+The front-end caches what it reads from WordPress until the nextjs-revalidate plugin reports a change. Once an environment's WordPress and Next.js are deployed, configure the plugin in WordPress, under **Settings › Next.js Revalidate**, or editors' changes never reach the site:
+
+| Setting           | Value                                                                                                                                                                                       |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Revalidate domain | The front-end's public URL, `NEXT_URL` (e.g. `https://yourdomain.com`). Behind basic auth, with its credentials: `https://user:pass@staging.yourdomain.com` (needs nextjs-revalidate 2.1+). |
+| Revalidate path   | `/api/revalidate/`. With its trailing slash, the request skips the 308 Next.js answers `/api/revalidate` with (`trailingSlash: true`).                                                      |
+| Revalidate secret | The `REVALIDATE_SECRET` of the front-end's environment (`shared/.env` on an SSH deployment, the project's environment variables on Vercel). Generate it with `openssl rand -hex 32`.         |
+
+Each environment has its own domain and secret. `provision.sh` doesn't set them: the secret lives only in the front-end's environment, not in the GitHub variables, and a domain carrying basic-auth credentials would be overwritten on every deploy. Check the result with the plugin's **Probe** tab.
+
 ## 🚀 Production deployments
 
 When we push to the `production` git branch, Next.js and WordPress are automatically deployed to production.

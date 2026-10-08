@@ -6,7 +6,7 @@ This document explains how the Next.js app caches what it reads from WordPress, 
 
 The app uses Next.js 16 [Cache Components](https://nextjs.org/docs/app/api-reference/config/next-config-js/cacheComponents) (`cacheComponents: true` in `next/next.config.ts`):
 
-- Every cached read of WordPress runs in a `'use cache'` scope with `cacheLife('max')`. It never expires on a timer.
+- Every cached read of WordPress runs in a `'use cache'` scope with `cacheLife('max')`. It isn't refreshed on a timer, only by a Change (the in-memory cache handler still drops it after 30 days, see [Known gaps](#known-gaps)).
 - Each cached entry carries **cache tags** naming what it depends on.
 - When an editor changes something, the [nextjs-revalidate](https://github.com/superhuit-agency/nextjs-revalidate) plugin sends a **Change** to `POST /api/revalidate`. The route turns it into `revalidateTag(tag, 'max')` calls.
 - `'max'` means stale-while-revalidate: the entry is marked stale, not deleted. The next visitor gets the stale page while a fresh one is generated, and the visitor after that gets the new content.
@@ -29,11 +29,11 @@ Tag names are built by one helper module, `next/src/lib/cache-tags.ts`, used bot
 | `node:{databaseId}` | the public node read of that post, and of each of its descendants, whose breadcrumbs show its title and URI; block data rendering one post; Navigation block data, for each link bound to a post (the theme resolves its URL to the post's current one) | a `post` change for that ID |
 | `nodes:{contentType}` | the public node read of a single post, page… of that type | a scoped `all` of that type. Editing one post clears only its `node:` tag |
 | `type:{contentType}` | listings (Query, Latest Posts), post type archives, next / previous post links, per-type sitemaps | a `post` change of that type |
-| `content` | listings with no type filter; the sitemap index; blocks that declare no tags | every `post` change |
-| `term:{databaseId}` | reads that display a term: post terms, the public node read, term archives, Navigation block data for each link bound to a term | a term change (not mapped yet, see [Known gaps](#known-gaps-until-plugin-v21)) |
+| `content` | term listings whose terms depend on their posts (Terms Query; Taxonomy List when it shows post counts or hides empty terms); listings with no type filter; the sitemap index and the taxonomy sitemaps; blocks that declare no tags | every `post` change |
+| `term:{databaseId}` | reads that display a term: post terms, the public node read, term archives, Navigation block data for each link bound to a term | a term change (not mapped yet, see [Known gaps](#known-gaps)) |
 | `taxonomy:{taxonomy}` | term listings, term sitemaps and the sitemap index | a scoped `all` of a type using that taxonomy; a term change once mapped |
 | `menu:{id}` | Navigation block data (block menu ID) | a `menu` change for that ID |
-| `settings` | the public node read (it also returns Site settings: SEO defaults, site title), site title / tagline / logo / date blocks, the locale list, sitemaps, blocks that declare no tags | a `settings` change, or `all` |
+| `settings` | the public node read (it also returns Site settings: SEO defaults, site title), site title / tagline / logo / date blocks, the locale list, the 404 breadcrumbs, sitemaps, blocks that declare no tags | a `settings` change, or `all` |
 | `templates` | the FSE template read | a `templates` change, or `all` |
 | `redirects` | every redirect lookup, so every cached 404 and cached redirect | `all` only |
 | `redirect:{uri}` | the redirect lookup for that URI, including a "no redirect" result | a `redirect` change for that URI |
@@ -49,6 +49,7 @@ Term tags use the term's database ID, not its slug, so a slug rename needs no ol
 | Public node read | `next/src/lib/get-node-by-uri.ts` (`getPublicNodeByURI`) | `node:{id}`, `nodes:{type}`, `settings`, the `term:` tags of its categories and tags, the `node:` tags of a page's ancestors; a post type archive gets `type:{type}`; `uris` on a multilingual site or when no node is found |
 | Redirect lookup | `next/src/lib/get-redirection.ts` | `redirect:{uri}`, `redirects` |
 | Locale list | `next/src/i18n/get-locales.ts` | `settings` |
+| 404 breadcrumbs | `next/src/lib/get-not-found-breadcrumbs.ts` | `settings` |
 | FSE templates | `next/src/lib/get-fse-templates.ts` | `templates` (see [FSE Templating](./fse-templating.md#refreshing-templates)) |
 | Sitemap | `next/src/lib/get-sitemap-data.ts` | index: `content` + `settings` + `taxonomy:{taxonomy}` of each taxonomy; per type: `type:{type}` + `settings`; per taxonomy (term archives): `taxonomy:{taxonomy}` + `content` + `settings` |
 | Block data | `next/src/lib/get-cached-block-data.ts` | the block's own `cacheTags` |
@@ -77,7 +78,7 @@ Which tags to return for which data, and why the opt-in exists, is detailed in [
 `next/src/app/api/revalidate/route.ts` speaks version 2 of the nextjs-revalidate contract:
 
 ```http
-POST /api/revalidate
+POST /api/revalidate/
 Authorization: Bearer <REVALIDATE_SECRET>
 Content-Type: application/json
 
@@ -85,6 +86,15 @@ Content-Type: application/json
 ```
 
 The secret comes from `REVALIDATE_SECRET` (see `next/.env.example`) and must match the one set in the plugin. It travels in a header, never in the URL, so it doesn't leak through access logs, browser history or referrers.
+
+**A front-end behind basic auth** (e.g. a staging site) has its credentials in the plugin's revalidate domain: `https://user:pass@staging.example.com`. From nextjs-revalidate 2.1, the plugin then sends them as `Authorization: Basic …`, and the secret in a header of its own:
+
+```http
+Authorization: Basic <base64(user:pass)>
+X-Nextjs-Revalidate-Secret: <REVALIDATE_SECRET>
+```
+
+The route reads `X-Nextjs-Revalidate-Secret` when the request has it, and `Authorization: Bearer` otherwise, both compared in constant time. Plugin 2.0 can't reach a front-end behind basic auth: its `Bearer` replaces the credentials. The starter pins 2.0.0 in `wordpress/composer.json`, so update it to 2.1 for such a site.
 
 How each change is mapped:
 
@@ -127,15 +137,31 @@ The next request for each of these pages waits for WordPress (`x-nextjs-cache: M
 
 ---
 
-## Known gaps until plugin v2.1
+## Known gaps
 
-Term edits don't reach the site on their own yet. Renaming a category or tag, or changing its slug, sends no change the route maps. The `term:` and `taxonomy:` tags are already in place; the mapping waits for [nextjs-revalidate#55](https://github.com/superhuit-agency/nextjs-revalidate/issues/55).
+### Term changes
+
+Term edits don't reach the site on their own yet. nextjs-revalidate 2.1 reports a `term` change when a category or tag is created, edited or deleted, but the route doesn't map it yet ([#154](https://github.com/superhuit-agency/superstack/issues/154)): it ignores it like any unknown subject. The `term:` and `taxonomy:` tags are already in place.
 
 Site settings aren't affected: the plugin sends a `settings` change from v2.0 ([nextjs-revalidate#171](https://github.com/superhuit-agency/nextjs-revalidate/issues/171)).
 
 A post's breadcrumbs can also show what its node read isn't tagged with: the parent categories of its category, and on a site with a static front page, the posts page. Renaming either leaves the trail as it was until the post itself changes. A page's ancestors are covered (see [The revalidate route](#the-revalidate-route)).
 
-**Workaround:** after a term edit or a posts page rename, use **Purge all** in the plugin's wp-admin screen. It sends an `all` change, which marks every cached entry stale. Pages then refresh one by one as they're requested, each asking WordPress again, so avoid it on a busy site at peak time.
+**Workaround:** after a term edit or a posts page rename, use **Purge all** in the plugin's wp-admin screen (**Settings › Next.js Revalidate**). It sends an `all` change, which marks every cached entry stale. Pages then refresh one by one as they're requested, each asking WordPress again, so avoid it on a busy site at peak time.
+
+### Options that move URIs
+
+The permalink structure and the category and tag bases (**Settings › Permalinks**) move the URI of every post or term at once, and the plugin reports no change for them. Use **Purge all** after saving them.
+
+The front page and the posts page (**Settings › Reading**) are reported: the theme adds `show_on_front`, `page_on_front` and `page_for_posts` to the plugin's site settings (`wordpress/theme/includes/admin/nextjs-revalidate.php`), so saving them sends a `settings` change. Every public node read carries `settings`, so the page at `/` and the posts page follow. What only shows a page's URI doesn't: listings and menu links still point to the old front page at `/`, and a cached 404 at a URI that now has content stays a 404, until their own change or a **Purge all**.
+
+### Regex redirections
+
+See [Regex redirections](#regex-redirections): use **Purge all** after changing a regex rule.
+
+### Entries expire after 30 days in memory
+
+`cacheLife('max')` revalidates after 30 days. The default in-memory cache handler doesn't serve a stale entry past that window: it treats an entry written more than 30 days ago as missing (`next/dist/server/lib/cache-handlers/default.js`). The content isn't wrong, but the next request for it is a **MISS** that waits for WordPress, as after an eviction. On a site nobody edits for a month, each page pays one such render.
 
 ---
 
@@ -186,7 +212,7 @@ Never measure with `next dev`: it adds a hash to cache keys, so entries aren't r
 
 ## Verifying caching end to end
 
-Automated tests cover the route's contract only. Check the rest by hand against a real WordPress running nextjs-revalidate 2.0, after any change to the reads, the tags or the route.
+Automated tests cover the route's contract only. Check the rest by hand against a real WordPress running nextjs-revalidate 2.0 or later, after any change to the reads, the tags or the route.
 
 Always use a production build, never `next dev`:
 
@@ -229,3 +255,23 @@ And:
 - [ ] Preview shows the latest draft and bypasses the cache.
 - [ ] The WordPress editor bundle builds (`npm --prefix ./wordpress run build`) and blocks show live data in the editor.
 - [ ] `npm run build` still reports the catch-all page (`/[[...uri]]`) as a static shell (Partial Prerendering).
+
+---
+
+## Upgrading an existing project
+
+A project started before Cache Components (route-level `revalidate = 3600`, nextjs-revalidate 1.x) needs all of this in one deploy:
+
+1. **Deploy nextjs-revalidate ^2.0 together with this route.** Plugin 2.0 speaks contract version 2 (a `POST` with the secret in a header), which the old route doesn't understand, and this route rejects a 1.x request. Update `superhuit-agency/nextjs-revalidate` in `wordpress/composer.json`: 2.1 for a front-end behind basic auth (see [The revalidate route](#the-revalidate-route)).
+2. **Configure the plugin** in **Settings › Next.js Revalidate**: the revalidate domain is the front-end's URL (`NEXT_URL`), the secret is the front-end's `REVALIDATE_SECRET`, and the path is `/api/revalidate/`. With its trailing slash, the request skips the 308 that `trailingSlash: true` answers `/api/revalidate` with. The plugin splits a 1.x revalidate URL into a domain and a path on its first admin request after the upgrade: add the trailing slash to that path. See [Deployment](./setup/deployment.md#-configure-nextjs-revalidate).
+3. **Remove every `export const revalidate`, `dynamic` and `fetchCache`.** Next 16 fails the build on route segment config with `cacheComponents` on. On a multilingual site that includes `src/app/[lang]/layout.tsx`, generated by the lang migration: also port [#226](https://github.com/superhuit-agency/superstack/pull/226) into it (`notFound()` for a first segment `getLocales()` doesn't list, then `langContext(lang)`), and into `src/app/[lang]/not-found.tsx`, which reads the language back with `langContext()` and passes it to the template and breadcrumbs reads. Compare with `generators/templates/lang-migration/lang-layout.tsx` and `next/src/app/not-found.tsx`.
+4. **Update each custom block's `data.ts`** (see [Block data](#block-data)):
+   - return the `cacheTags` its data depends on;
+   - declare `export const usesBaseUri = true;` if it reads `baseUriContext()`, and `usesArchiveContext` if its data changes with the archive being viewed;
+   - stop catching `fetchAPI` errors into `{}` or an empty result: `fetchAPI` throws a `WordPressReadError` on a failed read, which must propagate so the failure isn't cached.
+5. **Replace `getNodeByURI`** (now internal to `next/src/lib/get-node-by-uri.ts`) with `getPublicNodeByURI(uri, lang, routePage)`, or `getPreviewNodeByURI(uri, lang, routePage, auth, previewDraft)` in preview. Never pass a token to the public one.
+6. **Drop the FSE snapshot.** Remove the `predev` and `prebuild` scripts from `next/package.json`, and delete `next/src/lib/fse/` and `next/scripts/fetch-fse-templates-and-parts.ts`: templates are a cached read now (see [FSE Templating](./fse-templating.md#template-read)).
+7. **Optionally**, tune WordPress reads with `WORDPRESS_FETCH_MAX_RETRIES`, `WORDPRESS_FETCH_RETRY_DELAY`, `WORDPRESS_FETCH_TIMEOUT` and `WORDPRESS_FETCH_CONCURRENCY`, and log them with `DEBUG_PERFS=1` (see `next/.env.example`).
+8. **Keep PM2 to one instance** (see [Known risks](#known-risks)).
+
+Then run the checks in [Verifying caching end to end](#verifying-caching-end-to-end).
