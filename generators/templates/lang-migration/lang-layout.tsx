@@ -28,8 +28,6 @@ export const metadata: Metadata = {
 	manifest: '/manifest.webmanifest',
 };
 
-export const revalidate = 3600;
-
 // In multilang, this is the root layout so that `<html lang>` matches the
 // current language (the app root layout has no access to the `lang` param).
 export default async function RootLayout({
