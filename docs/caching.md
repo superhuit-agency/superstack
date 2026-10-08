@@ -116,7 +116,7 @@ So every change that can turn a cached page into a redirect expires the tags of 
 
 - a `redirect` change: `redirect:{uri}`, which a cached 404 at that URI carries;
 - a `post` change whose URI changed: `node:{id}`, which the page at its old URI carries. Its old URI may now be a redirect source, e.g. through Redirection's slug monitor;
-- `all`: `uris`, which every cached 404 carries, so a 404 that is now a redirect source renders the redirect.
+- `all`: `uris`, which every cached 404 and cached redirect carries (their node read found no node), so a URI that is now a redirect source, or a redirect to another target, renders it. This is what makes Purge all a workaround for [regex redirections](#regex-redirections).
 
 The next request for each of these pages waits for WordPress (`x-nextjs-cache: MISS`). They are rare changes, and only the pages that carry those tags pay for it.
 
@@ -129,6 +129,18 @@ Term edits don't reach the site on their own yet. Renaming a category or tag, or
 Site settings aren't affected: the plugin sends a `settings` change from v2.0 ([nextjs-revalidate#171](https://github.com/superhuit-agency/nextjs-revalidate/issues/171)).
 
 **Workaround:** after a term edit, use **Purge all** in the plugin's wp-admin screen. It sends an `all` change, which marks every cached entry stale. Pages then refresh one by one as they're requested, each asking WordPress again, so avoid it on a busy site at peak time.
+
+---
+
+## Regex redirections
+
+A Redirection rule whose source is a regular expression (e.g. `^/old-blog/(.*)` → `/blog/$1`) doesn't reach the site on its own. The redirect lookup caches its answer per URI, "no redirect" included, and the plugin sends no change for a regex rule since it names no single path (nextjs-revalidate 2.0 and 2.1, `Integrations/Redirection.php`). Every URI the rule covers that was already looked up keeps answering 404, and editing or deleting the rule leaves the URIs it redirected redirecting.
+
+No tag can cover it from the Next side: the route never hears of the rule.
+
+**Workaround:** after adding, editing, enabling, disabling or deleting a regex rule, use **Purge all**. It expires the cached 404s and cached redirects (see [Redirects are never re-rendered in the background](#redirects-are-never-re-rendered-in-the-background)), so each URI the rule covers, or used to cover, renders its new answer on its next request.
+
+Closing the gap needs the plugin to send a change for a regex rule, e.g. a `redirect` change with no `uri`, which the route would map to a `redirects` tag carried by every redirect lookup and so by every cached 404 and cached redirect.
 
 ---
 
