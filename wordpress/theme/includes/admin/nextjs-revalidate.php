@@ -186,9 +186,19 @@ function blocks_use_patterns($blocks, $refs) {
  * @return void
  */
 function report_templates() {
-	if (! class_exists('\NextJsRevalidate') || ! class_exists('\NextJsRevalidate\Change')) {
+	// Internal API, checked member by member: a plugin update that renames one
+	// skips the report instead of failing the save
+	if (
+		! method_exists('\NextJsRevalidate', 'init')
+		|| ! property_exists('\NextJsRevalidate', 'pendingChanges')
+		|| ! method_exists('\NextJsRevalidate\Change', 'templates')
+	) {
 		return;
 	}
 
-	\NextJsRevalidate::init()->pendingChanges->report(\NextJsRevalidate\Change::templates());
+	$pending_changes = \NextJsRevalidate::init()->pendingChanges;
+
+	if (is_object($pending_changes) && method_exists($pending_changes, 'report')) {
+		$pending_changes->report(\NextJsRevalidate\Change::templates());
+	}
 }
