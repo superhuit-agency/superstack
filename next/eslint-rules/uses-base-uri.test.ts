@@ -11,6 +11,7 @@ const ruleTester = new RuleTester();
 
 const importsContext = `import { baseUriContext } from '@/hooks/use-base-uri';`;
 const optIn = `export const usesBaseUri = true;`;
+const optInByAttributes = `export const usesBaseUri = (attrs) => attrs.query?.inherit === true;`;
 const getData = `export const getData = async () => ({ content: '' });`;
 
 const validModule = [importsContext, optIn, getData].join('\n');
@@ -25,6 +26,17 @@ describe('uses-base-uri', () => {
 			optInWithoutImport,
 			neitherImportsNorOptsIn,
 			`import { guardBaseUri } from '@/hooks/use-base-uri';\n${getData}`,
+			[importsContext, optInByAttributes, getData].join('\n'),
+			[
+				importsContext,
+				'export const usesBaseUri = function (attrs) { return attrs.inherit; };',
+				getData,
+			].join('\n'),
+			[
+				importsContext,
+				'export function usesBaseUri(attrs) { return attrs.inherit; }',
+				getData,
+			].join('\n'),
 		],
 		invalid: [
 			{
@@ -55,6 +67,10 @@ describe('uses-base-uri', () => {
 		invalid: [
 			{
 				code: optInWithoutImport,
+				errors: [{ messageId: 'unused' }],
+			},
+			{
+				code: [optInByAttributes, getData].join('\n'),
 				errors: [{ messageId: 'unused' }],
 			},
 		],

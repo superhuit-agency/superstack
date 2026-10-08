@@ -14,6 +14,7 @@ vi.mock('@/lib/fetch-api', () => ({ default: vi.fn() }));
 vi.mock('@/lib/get-cached-block-data', () => ({
 	getBlockDataModule: async (name: string) =>
 		name === 'test/with-data' ? { getData } : null,
+	blockUsesBaseUri: () => false,
 	default: async (name: string, attributes: object) =>
 		getData(null, attributes),
 }));
