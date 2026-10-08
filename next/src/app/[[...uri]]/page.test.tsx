@@ -37,7 +37,7 @@ vi.mock('@/hooks/use-base-uri', () => ({ baseUriContext: vi.fn() }));
 vi.mock('@/i18n/get-locales', () => ({ getLocales: vi.fn() }));
 
 vi.mock('@/lib', async () => ({
-	addLangPrefix: (uri: string) => uri,
+	addLangPrefix: (uri: string, lang: string) => `/${lang}${uri}`,
 	getAllURIs: vi.fn(),
 	getAuthToken: vi.fn(),
 	getPreviewNodeByURI: vi.fn(),
@@ -77,6 +77,20 @@ describe('Page', () => {
 		);
 		expect(vi.mocked(getRedirection)).not.toHaveBeenCalled();
 		expect(vi.mocked(notFound)).toHaveBeenCalled();
+	});
+
+	it.each([
+		[['blog', 'page', '2abc'], '/blog/page/2abc/'],
+		[['company', 'page', '01'], '/company/page/01/'],
+		[['company', 'page', '0'], '/company/page/0/'],
+	])('reads %j as a URI, not as a query loop page', async (segments, uri) => {
+		await expect(render(segments)).rejects.toThrow();
+
+		expect(vi.mocked(getPublicNodeByURI)).toHaveBeenCalledWith(
+			uri,
+			'fr',
+			1
+		);
 	});
 });
 
@@ -145,7 +159,7 @@ describe('generateMetadata', () => {
 		await expect(metadata(['37'])).rejects.toThrow('NEXT_REDIRECT');
 
 		expect(vi.mocked(redirect)).toHaveBeenCalledWith(
-			'/api/preview-exit?redirect=/37/'
+			'/api/preview-exit?redirect=%2Ffr%2F37%2F'
 		);
 		expect(vi.mocked(getPreviewNodeByURI)).not.toHaveBeenCalled();
 	});
