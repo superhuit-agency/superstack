@@ -371,13 +371,49 @@ describe('POST /api/revalidate', () => {
 		});
 
 		// The plugin reports them from 2.1.0, but they're not mapped yet (#154)
-		it('a term change', async () => {
+		it.each([
+			['a creation', null, { slug: 'video', uri: '/category/video/' }],
+			[
+				'a slug change',
+				{ slug: 'video', uri: '/category/video/' },
+				{ slug: 'videos', uri: '/category/videos/' },
+			],
+			['a delete', { slug: 'video', uri: '/category/video/' }, null],
+		])('a term change: %s', async (_, before, after) => {
 			const response = await send([
-				{ subject: 'term', id: 5, taxonomy: 'category' },
+				{ subject: 'term', id: 5, taxonomy: 'category', before, after },
 			]);
 
 			expect(response.status).toBe(200);
 			expect(revalidateTag).not.toHaveBeenCalled();
+			expect(revalidatePath).not.toHaveBeenCalled();
+		});
+
+		it("a post's terms, and still clears the post", async () => {
+			const response = await send([
+				{
+					subject: 'post',
+					id: 42,
+					type: 'post',
+					before: {
+						uri: '/hello/',
+						terms: [{ id: 7, taxonomy: 'category', slug: 'video' }],
+					},
+					after: {
+						uri: '/hello/',
+						terms: [
+							{ id: 9, taxonomy: 'category', slug: 'podcast' },
+						],
+					},
+				},
+			]);
+
+			expect(response.status).toBe(200);
+			expect(tagsMarkedStale()).toEqual([
+				'content',
+				'node:42',
+				'type:post',
+			]);
 		});
 	});
 
