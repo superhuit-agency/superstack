@@ -99,11 +99,6 @@
 			"count": 1
 		}
 	},
-	"src/components/core/QueryPaginationPrevious/typings.d.ts": {
-		"@typescript-eslint/no-empty-object-type": {
-			"count": 1
-		}
-	},
 	"src/components/core/Quote/typings.d.ts": {
 		"@typescript-eslint/no-empty-object-type": {
 			"count": 1
