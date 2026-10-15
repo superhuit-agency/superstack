@@ -47,6 +47,11 @@ jobs:
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: npx tsc --noEmit
 
+      # The committed GraphQL types must match the committed schema and the `gql` documents
+      - name: GraphQL types up to date
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: npm run generate:types && git diff --exit-code -- src/__generated__
+
       # Pre-existing errors are baselined in next/eslint-suppressions.json, so only new ones fail
       - name: Lint
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
