@@ -4,7 +4,7 @@
 		"Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
 		"This file is @generated automatically"
 	],
-	"content-hash": "fec89d33f668e1411e4963cca4111b51",
+	"content-hash": "7600e365c968cd7d5b065c551292b005",
 	"packages": [
 		{
 			"name": "ashhitch/wp-graphql-yoast-seo",
@@ -695,10 +695,10 @@
 		},
 		{
 			"name": "superhuit/wp-graphql-redirection",
-			"version": "2.0.2",
+			"version": "2.0.4",
 			"dist": {
 				"type": "zip",
-				"url": "https://github.com/superhuit-agency/wp-graphql-redirection/releases/download/v2.0.2/wp-graphql-redirection.zip"
+				"url": "https://github.com/superhuit-agency/wp-graphql-redirection/releases/download/v2.0.4/wp-graphql-redirection.zip"
 			},
 			"type": "wordpress-plugin"
 		},

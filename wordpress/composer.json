@@ -78,10 +78,10 @@
 			"type": "package",
 			"package": {
 				"name": "superhuit/wp-graphql-redirection",
-				"version": "2.0.2",
+				"version": "2.0.4",
 				"type": "wordpress-plugin",
 				"dist": {
-					"url": "https://github.com/superhuit-agency/wp-graphql-redirection/releases/download/v2.0.2/wp-graphql-redirection.zip",
+					"url": "https://github.com/superhuit-agency/wp-graphql-redirection/releases/download/v2.0.4/wp-graphql-redirection.zip",
 					"type": "zip"
 				}
 			}
