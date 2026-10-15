@@ -4,7 +4,7 @@
 		"Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
 		"This file is @generated automatically"
 	],
-	"content-hash": "22eec58e83336f855ebd6b3f536e8098",
+	"content-hash": "2eea1788a10142e2e6a8f2e6f7b3b0bd",
 	"packages": [
 		{
 			"name": "ashhitch/wp-graphql-yoast-seo",
@@ -550,25 +550,28 @@
 		},
 		{
 			"name": "pristas-peter/wp-graphql-gutenberg",
-			"version": "dev-master",
+			"version": "v0.5.1",
 			"source": {
 				"type": "git",
 				"url": "https://github.com/superhuit-agency/wp-graphql-gutenberg.git",
-				"reference": "d80cef61c18678098c2c2cc73f80369d53988f93"
+				"reference": "2959bf962098783d8613a9cf3c76ee12ba6eb46d"
 			},
 			"dist": {
 				"type": "zip",
-				"url": "https://api.github.com/repos/superhuit-agency/wp-graphql-gutenberg/zipball/d80cef61c18678098c2c2cc73f80369d53988f93",
-				"reference": "d80cef61c18678098c2c2cc73f80369d53988f93",
+				"url": "https://api.github.com/repos/superhuit-agency/wp-graphql-gutenberg/zipball/2959bf962098783d8613a9cf3c76ee12ba6eb46d",
+				"reference": "2959bf962098783d8613a9cf3c76ee12ba6eb46d",
 				"shasum": ""
 			},
 			"require": {
 				"opis/json-schema": "^1.0",
+				"php": ">=8.0",
 				"voku/simple_html_dom": "~4.8.10"
 			},
 			"require-dev": {
-				"automattic/vipwpcs": "^2.2",
-				"phpcompatibility/phpcompatibility-wp": "^2.1"
+				"automattic/vipwpcs": "^3.0",
+				"phpcompatibility/phpcompatibility-wp": "^2.1",
+				"squizlabs/php_codesniffer": "^3.13.6",
+				"wp-coding-standards/wpcs": "^3.4.1"
 			},
 			"type": "wordpress-plugin",
 			"autoload": {
@@ -580,6 +583,12 @@
 				]
 			},
 			"scripts": {
+				"post-install-cmd": [
+					"@composer dump-autoload --no-dev"
+				],
+				"post-update-cmd": [
+					"@composer dump-autoload --no-dev"
+				],
 				"phpcs-i": [
 					"@php ./vendor/bin/phpcs -i"
 				],
@@ -592,9 +601,9 @@
 			},
 			"description": "Query gutenberg blocks with wp-graphql",
 			"support": {
-				"source": "https://github.com/superhuit-agency/wp-graphql-gutenberg/tree/master"
+				"source": "https://github.com/superhuit-agency/wp-graphql-gutenberg/tree/v0.5.1"
 			},
-			"time": "2026-07-22T14:19:25+00:00"
+			"time": "2026-09-30T13:55:04+00:00"
 		},
 		{
 			"name": "squizlabs/php_codesniffer",
@@ -677,10 +686,10 @@
 		},
 		{
 			"name": "superhuit-agency/nextjs-revalidate",
-			"version": "2.1.0",
+			"version": "2.1.1",
 			"dist": {
 				"type": "zip",
-				"url": "https://github.com/superhuit-agency/nextjs-revalidate/releases/download/v2.1.0/nextjs-revalidate-v2.1.0.zip"
+				"url": "https://github.com/superhuit-agency/nextjs-revalidate/releases/download/v2.1.1/nextjs-revalidate-v2.1.1.zip"
 			},
 			"type": "wordpress-plugin"
 		},
@@ -695,58 +704,12 @@
 		},
 		{
 			"name": "superhuit/wp-graphql-redirection",
-			"version": "v1.1.1",
-			"source": {
-				"type": "git",
-				"url": "https://github.com/superhuit-agency/wp-graphql-redirection.git",
-				"reference": "726c67e9133966df0df833be26693a8bfaafcbd1"
-			},
+			"version": "2.0.4",
 			"dist": {
 				"type": "zip",
-				"url": "https://api.github.com/repos/superhuit-agency/wp-graphql-redirection/zipball/726c67e9133966df0df833be26693a8bfaafcbd1",
-				"reference": "726c67e9133966df0df833be26693a8bfaafcbd1",
-				"shasum": ""
+				"url": "https://github.com/superhuit-agency/wp-graphql-redirection/releases/download/v2.0.4/wp-graphql-redirection.zip"
 			},
-			"require": {
-				"php": "^7.4 || ^8.0"
-			},
-			"require-dev": {
-				"wp-graphql/wp-graphql": "^1.8",
-				"wpackagist-plugin/redirection": "^5.3"
-			},
-			"type": "wordpress-plugin",
-			"autoload": {
-				"psr-4": {
-					"WPGraphQLRedirection\\": "include/"
-				},
-				"classmap": [
-					"include/"
-				]
-			},
-			"notification-url": "https://packagist.org/downloads/",
-			"license": [
-				"GPL-3.0-or-later"
-			],
-			"authors": [
-				{
-					"name": "superhuit",
-					"email": "tech@superhuit.ch",
-					"homepage": "https://superhuit.ch",
-					"role": "Developer"
-				}
-			],
-			"description": "Exposes Redirection WP plugin in the WP-GraphQL schema",
-			"homepage": "https://github.com/superhuit-agency/wp-graphql-redirection",
-			"keywords": [
-				"graphql",
-				"redirection",
-				"wordpress"
-			],
-			"support": {
-				"issues": "https://github.com/superhuit-agency/wp-graphql-redirection/issues",
-				"source": "https://github.com/superhuit-agency/wp-graphql-redirection/tree/v1.1.1"
-			},
-			"time": "2024-09-19T15:23:36+00:00"
+			"type": "wordpress-plugin"
 		},
 		{
 			"name": "symfony/css-selector",
@@ -1330,9 +1293,7 @@
 	"packages-dev": [],
 	"aliases": [],
 	"minimum-stability": "stable",
-	"stability-flags": {
-		"pristas-peter/wp-graphql-gutenberg": 20
-	},
+	"stability-flags": [],
 	"prefer-stable": false,
 	"prefer-lowest": false,
 	"platform": {
