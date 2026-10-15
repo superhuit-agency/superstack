@@ -21,11 +21,6 @@ export const fragment = gql`
     fseTemplate {
       slug
     }
-    # archivePage {
-		# 	baseUri
-		# 	perPage
-		# 	type
-		# }    
     editLink @include(if: $isPreview)
     preview @include(if: $isPreviewDraft) {
       node {

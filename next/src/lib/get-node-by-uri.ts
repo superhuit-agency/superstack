@@ -251,8 +251,6 @@ async function getNodeByURI(
 		});
 	}
 
-	node.fullUri = uri;
-
 	// Expose the current page, and on an archive the term and post type it
 	// lists, so query loops inheriting the template query follow them.
 	const context = getBlockDataContext(node, uri, routePage);
