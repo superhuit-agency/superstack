@@ -5,3 +5,4 @@ wordpress/node_modules
 wordpress/theme/node_modules
 wordpress/.data
 wordpress/plugins
+next/src/__generated__

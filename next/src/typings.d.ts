@@ -108,15 +108,20 @@ type AuthType = {
 	authToken?: string;
 };
 
-type FetchApiFuncType = (
+/**
+ * Sends a GraphQL document to WordPress. Type a read with the types generated
+ * from its document (`@/__generated__/graphql`, see docs/fse-templating.md#typed-queries):
+ * `fetcher<PostTitleDataQuery, PostTitleDataQueryVariables>(query, { variables })`.
+ */
+type FetchApiFuncType = <TData = any, TVariables = Record<string, unknown>>(
 	query: string,
 	options?: {
-		variables?: any;
+		variables?: TVariables;
 		auth?: AuthType;
 		endpoint?: string;
 		headers?: Record<string, string>;
 	}
-) => Promise<any>;
+) => Promise<TData>;
 
 /**
  * Generic Block Attrs & Props

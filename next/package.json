@@ -9,7 +9,9 @@
 		"lint": "eslint",
 		"storybook": "storybook dev -p 6006",
 		"build-storybook": "storybook build",
-		"test": "vitest run"
+		"test": "vitest run",
+		"generate:schema": "node --env-file-if-exists=.env scripts/generate-graphql-schema.mjs",
+		"generate:types": "graphql-codegen"
 	},
 	"dependencies": {
 		"@formatjs/intl-localematcher": "^0.6.0",
@@ -22,6 +24,8 @@
 		"react-dom": "19.2.4"
 	},
 	"devDependencies": {
+		"@graphql-codegen/cli": "^7.4.6",
+		"@graphql-codegen/typescript-operations": "^6.1.10",
 		"@storybook/nextjs-vite": "^10.3.5",
 		"@types/js-cookie": "^3.0.6",
 		"@types/lodash": "^4.17.24",
