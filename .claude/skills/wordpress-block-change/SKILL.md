@@ -50,7 +50,8 @@ A block's `data.ts` `getData` runs in a cache entry of its own (`next/src/lib/ge
 4. If `getData` needs the page being viewed (its term or listed post type, the `/page/{n}` page, its `baseUri` or the block's own `innerBlocks`), declare `export const usesArchiveContext = true;` (or a function of the attributes, when only some depend on it, like `core/query`'s `inherit`) and read `getData`'s fourth argument, the `BlockDataContext`. It adds the context to the cache key; other blocks don't get it.
 5. Never import `next/cache` in `data.ts`: it's also bundled into the WordPress block editor.
 6. `fetchAPI` throws a `WordPressReadError` (`next/src/lib/wordpress-read-error.ts`) when WordPress doesn't answer or returns a GraphQL error. Don't catch it into empty data, or the failure is cached as "nothing there". Keep `null` for "nothing there", and throw a `WordPressReadError` yourself when the queried field is missing (`undefined`). `core/navigation` does this.
-7. ESLint enforces 2 and 3 (`superstack/require-uses-base-uri`, `superstack/no-unused-uses-base-uri`): run `cd next && npx eslint <path/to/data.ts>`.
+7. Write the block's query with `gql` and an operation name of its own, type the read with the generated types (`fetcher<XQuery, XQueryVariables>(…)`, from `@/__generated__/graphql`) and run `cd next && npm run generate:types`. Types are erased from the bundle, so this is safe in the editor too. See `docs/fse-templating.md#typed-queries`.
+8. ESLint enforces 2 and 3 (`superstack/require-uses-base-uri`, `superstack/no-unused-uses-base-uri`): run `cd next && npx eslint <path/to/data.ts>`.
 
 ## Safety Rules
 
@@ -60,7 +61,7 @@ A block's `data.ts` `getData` runs in a cache entry of its own (`next/src/lib/ge
 
 ## Verification Checklist
 
-1. `cd next && npx tsc --noEmit`
+1. `cd next && npm run generate:types && npx tsc --noEmit`
 2. `cd next && npx eslint src/components` reports no `superstack/*` problem.
 3. `npm --prefix ./wordpress run build` (theme side) or `npm --prefix ./next run build` (frontend side)
 4. Validate block renders in editor and frontend where applicable.

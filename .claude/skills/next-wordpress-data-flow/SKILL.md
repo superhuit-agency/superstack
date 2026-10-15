@@ -24,6 +24,9 @@ Keep cross-app data flow consistent when changing GraphQL queries, block props, 
   - `next/src/lib/get-cached-block-data.ts`
   - `next/src/lib/get-preview-node.ts`
   - `next/src/lib/get-auth-token.ts`
+- Query types:
+  - `next/schema.graphql` (WordPress schema snapshot), `next/codegen.ts`
+  - `next/src/__generated__/graphql.ts` (generated, committed)
 - Block/data mapping:
   - `next/src/lib/get-block-final-component-props.ts`
   - `next/src/components/global/blockRegistry.ts`
@@ -39,6 +42,7 @@ Keep cross-app data flow consistent when changing GraphQL queries, block props, 
 3. Keep runtime behavior consistent between preview and non-preview paths.
 4. Reuse existing helpers and query patterns.
 5. Avoid broad refactors unrelated to the requested data change.
+6. Write queries with `gql` and a unique operation name, and pass the generated types to the fetcher: `fetcher<PostTitleDataQuery, PostTitleDataQueryVariables>(query, { variables })`. Narrow union results (`'title' in node`) instead of casting. After changing a query, run `cd next && npm run generate:types`; after a plugin or theme change to the GraphQL schema, `npm run generate:schema` first (local WordPress). See `docs/fse-templating.md#typed-queries`.
 
 ## Caching Rules
 
@@ -58,7 +62,7 @@ Every public read of WordPress is cached until a Change clears one of its tags. 
 
 ## Verification Checklist
 
-1. `cd next && npx tsc --noEmit`
+1. `cd next && npm run generate:types && npx tsc --noEmit` (no diff left in `src/__generated__`)
 2. `cd next && npm test` and `npm run lint -- --pass-on-unpruned-suppressions`, the pull request checks (`.github/workflows/checks.yml`).
 3. Verify touched queries/mappers still satisfy consuming components.
 4. Confirm preview path still works when relevant.
