@@ -14691,6 +14691,9 @@ type RedirectionItemType {
   code: Int
 
   """"""
+  isRegex: Boolean
+
+  """"""
   target: String
 
   """"""
