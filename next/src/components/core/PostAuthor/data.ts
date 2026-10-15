@@ -1,6 +1,10 @@
 import { baseUriContext } from '@/hooks/use-base-uri';
 import { nodeAtUriTags } from '@/lib/cache-tags';
 import { gql } from '@/utils';
+import type {
+	PostAuthorDataQuery,
+	PostAuthorDataQueryVariables,
+} from '@/__generated__/graphql';
 
 export const usesBaseUri = true;
 
@@ -44,11 +48,15 @@ export const getData = async (fetcher: FetchApiFuncType) => {
 		uri,
 	};
 
-	const data = await fetcher(query, { variables });
-	const author = data?.nodeByUri?.author;
+	const data = await fetcher<
+		PostAuthorDataQuery,
+		PostAuthorDataQueryVariables
+	>(query, { variables });
+	const node = data?.nodeByUri;
+	const author = node && 'author' in node ? node.author : null;
 
 	return {
 		author: author?.node,
-		cacheTags: nodeAtUriTags(data?.nodeByUri?.databaseId),
+		cacheTags: nodeAtUriTags(node?.databaseId),
 	};
 };

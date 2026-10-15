@@ -1,6 +1,10 @@
 import { cacheTags } from '@/lib/cache-tags';
 import { WordPressReadError } from '@/lib/wordpress-read-error';
 import { gql } from '@/utils';
+import type {
+	NavigationMenuBlocksQuery,
+	NavigationMenuBlocksQueryVariables,
+} from '@/__generated__/graphql';
 
 const getSubmenuVisibility = (attrs: NavigationAttributes | null) => {
 	const deprecatedOpenOnClick = attrs?.openSubmenusOnClick;
@@ -55,7 +59,10 @@ export const getData = async (
 
 	const tags = [cacheTags.menu(attrs.ref)];
 
-	const data = await fetcher(navigationMenuQuery, {
+	const data = await fetcher<
+		NavigationMenuBlocksQuery,
+		NavigationMenuBlocksQueryVariables
+	>(navigationMenuQuery, {
 		variables: { id: String(attrs.ref) },
 	});
 

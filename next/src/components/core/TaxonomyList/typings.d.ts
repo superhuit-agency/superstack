@@ -22,10 +22,10 @@ interface TaxonomyListProps extends TaxonomyListAttributes {
 type TaxonomyTerm = {
 	id: string;
 	databaseId?: number;
-	name: string;
-	slug: string;
-	uri?: string;
-	count?: number;
+	name: string | null;
+	slug: string | null;
+	uri?: string | null;
+	count?: number | null;
 	parent?: {
 		node?: {
 			id?: string;
@@ -33,6 +33,6 @@ type TaxonomyTerm = {
 		} | null;
 	} | null;
 	language?: {
-		slug?: string;
+		slug?: string | null;
 	} | null;
 };

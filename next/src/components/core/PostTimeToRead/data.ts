@@ -1,6 +1,12 @@
 import { baseUriContext } from '@/hooks/use-base-uri';
 import { nodeAtUriTags } from '@/lib/cache-tags';
 import { gql } from '@/utils';
+import type {
+	PostTimeToReadByPostIdQuery,
+	PostTimeToReadByPostIdQueryVariables,
+	PostTimeToReadByUriQuery,
+	PostTimeToReadByUriQueryVariables,
+} from '@/__generated__/graphql';
 
 import {
 	blockCorePostTimeToReadWordCount,
@@ -208,7 +214,10 @@ export const getData = async (
 				}
 			}
 		`;
-		const byIdData = await fetcher(byIdQuery, {
+		const byIdData = await fetcher<
+			PostTimeToReadByPostIdQuery,
+			PostTimeToReadByPostIdQueryVariables
+		>(byIdQuery, {
 			variables: { postId: String(attrs.postId) },
 		});
 		bundle = byIdData?.post ?? null;
@@ -235,7 +244,10 @@ export const getData = async (
 		`;
 		const uri = baseUriContext();
 		if (uri) {
-			const byUriData = await fetcher(byUriQuery, { variables: { uri } });
+			const byUriData = await fetcher<
+				PostTimeToReadByUriQuery,
+				PostTimeToReadByUriQueryVariables
+			>(byUriQuery, { variables: { uri } });
 			bundle = byUriData?.nodeByUri ?? null;
 		}
 	}

@@ -1,9 +1,15 @@
 import configs from '@/configs.json';
 import { cacheTags } from '@/lib/cache-tags';
 import { gql } from '@/utils';
+import type {
+	LatestPostsQuery,
+	LatestPostsQueryVariables,
+	OrderEnum,
+	PostObjectsConnectionOrderbyEnum,
+} from '@/__generated__/graphql';
 
-const ORDER_ENUMS = new Set(['ASC', 'DESC']);
-const ORDER_BY_ENUMS = new Set([
+const ORDER_ENUMS: OrderEnum[] = ['ASC', 'DESC'];
+const ORDER_BY_ENUMS: PostObjectsConnectionOrderbyEnum[] = [
 	'AUTHOR',
 	'COMMENT_COUNT',
 	'DATE',
@@ -14,16 +20,16 @@ const ORDER_BY_ENUMS = new Set([
 	'PARENT',
 	'SLUG',
 	'TITLE',
-]);
+];
 
-const toOrderEnum = (value?: string) => {
+const toOrderEnum = (value?: string): OrderEnum => {
 	const normalized = value?.toUpperCase();
-	return normalized && ORDER_ENUMS.has(normalized) ? normalized : 'DESC';
+	return ORDER_ENUMS.find((order) => order === normalized) ?? 'DESC';
 };
 
-const toOrderByEnum = (value?: string) => {
+const toOrderByEnum = (value?: string): PostObjectsConnectionOrderbyEnum => {
 	const normalized = value?.toUpperCase();
-	return normalized && ORDER_BY_ENUMS.has(normalized) ? normalized : 'DATE';
+	return ORDER_BY_ENUMS.find((orderBy) => orderBy === normalized) ?? 'DATE';
 };
 
 const normalizeCategoryIds = (
@@ -107,18 +113,21 @@ export const getData = async (
 			: null;
 	const categories = normalizeCategoryIds(attrs?.categories);
 
-	const data = await fetcher(query, {
-		variables: {
-			first,
-			order,
-			orderby,
-			authorIn: selectedAuthor,
-			categoryIn: categories,
-			...(configs.isMultilang
-				? { language: lang ? lang.toUpperCase() : 'ALL' }
-				: {}),
-		},
-	});
+	const data = await fetcher<LatestPostsQuery, LatestPostsQueryVariables>(
+		query,
+		{
+			variables: {
+				first,
+				order,
+				orderby,
+				authorIn: selectedAuthor,
+				categoryIn: categories,
+				...(configs.isMultilang
+					? { language: lang ? lang.toUpperCase() : 'ALL' }
+					: {}),
+			},
+		}
+	);
 
 	return { data, cacheTags: [cacheTags.type('post')] };
 };

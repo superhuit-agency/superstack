@@ -2,6 +2,15 @@ import configs from '@/configs.json';
 import { baseUriContext } from '@/hooks/use-base-uri';
 import { cacheTags, termTags } from '@/lib/cache-tags';
 import { gql } from '@/utils';
+import type {
+	RootQueryToTermNodeConnectionWhereArgs,
+	TaxonomyEnum,
+	TermObjectsConnectionOrderbyEnum,
+	TermsQueryArchiveContextQuery,
+	TermsQueryArchiveContextQueryVariables,
+	TermsQueryTermsQuery,
+	TermsQueryTermsQueryVariables,
+} from '@/__generated__/graphql';
 
 import { taxonomyToGraphqlEnum } from '@/components/core/TaxonomyList/helper';
 
@@ -34,7 +43,7 @@ const toOrderEnum = (value?: string) => {
 const toTermOrderByEnum = (
 	orderBy: TermQueryType['orderBy'],
 	hasInclude: boolean
-): string => {
+): TermObjectsConnectionOrderbyEnum => {
 	if (hasInclude) return 'TERM_ORDER';
 	const u = orderBy?.toLowerCase();
 	if (u === 'slug') return 'SLUG';
@@ -68,6 +77,9 @@ const isTaxonomyHierarchical = (taxonomySlug: string): boolean => {
 	return true;
 };
 
+// Queried in multilang mode only, so missing from the generated types
+type MultilangTermFields = { language?: { slug?: string | null } | null };
+
 type TermArchiveContext = {
 	databaseId: number;
 	taxonomyName: string;
@@ -91,10 +103,14 @@ const fetchTermArchiveContext = async (
 		}
 	`;
 
-	const data = await fetcher(query, { variables: { uri } });
+	const data = await fetcher<
+		TermsQueryArchiveContextQuery,
+		TermsQueryArchiveContextQueryVariables
+	>(query, { variables: { uri } });
 	const node = data?.nodeByUri;
 	if (
 		!node ||
+		!('databaseId' in node) ||
 		typeof node.databaseId !== 'number' ||
 		typeof node.taxonomyName !== 'string'
 	) {
@@ -123,7 +139,7 @@ export const getData = async (
 	const includeIds = normalizeIncludeIds(termQuery.include ?? []);
 	const hasInclude = includeIds.length > 0;
 
-	let taxonomies: string[] = [];
+	let taxonomies: TaxonomyEnum[] = [];
 	let parent: number | undefined;
 	let childOf: number | undefined;
 
@@ -159,7 +175,7 @@ export const getData = async (
 	const order = hasInclude ? 'ASC' : toOrderEnum(termQuery.order);
 	const orderby = toTermOrderByEnum(termQuery.orderBy, hasInclude);
 
-	const where: Record<string, unknown> = {
+	const where: RootQueryToTermNodeConnectionWhereArgs = {
 		taxonomies,
 		hideEmpty: termQuery.hideEmpty !== false,
 		order,
@@ -208,20 +224,26 @@ export const getData = async (
 		}
 	`;
 
-	const data = await fetcher(termsQuery, {
+	const data = await fetcher<
+		TermsQueryTermsQuery,
+		TermsQueryTermsQueryVariables
+	>(termsQuery, {
 		variables: {
 			first,
 			where,
 		},
 	});
 
-	let nodes = data?.terms?.nodes ?? [];
+	let nodes: Array<
+		NonNullable<TermsQueryTermsQuery['terms']>['nodes'][number] &
+			MultilangTermFields
+	> = data?.terms?.nodes ?? [];
 
 	if (configs.isMultilang && lang) {
 		// Terms without an assigned language (empty slug) are kept: Polylang
 		// treats them as belonging to every language.
 		nodes = nodes.filter(
-			(node: { language?: { slug?: string } | null }) =>
+			(node) =>
 				!node.language?.slug ||
 				node.language.slug.toLowerCase() === lang.toLowerCase()
 		);

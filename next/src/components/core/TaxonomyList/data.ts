@@ -1,6 +1,10 @@
 import configs from '@/configs.json';
 import { cacheTags, termTags } from '@/lib/cache-tags';
 import { gql } from '@/utils';
+import type {
+	TaxonomyListTermsQuery,
+	TaxonomyListTermsQueryVariables,
+} from '@/__generated__/graphql';
 import { taxonomyToGraphqlEnum } from './helper';
 
 export const getData = async (
@@ -49,14 +53,15 @@ export const getData = async (
 		}
 	`;
 
-	const options = {
+	const data = await fetcher<
+		TaxonomyListTermsQuery,
+		TaxonomyListTermsQueryVariables
+	>(query, {
 		variables: {
 			taxonomies: [taxonomyEnum],
 			hideEmpty: !attrs?.showEmpty,
 		},
-	};
-
-	const data = await fetcher(query, options);
+	});
 
 	// The generic `terms` connection has no `language` where-arg (Polylang only
 	// adds it to post connections), so terms are filtered on the fetched result.

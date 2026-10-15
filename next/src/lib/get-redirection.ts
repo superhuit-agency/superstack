@@ -3,6 +3,10 @@ import { cacheLife, cacheTag } from 'next/cache';
 import { gql } from '@/utils';
 import { fetchAPI } from '@/lib';
 import { cacheTags } from '@/lib/cache-tags';
+import type {
+	RedirectionsQuery,
+	RedirectionsQueryVariables,
+} from '@/__generated__/graphql';
 
 /**
  * Cached per URI, including a "no redirect" result.
@@ -14,7 +18,10 @@ export default async function getRedirection(uri: string) {
 	cacheLife('max');
 	cacheTag(cacheTags.redirect(uri), cacheTags.redirects(), cacheTags.nodes());
 
-	const { redirections } = await fetchAPI(
+	const { redirections } = await fetchAPI<
+		RedirectionsQuery,
+		RedirectionsQueryVariables
+	>(
 		gql`
 			query redirectionsQuery($uri: String!) {
 				redirections(uri: $uri) {
@@ -37,10 +44,14 @@ export default async function getRedirection(uri: string) {
 		);
 	}
 
-	return redirections === null || !redirections[0]
+	const [redirection] = redirections ?? [];
+
+	// A redirection without a target (an error action) has nowhere to send to
+	return !redirection?.target
 		? null
 		: {
-				destination: redirections[0].target,
-				isPermanent: [301, 308].includes(redirections[0].code),
+				destination: redirection.target,
+				isPermanent:
+					redirection.code === 301 || redirection.code === 308,
 			};
 }

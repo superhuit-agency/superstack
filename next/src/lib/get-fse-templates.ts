@@ -4,16 +4,17 @@ import fetchAPI from '@/lib/fetch-api';
 import formatBlocksJSON from '@/lib/format-blocks-json';
 import { cacheTags } from '@/lib/cache-tags';
 import { gql } from '@/utils';
+import type { FseTemplatesQuery } from '@/__generated__/graphql';
 import { resolvePromises } from '@/utils/resolve-promises';
 
 type FseTemplateNode = {
-	slug: string;
-	blocksJSON?: string;
+	slug: string | null;
+	blocksJSON?: string | null;
 };
 
 type FseTemplatePartNode = FseTemplateNode & {
-	area?: string;
-	language?: { baseSlug: string; code: string };
+	area?: string | null;
+	language?: { baseSlug: string | null; code: string | null } | null;
 };
 
 /**
@@ -28,23 +29,24 @@ export default async function getFseTemplates(): Promise<FseTemplateEntry[]> {
 	cacheLife('max');
 	cacheTag(cacheTags.templates(), cacheTags.nodes());
 
-	const { allTemplates, allTemplateParts } = await fetchAPI(gql`
-		query fseTemplatesQuery {
-			allTemplates {
-				slug
-				blocksJSON
-			}
-			allTemplateParts {
-				area
-				slug
-				blocksJSON
-				language {
-					baseSlug
-					code
+	const { allTemplates, allTemplateParts } =
+		await fetchAPI<FseTemplatesQuery>(gql`
+			query fseTemplatesQuery {
+				allTemplates {
+					slug
+					blocksJSON
+				}
+				allTemplateParts {
+					area
+					slug
+					blocksJSON
+					language {
+						baseSlug
+						code
+					}
 				}
 			}
-		}
-	`);
+		`);
 
 	// Both fields always resolve to a list: anything else is a failed request,
 	// which must not be cached as "no template"
@@ -52,16 +54,19 @@ export default async function getFseTemplates(): Promise<FseTemplateEntry[]> {
 		throw new Error('Could not read the FSE templates from WordPress');
 	}
 
-	const templateParts: FseTemplatePartNode[] =
-		allTemplateParts.filter(Boolean);
+	const templateParts: FseTemplatePartNode[] = allTemplateParts.filter(
+		(part) => part !== null
+	);
 
 	// Settled one by one, so a template that fails to parse is dropped
 	// instead of failing every page
 	const templates = await resolvePromises(
-		allTemplates.filter(Boolean).map(async (template: FseTemplateNode) => ({
-			slug: template.slug,
-			blocks: await parseAndInlineBlocks(template, templateParts),
-		}))
+		allTemplates
+			.filter((template) => template !== null)
+			.map(async (template: FseTemplateNode) => ({
+				slug: template.slug,
+				blocks: await parseAndInlineBlocks(template, templateParts),
+			}))
 	);
 
 	return templates.filter(Boolean) as FseTemplateEntry[];
@@ -123,16 +128,18 @@ async function inlineTemplatePart(
 	);
 	const basePart =
 		matchingParts.find((part) => !part.language?.code) ?? matchingParts[0];
-	const translationParts = matchingParts.filter(
-		(part) => part.language?.code && part !== basePart
+	const translationParts = matchingParts.flatMap((part) =>
+		part.language?.code && part !== basePart
+			? [{ part, code: part.language.code }]
+			: []
 	);
 
 	const [innerBlocks, translationEntries] = await Promise.all([
 		parseAndInlineBlocks(basePart, templateParts, nestedSeen),
 		resolvePromises(
 			translationParts.map(
-				async (part): Promise<[string, BlockPropsType[]]> => [
-					part.language!.code,
+				async ({ part, code }): Promise<[string, BlockPropsType[]]> => [
+					code,
 					await parseAndInlineBlocks(part, templateParts, nestedSeen),
 				]
 			)

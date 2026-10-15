@@ -1,6 +1,10 @@
 import { baseUriContext } from '@/hooks/use-base-uri';
 import { cacheTags } from '@/lib/cache-tags';
 import { gql } from '@/utils';
+import type {
+	QueryTitleDataQuery,
+	QueryTitleDataQueryVariables,
+} from '@/__generated__/graphql';
 
 const archivePrefix = (type: string): string => {
 	if (type === 'archive') return 'Archives';
@@ -43,19 +47,22 @@ export const getData = async (
 		}
 	`;
 
-	const data = await fetcher(query, { variables: { uri } });
+	const data = await fetcher<
+		QueryTitleDataQuery,
+		QueryTitleDataQueryVariables
+	>(query, { variables: { uri } });
 	const node = data?.nodeByUri;
 
 	const tags = !node
 		? [cacheTags.uris()]
-		: typeof node.databaseId === 'number'
+		: 'databaseId' in node && typeof node.databaseId === 'number'
 			? [cacheTags.term(node.databaseId)]
 			: [];
 
 	const name: string =
-		typeof node?.label === 'string'
+		node && 'label' in node && typeof node.label === 'string'
 			? node.label
-			: typeof node?.name === 'string'
+			: node && 'name' in node && typeof node.name === 'string'
 				? node.name
 				: '';
 

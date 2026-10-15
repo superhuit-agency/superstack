@@ -1,6 +1,10 @@
 import { baseUriContext } from '@/hooks/use-base-uri';
 import { nodeAtUriTags } from '@/lib/cache-tags';
 import { gql } from '@/utils';
+import type {
+	PostExcerptDataQuery,
+	PostExcerptDataQueryVariables,
+} from '@/__generated__/graphql';
 
 export const usesBaseUri = true;
 
@@ -34,8 +38,12 @@ export const getData = async (
 		uri: uri,
 	};
 
-	const data = await fetcher(query, { variables });
-	const excerpt = data?.nodeByUri?.excerpt;
+	const data = await fetcher<
+		PostExcerptDataQuery,
+		PostExcerptDataQueryVariables
+	>(query, { variables });
+	const node = data?.nodeByUri;
+	const excerpt = node && 'excerpt' in node ? node.excerpt : null;
 
 	return {
 		content: typeof excerpt === 'string' ? excerpt : '',

@@ -1,6 +1,10 @@
 import { baseUriContext } from '@/hooks/use-base-uri';
 import { cacheTags } from '@/lib/cache-tags';
 import { gql } from '@/utils';
+import type {
+	TermNameDataQuery,
+	TermNameDataQueryVariables,
+} from '@/__generated__/graphql';
 
 export const usesBaseUri = true;
 
@@ -28,7 +32,10 @@ export const getData = async (
 		}
 	`;
 
-	const data = await fetcher(query, { variables: { uri } });
+	const data = await fetcher<TermNameDataQuery, TermNameDataQueryVariables>(
+		query,
+		{ variables: { uri } }
+	);
 	const node = data?.nodeByUri;
 
 	return {

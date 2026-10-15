@@ -61,7 +61,10 @@ export default async function TaxonomyList({
 					<select name={taxonomy} defaultValue="">
 						<option value="">Select {labelText}</option>
 						{terms.map((term) => (
-							<option key={getTermKey(term)} value={term.slug}>
+							<option
+								key={getTermKey(term)}
+								value={term.slug ?? undefined}
+							>
 								{term.name}
 								{showPostCounts &&
 								typeof term.count === 'number'
