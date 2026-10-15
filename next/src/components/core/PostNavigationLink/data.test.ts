@@ -94,4 +94,30 @@ describe('PostNavigationLink getData', () => {
 		expect(isWordPressReadError(error)).toBe(true);
 		expect(fetcher).toHaveBeenCalledTimes(2);
 	});
+
+	it.each([
+		['next', 'after', 'before', 'ASC'],
+		['previous', 'before', 'after', 'DESC'],
+	] as const)(
+		'sends only the date bound of the %s direction',
+		async (type, sent, leftOut, order) => {
+			const fetcher = vi
+				.fn()
+				.mockResolvedValueOnce(currentPost)
+				.mockResolvedValueOnce({ posts: { nodes: [] } });
+
+			await getData(
+				fetcher as unknown as FetchApiFuncType,
+				attributes(type)
+			);
+
+			const { variables } = fetcher.mock.calls[1][1];
+			expect(variables).toMatchObject({
+				[sent]: { year: 2026, month: 5, day: 4 },
+				order,
+				notIn: [42],
+			});
+			expect(variables).not.toHaveProperty(leftOut);
+		}
+	);
 });
