@@ -10,7 +10,7 @@ export const getData = async (
 ) => {
 	if (attrs?.postId) {
 		const query = gql`
-			query PostFeaturedImageData($postId: ID!) {
+			query PostFeaturedImageByPostId($postId: ID!) {
 				post(id: $postId) {
 					databaseId
 					featuredImage {

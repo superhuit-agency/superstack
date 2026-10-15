@@ -44,39 +44,41 @@ const normalizeIdList = (value?: Array<string> | string[]) => {
 	return ids.length ? ids : null;
 };
 
-const nodeFields = `
-        id
-        databaseId
-        uri
-        date
-        ... on NodeWithTitle {
-          title(format: RENDERED)
-        }
-        ... on NodeWithExcerpt {
-          excerpt(format: RENDERED)
-        }
-        ... on NodeWithContentEditor {
-          content(format: RENDERED)
-        }
-        ... on NodeWithAuthor {
-          author {
-            node {
-              name
-            }
-          }
-        }
-        ... on NodeWithFeaturedImage {
-          featuredImage {
-            node {
-              sourceUrl
-              altText
-              mediaDetails {
-                width
-                height
-              }
-            }
-          }
-        }
+const nodeFields = gql`
+	fragment QueryNodeFields on ContentNode {
+		id
+		databaseId
+		uri
+		date
+		... on NodeWithTitle {
+			title(format: RENDERED)
+		}
+		... on NodeWithExcerpt {
+			excerpt(format: RENDERED)
+		}
+		... on NodeWithContentEditor {
+			content(format: RENDERED)
+		}
+		... on NodeWithAuthor {
+			author {
+				node {
+					name
+				}
+			}
+		}
+		... on NodeWithFeaturedImage {
+			featuredImage {
+				node {
+					sourceUrl
+					altText
+					mediaDetails {
+						width
+						height
+					}
+				}
+			}
+		}
+	}
 `;
 
 const queryPosts = gql`
@@ -112,10 +114,11 @@ const queryPosts = gql`
         }
       }
       nodes {
-        ${nodeFields}
+        ...QueryNodeFields
       }
     }
   }
+  ${nodeFields}
 `;
 
 const queryContentNodes = gql`
@@ -149,10 +152,11 @@ const queryContentNodes = gql`
         }
       }
       nodes {
-        ${nodeFields}
+        ...QueryNodeFields
       }
     }
   }
+  ${nodeFields}
 `;
 
 const PAGINATION_BLOCKS = new Set([

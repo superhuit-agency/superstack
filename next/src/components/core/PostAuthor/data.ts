@@ -6,7 +6,7 @@ export const usesBaseUri = true;
 
 export const getData = async (fetcher: FetchApiFuncType) => {
 	const query = gql`
-		query nodeByUriQuery($uri: String!) {
+		query PostAuthorData($uri: String!) {
 			nodeByUri(uri: $uri) {
 				... on ContentNode {
 					databaseId

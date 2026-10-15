@@ -12,7 +12,7 @@ export const getData = async (
 
 	if (attrs?.term === 'category') {
 		query = gql`
-			query nodeByIdQuery($uri: String!) {
+			query PostTermsCategories($uri: String!) {
 				nodeByUri(uri: $uri) {
 					... on ContentNode {
 						databaseId
@@ -33,7 +33,7 @@ export const getData = async (
 
 	if (attrs?.term === 'post_tag') {
 		query = gql`
-			query nodeByIdQuery($uri: String!) {
+			query PostTermsTags($uri: String!) {
 				nodeByUri(uri: $uri) {
 					... on ContentNode {
 						databaseId

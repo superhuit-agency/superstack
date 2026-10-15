@@ -156,60 +156,67 @@ export const getData = async (
 	const comparisonOperator = getComparisonOperator(direction);
 
 	const postAdjacentQuery = gql`
-    query PostNavigationLinkAdjacentPost(
-      $date: DateInput!
-      $order: OrderEnum!
-      $categoryIn: [ID]
-      $tagIn: [ID]
-      $notIn: [ID]
-    ) {
-      posts(
-        first: 1
-        where: {
-          orderby: { field: DATE, order: $order }
-          stati: PUBLISH
-          dateQuery: { ${comparisonOperator}: $date }
-          categoryIn: $categoryIn
-          tagIn: $tagIn
-          notIn: $notIn
-        }
-      ) {
-        nodes {
-          databaseId
-          date
-          uri
-          title(format: RENDERED)
-        }
-      }
-    }
-  `;
+		query PostNavigationLinkAdjacentPost(
+			$before: DateInput
+			$after: DateInput
+			$order: OrderEnum!
+			$categoryIn: [ID]
+			$tagIn: [ID]
+			$notIn: [ID]
+		) {
+			posts(
+				first: 1
+				where: {
+					orderby: { field: DATE, order: $order }
+					stati: PUBLISH
+					dateQuery: { before: $before, after: $after }
+					categoryIn: $categoryIn
+					tagIn: $tagIn
+					notIn: $notIn
+				}
+			) {
+				nodes {
+					databaseId
+					date
+					uri
+					title(format: RENDERED)
+				}
+			}
+		}
+	`;
 
 	const pageAdjacentQuery = gql`
-    query PostNavigationLinkAdjacentPage(
-      $date: DateInput!
-      $order: OrderEnum!
-      $notIn: [ID]
-    ) {
-      pages(
-        first: 1
-        where: {
-          orderby: { field: DATE, order: $order }
-          dateQuery: { ${comparisonOperator}: $date }
-          notIn: $notIn
-        }
-      ) {
-        nodes {
-          databaseId
-          date
-          uri
-          title(format: RENDERED)
-        }
-      }
-    }
-  `;
+		query PostNavigationLinkAdjacentPage(
+			$before: DateInput
+			$after: DateInput
+			$order: OrderEnum!
+			$notIn: [ID]
+		) {
+			pages(
+				first: 1
+				where: {
+					orderby: { field: DATE, order: $order }
+					dateQuery: { before: $before, after: $after }
+					notIn: $notIn
+				}
+			) {
+				nodes {
+					databaseId
+					date
+					uri
+					title(format: RENDERED)
+				}
+			}
+		}
+	`;
 
+	// Only the bound of the direction is sent: a variable left out leaves its
+	// `dateQuery` field out
+	const date = toWpDateInput(currentNode.date);
 	const commonVariables = {
-		date: toWpDateInput(currentNode.date),
+		...(comparisonOperator === 'after'
+			? { after: date }
+			: { before: date }),
 		order,
 		notIn: [currentNode.databaseId],
 	};
