@@ -1,6 +1,12 @@
 import { baseUriContext } from '@/hooks/use-base-uri';
 import { nodeAtUriTags } from '@/lib/cache-tags';
 import { gql } from '@/utils';
+import type {
+	PostFeaturedImageByPostIdQuery,
+	PostFeaturedImageByPostIdQueryVariables,
+	PostFeaturedImageDataQuery,
+	PostFeaturedImageDataQueryVariables,
+} from '@/__generated__/graphql';
 
 export const usesBaseUri = true;
 
@@ -10,7 +16,7 @@ export const getData = async (
 ) => {
 	if (attrs?.postId) {
 		const query = gql`
-			query PostFeaturedImageData($postId: ID!) {
+			query PostFeaturedImageByPostId($postId: ID!) {
 				post(id: $postId) {
 					databaseId
 					featuredImage {
@@ -31,7 +37,10 @@ export const getData = async (
 			postId: attrs?.postId,
 		};
 
-		const data = await fetcher(query, { variables });
+		const data = await fetcher<
+			PostFeaturedImageByPostIdQuery,
+			PostFeaturedImageByPostIdQueryVariables
+		>(query, { variables });
 		const featuredImage = data?.post?.featuredImage;
 
 		return {
@@ -82,12 +91,17 @@ export const getData = async (
 		uri: uri,
 	};
 
-	const data = await fetcher(query, { variables });
+	const data = await fetcher<
+		PostFeaturedImageDataQuery,
+		PostFeaturedImageDataQueryVariables
+	>(query, { variables });
 
-	const featuredImage = data?.nodeByUri?.featuredImage;
+	const node = data?.nodeByUri;
+	const featuredImage =
+		node && 'featuredImage' in node ? node.featuredImage : null;
 
 	return {
 		featuredImage: featuredImage?.node,
-		cacheTags: nodeAtUriTags(data?.nodeByUri?.databaseId),
+		cacheTags: nodeAtUriTags(node?.databaseId),
 	};
 };

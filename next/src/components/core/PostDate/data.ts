@@ -1,6 +1,11 @@
 import { baseUriContext } from '@/hooks/use-base-uri';
 import { cacheTags, nodeAtUriTags } from '@/lib/cache-tags';
 import { gql } from '@/utils';
+import type {
+	PostDateDataQuery,
+	PostDateDataQueryVariables,
+	PostDateGeneralSettingsQuery,
+} from '@/__generated__/graphql';
 
 import { parsePostDateToUtcMs } from './format-post-date';
 
@@ -77,7 +82,8 @@ const resolveDisplayFormat = (
 };
 
 const fetchGeneralSettings = async (fetcher: FetchApiFuncType) => {
-	const data = await fetcher(queryPostDateGeneral);
+	const data =
+		await fetcher<PostDateGeneralSettingsQuery>(queryPostDateGeneral);
 	return {
 		dateFormat:
 			typeof data?.generalSettings?.dateFormat === 'string'
@@ -147,18 +153,20 @@ export const getData = async (
 		return { renderEmpty: true as const, cacheTags: [] };
 	}
 
-	const data = await fetcher(queryPostDate, { variables: { uri: baseUri } });
-	const node = data?.nodeByUri as
-		| {
-				databaseId?: number;
-				date?: string;
-				modified?: string;
-				uri?: string;
-		  }
-		| null
-		| undefined;
+	const data = await fetcher<PostDateDataQuery, PostDateDataQueryVariables>(
+		queryPostDate,
+		{ variables: { uri: baseUri } }
+	);
+	const found = data?.nodeByUri;
+	// A post or a page: only they have the dates queried
+	const node = found && 'date' in found ? found : null;
 
-	const tags = [...nodeAtUriTags(node?.databaseId), cacheTags.settings()];
+	const tags = [
+		...nodeAtUriTags(
+			found && 'databaseId' in found ? found.databaseId : undefined
+		),
+		cacheTags.settings(),
+	];
 
 	const field = resolveGraphqlField(attrs);
 	const raw =

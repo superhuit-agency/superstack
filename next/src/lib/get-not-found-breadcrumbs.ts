@@ -3,6 +3,7 @@ import { cacheLife, cacheTag } from 'next/cache';
 import configs from '@/configs.json';
 import { gql } from '@/utils';
 import { fetchAPI } from '@/lib';
+import type { NotFoundBreadcrumbsQuery } from '@/__generated__/graphql';
 import { cacheTags } from '@/lib/cache-tags';
 
 /**
@@ -25,7 +26,7 @@ export default async function getNotFoundBreadcrumbs(
 	cacheLife('max');
 	cacheTag(cacheTags.settings(), cacheTags.nodes());
 
-	const data = await fetchAPI(gql`
+	const data = await fetchAPI<NotFoundBreadcrumbsQuery>(gql`
 		query notFoundBreadcrumbs {
 			seo {
 				breadcrumbs {

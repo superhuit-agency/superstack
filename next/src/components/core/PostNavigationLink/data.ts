@@ -1,10 +1,17 @@
 import { baseUriContext } from '@/hooks/use-base-uri';
 import { cacheTags, nodeAtUriTags } from '@/lib/cache-tags';
 import { gql } from '@/utils';
+import type {
+	PostNavigationLinkAdjacentPageQuery,
+	PostNavigationLinkAdjacentPageQueryVariables,
+	PostNavigationLinkAdjacentPostQuery,
+	PostNavigationLinkAdjacentPostQueryVariables,
+	PostNavigationLinkContextQuery,
+	PostNavigationLinkContextQueryVariables,
+} from '@/__generated__/graphql';
 
 type NavigationDirection = 'next' | 'previous';
 type SupportedTaxonomy = 'category' | 'post_tag';
-type SupportedNodeType = 'Post' | 'Page';
 type QueryOrder = 'ASC' | 'DESC';
 
 type NavigationCandidate = {
@@ -12,14 +19,6 @@ type NavigationCandidate = {
 	date: string;
 	uri: string;
 	title: string;
-};
-
-type PostContext = {
-	__typename: SupportedNodeType;
-	databaseId: number;
-	date: string;
-	categories?: { nodes?: Array<{ databaseId: number }> };
-	tags?: { nodes?: Array<{ databaseId: number }> };
 };
 
 const isValidDirection = (value: unknown): value is NavigationDirection =>
@@ -113,10 +112,17 @@ export const getData = async (
 
 	if (!uri) return { navigationPost: null, cacheTags: [] };
 
-	const contextData = await fetcher(postContextQuery, {
+	const contextData = await fetcher<
+		PostNavigationLinkContextQuery,
+		PostNavigationLinkContextQueryVariables
+	>(postContextQuery, {
 		variables: { uri },
 	});
-	const currentNode = contextData?.nodeByUri as PostContext | null;
+	const node = contextData?.nodeByUri;
+	const currentNode =
+		node?.__typename === 'Post' || node?.__typename === 'Page'
+			? node
+			: null;
 
 	if (
 		!currentNode?.__typename ||
@@ -135,8 +141,8 @@ export const getData = async (
 	];
 
 	const categoryIn =
-		taxonomy === 'category'
-			? currentNode?.categories?.nodes
+		taxonomy === 'category' && currentNode.__typename === 'Post'
+			? currentNode.categories?.nodes
 					?.map((term: { databaseId: number }) =>
 						Number(term.databaseId)
 					)
@@ -144,8 +150,8 @@ export const getData = async (
 			: null;
 
 	const tagIn =
-		taxonomy === 'post_tag'
-			? currentNode?.tags?.nodes
+		taxonomy === 'post_tag' && currentNode.__typename === 'Post'
+			? currentNode.tags?.nodes
 					?.map((term: { databaseId: number }) =>
 						Number(term.databaseId)
 					)
@@ -156,60 +162,67 @@ export const getData = async (
 	const comparisonOperator = getComparisonOperator(direction);
 
 	const postAdjacentQuery = gql`
-    query PostNavigationLinkAdjacentPost(
-      $date: DateInput!
-      $order: OrderEnum!
-      $categoryIn: [ID]
-      $tagIn: [ID]
-      $notIn: [ID]
-    ) {
-      posts(
-        first: 1
-        where: {
-          orderby: { field: DATE, order: $order }
-          stati: PUBLISH
-          dateQuery: { ${comparisonOperator}: $date }
-          categoryIn: $categoryIn
-          tagIn: $tagIn
-          notIn: $notIn
-        }
-      ) {
-        nodes {
-          databaseId
-          date
-          uri
-          title(format: RENDERED)
-        }
-      }
-    }
-  `;
+		query PostNavigationLinkAdjacentPost(
+			$before: DateInput
+			$after: DateInput
+			$order: OrderEnum!
+			$categoryIn: [ID]
+			$tagIn: [ID]
+			$notIn: [ID]
+		) {
+			posts(
+				first: 1
+				where: {
+					orderby: { field: DATE, order: $order }
+					stati: PUBLISH
+					dateQuery: { before: $before, after: $after }
+					categoryIn: $categoryIn
+					tagIn: $tagIn
+					notIn: $notIn
+				}
+			) {
+				nodes {
+					databaseId
+					date
+					uri
+					title(format: RENDERED)
+				}
+			}
+		}
+	`;
 
 	const pageAdjacentQuery = gql`
-    query PostNavigationLinkAdjacentPage(
-      $date: DateInput!
-      $order: OrderEnum!
-      $notIn: [ID]
-    ) {
-      pages(
-        first: 1
-        where: {
-          orderby: { field: DATE, order: $order }
-          dateQuery: { ${comparisonOperator}: $date }
-          notIn: $notIn
-        }
-      ) {
-        nodes {
-          databaseId
-          date
-          uri
-          title(format: RENDERED)
-        }
-      }
-    }
-  `;
+		query PostNavigationLinkAdjacentPage(
+			$before: DateInput
+			$after: DateInput
+			$order: OrderEnum!
+			$notIn: [ID]
+		) {
+			pages(
+				first: 1
+				where: {
+					orderby: { field: DATE, order: $order }
+					dateQuery: { before: $before, after: $after }
+					notIn: $notIn
+				}
+			) {
+				nodes {
+					databaseId
+					date
+					uri
+					title(format: RENDERED)
+				}
+			}
+		}
+	`;
 
+	// Only the bound of the direction is sent: a variable left out leaves its
+	// `dateQuery` field out
+	const date = toWpDateInput(currentNode.date);
 	const commonVariables = {
-		date: toWpDateInput(currentNode.date),
+		...(comparisonOperator === 'after'
+			? { after: date }
+			: { before: date }),
 		order,
 		notIn: [currentNode.databaseId],
 	};
@@ -217,7 +230,10 @@ export const getData = async (
 	let adjacentPost: NavigationCandidate | null = null;
 
 	if (currentNode.__typename === 'Post') {
-		const postData = await fetcher(postAdjacentQuery, {
+		const postData = await fetcher<
+			PostNavigationLinkAdjacentPostQuery,
+			PostNavigationLinkAdjacentPostQueryVariables
+		>(postAdjacentQuery, {
 			variables: {
 				...commonVariables,
 				categoryIn: categoryIn?.length ? categoryIn : null,
@@ -229,7 +245,10 @@ export const getData = async (
 			currentNode.databaseId
 		);
 	} else {
-		const pageData = await fetcher(pageAdjacentQuery, {
+		const pageData = await fetcher<
+			PostNavigationLinkAdjacentPageQuery,
+			PostNavigationLinkAdjacentPageQueryVariables
+		>(pageAdjacentQuery, {
 			variables: commonVariables,
 		});
 		adjacentPost = pickAdjacentNode(

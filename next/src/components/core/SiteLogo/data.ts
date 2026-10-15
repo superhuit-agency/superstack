@@ -1,5 +1,6 @@
 import { cacheTags } from '@/lib/cache-tags';
 import { gql } from '@/utils';
+import type { SiteLogoDataQuery } from '@/__generated__/graphql';
 
 export const getData = async (
 	fetcher: FetchApiFuncType,
@@ -20,7 +21,7 @@ export const getData = async (
 
 	const tags = [cacheTags.settings()];
 
-	const data = await fetcher(query);
+	const data = await fetcher<SiteLogoDataQuery>(query);
 	const siteLogo = data?.siteLogo;
 
 	if (!siteLogo?.sourceUrl) {

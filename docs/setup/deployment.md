@@ -30,6 +30,7 @@ on:
 
 - the Vitest suite (`npm test`)
 - the type check (`npx tsc --noEmit`)
+- that the committed GraphQL types match the committed schema and queries (`npm run generate:types`, then no diff in `src/__generated__`, see [Typed queries](../fse-templating.md#typed-queries))
 - ESLint (`npm run lint`)
 
 ESLint errors that predate this check are baselined in `next/eslint-suppressions.json`, so only new errors fail. Once you fix baselined errors, run `npx eslint . --prune-suppressions` in `next/` to shrink the baseline.

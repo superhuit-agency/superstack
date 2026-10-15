@@ -1,8 +1,13 @@
-export const taxonomyToGraphqlEnum = (taxonomy: string) => {
+import type { TaxonomyEnum } from '@/__generated__/graphql';
+
+export const taxonomyToGraphqlEnum = (taxonomy: string): TaxonomyEnum => {
 	if (taxonomy === 'category') return 'CATEGORY';
 	if (taxonomy === 'post_tag') return 'TAG';
 
-	return taxonomy.replace(/[^a-zA-Z0-9]+/g, '_').toUpperCase();
+	// A custom taxonomy: WordPress rejects a value it doesn't register
+	return taxonomy
+		.replace(/[^a-zA-Z0-9]+/g, '_')
+		.toUpperCase() as TaxonomyEnum;
 };
 
 export const getTermParentKey = (term: TaxonomyTerm): string | null => {
@@ -17,7 +22,7 @@ export const getTermParentKey = (term: TaxonomyTerm): string | null => {
 export const getTermKey = (term: TaxonomyTerm): string => {
 	if (term.id) return term.id;
 	if (typeof term.databaseId === 'number') return `db:${term.databaseId}`;
-	return term.slug;
+	return term.slug ?? '';
 };
 
 export const toTree = (terms: TaxonomyTerm[]) => {

@@ -60,7 +60,9 @@ export const guardBaseUri = (blockName: string) => {
 	cachedContext().set('guardedBlock', blockName);
 };
 
-export const baseUriContext = (uri?: string) => {
+export function baseUriContext(uri: string): { Value: string };
+export function baseUriContext(): string | undefined;
+export function baseUriContext(uri?: string) {
 	const cache = cachedContext();
 
 	if (!uri) {
@@ -80,4 +82,4 @@ export const baseUriContext = (uri?: string) => {
 			cache.set('baseUri', value);
 		},
 	};
-};
+}

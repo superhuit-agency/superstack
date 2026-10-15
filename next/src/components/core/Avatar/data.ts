@@ -1,4 +1,8 @@
 import { gql } from '@/utils';
+import type {
+	AvatarDataQuery,
+	AvatarDataQueryVariables,
+} from '@/__generated__/graphql';
 
 export const getData = async (
 	fetcher: FetchApiFuncType,
@@ -20,11 +24,14 @@ export const getData = async (
 		}
 	`;
 
-	const data = await fetcher(query, {
-		variables: {
-			userId: attrs?.userId,
-		},
-	});
+	const data = await fetcher<AvatarDataQuery, AvatarDataQueryVariables>(
+		query,
+		{
+			variables: {
+				userId: attrs?.userId,
+			},
+		}
+	);
 
 	return {
 		data: {

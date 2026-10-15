@@ -53,6 +53,18 @@ describe('getRedirection', () => {
 		}
 	);
 
+	it.each([
+		['empty', ''],
+		['null', null],
+	])(
+		'finds no redirect when the target is %s (an error action)',
+		async (_, target) => {
+			wordpressReturns([{ code: 410, target }]);
+
+			expect(await getRedirection('/old/')).toBeNull();
+		}
+	);
+
 	it('tags the lookup `redirects`, so a Purge all expires every cached 404 and redirect', async () => {
 		wordpressReturns([]);
 

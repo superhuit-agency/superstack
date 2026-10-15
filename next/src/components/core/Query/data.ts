@@ -1,9 +1,18 @@
 import configs from '@/configs.json';
 import { cacheTags } from '@/lib/cache-tags';
 import { gql } from '@/utils';
+import type {
+	ContentTypeEnum,
+	OrderEnum,
+	PostObjectsConnectionOrderbyEnum,
+	QueryContentNodesQuery,
+	QueryContentNodesQueryVariables,
+	QueryPostsQuery,
+	QueryPostsQueryVariables,
+} from '@/__generated__/graphql';
 
-const ORDER_ENUMS = new Set(['ASC', 'DESC']);
-const ORDER_BY_ENUMS = new Set([
+const ORDER_ENUMS: OrderEnum[] = ['ASC', 'DESC'];
+const ORDER_BY_ENUMS: PostObjectsConnectionOrderbyEnum[] = [
 	'AUTHOR',
 	'COMMENT_COUNT',
 	'DATE',
@@ -14,16 +23,16 @@ const ORDER_BY_ENUMS = new Set([
 	'PARENT',
 	'SLUG',
 	'TITLE',
-]);
+];
 
-const toOrderEnum = (value?: string) => {
+const toOrderEnum = (value?: string): OrderEnum => {
 	const normalized = value?.toUpperCase();
-	return normalized && ORDER_ENUMS.has(normalized) ? normalized : 'DESC';
+	return ORDER_ENUMS.find((order) => order === normalized) ?? 'DESC';
 };
 
-const toOrderByEnum = (value?: string) => {
+const toOrderByEnum = (value?: string): PostObjectsConnectionOrderbyEnum => {
 	const normalized = value?.toUpperCase();
-	return normalized && ORDER_BY_ENUMS.has(normalized) ? normalized : 'DATE';
+	return ORDER_BY_ENUMS.find((orderBy) => orderBy === normalized) ?? 'DATE';
 };
 
 const toPositiveInt = (value: unknown) => {
@@ -44,39 +53,41 @@ const normalizeIdList = (value?: Array<string> | string[]) => {
 	return ids.length ? ids : null;
 };
 
-const nodeFields = `
-        id
-        databaseId
-        uri
-        date
-        ... on NodeWithTitle {
-          title(format: RENDERED)
-        }
-        ... on NodeWithExcerpt {
-          excerpt(format: RENDERED)
-        }
-        ... on NodeWithContentEditor {
-          content(format: RENDERED)
-        }
-        ... on NodeWithAuthor {
-          author {
-            node {
-              name
-            }
-          }
-        }
-        ... on NodeWithFeaturedImage {
-          featuredImage {
-            node {
-              sourceUrl
-              altText
-              mediaDetails {
-                width
-                height
-              }
-            }
-          }
-        }
+const nodeFields = gql`
+	fragment QueryNodeFields on ContentNode {
+		id
+		databaseId
+		uri
+		date
+		... on NodeWithTitle {
+			title(format: RENDERED)
+		}
+		... on NodeWithExcerpt {
+			excerpt(format: RENDERED)
+		}
+		... on NodeWithContentEditor {
+			content(format: RENDERED)
+		}
+		... on NodeWithAuthor {
+			author {
+				node {
+					name
+				}
+			}
+		}
+		... on NodeWithFeaturedImage {
+			featuredImage {
+				node {
+					sourceUrl
+					altText
+					mediaDetails {
+						width
+						height
+					}
+				}
+			}
+		}
+	}
 `;
 
 const queryPosts = gql`
@@ -112,10 +123,11 @@ const queryPosts = gql`
         }
       }
       nodes {
-        ${nodeFields}
+        ...QueryNodeFields
       }
     }
   }
+  ${nodeFields}
 `;
 
 const queryContentNodes = gql`
@@ -149,10 +161,11 @@ const queryContentNodes = gql`
         }
       }
       nodes {
-        ${nodeFields}
+        ...QueryNodeFields
       }
     }
   }
+  ${nodeFields}
 `;
 
 const PAGINATION_BLOCKS = new Set([
@@ -321,7 +334,7 @@ export const getData = async (
 
 	const usePostsQuery = postType === 'post' && !taxTermIn;
 
-	const variables: Record<string, unknown> = {
+	const variables = {
 		first: perPage,
 		offset,
 		order,
@@ -332,20 +345,32 @@ export const getData = async (
 			? { language: lang ? lang.toUpperCase() : 'ALL' }
 			: {}),
 	};
+
+	let connection:
+		| QueryPostsQuery['posts']
+		| QueryContentNodesQuery['contentNodes'];
+
 	if (usePostsQuery) {
-		variables.categoryId = categoryId;
-		variables.categoryIn = categoryIn;
-		variables.tagIn = tagIn;
+		const data = await fetcher<QueryPostsQuery, QueryPostsQueryVariables>(
+			queryPosts,
+			{ variables: { ...variables, categoryId, categoryIn, tagIn } }
+		);
+		connection = data?.posts;
 	} else {
-		variables.contentTypes = [postType.toUpperCase()];
-		variables.taxTermIn = taxTermIn;
+		const data = await fetcher<
+			QueryContentNodesQuery,
+			QueryContentNodesQueryVariables
+		>(queryContentNodes, {
+			variables: {
+				...variables,
+				// A custom post type: WordPress rejects a type it doesn't register
+				contentTypes: [postType.toUpperCase() as ContentTypeEnum],
+				taxTermIn,
+			},
+		});
+		connection = data?.contentNodes;
 	}
 
-	const data = await fetcher(usePostsQuery ? queryPosts : queryContentNodes, {
-		variables,
-	});
-
-	const connection = usePostsQuery ? data?.posts : data?.contentNodes;
 	const total =
 		typeof connection?.pageInfo?.offsetPagination?.total === 'number'
 			? connection.pageInfo.offsetPagination.total
@@ -358,12 +383,12 @@ export const getData = async (
 			: null;
 	const currentPage = page;
 
-	const nodes = (connection?.nodes ?? []).map((node: unknown) => ({
+	const nodes = (connection?.nodes ?? []).map((node) => ({
 		excerpt: '',
 		content: null,
 		author: null,
 		featuredImage: null,
-		...(node as Record<string, unknown>),
+		...node,
 	}));
 
 	const baseUri = context?.baseUri ?? '/';

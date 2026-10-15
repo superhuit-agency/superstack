@@ -1,4 +1,9 @@
 import { gql } from '@/utils';
+import type {
+	PostTermsCategoriesQuery,
+	PostTermsTagsQuery,
+	PostTermsTagsQueryVariables,
+} from '@/__generated__/graphql';
 import { baseUriContext } from '@/hooks/use-base-uri';
 import { nodeAtUriTags, termTags } from '@/lib/cache-tags';
 
@@ -12,7 +17,7 @@ export const getData = async (
 
 	if (attrs?.term === 'category') {
 		query = gql`
-			query nodeByIdQuery($uri: String!) {
+			query PostTermsCategories($uri: String!) {
 				nodeByUri(uri: $uri) {
 					... on ContentNode {
 						databaseId
@@ -33,7 +38,7 @@ export const getData = async (
 
 	if (attrs?.term === 'post_tag') {
 		query = gql`
-			query nodeByIdQuery($uri: String!) {
+			query PostTermsTags($uri: String!) {
 				nodeByUri(uri: $uri) {
 					... on ContentNode {
 						databaseId
@@ -62,9 +67,14 @@ export const getData = async (
 		uri,
 	};
 
-	const data = await fetcher(query, { variables });
-	const categories = data?.nodeByUri?.categories?.nodes;
-	const tags = data?.nodeByUri?.tags?.nodes;
+	const data = await fetcher<
+		PostTermsCategoriesQuery | PostTermsTagsQuery,
+		PostTermsTagsQueryVariables
+	>(query, { variables });
+	const node = data?.nodeByUri;
+	const categories =
+		node && 'categories' in node ? node.categories?.nodes : undefined;
+	const tags = node && 'tags' in node ? node.tags?.nodes : undefined;
 
 	return {
 		categories,
