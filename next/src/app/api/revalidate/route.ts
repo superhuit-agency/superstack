@@ -141,10 +141,11 @@ function postInvalidation({
 }
 
 /**
- * The manual "Purge all" lever. Without a `type`, everything for the whole
- * site, with the cached 404s and redirects expired since any of them may now
- * be a redirect source or redirect elsewhere; with one, that type's single
- * pages and listings, and the term listings of its taxonomies.
+ * "Purge all", and from nextjs-revalidate 2.1.1 a routing setting change
+ * (permalinks, Reading options, Polylang URLs). Without a `type`, everything
+ * for the whole site, with the cached 404s and redirects expired since any of
+ * them may now be a redirect source or redirect elsewhere; with one, that
+ * type's single pages and listings, and the term listings of its taxonomies.
  */
 function allInvalidation({ type, taxonomies }: Record<string, unknown>) {
 	if (typeof type !== 'string') {
