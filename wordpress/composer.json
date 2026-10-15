@@ -62,10 +62,10 @@
 			"type": "package",
 			"package": {
 				"name": "superhuit-agency/nextjs-revalidate",
-				"version": "2.1.0",
+				"version": "2.1.1",
 				"type": "wordpress-plugin",
 				"dist": {
-					"url": "https://github.com/superhuit-agency/nextjs-revalidate/releases/download/v2.1.0/nextjs-revalidate-v2.1.0.zip",
+					"url": "https://github.com/superhuit-agency/nextjs-revalidate/releases/download/v2.1.1/nextjs-revalidate-v2.1.1.zip",
 					"type": "zip"
 				}
 			}

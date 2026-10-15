@@ -4,7 +4,7 @@
 		"Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
 		"This file is @generated automatically"
 	],
-	"content-hash": "22eec58e83336f855ebd6b3f536e8098",
+	"content-hash": "af8c661e366c99e4566e2b01a24d8bf7",
 	"packages": [
 		{
 			"name": "ashhitch/wp-graphql-yoast-seo",
@@ -677,10 +677,10 @@
 		},
 		{
 			"name": "superhuit-agency/nextjs-revalidate",
-			"version": "2.1.0",
+			"version": "2.1.1",
 			"dist": {
 				"type": "zip",
-				"url": "https://github.com/superhuit-agency/nextjs-revalidate/releases/download/v2.1.0/nextjs-revalidate-v2.1.0.zip"
+				"url": "https://github.com/superhuit-agency/nextjs-revalidate/releases/download/v2.1.1/nextjs-revalidate-v2.1.1.zip"
 			},
 			"type": "wordpress-plugin"
 		},
