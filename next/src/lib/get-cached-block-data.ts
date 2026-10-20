@@ -10,6 +10,13 @@ const CACHE_TAG_MAX_ITEMS = 128;
 export type BlockData = Record<string, unknown> & { cacheTags?: string[] };
 
 export type BlockDataModule = {
+	/**
+	 * The block's data, merged into its attributes. Returns empty data when
+	 * there's nothing to show, and throws only for a failure: outside preview,
+	 * a throw fails the page render, so it's never cached; in preview, the
+	 * block renders with its own attributes instead. See
+	 * docs/adr/0001-block-errors-fail-the-public-render.md.
+	 */
 	getData?: (
 		fetcher: FetchApiFuncType,
 		attrs: object,

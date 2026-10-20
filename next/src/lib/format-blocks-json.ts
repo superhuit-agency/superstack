@@ -1,8 +1,7 @@
 import { getWpUrl } from '@/utils/node-utils';
 import getFunkyWpUploadsURI from '@/lib/get-funky-wp-uploads-uri';
 import getBlockFinalComponentProps from '@/lib/get-block-final-component-props';
-import { throwIfBaseUriNotDeclared } from '@/hooks/use-base-uri';
-import { throwIfWordPressReadFailed } from '@/lib/wordpress-read-error';
+import settledBlockDataOrThrow from '@/lib/settled-block-data-or-throw';
 
 export default async function formatBlocksJSON(
 	blocksJSON: string,
@@ -35,15 +34,11 @@ export default async function formatBlocksJSON(
 
 	if (!blocksJSON) return [];
 
-	const results = await Promise.allSettled(
-		JSON.parse(blocksJSON).map((block: any) =>
-			getBlockFinalComponentProps(block, options)
+	return settledBlockDataOrThrow<BlockPropsType>(
+		await Promise.allSettled(
+			JSON.parse(blocksJSON).map((block: any) =>
+				getBlockFinalComponentProps(block, options)
+			)
 		)
-	);
-	throwIfBaseUriNotDeclared(results);
-	throwIfWordPressReadFailed(results);
-
-	return results.map((p: PromiseSettledResult<BlockPropsType>) =>
-		p.status === 'fulfilled' ? p.value : null
 	);
 }

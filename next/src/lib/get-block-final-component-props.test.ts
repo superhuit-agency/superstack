@@ -209,17 +209,72 @@ describe('getBlockFinalComponentProps', () => {
 				innerBlocks: [],
 			};
 
-			const results = await Promise.all([
+			const results = await Promise.allSettled([
 				getBlockFinalComponentProps(siteTitle, { lang: 'en' }),
 				getBlockFinalComponentProps({ ...siteTitle }, { lang: 'en' }),
 			]);
 
 			expect(vi.mocked(getCachedBlockData)).toHaveBeenCalledTimes(1);
-			// Not a WordPressReadError: both fall back to their own attributes
+			// Any failure fails the public render, not only a WordPressReadError
 			expect(results).toEqual([
-				{ name: 'core/site-title', attributes: {}, innerBlocks: [] },
-				{ name: 'core/site-title', attributes: {}, innerBlocks: [] },
+				{ status: 'rejected', reason: new Error('WordPress is down') },
+				{ status: 'rejected', reason: new Error('WordPress is down') },
 			]);
+		});
+	});
+
+	describe("when an inner block's data fails", () => {
+		const failing = {
+			name: 'test/failing',
+			attributes: { ref: 1 },
+			innerBlocks: [],
+		};
+		const sibling = {
+			name: 'test/sibling',
+			attributes: { ref: 2 },
+			innerBlocks: [],
+		};
+		const parent = {
+			name: 'test/parent',
+			attributes: { ref: 3 },
+			innerBlocks: [failing, sibling],
+		};
+
+		const dataOf = async (name: string) => {
+			if (name === 'test/failing') throw new TypeError('Not a menu');
+			return { label: name };
+		};
+
+		beforeEach(() => {
+			vi.mocked(getBlockDataModule).mockImplementation(async (name) => ({
+				getData: () => dataOf(name),
+			}));
+			vi.mocked(getCachedBlockData).mockImplementation(dataOf);
+		});
+
+		it("fails its parent's public render", async () => {
+			await expect(
+				getBlockFinalComponentProps(parent, { lang: null })
+			).rejects.toThrow('Not a menu');
+		});
+
+		it('renders it with its own attributes in preview, next to its parent and siblings', async () => {
+			await expect(
+				getBlockFinalComponentProps(parent, {
+					lang: null,
+					preview: true,
+				})
+			).resolves.toEqual({
+				name: 'test/parent',
+				attributes: { ref: 3, label: 'test/parent' },
+				innerBlocks: [
+					failing,
+					{
+						...sibling,
+						attributes: { ref: 2, label: 'test/sibling' },
+					},
+				],
+			});
 		});
 	});
 });
