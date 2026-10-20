@@ -13,7 +13,7 @@
  * // postcss
  * @mixin clamp width, 24, 32, 600px, 900px;
  * // css
- * width: clamp(1.5rem, 2.5vw + 0.5rem, 2rem);
+ * width: clamp(24px, 2.67vw + 0.5rem, 32px);
  *
  */
 module.exports = {
