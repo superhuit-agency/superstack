@@ -3,8 +3,8 @@
  * Render a fluid sizing using clamp for any property
  *
  * @param {String} $property - Property to act on
- * @param {Number} $min-px - Minimum size in px
- * @param {Number} $max-px - Maximum size in px
+ * @param {Number} $min-px - Size in px at the minimum breakpoint (may be larger than $max-px to shrink as the viewport grows)
+ * @param {Number} $max-px - Size in px at the maximum breakpoint
  * @param {String} $min-bp - Minimum breakpoint in PX
  * @param {String} $max-bp - Maximum breakpoint in PX
  * @returns {Object} - Object with the property and value
@@ -13,7 +13,7 @@
  * // postcss
  * @mixin clamp width, 24, 32, 600px, 900px;
  * // css
- * width: clamp(1.5rem, 2.5vw + 0.5rem, 2rem);
+ * width: clamp(24px, 2.67vw + 0.5rem, 32px);
  *
  */
 module.exports = {
@@ -39,8 +39,12 @@ module.exports = {
 		const slopeVw = rnd(slope * 100, 2);
 		const interceptRems = rnd(toRems(minPx - slope * strippedMinBp), 2);
 
+		// clamp() needs the smaller size first, even when the size shrinks as the viewport grows
+		const [lowerPx, upperPx] =
+			Number(minPx) > Number(maxPx) ? [maxPx, minPx] : [minPx, maxPx];
+
 		return {
-			[property]: `clamp(${minPx}px, ${slopeVw}vw + ${interceptRems}rem, ${maxPx}px)`,
+			[property]: `clamp(${lowerPx}px, ${slopeVw}vw + ${interceptRems}rem, ${upperPx}px)`,
 		};
 	},
 };
