@@ -129,7 +129,7 @@ Last release, installs and support threads come from the WordPress.org API, read
 
 | Candidate (version) | Last release | Active installs | Releases, last 12 months | Advisories, last 2 years (worst) | Support | Licence | Other |
 |---|---|---|---|---|---|---|---|
-| **Baseline** (1.1.1) | 2024-12-10 [spf-releases] | In-house | 0 (20 releases from 2023-01 to 2024-12) [spf-releases] | None published. The chunked upload handler needs hardening before it ships on `future` [spf-sub] | In-house | GPL-3.0-or-later [spf-readme] | We own all of its maintenance |
+| **Baseline** (1.1.1) | 2024-12-10 [spf-releases] | In-house | 0 (20 releases from 2023-01 to 2024-12) [spf-releases] | None published, but reading the code finds unpatched gaps of critical severity: the chunked upload handler and the Submissions admin actions are reachable without proper authorization. Fix them before it ships on `future`, and release a patched 1.1.x for `main` [spf-sub], [spf-results] | In-house | GPL-3.0-or-later [spf-readme] | We own all of its maintenance |
 | **CF7** (6.2.2) | 2026-10-11 | 10,000,000+ | 8 [gh-cf7-rel] | 1, Medium 5.3 ("Order Replay" < 6.0.6) [wpscan-cf7] | 30/80 | GPLv2+ | 6.2.x **requires WordPress 7.1**. `future` runs 6.9 (`wordpress/Dockerfile`), so pin 6.1.7 (WP 6.7+) or upgrade [api-cf7], [cf7-617] |
 | **Flamingo** (2.6.4) | 2026-08-18 | 800,000+ | 4 [gh-fl-rel] | 1, Low 2.7 [wpscan-fl] | 1/1 | GPLv2+ | Same vendor as CF7 (Rock Lobster Inc.), one developer in practice |
 | **Forminator** (1.58.2) | 2026-10-14 | 600,000+ | ~41 (9 on 2026-08-18) [fmn-readme] | 42 [fmn-vuln]. Worst **Critical 9.8**: unauthenticated file upload (CVE-2026-15748) and object injection (CVE-2026-66583), plus Critical 9.1 shortcode execution (CVE-2026-92229). Two more unauthenticated shortcode executions are Medium 6.5 (CVE-2026-101335, CVE-2026-103911) | 56/69 | GPL v3 | WPMU DEV / Incsub |
@@ -210,7 +210,7 @@ Day counts are rough estimates for one developer, for comparison only.
   - Add an entry-retention setting with a WP-cron purge that also deletes the entry's uploaded files.
   - Allow several recipients.
   - Read the secret from a header instead of the query string.
-  - Harden the chunked upload handler.
+  - Fix the authorization and input handling of the chunked upload handler and of the Submissions export and delete actions.
   - ~3–4 days.
 - **Blocks in WordPress:** port the 10 `supt/input-*` blocks and the `supt/form` block from `main`'s `src/components` (about 100 KB of TSX/CSS) to `wordpress/theme/src/blocks`. ~2 days.
 - **Blocks in Next:**
@@ -311,7 +311,7 @@ Why:
 
 **Trade-offs we accept:**
 
-- **We own the maintenance and the security** of a small plugin. There is no community and no third-party patch stream. Its upload path in particular needs hardening as part of this work.
+- **We own the maintenance and the security** of a small plugin. There is no community and no third-party patch stream. Its upload handler and Submissions admin actions have unpatched critical gaps today, so the port starts with a security fix, and `main` needs a patched release too.
 - **Less in the box.** We get no form features beyond the must-haves (conditional logic, multi-step, payments, integrations) unless we build them.
 - **Different place, different version.** The input blocks move from `main`'s shared `src/components` into `future`'s split theme/Next layout, so the plugin version for `future` differs from the one `main` pins.
 
