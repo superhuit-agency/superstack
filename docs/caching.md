@@ -37,7 +37,7 @@ Tag names are built by one helper module, `next/src/lib/cache-tags.ts`, used bot
 | `templates` | the FSE template read | a `templates` change, or `all` |
 | `redirects` | every redirect lookup, so every cached 404 and cached redirect | `all` only |
 | `redirect:{uri}` | the redirect lookup for that URI, including a "no redirect" result. Past Next's 256-character limit, the tag is cut and ends with a digest of the whole tag (`cacheTags.redirect`), so the lookup and the route still agree | a `redirect` change for that URI |
-| `uris` | public node reads that found **no** node (cached 404s); on a multilingual site, every public node read, since it links to its translations (hreflang, language switcher); Page-dependent blocks that found no post at the Base URI | a `post` or `term` change whose URI changed (publish, unpublish, trash, delete, slug change), or `all` |
+| `uris` | public node reads that found **no** node (cached 404s); on a multilingual site, every public node read, since it links to its translations (hreflang, language switcher); Page-dependent blocks that found no post at the Base URI | a `post` change whose URI changed (publish, unpublish, trash, delete, slug change), a `term` change whose URI changed (creation, delete, slug or parent change), or `all` |
 | `nodes` | every cached read | `all` only: **Purge all**, or a change to an [option that moves URIs](#options-that-move-uris) |
 
 Term tags use the term's database ID, not its slug, so a slug rename needs no old slug. Queries that render terms must fetch `databaseId`.
