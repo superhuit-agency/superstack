@@ -79,7 +79,7 @@ All the other per-form fields (text, email, textarea, wysiwyg, true/false, group
 |---|---|---|---|
 | **Baseline:** starterpack-forms without ACF PRO | 1.1.1 | **Recommended** | Meets the nine must-haves once ACF PRO is replaced and entry expiry is added. Smallest footprint. [spf-type], [spf-sub], [spf-results] |
 | Contact Form 7 + Flamingo | 6.2.2 + 2.6.4 | **Shortlisted** | Everything is free. Public REST submit with field errors and server-side Turnstile. Tiny. But the form builder is a markup editor, not Gutenberg. [cf7-rest], [cf7-turnstile], [cf7-admin] |
-| Forminator | 1.58.2 | **Shortlisted (runner-up)** | Every must-have is free. But it has no read API, no Polylang support, heavy upsells, and four critical unauthenticated advisories in 2026. [fmn-readme], [fmn-api], [fmn-vuln] |
+| Forminator | 1.58.2 | **Shortlisted (runner-up)** | Every must-have is free. But it has no read API, no Polylang support, heavy upsells, and three critical unauthenticated advisories in 2026. [fmn-readme], [fmn-api], [fmn-vuln] |
 | Fluent Forms | 6.2.16 | Eliminated | File Upload and auto-delete of entries are Pro. [ff-component], [ff-readme] |
 | Formidable Forms Lite | 7.0 | Eliminated | File upload and section heading are Pro. The REST API and the Polylang add-on are paid. [frm-field], [frm-api-doc], [frm-pll] |
 | Ninja Forms | 3.15.6 | Eliminated | File Uploads is a paid add-on. No public read or submit API. No Polylang support. [nf-upload], [nf-routes], [nf-pll] |
@@ -132,7 +132,7 @@ Last release, installs and support threads come from the WordPress.org API, read
 | **Baseline** (1.1.1) | 2024-12-10 [spf-releases] | In-house | 0 (20 releases from 2023-01 to 2024-12) [spf-releases] | None published. The chunked upload handler needs hardening before it ships on `future` [spf-sub] | In-house | GPL-3.0-or-later [spf-readme] | We own all of its maintenance |
 | **CF7** (6.2.2) | 2026-10-11 | 10,000,000+ | 8 [gh-cf7-rel] | 1, Medium 5.3 ("Order Replay" < 6.0.6) [wpscan-cf7] | 30/80 | GPLv2+ | 6.2.x **requires WordPress 7.1**. `future` runs 6.9 (`wordpress/Dockerfile`), so pin 6.1.7 (WP 6.7+) or upgrade [api-cf7], [cf7-617] |
 | **Flamingo** (2.6.4) | 2026-08-18 | 800,000+ | 4 [gh-fl-rel] | 1, Low 2.7 [wpscan-fl] | 1/1 | GPLv2+ | Same vendor as CF7 (Rock Lobster Inc.), one developer in practice |
-| **Forminator** (1.58.2) | 2026-10-14 | 600,000+ | ~41 (9 on 2026-08-18) [fmn-readme] | 42 [fmn-vuln]. Worst **Critical 9.8**: unauthenticated file upload (CVE-2026-15748) and object injection (CVE-2026-66583), plus two unauthenticated shortcode executions | 56/69 | GPL v3 | WPMU DEV / Incsub |
+| **Forminator** (1.58.2) | 2026-10-14 | 600,000+ | ~41 (9 on 2026-08-18) [fmn-readme] | 42 [fmn-vuln]. Worst **Critical 9.8**: unauthenticated file upload (CVE-2026-15748) and object injection (CVE-2026-66583), plus Critical 9.1 shortcode execution (CVE-2026-92229). Two more unauthenticated shortcode executions are Medium 6.5 (CVE-2026-101335, CVE-2026-103911) | 56/69 | GPL v3 | WPMU DEV / Incsub |
 | Fluent Forms (6.2.16) | 2026-10-16 | 800,000+ | 32 [ff-readme] | 25 [ff-vuln]. Worst High 8.2 (authorization bypass) | 12/12 | GPLv2+ | WPManageNinja |
 | Formidable Lite (7.0) | 2026-10-16 | 300,000+ | 15 [frm-svn-log] | 6 [frm-vuln]. Worst High 7.2 (unauthenticated stored XSS) | 1/1 | GPL v2 | Strategy11 |
 | Ninja Forms (3.15.6) | 2026-10-15 | 500,000+ | 34 tags (25 mainline) [nf-svn-log] | 26 [nf-vuln]. Worst **Critical 9.3** | 7/11 | GPLv2+ | Saturday Drive |
@@ -289,7 +289,7 @@ Day counts are rough estimates for one developer, for comparison only.
 - **Environment variables:** `NEXT_PUBLIC_HCAPTCHA_KEY` (Next). The secret lives in Forminator's settings (a WordPress option).
 - **Migration from starterpack-forms:** rebuild every form in Forminator's builder, then a DB migration swaps the blocks. ~1–2 days.
 - **Total: ~9–11 days, plus ongoing security patching.**
-  - It has had four critical unauthenticated advisories in 2026 [fmn-vuln].
+  - It has had three critical unauthenticated advisories in 2026 [fmn-vuln].
   - It has no Polylang story [fmn-wpml].
 
 ## Recommendation
