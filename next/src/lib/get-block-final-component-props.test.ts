@@ -258,6 +258,27 @@ describe('getBlockFinalComponentProps', () => {
 			).rejects.toThrow('Not a menu');
 		});
 
+		it('ignores it when getData replaces the static inner blocks', async () => {
+			vi.mocked(getCachedBlockData).mockImplementation(async (name) =>
+				name === 'test/parent'
+					? { innerBlocks: [sibling] }
+					: dataOf(name)
+			);
+
+			await expect(
+				getBlockFinalComponentProps(parent, { lang: null })
+			).resolves.toEqual({
+				name: 'test/parent',
+				attributes: { ref: 3 },
+				innerBlocks: [
+					{
+						...sibling,
+						attributes: { ref: 2, label: 'test/sibling' },
+					},
+				],
+			});
+		});
+
 		it('renders it with its own attributes in preview, next to its parent and siblings', async () => {
 			await expect(
 				getBlockFinalComponentProps(parent, {

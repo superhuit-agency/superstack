@@ -99,12 +99,20 @@ export default async function getBlockFinalComponentProps(
 		getAttributes(name, attributes, innerBlocks, options),
 		getInnerBlocks(innerBlocks, options),
 	]);
+	const [attrsResult, blksResult] = results;
+
+	// Static inner blocks replaced by those getData returns are never rendered,
+	// so their failure doesn't fail the render
+	const renderedResults =
+		attrsResult.status === 'fulfilled' &&
+		attrsResult.value.innerBlocks !== undefined
+			? [attrsResult]
+			: results;
+
 	// Outside preview, any failure fails the render, so it's never cached. In
 	// preview, the block falls back to its own attributes instead
-	if (options?.preview) throwIfBaseUriNotDeclared(results);
-	else settledBlockDataOrThrow<unknown>(results);
-
-	const [attrsResult, blksResult] = results;
+	throwIfBaseUriNotDeclared(results);
+	if (!options?.preview) settledBlockDataOrThrow<unknown>(renderedResults);
 
 	if (attrsResult.status === 'fulfilled') {
 		const { attrs, innerBlocks: dataInnerBlocks } = attrsResult.value;

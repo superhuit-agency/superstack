@@ -35,7 +35,8 @@ export const isBaseUriNotDeclaredError = (error: unknown) =>
 
 /**
  * Rethrows a `BaseUriNotDeclaredError` from settled block-data promises,
- * which otherwise swallow block-data errors: it must fail `next build`.
+ * which swallow block-data errors in preview: it must fail `next build` and
+ * the preview too.
  */
 export const throwIfBaseUriNotDeclared = (
 	results: PromiseSettledResult<unknown>[]
