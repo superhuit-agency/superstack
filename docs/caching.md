@@ -153,7 +153,7 @@ This is a Next.js bug, still in 16.5.0-canary.19 (`is404: res.statusCode === 404
 
 So a `post` or `term` change whose URI changed also expires the page at its new URI (`revalidatePath(after.uri)`), which may be a cached 404: a post published there, or a post or a term moved there. Its descendants' new URIs too, through their own changes. `uris` stays stale-while-revalidate, as above.
 
-Not covered: a `/page/{n}` of the new URI that was cached as a 404 before it had content, e.g. `/blog/category/clips/page/2/` before a category moves to `/blog/category/clips/`. It's re-rendered in the background with the 404's head. Expire it with the plugin's **Probe** tab, which sends a `path` change for it.
+Not covered, since the route doesn't know their paths: a `/page/{n}` cached as a 404 that later gets content. That's a `/page/{n}` of the new URI, cached before it had content, e.g. `/blog/category/clips/page/2/` before a category moves to `/blog/category/clips/`; and a page past an archive's last one, e.g. `/blog/page/3/`, which a new post brings back: it carries the archive's `type:{type}` (see [Cached reads](#cached-reads)), which the publish marks stale. Either is re-rendered in the background with the 404's head. Expire it with the plugin's **Probe** tab, which sends a `path` change for it.
 
 ---
 
