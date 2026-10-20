@@ -1,5 +1,6 @@
 {
 	"isMultilang": false,
 	"staticLang": "fr",
-	"hasCurrentLocaleInLangSwitcher": true
+	"hasCurrentLocaleInLangSwitcher": true,
+	"hasGdpr": true
 }

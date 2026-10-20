@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { notFound } from 'next/navigation';
 
+import { Analytics } from '@/components/global/Analytics';
 import { getDictionary } from '@/i18n/dictionaries';
 import { getLocales } from '@/i18n/get-locales';
 import { LocaleProvider } from '@/contexts/locale-context';
@@ -62,6 +63,7 @@ export default async function RootLayout({
 			<body>
 				<LocaleProvider locale={lang as Locale} dictionary={dictionary}>
 					{children}
+					<Analytics />
 				</LocaleProvider>
 			</body>
 		</html>
