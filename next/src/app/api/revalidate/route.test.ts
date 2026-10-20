@@ -117,7 +117,7 @@ describe('POST /api/revalidate', () => {
 		});
 
 		it.each([
-			['a publish', null, { uri: '/hello/' }, []],
+			['a publish', null, { uri: '/hello/' }, ['/hello/']],
 			[
 				'an unpublish, trash or delete',
 				{ uri: '/hello/' },
@@ -128,10 +128,10 @@ describe('POST /api/revalidate', () => {
 				'a slug change',
 				{ uri: '/hello/' },
 				{ uri: '/hello-world/' },
-				['/hello/'],
+				['/hello-world/', '/hello/'],
 			],
 		])(
-			'also clears the cached 404s, and expires the old URI, for %s',
+			'also clears the cached 404s, and expires the old and the new URI, for %s',
 			async (_, before, after, paths) => {
 				await send([
 					{ subject: 'post', id: 42, type: 'event', before, after },
@@ -148,7 +148,24 @@ describe('POST /api/revalidate', () => {
 			}
 		);
 
-		it('expires the old URI once for a slug change and the redirect it creates', async () => {
+		// The new URI may be a cached 404: re-rendered in the background, it
+		// would keep the 404's metadata (vercel/next.js#71440)
+		it('expires the new URI rather than letting its cached 404 go stale', async () => {
+			await send([
+				{
+					subject: 'post',
+					id: 42,
+					type: 'post',
+					before: null,
+					after: { uri: '/blog/brand-new/' },
+				},
+			]);
+
+			expect(tagsMarkedStale()).toContain('uris');
+			expect(pathsExpired()).toContain('/blog/brand-new/');
+		});
+
+		it('expires each URI once for a slug change and the redirect it creates', async () => {
 			await send([
 				{
 					subject: 'post',
@@ -167,7 +184,7 @@ describe('POST /api/revalidate', () => {
 				'uris',
 			]);
 			expect(tagsExpired()).toEqual(['redirect:/hello/']);
-			expect(revalidatePath).toHaveBeenCalledExactlyOnceWith('/hello/');
+			expect(pathsExpired()).toEqual(['/hello-world/', '/hello/']);
 		});
 
 		it('clears each tag once for several posts', async () => {
@@ -195,7 +212,7 @@ describe('POST /api/revalidate', () => {
 				'type:post',
 				'uris',
 			]);
-			expect(pathsExpired()).toEqual(['/b/']);
+			expect(pathsExpired()).toEqual(['/a/', '/b/']);
 		});
 
 		it("clears a moved page's descendants, which the plugin reports as changes of their own", async () => {
@@ -247,16 +264,16 @@ describe('POST /api/revalidate', () => {
 		});
 
 		it.each([
-			['a creation', null, video, []],
+			['a creation', null, video, ['/category/video/']],
 			['a delete', video, null, ['/category/video/']],
 			[
 				'a slug change',
 				video,
 				{ slug: 'videos', uri: '/category/videos/' },
-				['/category/video/'],
+				['/category/video/', '/category/videos/'],
 			],
 		])(
-			'also clears the cached 404s, and expires the old URI, for %s',
+			'also clears the cached 404s, and expires the old and the new URI, for %s',
 			async (_, before, after, paths) => {
 				await send([
 					{
@@ -316,6 +333,7 @@ describe('POST /api/revalidate', () => {
 				'uris',
 			]);
 			expect(pathsExpired()).toEqual([
+				'/category/live/',
 				'/category/video/',
 				'/category/video/live/',
 			]);
@@ -418,6 +436,16 @@ describe('POST /api/revalidate', () => {
 				},
 			],
 			[
+				"a post's new URI",
+				{
+					subject: 'post',
+					id: 42,
+					type: 'post',
+					before: null,
+					after: { uri: '/caf%c3%a9/' },
+				},
+			],
+			[
 				"a term's old URI",
 				{
 					subject: 'term',
@@ -427,6 +455,16 @@ describe('POST /api/revalidate', () => {
 					after: { slug: 'cafe', uri: '/cafe/' },
 				},
 			],
+			[
+				"a term's new URI",
+				{
+					subject: 'term',
+					id: 5,
+					taxonomy: 'category',
+					before: null,
+					after: { slug: 'caf%c3%a9', uri: '/caf%c3%a9/' },
+				},
+			],
 			['a redirect', { subject: 'redirect', uri: '/caf%c3%a9/' }],
 			['a path', { subject: 'path', uri: '/caf%c3%a9/' }],
 		])(
@@ -434,9 +472,8 @@ describe('POST /api/revalidate', () => {
 			async (_, change) => {
 				await send([change]);
 
-				expect(revalidatePath).toHaveBeenCalledExactlyOnceWith(
-					'/café/'
-				);
+				expect(pathsExpired()).toContain('/café/');
+				expect(pathsExpired()).not.toContain('/caf%c3%a9/');
 			}
 		);
 
