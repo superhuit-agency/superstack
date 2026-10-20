@@ -36,7 +36,6 @@ export default function Gdpr() {
 	// ##############################
 
 	const onPersonalizeClick = useCallback(() => {
-		pendingCategoryEnabled.current = {};
 		modalRef.current?.open();
 	}, []);
 

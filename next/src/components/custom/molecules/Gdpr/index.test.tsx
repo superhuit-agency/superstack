@@ -147,4 +147,32 @@ describe('Gdpr', () => {
 			{ ...DENIED, analytics_storage: 'granted' },
 		]);
 	});
+
+	it('saves a choice made before the modal was closed and reopened', () => {
+		render();
+		act(() => button(en.gdpr.banner.personalize).click());
+
+		const checkbox = () =>
+			test.container.querySelector<HTMLInputElement>(
+				'#cookie-law-category-checkbox-analytics'
+			)!;
+
+		act(() => checkbox().click());
+		act(() => {
+			modal().dispatchEvent(new MouseEvent('click', { bubbles: true }));
+		});
+		act(() => vi.advanceTimersByTime(300));
+		expect(modal().getAttribute('aria-hidden')).toBe('true');
+
+		act(() => button(en.gdpr.banner.personalize).click());
+		expect(checkbox().checked).toBe(true);
+		act(() => button(en.gdpr.modal.save).click());
+
+		expect(Cookies.get('supt-cookie-law-consent_analytics_accepted')).toBe(
+			'yes'
+		);
+		expect(consentUpdates()).toEqual([
+			{ ...DENIED, analytics_storage: 'granted' },
+		]);
+	});
 });
