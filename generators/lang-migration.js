@@ -223,6 +223,13 @@ function updateLocaleContextDefaults(defaultLocale) {
 }
 
 function ensureDictionaries(locales) {
+	// The cookie banner reads its strings from the `gdpr` keys: seed them in
+	// English until they get translated
+	const enDictionaryPath = path.join(paths.dictionariesDir, 'en.json');
+	const { gdpr } = fs.existsSync(enDictionaryPath)
+		? JSON.parse(fs.readFileSync(enDictionaryPath, 'utf8'))
+		: {};
+
 	for (const locale of locales) {
 		const dictionaryPath = path.join(
 			paths.dictionariesDir,
@@ -230,7 +237,10 @@ function ensureDictionaries(locales) {
 		);
 		if (fs.existsSync(dictionaryPath)) continue;
 
-		fs.writeFileSync(dictionaryPath, '{}\n');
+		fs.writeFileSync(
+			dictionaryPath,
+			JSON.stringify(gdpr ? { gdpr } : {}, null, '\t') + '\n'
+		);
 		log(`Created ${path.relative(rootDir, dictionaryPath)}`);
 	}
 }

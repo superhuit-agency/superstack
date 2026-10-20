@@ -1,0 +1,15 @@
+{
+	"cookieName": "supt-cookie-law-consent",
+	"hash": "manage-cookies",
+	"categories": [
+		{
+			"id": "necessary",
+			"mandatory": true
+		},
+		{
+			"id": "analytics",
+			"services": ["gtm"],
+			"consentTypes": ["analytics_storage"]
+		}
+	]
+}
