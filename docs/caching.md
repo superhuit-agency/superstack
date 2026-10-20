@@ -30,14 +30,14 @@ Tag names are built by one helper module, `next/src/lib/cache-tags.ts`, used bot
 | `nodes:{contentType}` | the public node read of a single post, page… of that type | a scoped `all` of that type. Editing one post clears only its `node:` tag |
 | `type:{contentType}` | listings (Query, Latest Posts), post type archives, next / previous post links, per-type sitemaps | a `post` change of that type |
 | `content` | term listings whose terms depend on their posts (Terms Query; Taxonomy List when it shows post counts or hides empty terms); listings with no type filter; the sitemap index and the taxonomy sitemaps; blocks that declare no tags | every `post` change |
-| `term:{databaseId}` | reads that display a term: post terms, the public node read, term archives, Navigation block data for each link bound to a term | a term change (not mapped yet, see [Known gaps](#known-gaps)) |
-| `taxonomy:{taxonomy}` | term listings, term sitemaps and the sitemap index | a scoped `all` of a type using that taxonomy; a term change once mapped |
+| `term:{databaseId}` | reads that display a term: post terms, the public node read, term archives, Navigation block data for each link bound to a term | a `term` change for that ID |
+| `taxonomy:{taxonomy}` | term listings, term sitemaps and the sitemap index | a `term` change in that taxonomy; a scoped `all` of a type using that taxonomy |
 | `menu:{id}` | Navigation block data (block menu ID) | a `menu` change for that ID |
 | `settings` | the public node read (it also returns Site settings: SEO defaults, site title), site title / tagline / logo / date blocks, the locale list, the 404 breadcrumbs, sitemaps, blocks that declare no tags | a `settings` change, or `all` |
 | `templates` | the FSE template read | a `templates` change, or `all` |
 | `redirects` | every redirect lookup, so every cached 404 and cached redirect | `all` only |
 | `redirect:{uri}` | the redirect lookup for that URI, including a "no redirect" result. Past Next's 256-character limit, the tag is cut and ends with a digest of the whole tag (`cacheTags.redirect`), so the lookup and the route still agree | a `redirect` change for that URI |
-| `uris` | public node reads that found **no** node (cached 404s); on a multilingual site, every public node read, since it links to its translations (hreflang, language switcher); Page-dependent blocks that found no post at the Base URI | a `post` change whose URI changed (publish, unpublish, trash, delete, slug change), or `all` |
+| `uris` | public node reads that found **no** node (cached 404s); on a multilingual site, every public node read, since it links to its translations (hreflang, language switcher); Page-dependent blocks that found no post at the Base URI | a `post` or `term` change whose URI changed (publish, unpublish, trash, delete, slug change), or `all` |
 | `nodes` | every cached read | `all` only: **Purge all**, or a change to an [option that moves URIs](#options-that-move-uris) |
 
 Term tags use the term's database ID, not its slug, so a slug rename needs no old slug. Queries that render terms must fetch `databaseId`.
@@ -100,8 +100,8 @@ How each change is mapped:
 
 | Change | Clears |
 | --- | --- |
-| `post` | `node:{id}`, `type:{type}`, `content`; plus `uris` when `before.uri !== after.uri` (a missing side counts as no URI), and then `revalidatePath(before.uri)` when there is one, decoded. The post's `terms` on each side (2.1) are ignored until [#154](https://github.com/superhuit-agency/superstack/issues/154) |
-| `term` (2.1) | Nothing yet: ignored until [#154](https://github.com/superhuit-agency/superstack/issues/154) (see [Term changes](#term-changes)) |
+| `post` | `node:{id}`, `type:{type}`, `content`; plus `uris` when `before.uri !== after.uri` (a missing side counts as no URI), and then `revalidatePath(before.uri)` when there is one, decoded. The post's `terms` on each side (2.1) are ignored: the term archives and listings that show the post carry `type:{type}`, and clearing their `term:` tags would also refresh every other post in those terms |
+| `term` (2.1) | `term:{id}`, `taxonomy:{taxonomy}`; plus `uris` when `before.uri !== after.uri` (a creation, a delete, a slug or parent change), and then `revalidatePath(before.uri)` when there is one, decoded |
 | `redirect` | `redirect:{uri}`, expired, the URI normalised by `normalizeUri` as in the lookup: path only, decoded, lowercased, with leading and trailing slashes; and `revalidatePath(uri)`, decoded |
 | `path` | `revalidatePath(uri)`, decoded: the path as the visitor sees it, not a rewritten route |
 | `menu` | `menu:{id}` (`locations` is ignored: nothing reads classic menus by location) |
@@ -113,6 +113,8 @@ How each change is mapped:
 Every path given to `revalidatePath` is decoded first by `decodePath()` (`next/src/lib/cache-tags.ts`), keeping its case: Next tags a page by its decoded path, while WordPress sends a non-ASCII slug percent-encoded in lower case (`/caf%c3%a9/`), which would never match.
 
 Renaming a parent page sends a `post` change for the parent only. Its descendants' node reads carry `node:{parent}` for their breadcrumbs, so they go stale too: one entry per descendant (and per paginated route), however small the edit. When the parent's slug or its own parent changes, the plugin also reports each descendant whose URI moved as a `post` change of its own, so its old URI stops serving.
+
+A term works the same way. Renaming a category sends one `term` change, however many posts it holds: every page that displays it (its archive, the posts in it, term lists, menu links to it) carries `term:{id}`, and every term listing of its taxonomy `taxonomy:{taxonomy}`. When a category's slug or parent changes, the plugin also reports each descendant whose URI moved, and deleting a term reports the default term (*Uncategorized*) the delete moved posts into ([ADR 0040](https://github.com/superhuit-agency/nextjs-revalidate/blob/v2.1.1/docs/adr/0040-a-term-reports-itself-and-a-post-the-terms-it-is-in.md)). Tags are cleared by ID, not slug, so a slug change needs no old slug.
 
 Responses:
 
@@ -136,25 +138,22 @@ So every change that can turn a cached page into a redirect expires that page ra
 
 - a `redirect` change: `redirect:{uri}`, which a cached 404 at that URI carries, and the page at the path (`revalidatePath`), which may be a page rather than a 404, e.g. a post's old URI once Redirection's slug monitor redirects it;
 - a `post` change whose URI changed: the page at its old URI (`revalidatePath(before.uri)`), which an existing redirect from that URI now applies to. Its descendants' old URIs too: the plugin sends a change for each of them;
+- a `term` change whose URI changed: the page at the term archive's old URI, the same way;
 - `all`: `redirects`, which every cached 404 and cached redirect carries (only a URI with no node looks a redirect up), so a URI that is now a redirect source, or a redirect to another target, renders it. This is what makes Purge all a workaround for [regex redirections](#regex-redirections).
 
-Only tags that no change marks stale are expired: a later `revalidateTag(tag, 'max')` on an expired tag replaces its expiry, and the page would be re-rendered in the background after all ([vercel/next.js#99862](https://github.com/vercel/next.js/issues/99862)). That's why the post's `node:{id}` and `uris` stay stale-while-revalidate, and the old URI is expired by path instead.
+Only tags that no change marks stale are expired: a later `revalidateTag(tag, 'max')` on an expired tag replaces its expiry, and the page would be re-rendered in the background after all ([vercel/next.js#99862](https://github.com/vercel/next.js/issues/99862)). That's why the post's `node:{id}`, the term's `term:{id}` and `uris` stay stale-while-revalidate, and the old URI is expired by path instead.
 
-The next request for each of these pages waits for WordPress (`x-nextjs-cache: MISS`). They are rare changes, and only those pages pay for it: one page per redirect or moved post, and every cached 404 and cached redirect on Purge all.
+The next request for each of these pages waits for WordPress (`x-nextjs-cache: MISS`). They are rare changes, and only those pages pay for it: one page per redirect, moved post or moved term, and every cached 404 and cached redirect on Purge all.
 
 ---
 
 ## Known gaps
 
-### Term changes
+### Breadcrumbs
 
-Term edits don't reach the site on their own yet. The shipped plugin (2.1.1) sends them: a `term` change when a category or tag is created, edited or deleted, and the post's terms on both sides of a `post` change. The route maps neither yet ([#154](https://github.com/superhuit-agency/superstack/issues/154)): it ignores the `term` change like any unknown subject, and a post's `terms` like any unknown field, so a post change clears the same as with 2.0, and none of its terms' archives. The `term:` and `taxonomy:` tags are already in place. When #154 maps them, a term whose URI moved, or that was deleted, needs its old URI expired by path, as a post's is: marked stale only, a term archive that turns into a redirect is re-rendered in the background and cached without its `Location` (see [Redirects are never re-rendered in the background](#redirects-are-never-re-rendered-in-the-background)).
+A post's breadcrumbs can show what its node read isn't tagged with: the parent categories of its category, and on a site with a static front page, the posts page. Renaming either leaves the trail as it was until the post itself changes. A parent category's slug or parent change is covered: the plugin reports each child category whose URI moved, and the posts in it carry the child's `term:{id}`. A page's ancestors are covered too (see [The revalidate route](#the-revalidate-route)).
 
-Site settings aren't affected: the plugin sends a `settings` change from v2.0 ([nextjs-revalidate#171](https://github.com/superhuit-agency/nextjs-revalidate/issues/171)).
-
-A post's breadcrumbs can also show what its node read isn't tagged with: the parent categories of its category, and on a site with a static front page, the posts page. Renaming either leaves the trail as it was until the post itself changes. A page's ancestors are covered (see [The revalidate route](#the-revalidate-route)).
-
-**Workaround:** after a term edit or a posts page rename, use **Purge all** in the plugin's wp-admin screen (**Settings › Next.js Revalidate**). It sends an `all` change, which marks every cached entry stale. Pages then refresh one by one as they're requested, each asking WordPress again, so avoid it on a busy site at peak time.
+**Workaround:** after renaming a parent category or the posts page, use **Purge all** in the plugin's wp-admin screen (**Settings › Next.js Revalidate**). It sends an `all` change, which marks every cached entry stale. Pages then refresh one by one as they're requested, each asking WordPress again, so avoid it on a busy site at peak time.
 
 ### Synced patterns
 
@@ -290,6 +289,7 @@ Check the sequence for each of these:
 - [ ] Editing a template part in the Site Editor
 - [ ] Editing a block menu in the Site Editor
 - [ ] Moving a page a block menu links to (new slug or parent): the menu links to its new URI
+- [ ] Renaming a category: the posts that display it, its archive and the term listings of its taxonomy follow. Changing its slug: its old archive URI stops serving, the new one works
 - [ ] Adding a redirect, from a cached 404 and from a slug change: the source goes **HIT → MISS → HIT**, a 308 with a `Location` header on both
 - [ ] Purge all
 
