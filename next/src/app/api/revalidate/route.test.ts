@@ -472,7 +472,9 @@ describe('POST /api/revalidate', () => {
 			async (_, change) => {
 				await send([change]);
 
-				expect(pathsExpired()).toContain('/café/');
+				expect(
+					pathsExpired().filter((path) => path === '/café/')
+				).toHaveLength(1);
 				expect(pathsExpired()).not.toContain('/caf%c3%a9/');
 			}
 		);
