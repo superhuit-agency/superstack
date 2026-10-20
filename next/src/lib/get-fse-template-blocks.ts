@@ -1,7 +1,6 @@
-import { throwIfBaseUriNotDeclared } from '@/hooks/use-base-uri';
 import getBlockFinalComponentProps from '@/lib/get-block-final-component-props';
 import getFseTemplates from '@/lib/get-fse-templates';
-import { throwIfWordPressReadFailed } from '@/lib/wordpress-read-error';
+import settledBlockDataOrThrow from '@/lib/settled-block-data-or-throw';
 
 /**
  * Recursively swaps a `core/template-part` block's `innerBlocks` for its
@@ -59,6 +58,9 @@ export const getTemplateBlocks = async (
  * Runs getData enrichment on template blocks at request time so dynamic data
  * (navigation, site logo, etc.) is fetched per page, not baked into the cached
  * FSE templates.
+ *
+ * Like content blocks, a template block whose data fails fails the public
+ * render, and falls back to its own attributes in preview: it's never dropped.
  */
 export const enrichTemplateBlocks = (
 	blocks: BlockPropsType[],
@@ -70,11 +72,4 @@ export const enrichTemplateBlocks = (
 				blocks.map((block) =>
 					getBlockFinalComponentProps(block, options)
 				)
-			).then((results) => {
-				throwIfBaseUriNotDeclared(results);
-				throwIfWordPressReadFailed(results);
-
-				return results
-					.map((r) => (r.status === 'fulfilled' ? r.value : null))
-					.filter(Boolean) as BlockPropsType[];
-			});
+			).then(settledBlockDataOrThrow);

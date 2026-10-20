@@ -5,10 +5,7 @@ import { baseUriContext } from '@/hooks/use-base-uri';
 import { fetchAPI, formatBlocksJSON } from '@/lib';
 import getBlockFinalComponentProps from '@/lib/get-block-final-component-props';
 import getFseTemplates from '@/lib/get-fse-templates';
-import {
-	getPreviewNodeByURI,
-	getPublicNodeByURI,
-} from '@/lib/get-node-by-uri';
+import { getPreviewNodeByURI, getPublicNodeByURI } from '@/lib/get-node-by-uri';
 
 const configs = vi.hoisted(() => ({
 	isMultilang: false,
@@ -445,6 +442,22 @@ describe('getPublicNodeByURI', () => {
 		await getPublicNodeByURI('/about/', 'en');
 
 		expect(cacheTagsGiven()).toContain('uris');
+	});
+
+	it("fails when a block's data fails, rather than render the page without its blocks", async () => {
+		wordpressReturns({
+			__typename: 'Page',
+			contentTypeName: 'page',
+			id: 12,
+			uri: '/about/',
+		});
+		vi.mocked(formatBlocksJSON).mockRejectedValueOnce(
+			new TypeError('Not a menu')
+		);
+
+		await expect(getPublicNodeByURI('/about/')).rejects.toThrow(
+			'Not a menu'
+		);
 	});
 
 	it('gives the blocks the Base URI with its language prefix', async () => {

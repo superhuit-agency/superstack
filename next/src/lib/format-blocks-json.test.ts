@@ -1,10 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import formatBlocksJSON from '@/lib/format-blocks-json';
 import {
-	isWordPressReadError,
-	WordPressReadError,
-} from '@/lib/wordpress-read-error';
+	BaseUriNotDeclaredError,
+	isBaseUriNotDeclaredError,
+} from '@/hooks/use-base-uri';
+import formatBlocksJSON from '@/lib/format-blocks-json';
+import { WordPressReadError } from '@/lib/wordpress-read-error';
 
 const getData = vi.fn();
 
@@ -21,9 +22,9 @@ vi.mock('@/lib/get-cached-block-data', () => ({
 
 const blocksJSON = (blocks: unknown[]) => JSON.stringify(blocks);
 
-const withData = (innerBlocks: unknown[] = []) => ({
+const withData = (innerBlocks: unknown[] = [], ref = 1) => ({
 	name: 'test/with-data',
-	attributes: { ref: 1 },
+	attributes: { ref },
 	innerBlocks,
 });
 
@@ -32,6 +33,22 @@ const group = (innerBlocks: unknown[]) => ({
 	attributes: {},
 	innerBlocks,
 });
+
+const errors = [
+	['a plain Error', new Error('Malformed data')],
+	[
+		'a TypeError',
+		new TypeError("Cannot read properties of null (reading 'title')"),
+	],
+	['a WordPressReadError', new WordPressReadError('the menu 1', 'menu:1')],
+] as const;
+
+/** The block with `ref: 1` fails with `error`, any other gets a label. */
+const failFirstBlock = (error: Error) =>
+	getData.mockImplementation(async (_fetcher, attrs: { ref: number }) => {
+		if (attrs.ref === 1) throw error;
+		return { label: `Menu ${attrs.ref}` };
+	});
 
 beforeEach(() => {
 	getData.mockReset();
@@ -52,61 +69,70 @@ describe('formatBlocksJSON', () => {
 		]);
 	});
 
-	it('renders a block with its own attributes when its data fails otherwise', async () => {
-		getData.mockRejectedValue(new Error('Malformed data'));
+	it.each(errors)(
+		"fails when a block's data fails with %s",
+		async (_, error) => {
+			failFirstBlock(error);
 
-		await expect(
-			formatBlocksJSON(blocksJSON([withData()]))
-		).resolves.toEqual([
-			{ name: 'test/with-data', attributes: { ref: 1 }, innerBlocks: [] },
-		]);
-	});
+			await expect(
+				formatBlocksJSON(blocksJSON([withData(), withData([], 2)]))
+			).rejects.toBe(error);
+		}
+	);
 
-	it('fails when a read from WordPress fails', async () => {
-		getData.mockRejectedValue(
-			new WordPressReadError('the menu 1', 'menu:1')
-		);
+	it.each(errors)(
+		"fails when a nested block's data fails with %s",
+		async (_, error) => {
+			failFirstBlock(error);
 
-		const error = await formatBlocksJSON(blocksJSON([withData()])).catch(
-			(e) => e
-		);
+			await expect(
+				formatBlocksJSON(blocksJSON([group([group([withData()])])]))
+			).rejects.toBe(error);
+		}
+	);
 
-		expect(isWordPressReadError(error)).toBe(true);
-	});
+	it.each(errors)(
+		'renders a block with its own attributes when its data fails with %s in preview',
+		async (_, error) => {
+			failFirstBlock(error);
 
-	it('fails when a read from WordPress fails in a nested block', async () => {
-		getData.mockRejectedValue(
-			new WordPressReadError('the menu 1', 'menu:1')
-		);
+			await expect(
+				formatBlocksJSON(
+					blocksJSON([group([withData(), withData([], 2)])]),
+					{ preview: true }
+				)
+			).resolves.toEqual([
+				{
+					name: 'core/group',
+					attributes: {},
+					innerBlocks: [
+						{
+							name: 'test/with-data',
+							attributes: { ref: 1 },
+							innerBlocks: [],
+						},
+						{
+							name: 'test/with-data',
+							attributes: { ref: 2, label: 'Menu 2' },
+							innerBlocks: [],
+						},
+					],
+				},
+			]);
+		}
+	);
 
-		const error = await formatBlocksJSON(
-			blocksJSON([group([group([withData()])])])
-		).catch((e) => e);
+	it.each([false, true])(
+		'fails when a block reads the Base URI without declaring it (preview: %s)',
+		async (preview) => {
+			failFirstBlock(new BaseUriNotDeclaredError('test/with-data'));
 
-		expect(isWordPressReadError(error)).toBe(true);
-	});
+			const error = await formatBlocksJSON(
+				blocksJSON([group([withData()]), withData([], 2)]),
+				{ preview }
+			).catch((e) => e);
 
-	it('renders a block with its own attributes when a read from WordPress fails in preview', async () => {
-		getData.mockRejectedValue(
-			new WordPressReadError('the menu 1', 'menu:1')
-		);
-
-		await expect(
-			formatBlocksJSON(blocksJSON([group([withData()])]), {
-				preview: true,
-			})
-		).resolves.toEqual([
-			{
-				name: 'core/group',
-				attributes: {},
-				innerBlocks: [
-					{
-						name: 'test/with-data',
-						attributes: { ref: 1 },
-						innerBlocks: [],
-					},
-				],
-			},
-		]);
-	});
+			expect(isBaseUriNotDeclaredError(error)).toBe(true);
+		}
+	);
 });

@@ -4,7 +4,6 @@ import * as _templatesData from '@/components/templates/data';
 import configs from '@/configs.json';
 import {
 	baseUriContext,
-	isBaseUriNotDeclaredError,
 	throwIfBaseUriNotDeclared,
 } from '@/hooks/use-base-uri';
 import { fetchAPI, formatBlocksJSON } from '@/lib';
@@ -15,10 +14,7 @@ import {
 	getTemplateBlocks,
 } from '@/lib/get-fse-template-blocks';
 import injectBreadcrumbs from '@/lib/inject-breadcrumbs';
-import {
-	isWordPressReadError,
-	throwIfWordPressReadFailed,
-} from '@/lib/wordpress-read-error';
+import { throwIfWordPressReadFailed } from '@/lib/wordpress-read-error';
 
 const templatesData: any = _templatesData;
 
@@ -269,33 +265,27 @@ async function getNodeByURI(
 				{ lang, preview, context }
 			),
 			getTemplateData(node),
-		])
-			.then((results) => {
-				throwIfBaseUriNotDeclared(results);
-				throwIfWordPressReadFailed(results);
+		]).then((results) => {
+			throwIfBaseUriNotDeclared(results);
+			throwIfWordPressReadFailed(results);
 
-				const [bProm, tProm] = results;
-				return {
-					blocksJSON: bProm.status === 'fulfilled' ? bProm.value : [],
-					templateData:
-						tProm.status === 'fulfilled' ? tProm.value : {},
-				};
-			})
-			.catch((error) => {
-				if (
-					isBaseUriNotDeclaredError(error) ||
-					isWordPressReadError(error)
-				)
-					throw error;
+			const [bProm, tProm] = results;
 
+			// A block whose data failed fails the public render, rather
+			// than the page being cached without its blocks (see
+			// docs/adr/0001-block-errors-fail-the-public-render.md)
+			if (bProm.status === 'rejected' && !preview) throw bProm.reason;
+
+			if (bProm.status === 'rejected' || tProm.status === 'rejected')
 				console.error(
 					'Error while enriching & formatting blocksJSON and templateData'
 				);
-				return {
-					blocksJSON: [],
-					templateData: {},
-				};
-			}),
+
+			return {
+				blocksJSON: bProm.status === 'fulfilled' ? bProm.value : [],
+				templateData: tProm.status === 'fulfilled' ? tProm.value : {},
+			};
+		}),
 	]);
 
 	const blocksWithContent =

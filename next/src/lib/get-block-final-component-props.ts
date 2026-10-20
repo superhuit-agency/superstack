@@ -11,7 +11,7 @@ import getCachedBlockData, {
 	blockUsesBaseUri,
 	getBlockDataModule,
 } from '@/lib/get-cached-block-data';
-import { throwIfWordPressReadFailed } from '@/lib/wordpress-read-error';
+import settledBlockDataOrThrow from '@/lib/settled-block-data-or-throw';
 
 type BlockPropsOptions = {
 	skipGetData?: boolean;
@@ -99,11 +99,20 @@ export default async function getBlockFinalComponentProps(
 		getAttributes(name, attributes, innerBlocks, options),
 		getInnerBlocks(innerBlocks, options),
 	]);
-	throwIfBaseUriNotDeclared(results);
-	// Nothing is cached in preview: the block falls back to its own attributes
-	if (!options?.preview) throwIfWordPressReadFailed(results);
-
 	const [attrsResult, blksResult] = results;
+
+	// Static inner blocks replaced by those getData returns are never rendered,
+	// so their failure doesn't fail the render
+	const renderedResults =
+		attrsResult.status === 'fulfilled' &&
+		attrsResult.value.innerBlocks !== undefined
+			? [attrsResult]
+			: results;
+
+	// Outside preview, any failure fails the render, so it's never cached. In
+	// preview, the block falls back to its own attributes instead
+	throwIfBaseUriNotDeclared(results);
+	if (!options?.preview) settledBlockDataOrThrow<unknown>(renderedResults);
 
 	if (attrsResult.status === 'fulfilled') {
 		const { attrs, innerBlocks: dataInnerBlocks } = attrsResult.value;
@@ -124,7 +133,7 @@ export default async function getBlockFinalComponentProps(
 				(blksResult.value as BlockPropsType['innerBlocks']) ?? [];
 		}
 	} else {
-		// getData failed: render the block with its own attributes
+		// getData failed in preview: render the block with its own attributes
 		props.attributes = attributes as Record<string, unknown>;
 
 		if (blksResult.status === 'fulfilled') {
@@ -207,13 +216,11 @@ const getInnerBlocks = async (
 ) => {
 	if (!(blocks?.length > 0)) return [];
 
-	const rs = await Promise.allSettled(
-		blocks.map((block) =>
-			getBlockFinalComponentProps({ ...block }, options)
+	return settledBlockDataOrThrow(
+		await Promise.allSettled(
+			blocks.map((block) =>
+				getBlockFinalComponentProps({ ...block }, options)
+			)
 		)
 	);
-	throwIfBaseUriNotDeclared(rs);
-	throwIfWordPressReadFailed(rs);
-
-	return rs.map((r) => (r.status === 'fulfilled' ? r.value : null));
 };

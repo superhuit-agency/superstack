@@ -26,9 +26,10 @@ export const isWordPressReadError = (error: unknown) =>
 	);
 
 /**
- * Rethrows a `WordPressReadError` from settled block-data promises, which
- * otherwise swallow block-data errors: it must fail the public page render,
- * so the failure is never cached in place of the data.
+ * Rethrows a `WordPressReadError` from settled promises, which otherwise
+ * swallow their errors: it must fail the public page render, so the failure
+ * is never cached in place of the data. The block pipeline doesn't need it:
+ * any block-data error fails the public render there.
  */
 export const throwIfWordPressReadFailed = (
 	results: PromiseSettledResult<unknown>[]
