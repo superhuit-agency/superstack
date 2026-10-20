@@ -2,8 +2,9 @@
 
 import { ErrorPage } from '@/components/global/ErrorPage';
 
-// Shown when a page fails to render before it was ever cached. A page cached
-// before keeps serving its previous version instead.
+// Shown on a client-side navigation to a page that fails to render before it
+// was ever cached (a full page load gets Next's plain-text 500), and on errors
+// in client components. A page cached before keeps serving its previous version.
 export default function Error({
 	error,
 	unstable_retry,
