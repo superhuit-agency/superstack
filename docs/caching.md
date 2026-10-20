@@ -10,7 +10,7 @@ The app uses Next.js 16 [Cache Components](https://nextjs.org/docs/app/api-refer
 - Each cached entry carries **cache tags** naming what it depends on.
 - When an editor changes something, the [nextjs-revalidate](https://github.com/superhuit-agency/nextjs-revalidate) plugin sends a **Change** to `POST /api/revalidate`. The route turns it into `revalidateTag(tag, 'max')` calls.
 - `'max'` means stale-while-revalidate: the entry is marked stale, not deleted. The next visitor gets the stale page while a fresh one is generated, and the visitor after that gets the new content.
-- A change that may turn a cached page into a redirect **expires** that page instead (`revalidateTag(tag, { expire: 0 })` or `revalidatePath`): the next visitor waits for a fresh render. See [Redirects are never re-rendered in the background](#redirects-are-never-re-rendered-in-the-background).
+- A change that may turn a cached page into a redirect, or a cached 404 into a page, **expires** that page instead (`revalidateTag(tag, { expire: 0 })` or `revalidatePath`): the next visitor waits for a fresh render. See [Redirects are never re-rendered in the background](#redirects-are-never-re-rendered-in-the-background) and [A cached 404 is never re-rendered into a page in the background](#a-cached-404-is-never-re-rendered-into-a-page-in-the-background).
 - Public pages are served from a prerendered static shell. WordPress is only asked again for what changed, and only when someone next requests it.
 - Preview never reads or writes the cache.
 
@@ -102,8 +102,8 @@ How each change is mapped:
 
 | Change | Clears |
 | --- | --- |
-| `post` | `node:{id}`, `type:{type}`, `content`; plus `uris` when `before.uri !== after.uri` (a missing side counts as no URI), and then `revalidatePath(before.uri)` when there is one, decoded. The post's `terms` on each side (2.1) are ignored: the term archives and listings that show the post carry `type:{type}`, and clearing their `term:` tags would also refresh every other post in those terms |
-| `term` (2.1) | `term:{id}`, `taxonomy:{taxonomy}`; plus `uris` when `before.uri !== after.uri` (a creation, a delete, a slug or parent change), and then `revalidatePath(before.uri)` when there is one, decoded |
+| `post` | `node:{id}`, `type:{type}`, `content`; plus `uris` when `before.uri !== after.uri` (a missing side counts as no URI), and then `revalidatePath(before.uri)` and `revalidatePath(after.uri)` for each side that has one, decoded. The post's `terms` on each side (2.1) are ignored: the term archives and listings that show the post carry `type:{type}`, and clearing their `term:` tags would also refresh every other post in those terms |
+| `term` (2.1) | `term:{id}`, `taxonomy:{taxonomy}`; plus `uris` when `before.uri !== after.uri` (a creation, a delete, a slug or parent change), and then `revalidatePath(before.uri)` and `revalidatePath(after.uri)` for each side that has one, decoded |
 | `redirect` | `redirect:{uri}`, expired, the URI normalised by `normalizeUri` as in the lookup: path only, decoded, lowercased, with leading and trailing slashes; and `revalidatePath(uri)`, decoded |
 | `path` | `revalidatePath(uri)`, decoded: the path as the visitor sees it, not a rewritten route |
 | `menu` | `menu:{id}` (`locations` is ignored: nothing reads classic menus by location) |
@@ -143,9 +143,19 @@ So every change that can turn a cached page into a redirect expires that page ra
 - a `term` change whose URI changed: the page at the term archive's old URI, the same way;
 - `all`: `redirects`, which every cached 404 and cached redirect carries (only a URI with no node looks a redirect up), so a URI that is now a redirect source, or a redirect to another target, renders it. This is what makes Purge all a workaround for [regex redirections](#regex-redirections).
 
-Only tags that no change marks stale are expired: a later `revalidateTag(tag, 'max')` on an expired tag replaces its expiry, and the page would be re-rendered in the background after all ([vercel/next.js#99862](https://github.com/vercel/next.js/issues/99862)). That's why the post's `node:{id}`, the term's `term:{id}` and `uris` stay stale-while-revalidate, and the old URI is expired by path instead.
+Only tags that no change marks stale are expired: a later `revalidateTag(tag, 'max')` on an expired tag replaces its expiry, and the page would be re-rendered in the background after all ([vercel/next.js#99862](https://github.com/vercel/next.js/issues/99862)). That's why the post's `node:{id}`, the term's `term:{id}` and `uris` stay stale-while-revalidate, and the old URI is expired by path instead (the new one too, see [below](#a-cached-404-is-never-re-rendered-into-a-page-in-the-background)).
 
-The next request for each of these pages waits for WordPress (`x-nextjs-cache: MISS`). They are rare changes, and only those pages pay for it: one page per redirect, moved post or moved term, and every cached 404 and cached redirect on Purge all.
+The next request for each of these pages waits for WordPress (`x-nextjs-cache: MISS`). They are rare changes, and only those pages pay for it: one page per redirect, two per moved post or moved term (its old and new URI), and every cached 404 and cached redirect on Purge all.
+
+### A cached 404 is never re-rendered into a page in the background
+
+When a stale entry is re-rendered in the background, Next renders it with the response object of the request the stale entry was just served to. For a cached 404, that response's status is already 404, and Next decides from it that the render is a not-found render: it resolves the metadata of the not-found boundary instead of the page's `generateMetadata`, and adds `<meta name="robots" content="noindex">`. The page itself renders its new content, so the entry is cached as a `200` with the post's body and the 404's `<head>`: no `<title>`, no `og:title`, no description, canonical or hreflang, and `noindex`, until its next invalidation. A crawler user agent (`Googlebot`) still got the right head in testing: Next doesn't serve it that cached HTML.
+
+This is a Next.js bug, still in 16.5.0-canary.19 (`is404: res.statusCode === 404` in `app-render.tsx`), reported as [vercel/next.js#71440](https://github.com/vercel/next.js/issues/71440) for the `noindex` side. A blocking render gets a fresh response, so it isn't affected.
+
+So a `post` or `term` change whose URI changed also expires the page at its new URI (`revalidatePath(after.uri)`), which may be a cached 404: a post published there, or a post or a term moved there. Its descendants' new URIs too, through their own changes. `uris` stays stale-while-revalidate, as above.
+
+Not covered, since the route doesn't know their paths: a `/page/{n}` cached as a 404 that later gets content. That's a `/page/{n}` of the new URI, cached before it had content, e.g. `/blog/category/clips/page/2/` before a category moves to `/blog/category/clips/`; and a page past an archive's last one, e.g. `/blog/page/3/`, which a new post brings back: it carries the archive's `type:{type}` (see [Cached reads](#cached-reads)), which the publish marks stale. Either is re-rendered in the background with the 404's head. Expire it with the plugin's **Probe** tab, which sends a `path` change for it.
 
 ---
 
@@ -286,12 +296,12 @@ Check the sequence for each of these:
 - [ ] Publishing a new post: it appears in listings
 - [ ] Changing a slug: the old URI stops serving, the new one works
 - [ ] Renaming a parent page: its child pages' breadcrumbs follow. Changing its slug: the children's old URIs stop serving
-- [ ] Publishing at a URI that used to 404: **STALE → HIT**, so the cached 404 is served once more before the new page. That's by design: `uris` goes stale, it isn't expired
+- [ ] Publishing at a URI that used to 404 (request it twice first, so the 404 is a **HIT**): **MISS → HIT**, and the response has the post's `<title>` and `og:title`, without `<meta name="robots" content="noindex">`. Check the whole HTML with `curl`, with a browser user agent and with a crawler's (e.g. `-A Googlebot`), see [A cached 404 is never re-rendered into a page in the background](#a-cached-404-is-never-re-rendered-into-a-page-in-the-background). A URI that still has no post stays a 404
 - [ ] On a multilingual site, changing a translation's slug or publishing a new one: the other languages' hreflang and language switcher follow
 - [ ] Editing a template part in the Site Editor
 - [ ] Editing a block menu in the Site Editor
 - [ ] Moving a page a block menu links to (new slug or parent): the menu links to its new URI
-- [ ] Renaming a category: the posts that display it, its archive and the term listings of its taxonomy follow. Changing its slug: its old archive URI stops serving, the new one works
+- [ ] Renaming a category: the posts that display it, its archive and the term listings of its taxonomy follow. Changing its slug: its old archive URI stops serving, the new one works. Changing it to a URI that was a cached 404: **MISS → HIT**, with the category's `<title>` and `og:title`
 - [ ] Adding a redirect, from a cached 404 and from a slug change: the source goes **HIT → MISS → HIT**, a 308 with a `Location` header on both
 - [ ] Purge all
 
