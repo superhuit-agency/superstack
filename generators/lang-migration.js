@@ -224,11 +224,18 @@ function updateLocaleContextDefaults(defaultLocale) {
 
 function ensureDictionaries(locales) {
 	// The cookie banner reads its strings from the `gdpr` keys: seed them in
-	// English until they get translated
-	const enDictionaryPath = path.join(paths.dictionariesDir, 'en.json');
-	const { gdpr } = fs.existsSync(enDictionaryPath)
-		? JSON.parse(fs.readFileSync(enDictionaryPath, 'utf8'))
-		: {};
+	// English (or the first dictionary that has them) until they get translated
+	const dictionaryFiles = fs
+		.readdirSync(paths.dictionariesDir)
+		.filter((file) => file.endsWith('.json'))
+		.sort((a, b) => (a === 'en.json' ? -1 : b === 'en.json' ? 1 : 0));
+	let gdpr;
+	for (const file of dictionaryFiles) {
+		({ gdpr } = JSON.parse(
+			fs.readFileSync(path.join(paths.dictionariesDir, file), 'utf8')
+		));
+		if (gdpr) break;
+	}
 
 	for (const locale of locales) {
 		const dictionaryPath = path.join(

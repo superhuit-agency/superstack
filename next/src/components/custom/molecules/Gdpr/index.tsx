@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { usePathname } from 'next/navigation';
+
 import gdprConfigs from '@/gdpr-configs.json';
 
 import { GdprBanner } from './GdprBanner';
@@ -30,6 +32,7 @@ export default function Gdpr() {
 
 	const pendingCategoryEnabled = useRef<Record<string, boolean>>({});
 	const modalRef = useRef<GdprModalHandle>(null);
+	const pathname = usePathname();
 
 	// ##############################
 	// #region Event handler
@@ -39,8 +42,8 @@ export default function Gdpr() {
 		modalRef.current?.open();
 	}, []);
 
-	const onHashChange = useCallback((event: HashChangeEvent) => {
-		if (event.newURL.indexOf(`#${gdprConfigs.hash}`) === -1) return;
+	const openModalFromHash = useCallback(() => {
+		if (window.location.hash.indexOf(`#${gdprConfigs.hash}`) === -1) return;
 
 		modalRef.current?.open();
 
@@ -126,13 +129,18 @@ export default function Gdpr() {
 		/* eslint-enable react-hooks/set-state-in-effect */
 	}, [updateConsent]);
 
+	// A next/link to another page with the hash fires no `hashchange`, nor does a page loaded with it
 	useEffect(() => {
-		window.addEventListener('hashchange', onHashChange);
+		openModalFromHash();
+	}, [pathname, openModalFromHash]);
+
+	useEffect(() => {
+		window.addEventListener('hashchange', openModalFromHash);
 
 		return () => {
-			window.removeEventListener('hashchange', onHashChange);
+			window.removeEventListener('hashchange', openModalFromHash);
 		};
-	}, [onHashChange]);
+	}, [openModalFromHash]);
 
 	return (
 		<div className="supt-gdpr">

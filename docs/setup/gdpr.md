@@ -27,7 +27,7 @@ GTM loads only when `GOOGLE_TAG_MANAGER_ID` is set in `next/.env` (see `next/.en
 GOOGLE_TAG_MANAGER_ID=GTM-XXXXXXX
 ```
 
-It is read when the root layout renders, which is at build time: set it in the build environment, and rebuild after changing it. Without it, no GTM script is loaded, whatever the flag.
+It is read when the root layout renders, which is at build time: set it in the environment the build reads (`shared/.env` on an SSH deployment, which the build downloads; the project's environment variables on Vercel), and redeploy after changing it. Without it, no GTM script is loaded, whatever the flag.
 
 With GTM loaded, a `{ event: 'pageview', page_path }` event is pushed to the `dataLayer` on the first load and on every client-side navigation, which the App Router doesn't report on its own. Use it as a custom event trigger in GTM.
 

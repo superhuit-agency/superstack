@@ -114,6 +114,7 @@ describe('Gdpr', () => {
 		render();
 
 		act(() => {
+			window.history.replaceState(null, '', '/#manage-cookies');
 			window.dispatchEvent(
 				new HashChangeEvent('hashchange', {
 					newURL: `${window.location.origin}/#manage-cookies`,
@@ -122,6 +123,16 @@ describe('Gdpr', () => {
 		});
 
 		expect(modal().getAttribute('aria-hidden')).toBe('false');
+		expect(window.location.hash).toBe('');
+	});
+
+	it('opens the modal on a page loaded with the `#manage-cookies` hash', () => {
+		Cookies.set('supt-cookie-law-consent_banner', 'dismiss');
+		window.history.replaceState(null, '', '/privacy/#manage-cookies');
+		render();
+
+		expect(modal().getAttribute('aria-hidden')).toBe('false');
+		expect(window.location.hash).toBe('');
 	});
 
 	it('saves the categories chosen in the modal', () => {
