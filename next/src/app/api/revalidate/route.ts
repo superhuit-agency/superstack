@@ -43,7 +43,7 @@ export async function POST(request: Request) {
 		invalidation.expiredTags?.forEach((tag) => expiredTags.add(tag));
 		// Decoded: Next tags a page by its decoded path, WordPress sends it
 		// percent-encoded
-		if (invalidation.path) paths.add(decodePath(invalidation.path));
+		invalidation.paths?.forEach((path) => paths.add(decodePath(path)));
 	}
 
 	// Marked stale only: the next visitor gets the stale entry while a fresh
@@ -58,21 +58,21 @@ export async function POST(request: Request) {
 	// marks stale: a later `'max'` on a tag replaces its expiry
 	for (const tag of expiredTags) revalidateTag(tag, { expire: 0 });
 
-	// Expired too: the page at that path
+	// Expired too: the page at each path
 	for (const path of paths) revalidatePath(path);
 
 	return Response.json({ revalidated: true, now: Date.now() });
 }
 
 /**
- * What one change clears: cache tags to mark stale or to expire, or a path. A
+ * What one change clears: cache tags to mark stale or to expire, and paths. A
  * subject or a field this route doesn't know is ignored, so a minor plugin
  * release never breaks the site.
  */
 function invalidationOf(change: Record<string, unknown>): {
 	tags?: string[];
 	expiredTags?: string[];
-	path?: string;
+	paths?: string[];
 } {
 	switch (change.subject) {
 		case 'post':
@@ -88,14 +88,16 @@ function invalidationOf(change: Record<string, unknown>): {
 			return typeof change.uri === 'string'
 				? {
 						expiredTags: [cacheTags.redirect(change.uri)],
-						path: change.uri,
+						paths: [change.uri],
 					}
 				: {};
 
 		// this should be the actual path not a rewritten path
 		// e.g. for "/blog/[slug]" this should be "/blog/post-1"
 		case 'path':
-			return typeof change.uri === 'string' ? { path: change.uri } : {};
+			return typeof change.uri === 'string'
+				? { paths: [change.uri] }
+				: {};
 
 		// Menus are read by ID, never by location: `locations` is ignored
 		case 'menu':
@@ -119,7 +121,7 @@ function invalidationOf(change: Record<string, unknown>): {
  * A post's own entry, its type's listings and the untyped listings. When its
  * URI changed (a publish, an unpublish, a trash, a delete or a slug change),
  * also the cached 404s, so a URI that now has content stops answering 404,
- * and the page at its old URI, expired: that URI may now be a redirect source.
+ * and the pages at its old and new URIs, expired (see `movedUriPaths`).
  */
 function postInvalidation({
 	id,
@@ -139,7 +141,7 @@ function postInvalidation({
 
 	return {
 		tags: [...tags, cacheTags.uris()],
-		path: uriOf(before) ?? undefined,
+		paths: movedUriPaths(before, after),
 	};
 }
 
@@ -147,7 +149,8 @@ function postInvalidation({
  * A term's own tag, which whatever displays it carries (its archive, the
  * posts in it, term lists, menu links), and its taxonomy's term listings.
  * When its URI changed (a creation, a delete or a slug or parent change),
- * also the cached 404s, and the page at its old URI, expired, as a post's.
+ * also the cached 404s, and the pages at its old and new URIs, expired, as a
+ * post's.
  * The plugin reports the descendants a change moves, and the default term a
  * delete moved posts into, as changes of their own.
  */
@@ -165,8 +168,20 @@ function termInvalidation({
 
 	return {
 		tags: [...tags, cacheTags.uris()],
-		path: uriOf(before) ?? undefined,
+		paths: movedUriPaths(before, after),
 	};
+}
+
+/**
+ * The pages to expire when a post or a term moves: its old URI, which an
+ * existing redirect from it now applies to, and its new URI, which may be a
+ * cached 404. Marked stale, that 404 would be re-rendered in the background
+ * by the request it's served to, and Next renders the metadata of that render
+ * as the 404's (`res.statusCode` is the stale 404's): the new page would be
+ * cached without its title and Open Graph tags (vercel/next.js#71440).
+ */
+function movedUriPaths(before: unknown, after: unknown): string[] {
+	return [uriOf(before), uriOf(after)].filter((uri) => uri !== null);
 }
 
 /**
