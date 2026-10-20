@@ -55,7 +55,7 @@ What starterpack-forms 1.1.1 does on `main`, read from its code:
 - **GraphQL:** the plugin exposes a `form` type with `fields` (a JSON string), `optIns` and `strings` [spf-type]. Next renders it with `react-hook-form` [main-form].
 - **Submission:**
   - The browser posts to `/api/submit-form/`. A `next.config.js` rewrite forwards it to WordPress, adding `WORDPRESS_FORMS_SECRET` to the query string [main-next].
-  - WordPress checks hCaptcha (`WORDPRESS_HCAPTCHA_SECRET`), then validates with `symfony/validator` and answers `{ errors: { <field>: [messages] } }` [spf-sub].
+  - WordPress checks hCaptcha (`WORDPRESS_HCAPTCHA_SECRET`), then validates with `symfony/validator` and answers through `wp_send_json_error`: `{ success: false, data: { errors: { <field>: [messages] } } }` [spf-sub].
   - Files are uploaded first, in chunks, through `/api/submit-form/upload/` [main-next], [spf-sub].
 - **Emails:** a notification and a confirmation email to the submitter, with "send to", "send from" and a template [spf-sub]. Each is set per form, with global defaults on an ACF options page [spf-acf-form], [spf-acf-opts].
 - **Entries:**
@@ -95,7 +95,7 @@ All the other per-form fields (text, email, textarea, wysiwyg, true/false, group
 
 | Candidate (version) | 1 Free | 2 Editors build | 3 Headless | 4 Fields + server validation | 5 Spam | 6 Emails | 7 Entries + CSV | 8 Polylang | 9 GDPR |
 |---|---|---|---|---|---|---|---|---|---|
-| **Baseline** (1.1.1 without ACF PRO) | 🟡 Only once the repeater and options page are replaced [spf-acf-form], [spf-acf-opts] | ✅ Gutenberg `supt/input-*` blocks in a form CPT [spf-type] | ✅ GraphQL `form` type. Submits with a shared secret and gets JSON field errors [spf-type], [spf-sub] | ✅ All baseline types. Symfony validator returns field errors [spf-sub] | ✅ hCaptcha checked server-side. No honeypot [spf-sub] | 🟡 Notification and confirmation. "Send to" is a single ACF email field [spf-sub], [spf-acf-form] | ✅ Post meta, admin list, CSV [spf-results] | ✅ `form` CPT translatable through `wpml-config.xml`. FR `.po` [spf-wpml], [pll-wpml-config], [spf-lang] | 🟡 Consent opt-ins and manual delete. No expiry; uploaded files are kept after an entry is deleted [spf-results] |
+| **Baseline** (1.1.1 without ACF PRO) | 🟡 Only once the repeater and options page are replaced [spf-acf-form], [spf-acf-opts] | ✅ Gutenberg `supt/input-*` blocks in a form CPT [spf-type] | ✅ GraphQL `form` type. Submits with a shared secret and gets JSON field errors [spf-type], [spf-sub] | ✅ All baseline types. Symfony validator returns field errors [spf-sub] | 🟡 hCaptcha checked server-side, but it sends `REMOTE_ADDR` (the Next server's IP behind Next) and passes when no secret is set. No honeypot [spf-sub] | 🟡 Notification and confirmation. "Send to" is a single ACF email field [spf-sub], [spf-acf-form] | ✅ Post meta, admin list, CSV [spf-results] | ✅ `form` CPT translatable through `wpml-config.xml`. FR `.po` [spf-wpml], [pll-wpml-config], [spf-lang] | 🟡 Consent opt-ins and manual delete. No expiry; uploaded files are kept after an entry is deleted [spf-results] |
 | **CF7 + Flamingo** (6.2.2 + 2.6.4) | ✅ No Pro tier; both GPLv2+ [cf7-readme], [api-cf7] | 🟡 Classic markup editor with form-tags (`[text* name]`). The block only embeds a form [cf7-admin], [cf7-block] | 🟡 Public REST submit, no nonce, JSON `invalid_fields`. Reading a definition needs the `publish_pages` capability [cf7-rest], [cf7-sub] | 🟡 text, email, textarea, select, checkbox, radio, file, acceptance. No section-break tag: headings are HTML in the template [cf7-modules], [cf7-file] | ✅ Turnstile (token in the REST payload) and reCAPTCHA v3, checked server-side. No hCaptcha or honeypot [cf7-turnstile] | ✅ Mail plus optional "Mail (2)" to the submitter [cf7-sub] | 🟡 Needs Flamingo (free). CSV export. Files are not kept, only a hash [cf7-flamingo-mod], [fl-csv], [cf7-sub] | 🟡 One form per language, or the "Multilingual CF7 with Polylang" add-on, whose form translation is HTML-only [pll-cf7], [mcf7pll] | 🟡 `[acceptance]` field and erasers. Only spam entries expire (30 days) [cf7-acceptance], [fl-cron], [fl-privacy] |
 | **Forminator** (1.58.2) | ✅ Uploads, captcha, retention and CSV are free. E-signature and Stripe subscriptions are Pro [fmn-readme] | 🟡 Own drag-and-drop builder. The block only embeds a form [fmn-block] | 🟡 No read API. Submits through admin-ajax with a nonce, which can be fetched publicly or switched off [fmn-api], [fmn-front] | ✅ All baseline types, including upload and section. Server-side required checks [fmn-readme], [fmn-front] | ✅ reCAPTCHA, hCaptcha, Turnstile and honeypot, checked server-side [fmn-captcha], [fmn-front] | ✅ Several notifications and an auto-response [fmn-readme] | ✅ Submissions list and CSV export [fmn-export] | ❌ No Polylang or WPML integration. Workaround: one form per language [fmn-wpml] | ✅ GDPR/consent fields, retention and auto-delete, erasers [fmn-gdpr] |
 | Fluent Forms (6.2.16) | ❌ File Upload and auto-delete are Pro [ff-component], [ff-readme] | 🟡 Own builder. The block only embeds a form [ff-block] | 🟡 Every `fluentform/v1` REST route needs a capability. Admin-ajax submit without nonce, JSON errors (HTTP 423) [ff-routes], [ff-ajax], [ff-valid] | ❌ No file upload in free. Section break ✅ [ff-component] | ✅ reCAPTCHA, hCaptcha, Turnstile, honeypot [ff-valid], [ff-honeypot] | ✅ Notification and confirmation are free [ff-readme] | ✅ CSV, Excel, ODS, JSON export [ff-export] | 🟡 Official bridge is WPML-only. Polylang bridge is an unmaintained GitHub repo [ff-wpml], [ff-pll] | 🟡 GDPR field and manual delete. Auto-delete is Pro [ff-readme] |
@@ -212,7 +212,7 @@ Day counts are rough estimates for one developer, for comparison only.
   - Read the secret from a header instead of the query string.
   - Fix the authorization and input handling of the chunked upload handler and of the Submissions export and delete actions.
   - ~3–4 days.
-- **Blocks in WordPress:** port the 10 `supt/input-*` blocks and the `supt/form` block from `main`'s `src/components` (about 100 KB of TSX/CSS) to `wordpress/theme/src/blocks`. ~2 days.
+- **Blocks in WordPress:** port the 7 `supt/input-*` blocks, `supt/form-section-breaker` and the `supt/form` block from `main`'s `src/components` (about 100 KB of TSX/CSS) to `wordpress/theme/src/blocks`. ~2 days.
 - **Blocks in Next:**
   - Port `Form` and the input atoms to `next/src/components/custom` and register them in `next/src/components/data.ts`.
   - Add `react-hook-form` and `@hcaptcha/react-hcaptcha`, which `main` already uses [main-form].
@@ -221,6 +221,7 @@ Day counts are rough estimates for one developer, for comparison only.
 - **Submission route:** a route handler, e.g. `next/src/app/api/forms/route.ts`, replaces the two `next.config.js` rewrites. It forwards the multipart body to WordPress with the secret in a header, and uses `secret-matches` as the revalidate route does. ~1 day.
 - **Spam:**
   - hCaptcha as today. Turnstile could be added as a second provider.
+  - Send the visitor's IP from a header set by Next instead of `REMOTE_ADDR`, and fail closed when the secret is missing [spf-sub].
   - A honeypot is cheap to add in the same validation step.
   - ~0.5 day.
 - **Environment variables:**
@@ -288,7 +289,7 @@ Day counts are rough estimates for one developer, for comparison only.
 - **Spam:** hCaptcha or Turnstile configured in Forminator, with the token sent as `h-captcha-response` / `forminator-turnstile-response` [fmn-front]. ~0.5 day.
 - **Environment variables:** `NEXT_PUBLIC_HCAPTCHA_KEY` (Next). The secret lives in Forminator's settings (a WordPress option).
 - **Migration from starterpack-forms:** rebuild every form in Forminator's builder, then a DB migration swaps the blocks. ~1–2 days.
-- **Total: ~9–11 days, plus ongoing security patching.**
+- **Total: ~8.5–9.5 days, plus ongoing security patching.**
   - It has had three critical unauthenticated advisories in 2026 [fmn-vuln].
   - It has no Polylang story [fmn-wpml].
 
@@ -298,7 +299,7 @@ Day counts are rough estimates for one developer, for comparison only.
 
 Why:
 
-- **Same integration work.** All three shortlisted options cost about the same to integrate (~9–11 days), because `future` needs a field renderer, a submission route and a spam widget whichever we pick. A third-party plugin doesn't save that work. It only changes what the renderer has to parse.
+- **Same integration work.** All three shortlisted options cost about the same to integrate (~8.5–11 days), because `future` needs a field renderer, a submission route and a spam widget whichever we pick. A third-party plugin doesn't save that work. It only changes what the renderer has to parse.
 - **The baseline fits our stack best:**
   - It is the only option where editors build forms with Gutenberg blocks, the way they edit pages.
   - Its GraphQL form definition is ours.
