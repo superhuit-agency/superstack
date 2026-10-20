@@ -78,6 +78,9 @@ function invalidationOf(change: Record<string, unknown>): {
 		case 'post':
 			return postInvalidation(change);
 
+		case 'term':
+			return termInvalidation(change);
+
 		// Normalised by the helper, the same way as the redirect lookup's tag.
 		// The page at the source path too: it may be a page, not a cached 404,
 		// e.g. a post's old URI after Redirection's slug monitor
@@ -141,6 +144,32 @@ function postInvalidation({
 }
 
 /**
+ * A term's own tag, which whatever displays it carries (its archive, the
+ * posts in it, term lists, menu links), and its taxonomy's term listings.
+ * When its URI changed (a creation, a delete or a slug or parent change),
+ * also the cached 404s, and the page at its old URI, expired, as a post's.
+ * The plugin reports the descendants a change moves, and the default term a
+ * delete moved posts into, as changes of their own.
+ */
+function termInvalidation({
+	id,
+	taxonomy,
+	before,
+	after,
+}: Record<string, unknown>) {
+	if (!isId(id) || typeof taxonomy !== 'string') return {};
+
+	const tags = [cacheTags.term(id), cacheTags.taxonomy(taxonomy)];
+
+	if (uriOf(before) === uriOf(after)) return { tags };
+
+	return {
+		tags: [...tags, cacheTags.uris()],
+		path: uriOf(before) ?? undefined,
+	};
+}
+
+/**
  * "Purge all", and from nextjs-revalidate 2.1.1 a routing setting change
  * (permalinks, Reading options, Polylang URLs). Without a `type`, everything
  * for the whole site, with the cached 404s and redirects expired since any of
@@ -171,7 +200,10 @@ function allInvalidation({ type, taxonomies }: Record<string, unknown>) {
 	};
 }
 
-/** The URI of one side of a post change, `null` when it's not on the site. */
+/**
+ * The URI of one side of a post or term change, `null` when it's not on the
+ * site.
+ */
 function uriOf(side: unknown): string | null {
 	return isObject(side) && typeof side.uri === 'string' ? side.uri : null;
 }

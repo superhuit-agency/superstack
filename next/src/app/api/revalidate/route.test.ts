@@ -226,6 +226,102 @@ describe('POST /api/revalidate', () => {
 		});
 	});
 
+	describe('a term change', () => {
+		const video = { slug: 'video', uri: '/category/video/' };
+
+		it('clears the term and its taxonomy for a rename', async () => {
+			const response = await send([
+				{
+					subject: 'term',
+					id: 5,
+					taxonomy: 'category',
+					before: video,
+					after: video,
+				},
+			]);
+
+			expect(response.status).toBe(200);
+			expect(tagsMarkedStale()).toEqual(['taxonomy:category', 'term:5']);
+			expect(tagsExpired()).toEqual([]);
+			expect(revalidatePath).not.toHaveBeenCalled();
+		});
+
+		it.each([
+			['a creation', null, video, []],
+			['a delete', video, null, ['/category/video/']],
+			[
+				'a slug change',
+				video,
+				{ slug: 'videos', uri: '/category/videos/' },
+				['/category/video/'],
+			],
+		])(
+			'also clears the cached 404s, and expires the old URI, for %s',
+			async (_, before, after, paths) => {
+				await send([
+					{
+						subject: 'term',
+						id: 5,
+						taxonomy: 'post_tag',
+						before,
+						after,
+					},
+				]);
+
+				expect(tagsMarkedStale()).toEqual([
+					'taxonomy:post_tag',
+					'term:5',
+					'uris',
+				]);
+				expect(tagsExpired()).toEqual([]);
+				expect(pathsExpired()).toEqual(paths);
+			}
+		);
+
+		it('clears each term once for a delete, its moved child and the default term', async () => {
+			const uncategorized = {
+				slug: 'uncategorized',
+				uri: '/category/uncategorized/',
+			};
+
+			await send([
+				{
+					subject: 'term',
+					id: 5,
+					taxonomy: 'category',
+					before: video,
+					after: null,
+				},
+				{
+					subject: 'term',
+					id: 6,
+					taxonomy: 'category',
+					before: { slug: 'live', uri: '/category/video/live/' },
+					after: { slug: 'live', uri: '/category/live/' },
+				},
+				{
+					subject: 'term',
+					id: 1,
+					taxonomy: 'category',
+					before: uncategorized,
+					after: uncategorized,
+				},
+			]);
+
+			expect(tagsMarkedStale()).toEqual([
+				'taxonomy:category',
+				'term:1',
+				'term:5',
+				'term:6',
+				'uris',
+			]);
+			expect(pathsExpired()).toEqual([
+				'/category/video/',
+				'/category/video/live/',
+			]);
+		});
+	});
+
 	describe('a redirect change', () => {
 		it.each([
 			['/old-path/'],
@@ -321,6 +417,16 @@ describe('POST /api/revalidate', () => {
 					after: { uri: '/cafe-2/' },
 				},
 			],
+			[
+				"a term's old URI",
+				{
+					subject: 'term',
+					id: 5,
+					taxonomy: 'category',
+					before: { slug: 'caf%c3%a9', uri: '/caf%c3%a9/' },
+					after: { slug: 'cafe', uri: '/cafe/' },
+				},
+			],
 			['a redirect', { subject: 'redirect', uri: '/caf%c3%a9/' }],
 			['a path', { subject: 'path', uri: '/caf%c3%a9/' }],
 		])(
@@ -370,6 +476,13 @@ describe('POST /api/revalidate', () => {
 				after: { uri: '/hello-world/' },
 			},
 			{ subject: 'redirect', uri: '/hello/' },
+			{
+				subject: 'term',
+				id: 5,
+				taxonomy: 'category',
+				before: { slug: 'video', uri: '/category/video/' },
+				after: { slug: 'videos', uri: '/category/videos/' },
+			},
 			{ subject: 'menu', id: 7, locations: [] },
 			{ subject: 'templates' },
 			{ subject: 'settings' },
@@ -411,18 +524,16 @@ describe('POST /api/revalidate', () => {
 			expect(tagsMarkedStale()).toEqual(['menu:7']);
 		});
 
-		// The plugin reports them from 2.1.0, but they're not mapped yet (#154)
 		it.each([
-			['a creation', null, { slug: 'video', uri: '/category/video/' }],
-			[
-				'a slug change',
-				{ slug: 'video', uri: '/category/video/' },
-				{ slug: 'videos', uri: '/category/videos/' },
-			],
-			['a delete', { slug: 'video', uri: '/category/video/' }, null],
-		])('a term change: %s', async (_, before, after) => {
+			['with no ID', { subject: 'term', taxonomy: 'category' }],
+			['with no taxonomy', { subject: 'term', id: 5 }],
+		])('a term change %s', async (_, change) => {
 			const response = await send([
-				{ subject: 'term', id: 5, taxonomy: 'category', before, after },
+				{
+					...change,
+					before: { slug: 'video', uri: '/category/video/' },
+					after: { slug: 'video', uri: '/category/video/' },
+				},
 			]);
 
 			expect(response.status).toBe(200);
