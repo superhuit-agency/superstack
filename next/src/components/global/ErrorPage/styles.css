@@ -1,0 +1,37 @@
+@import '@resources/index.css';
+
+.supt-error-page {
+	@extend %container;
+	display: flex;
+	align-items: center;
+	min-height: 100vh;
+	padding: 80px 0;
+	color: $color-text;
+
+	&__inner {
+		display: flex;
+		flex-direction: column;
+		@mixin clamp gap, 16, 24, $breakpoint-xxs, $breakpoint-lg;
+		max-width: 640px;
+	}
+
+	&__title {
+		@extend %t-h1;
+	}
+
+	&__message {
+		@extend %t-introduction;
+	}
+
+	&__buttons {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 16px;
+		margin-top: 8px;
+	}
+
+	&__reference {
+		@extend %t-caption;
+		color: $color-neutral-500;
+	}
+}
