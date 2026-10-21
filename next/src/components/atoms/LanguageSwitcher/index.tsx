@@ -43,7 +43,7 @@ export default function LanguageSwitcher() {
 
 	if (!alternates.length) return null;
 
-	const currentLang = pathname.split('/').filter(Boolean)[0] ?? '';
+	const currentLang = (pathname ?? '').split('/').filter(Boolean)[0] ?? '';
 
 	return (
 		<nav aria-label="Language switcher">
