@@ -2,28 +2,32 @@
 
 An opinionated boilerplate for decoupled (headless) websites that are both performant (Next.js) and easy to edit (WordPress with Gutenberg block editor) — focused on accelerating custom blocks development.
 
+> **Superstack 2** is a new stack, rebuilt from scratch: it is not an in-place upgrade of v1. Start new projects from v2 (`main`). v1 is frozen on the [`v1.x`](https://github.com/superhuit-agency/superstack/tree/v1.x) branch and gets no fixes. See the [changelog](./docs/CHANGELOG.md).
+
 ## Features
 
 **Highlights**
 
--   Create new blocks quickly via a CLI
--   Iterate efficiently on your blocks — Gutenberg and frontend code in the same folder
--   Easy data fetching through GraphQL
--   Save time with pre-built blocks and hooks
+-   Pages, archives, the 404 page, header and footer authored as Full Site Editing templates in WordPress
+-   Core blocks rendered in Next.js, with pre-built post, query loop, navigation and breadcrumb blocks
+-   Easy data fetching through GraphQL, typed with GraphQL Codegen
+-   Create blocks from patterns or as custom Gutenberg blocks ([guide](./docs/blocks/create-block.md))
 
 **Next.js**
 
 -   Next.js 16 with App Router and React Server Components
--   Next.js Preview Mode
--   Next.js Cache Revalidation (via WordPress Plugin)
+-   Draft Mode preview
+-   Cache Components with tag-based invalidation (via the [nextjs-revalidate](https://github.com/superhuit-agency/nextjs-revalidate) WordPress plugin)
 
 **The basics**
 
 -   Typing with TypeScript
 -   Styling with CSS (PostCSS)
 -   Dynamic styleguide with Storybook
+-   Tests with Vitest
 -   Dockerized
 -   Multilang support
+-   Cookie consent (GDPR) with Google Consent Mode v2
 
 # Table of Contents
 
@@ -33,9 +37,12 @@ An opinionated boilerplate for decoupled (headless) websites that are both perfo
 
 ## 🏗 Project setup
 
-- Getting Started
+- [Getting Started](#getting-started)
 - [Deploy](./docs/setup/deployment.md)
 - [Caching](./docs/caching.md)
+- [FSE templating](./docs/fse-templating.md)
+- [Multilang](./docs/setup/multilang.md) and [translations](./docs/setup/translations.md)
+- [Theme CSS](./docs/setup/theme-css.md), [fonts](./docs/setup/add-fonts.md) and [favicon](./docs/setup/add-favicon.md)
 - [Parallel local instances](./docs/setup/parallel-local-dev.md)
 - [Cookie consent (GDPR) and Google Tag Manager](./docs/setup/gdpr.md)
 
@@ -89,7 +96,7 @@ npm install
 cp .env.example .env # preview is refused without WORDPRESS_PREVIEW_SECRET
 ```
 
-## Development
+### Development
 
 ```bash
 npm run dev

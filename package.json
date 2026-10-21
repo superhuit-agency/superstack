@@ -1,7 +1,7 @@
 {
   "name": "superstack",
-  "version": "1.0.0",
-  "description": "WIP in redaction",
+  "version": "2.0.0",
+  "description": "Headless WordPress + Next.js starter",
   "main": "index.js",
   "directories": {
     "doc": "docs"
