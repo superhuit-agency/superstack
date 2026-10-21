@@ -74,7 +74,7 @@ describe('Navigation', () => {
 
 		expect(
 			test.container.querySelectorAll(
-				'[role="menu"], [role="menubar"], [role="menuitem"], [role="none"]'
+				'[role="menu"], [role="menubar"], [role="menuitem"], [role="none"], [aria-haspopup]'
 			)
 		).toHaveLength(0);
 	});

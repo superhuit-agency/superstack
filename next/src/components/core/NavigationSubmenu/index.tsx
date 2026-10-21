@@ -26,7 +26,6 @@ export default function NavigationSubmenu(props: NavigationSubmenuProps) {
 				className="wp-block-navigation-submenu__label"
 				label={props.label}
 				url={props.url}
-				aria-haspopup="true"
 				aria-expanded={isExpanded ? 'true' : 'false'}
 				aria-controls={`${id}-items`}
 				onMouseEnter={() => setIsExpanded(true)}

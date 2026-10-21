@@ -44,7 +44,7 @@ describe('NavigationSubmenu', () => {
 	}
 
 	const submenuButton = () =>
-		test.container.querySelector<HTMLElement>('[aria-haspopup="true"]')!;
+		test.container.querySelector<HTMLElement>('[aria-expanded]')!;
 
 	function hoverSubmenu() {
 		act(() => {
@@ -90,7 +90,7 @@ describe('NavigationSubmenu', () => {
 			expect(submenus).toHaveLength(2);
 
 			submenus.forEach((submenu) => {
-				const button = submenu.querySelector('[aria-haspopup="true"]')!;
+				const button = submenu.querySelector('[aria-expanded]')!;
 				const list = submenu.querySelector(
 					'.wp-block-navigation-submenu__items'
 				)!;
