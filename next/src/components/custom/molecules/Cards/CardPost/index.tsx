@@ -16,7 +16,6 @@ export default function CardPost(props: CardPostProps) {
 						height={props.featuredimage.height}
 						className="supt-card-post__image"
 						sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 350px"
-						priority={false}
 						loading="lazy"
 						quality={75}
 					/>

@@ -71,7 +71,8 @@ const Image: FC<ImageProps> & BlockConfigs = forwardRef<
 							? undefined
 							: normalizedHeight
 					}
-					priority={priority}
+					preload={priority}
+					fetchPriority={priority ? 'high' : undefined}
 					quality={quality}
 					fill={isFilled}
 					unoptimized={
