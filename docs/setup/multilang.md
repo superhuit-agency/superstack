@@ -41,6 +41,8 @@ All multilang behaviour is controlled by `next/src/configs.json`:
 | `src/app/[lang]/layout.tsx` | Loads the dictionary for the current locale and wraps children in `LocaleProvider`. Answers 404 when the first segment isn't a locale (paths with an extension, e.g. `/llms.txt`, skip the proxy) |
 | `src/app/[lang]/[[...uri]]/page.tsx` | Passes `lang` to `getPublicNodeByURI` (or `getPreviewNodeByURI` in preview) to fetch the correct translation from WP |
 | `src/app/[lang]/not-found.tsx` | Renders the 404 template, its template parts and breadcrumbs in the current language. It gets no `params`: `[lang]/layout.tsx` stores `lang` with `langContext()` (`src/hooks/use-lang.ts`), and the 404 reads it back |
+| `src/app/[lang]/error.tsx` | The error page, e.g. on a client-side navigation to a page that fails to render before it was ever cached, in the current language: it reads the `LocaleProvider` of `[lang]/layout.tsx`, which holds the URL's locale. Its home link points to `/{lang}/` |
+| `src/app/global-error.tsx` | The error page when the root layout itself fails in the browser. It renders its own `<html>`, in the default locale, as its `LocaleProvider` failed with the layout |
 | `src/lib/get-all-uris.ts` | In multilang mode, fetches `language { code }` per node and maps URIs to `{ lang, uri }` pairs for `generateStaticParams` |
 | `src/lib/get-node-by-uri.ts` | Wraps type fragments in `translation(language: LANG) { ... }` when multilang is enabled |
 | `src/lib/fragments/language.ts` | GraphQL `language { code, locale }` fields — empty string when `isMultilang: false` |
@@ -53,7 +55,7 @@ All multilang behaviour is controlled by `next/src/configs.json`:
 ## Adding a language
 
 1. Add the language in **WP Admin → Languages** (Polylang)
-2. Add a dictionary file: `next/src/i18n/dictionaries/{slug}.json`
+2. Add a dictionary file: `next/src/i18n/dictionaries/{slug}.json`, with the `gdpr` (cookie banner) and `error` (error page) strings
 3. Add the slug to the `locales` array in `next/src/proxy.ts`
 
 ## Using translations in components

@@ -27,5 +27,12 @@
 			"description": "Ce site web utilise des cookies pour améliorer votre expérience lorsque vous naviguez sur le site Web. Parmi ces cookies, les cookies classés comme nécessaires sont stockés sur votre navigateur car ils sont essentiels pour le fonctionnement des fonctionnalités de base du site Web. Nous utilisons également des cookies de tiers qui nous aident à analyser et à comprendre comment vous utilisez ce site Web. Ces cookies ne seront stockés dans votre navigateur qu'avec votre consentement. Vous avez également la possibilité de désactiver ces cookies. Toutefois, la désactivation de certains de ces cookies peut avoir un effet sur votre expérience de navigation.",
 			"save": "Accepter et sauvegarder"
 		}
+	},
+	"error": {
+		"title": "Une erreur est survenue",
+		"message": "Cette page n'a pas pu être affichée. Veuillez réessayer dans quelques instants.",
+		"retry": "Réessayer",
+		"home": "Retour à la page d'accueil",
+		"reference": "Référence de l'erreur :"
 	}
 }

@@ -18,7 +18,7 @@
  * - move `[[...uri]]` in/out of the `[lang]` route segment
  * - swap the root layout: in multilang, `[lang]/layout.tsx` is the root layout
  *   (so `<html lang>` matches the current language) and `not-found.tsx`
- *   moves into `[lang]` with it
+ *   and `error.tsx` move into `[lang]` with it
  * - update `configs.json`, `proxy.ts`, `typings.d.ts`, `locale-context.tsx`
  * - toggle the `IS_MULTILANG` default in `wordpress/scripts/provision.sh`
  *
@@ -48,6 +48,10 @@ const paths = {
 		rootDir,
 		'next/src/app/[lang]/not-found.test.tsx'
 	),
+	error: path.join(rootDir, 'next/src/app/error.tsx'),
+	langError: path.join(rootDir, 'next/src/app/[lang]/error.tsx'),
+	errorTest: path.join(rootDir, 'next/src/app/error.test.tsx'),
+	langErrorTest: path.join(rootDir, 'next/src/app/[lang]/error.test.tsx'),
 	configsJson: path.join(rootDir, 'next/src/configs.json'),
 	proxy: path.join(rootDir, 'next/src/proxy.ts'),
 	typings: path.join(rootDir, 'next/src/i18n/typings.d.ts'),
@@ -223,18 +227,24 @@ function updateLocaleContextDefaults(defaultLocale) {
 }
 
 function ensureDictionaries(locales) {
-	// The cookie banner reads its strings from the `gdpr` keys: seed them in
-	// English (or the first dictionary that has them) until they get translated
+	// The cookie banner and the error page read their strings from the `gdpr`
+	// and `error` keys: seed them in English (or the first dictionary that has
+	// them) until they get translated
 	const dictionaryFiles = fs
 		.readdirSync(paths.dictionariesDir)
 		.filter((file) => file.endsWith('.json'))
 		.sort((a, b) => (a === 'en.json' ? -1 : b === 'en.json' ? 1 : 0));
-	let gdpr;
-	for (const file of dictionaryFiles) {
-		({ gdpr } = JSON.parse(
-			fs.readFileSync(path.join(paths.dictionariesDir, file), 'utf8')
-		));
-		if (gdpr) break;
+	const seed = {};
+	for (const key of ['gdpr', 'error']) {
+		for (const file of dictionaryFiles) {
+			const dictionary = JSON.parse(
+				fs.readFileSync(path.join(paths.dictionariesDir, file), 'utf8')
+			);
+			if (dictionary[key]) {
+				seed[key] = dictionary[key];
+				break;
+			}
+		}
 	}
 
 	for (const locale of locales) {
@@ -246,7 +256,7 @@ function ensureDictionaries(locales) {
 
 		fs.writeFileSync(
 			dictionaryPath,
-			JSON.stringify(gdpr ? { gdpr } : {}, null, '\t') + '\n'
+			JSON.stringify(seed, null, '\t') + '\n'
 		);
 		log(`Created ${path.relative(rootDir, dictionaryPath)}`);
 	}
@@ -309,6 +319,14 @@ function toMultilang(defaultLocale, additionalLocales) {
 		paths.langNotFoundTest,
 		'Moved not-found.test.tsx into [lang] folder'
 	);
+	// Under the `[lang]` root layout, so the error page renders inside its
+	// document and in its language
+	moveDir(paths.error, paths.langError, 'Moved error.tsx into [lang] folder');
+	moveDir(
+		paths.errorTest,
+		paths.langErrorTest,
+		'Moved error.test.tsx into [lang] folder'
+	);
 
 	if (fs.existsSync(paths.rootLayout)) {
 		fs.rmSync(paths.rootLayout);
@@ -348,6 +366,16 @@ function toSinglelang(defaultLocale) {
 		paths.langNotFoundTest,
 		paths.notFoundTest,
 		'Moved not-found.test.tsx out of [lang] folder'
+	);
+	moveDir(
+		paths.langError,
+		paths.error,
+		'Moved error.tsx out of [lang] folder'
+	);
+	moveDir(
+		paths.langErrorTest,
+		paths.errorTest,
+		'Moved error.test.tsx out of [lang] folder'
 	);
 
 	if (fs.existsSync(paths.langDir)) {
