@@ -98,11 +98,27 @@ describe('NavigationSubmenu', () => {
 				const controlled = referencedElements(button, 'aria-controls');
 				expect(controlled).toHaveLength(1);
 				expect(controlled[0]).toBe(list);
-
-				const labelledBy = referencedElements(list, 'aria-labelledby');
-				expect(labelledBy).toHaveLength(1);
-				expect(labelledBy[0]).toBe(button);
 			});
 		}
 	);
+
+	it('is a list item holding its label and the list of its items', () => {
+		visit('/a');
+
+		const submenu = test.container.querySelector(
+			'.wp-block-navigation-submenu'
+		)!;
+		expect(submenu.tagName).toBe('LI');
+		expect(submenu.parentElement!.tagName).toBe('UL');
+
+		const [label, list] = Array.from(submenu.children);
+		expect(submenu.children).toHaveLength(2);
+		expect(label.tagName).toBe('DIV');
+		expect(label.classList).toContain('wp-block-navigation-submenu__label');
+		expect(label.contains(submenuButton())).toBe(true);
+		expect(list.tagName).toBe('UL');
+		expect(list.classList).toContain('wp-block-navigation-submenu__items');
+		expect(list.hasAttribute('role')).toBe(false);
+		expect(list.hasAttribute('aria-labelledby')).toBe(false);
+	});
 });

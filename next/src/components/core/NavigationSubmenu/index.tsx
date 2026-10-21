@@ -20,26 +20,24 @@ export default function NavigationSubmenu(props: NavigationSubmenuProps) {
 	useLayoutEffect(() => setIsExpanded(false), [pathname]);
 
 	return (
-		<div className="wp-block-navigation-submenu">
+		<li className="wp-block-navigation-submenu">
 			<NavigationLink
+				as="div"
 				className="wp-block-navigation-submenu__label"
 				label={props.label}
 				url={props.url}
 				aria-haspopup="true"
 				aria-expanded={isExpanded ? 'true' : 'false'}
 				aria-controls={`${id}-items`}
-				id={`${id}-button`}
 				onMouseEnter={() => setIsExpanded(true)}
 				onMouseLeave={() => setIsExpanded(false)}
 			/>
 			<ul
 				className="wp-block-navigation-submenu__items"
 				id={`${id}-items`}
-				role="menu"
-				aria-labelledby={`${id}-button`}
 			>
 				{props.children}
 			</ul>
-		</div>
+		</li>
 	);
 }
