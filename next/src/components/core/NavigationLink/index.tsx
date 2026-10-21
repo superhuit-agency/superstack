@@ -1,12 +1,12 @@
 import { Link } from '@/components/custom/atoms/Link';
 import cx from 'classnames';
 
-export default function NavigationLink(props: NavigationLinkProps) {
+export default function NavigationLink({
+	as: Tag = 'li',
+	...props
+}: NavigationLinkProps) {
 	return (
-		<li
-			className={cx('wp-block-navigation-link', props.className)}
-			role="menuitem"
-		>
+		<Tag className={cx('wp-block-navigation-link', props.className)}>
 			<Link
 				href={props.url}
 				className="wp-block-navigation-link"
@@ -14,6 +14,6 @@ export default function NavigationLink(props: NavigationLinkProps) {
 			>
 				{props.label}
 			</Link>
-		</li>
+		</Tag>
 	);
 }

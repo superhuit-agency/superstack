@@ -4,6 +4,7 @@ interface NavigationLinkAttributes extends BlockAttributes {
 }
 
 interface NavigationLinkProps extends NavigationLinkAttributes {
+	as?: 'li' | 'div';
 	'aria-haspopup'?: 'true' | 'false';
 	'aria-expanded'?: 'true' | 'false';
 	'aria-controls'?: string;
