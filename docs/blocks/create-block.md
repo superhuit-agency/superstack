@@ -154,13 +154,37 @@ Core blocks follow the same convention — see [`core/Heading/block.json`](../..
 
 ### Step 2: Register the block in Next.js
 
-Add the slug to `blocksList` in [`next/src/components/global/Blocks.tsx`](../../next/src/components/global/Blocks.tsx):
+Add the slug to `blocksList` in [`next/src/components/global/Blocks.tsx`](../../next/src/components/global/Blocks.tsx). How the component is imported depends on whether it is a Server or a Client Component (see [ADR 0002](../adr/0002-blocks-static-imports-client-blocks-split.md)).
+
+**Server Component** (the default): import it statically.
 
 ```ts
-'superstack/tag': () => import('../custom/atoms/Tag'),
+import Tag from '../custom/atoms/Tag';
+
+// in blocksList
+'superstack/tag': Tag,
 ```
 
-Without this entry, the block saves in WordPress but Next.js will log a dev warning and render nothing.
+**Client Component** (`'use client'`): export it from [`next/src/components/global/ClientBlocks.tsx`](../../next/src/components/global/ClientBlocks.tsx) with `next/dynamic`, then register that export. Its JS gets its own chunk, loaded only on the pages that render it.
+
+```ts
+// ClientBlocks.tsx
+export const Tag = dynamic(() => import('../custom/atoms/Tag'));
+
+// Blocks.tsx
+import { Tag } from './ClientBlocks';
+
+// in blocksList
+'superstack/tag': Tag,
+```
+
+The same applies to a client part of a Server Component block (a player, a sticky header, a modal trigger…): the Server Component imports it from `ClientBlocks.tsx`, not from its own folder.
+
+- Don't use `() => import()` in `blocksList`, or `next/dynamic` in a Server Component: Turbopack then emits one render-blocking CSS file per block, and still ships the JS of every Client Component on every page.
+- Navigation blocks (header, menu, language switcher) are imported statically even when they are Client Components: they are on every page, so splitting them only adds requests.
+- A component must import all the CSS it needs (`import './styles.css'`, plus the stylesheet of any other block whose classes it reuses). A Client Component's CSS now loads with its own chunk, so styles it used to get from another block on the page can go missing.
+
+Without the `blocksList` entry, the block saves in WordPress but Next.js will log a dev warning and render nothing.
 
 ### Step 3: Register the block in the WordPress editor
 
@@ -265,15 +289,15 @@ This applies to humans and coding agents alike.
 
 ## Checklist — custom block
 
-| Step                                           | Location                                            |
-| ---------------------------------------------- | --------------------------------------------------- |
-| 1. `block.json` + `index.tsx` + `typings.d.ts` | `next/src/components/custom/<level>/<Name>/`        |
-| 2. Register slug                               | `next/src/components/global/Blocks.tsx`             |
-| 3. `register.ts` + `edit.tsx`                  | `wordpress/theme/src/blocks/custom/<level>/<Name>/` |
-| 4. Barrel import                               | `wordpress/theme/src/blocks/index.ts`               |
-| 5. Build theme assets                          | `npm --prefix ./wordpress run build`                |
-| 6. Sync GraphQL registry                       | WP Admin → GraphQL → Gutenberg                      |
-| 7. Verify editor + frontend                    | —                                                   |
+| Step                                           | Location                                                                           |
+| ---------------------------------------------- | ---------------------------------------------------------------------------------- |
+| 1. `block.json` + `index.tsx` + `typings.d.ts` | `next/src/components/custom/<level>/<Name>/`                                       |
+| 2. Register slug                               | `next/src/components/global/Blocks.tsx` (Client Components via `ClientBlocks.tsx`) |
+| 3. `register.ts` + `edit.tsx`                  | `wordpress/theme/src/blocks/custom/<level>/<Name>/`                                |
+| 4. Barrel import                               | `wordpress/theme/src/blocks/index.ts`                                              |
+| 5. Build theme assets                          | `npm --prefix ./wordpress run build`                                               |
+| 6. Sync GraphQL registry                       | WP Admin → GraphQL → Gutenberg                                                     |
+| 7. Verify editor + frontend                    | —                                                                                  |
 
 ## Parent / child blocks (optional)
 

@@ -1,78 +1,141 @@
 import React from 'react';
 
-type BlockModule = {
-	default: React.ElementType;
-};
+import Accordion from '../core/Accordion';
+import AccordionHeading from '../core/AccordionHeading';
+import AccordionItem from '../core/AccordionItem';
+import AccordionPanel from '../core/AccordionPanel';
+import Audio from '../core/Audio';
+import Avatar from '../core/Avatar';
+import ReusableBlock from '../core/Block';
+import Button from '../core/Button';
+import Buttons from '../core/Buttons';
+import Column from '../core/Column';
+import Columns from '../core/Columns';
+import TaxonomyList from '../core/TaxonomyList';
+import Code from '../core/Code';
+import Cover from '../core/Cover';
+import Embed from '../core/Embed';
+import File from '../core/File';
+import Gallery from '../core/Gallery';
+import Group from '../core/Group';
+import Heading from '../core/Heading';
+import CustomHtml from '../core/CustomHtml';
+import Image from '../core/Image';
+import LatestPosts from '../core/LatestPosts';
+import List from '../core/List';
+import ListItem from '../core/ListItem';
+import Math from '../core/Math';
+import MediaText from '../core/MediaText';
+import Navigation from '../core/Navigation';
+import NavigationLink from '../core/NavigationLink';
+import NavigationSubmenu from '../core/NavigationSubmenu';
+import Paragraph from '../core/Paragraph';
+import PostAuthor from '../core/PostAuthor';
+import PostContent from '../core/PostContent';
+import PostExcerpt from '../core/PostExcerpt';
+import PostFeaturedImage from '../core/PostFeaturedImage';
+import PostTitle from '../core/PostTitle';
+import PostAuthorName from '../core/PostAuthorName';
+import PostTerms from '../core/PostTerms';
+import PostNavigationLink from '../core/PostNavigationLink';
+import PostTimeToRead from '../core/PostTimeToRead';
+import Preformatted from '../core/Preformatted';
+import Pullquote from '../core/Pullquote';
+import Query from '../core/Query';
+import QueryPagination from '../core/QueryPagination';
+import QueryPaginationNext from '../core/QueryPaginationNext';
+import QueryPaginationNumbers from '../core/QueryPaginationNumbers';
+import QueryPaginationPrevious from '../core/QueryPaginationPrevious';
+import QueryTitle from '../core/QueryTitle';
+import Quote from '../core/Quote';
+import Separator from '../core/Separator';
+import SiteLogo from '../core/SiteLogo';
+import SiteTagline from '../core/SiteTagline';
+import SiteTitle from '../core/SiteTitle';
+import SocialLink from '../core/SocialLink';
+import SocialLinks from '../core/SocialLinks';
+import Spacer from '../core/Spacer';
+import Table from '../core/Table';
+import TemplatePart from '../core/TemplatePart';
+import TermName from '../core/TermName';
+import TermsQuery from '../core/TermsQuery';
+import Video from '../core/Video';
+import LanguageSwitcher from '../atoms/LanguageSwitcher';
+import NavigationLanguageSwitcher from '../atoms/NavigationLanguageSwitcher';
+import YoastBreadcrumbs from '../core/YoastBreadcrumbs';
 
-const blocksList: Record<string, () => Promise<BlockModule>> = {
-	'core/accordion': () => import('../core/Accordion'),
-	'core/accordion-heading': () => import('../core/AccordionHeading'),
-	'core/accordion-item': () => import('../core/AccordionItem'),
-	'core/accordion-panel': () => import('../core/AccordionPanel'),
-	'core/audio': () => import('../core/Audio'),
-	'core/avatar': () => import('../core/Avatar'),
-	'core/block': () => import('../core/Block'),
-	'core/button': () => import('../core/Button'),
-	'core/buttons': () => import('../core/Buttons'),
-	'core/column': () => import('../core/Column'),
-	'core/columns': () => import('../core/Columns'),
-	'core/categories': () => import('../core/TaxonomyList'),
-	'core/code': () => import('../core/Code'),
-	'core/cover': () => import('../core/Cover'),
-	'core/embed': () => import('../core/Embed'),
-	'core/file': () => import('../core/File'),
-	'core/gallery': () => import('../core/Gallery'),
-	'core/group': () => import('../core/Group'),
-	'core/heading': () => import('../core/Heading'),
-	'core/html': () => import('../core/CustomHtml'),
-	'core/image': () => import('../core/Image'),
-	'core/latest-posts': () => import('../core/LatestPosts'),
-	'core/list': () => import('../core/List'),
-	'core/list-item': () => import('../core/ListItem'),
-	'core/math': () => import('../core/Math'),
-	'core/media-text': () => import('../core/MediaText'),
-	'core/navigation': () => import('../core/Navigation'),
-	'core/navigation-link': () => import('../core/NavigationLink'),
-	'core/navigation-submenu': () => import('../core/NavigationSubmenu'),
-	'core/paragraph': () => import('../core/Paragraph'),
-	'core/post-author': () => import('../core/PostAuthor'),
-	'core/post-content': () => import('../core/PostContent'),
-	'core/post-excerpt': () => import('../core/PostExcerpt'),
-	'core/post-featured-image': () => import('../core/PostFeaturedImage'),
-	'core/post-title': () => import('../core/PostTitle'),
-	'core/post-author-name': () => import('../core/PostAuthorName'),
-	'core/post-date': () => import('../core/PostDate'),
-	'core/post-terms': () => import('../core/PostTerms'),
-	'core/post-navigation-link': () => import('../core/PostNavigationLink'),
-	'core/post-time-to-read': () => import('../core/PostTimeToRead'),
-	'core/preformatted': () => import('../core/Preformatted'),
-	'core/pullquote': () => import('../core/Pullquote'),
-	'core/query': () => import('../core/Query'),
-	'core/query-pagination': () => import('../core/QueryPagination'),
-	'core/query-pagination-next': () => import('../core/QueryPaginationNext'),
-	'core/query-pagination-numbers': () =>
-		import('../core/QueryPaginationNumbers'),
-	'core/query-pagination-previous': () =>
-		import('../core/QueryPaginationPrevious'),
-	'core/query-title': () => import('../core/QueryTitle'),
-	'core/quote': () => import('../core/Quote'),
-	'core/separator': () => import('../core/Separator'),
-	'core/site-logo': () => import('../core/SiteLogo'),
-	'core/site-tagline': () => import('../core/SiteTagline'),
-	'core/site-title': () => import('../core/SiteTitle'),
-	'core/social-link': () => import('../core/SocialLink'),
-	'core/social-links': () => import('../core/SocialLinks'),
-	'core/spacer': () => import('../core/Spacer'),
-	'core/table': () => import('../core/Table'),
-	'core/template-part': () => import('../core/TemplatePart'),
-	'core/term-name': () => import('../core/TermName'),
-	'core/terms-query': () => import('../core/TermsQuery'),
-	'core/verse': () => import('../core/Preformatted'),
-	'core/video': () => import('../core/Video'),
-	'polylang/language-switcher': () => import('../atoms/LanguageSwitcher'),
-	'polylang/navigation-language-switcher': () =>
-		import('../atoms/NavigationLanguageSwitcher'),
-	'yoast-seo/breadcrumbs': () => import('../core/YoastBreadcrumbs'),
+import { PostDate } from './ClientBlocks';
+
+// Static imports: Turbopack emits one CSS file per dynamically imported module,
+// which made every block stylesheet a separate render-blocking request.
+// Client Components are code-split per block in `./ClientBlocks`, except the
+// navigation ones: they are on every page, so splitting them only adds requests.
+const blocksList: Record<string, React.ElementType> = {
+	'core/accordion': Accordion,
+	'core/accordion-heading': AccordionHeading,
+	'core/accordion-item': AccordionItem,
+	'core/accordion-panel': AccordionPanel,
+	'core/audio': Audio,
+	'core/avatar': Avatar,
+	'core/block': ReusableBlock,
+	'core/button': Button,
+	'core/buttons': Buttons,
+	'core/column': Column,
+	'core/columns': Columns,
+	'core/categories': TaxonomyList,
+	'core/code': Code,
+	'core/cover': Cover,
+	'core/embed': Embed,
+	'core/file': File,
+	'core/gallery': Gallery,
+	'core/group': Group,
+	'core/heading': Heading,
+	'core/html': CustomHtml,
+	'core/image': Image,
+	'core/latest-posts': LatestPosts,
+	'core/list': List,
+	'core/list-item': ListItem,
+	'core/math': Math,
+	'core/media-text': MediaText,
+	'core/navigation': Navigation,
+	'core/navigation-link': NavigationLink,
+	'core/navigation-submenu': NavigationSubmenu,
+	'core/paragraph': Paragraph,
+	'core/post-author': PostAuthor,
+	'core/post-content': PostContent,
+	'core/post-excerpt': PostExcerpt,
+	'core/post-featured-image': PostFeaturedImage,
+	'core/post-title': PostTitle,
+	'core/post-author-name': PostAuthorName,
+	'core/post-date': PostDate,
+	'core/post-terms': PostTerms,
+	'core/post-navigation-link': PostNavigationLink,
+	'core/post-time-to-read': PostTimeToRead,
+	'core/preformatted': Preformatted,
+	'core/pullquote': Pullquote,
+	'core/query': Query,
+	'core/query-pagination': QueryPagination,
+	'core/query-pagination-next': QueryPaginationNext,
+	'core/query-pagination-numbers': QueryPaginationNumbers,
+	'core/query-pagination-previous': QueryPaginationPrevious,
+	'core/query-title': QueryTitle,
+	'core/quote': Quote,
+	'core/separator': Separator,
+	'core/site-logo': SiteLogo,
+	'core/site-tagline': SiteTagline,
+	'core/site-title': SiteTitle,
+	'core/social-link': SocialLink,
+	'core/social-links': SocialLinks,
+	'core/spacer': Spacer,
+	'core/table': Table,
+	'core/template-part': TemplatePart,
+	'core/term-name': TermName,
+	'core/terms-query': TermsQuery,
+	'core/verse': Preformatted,
+	'core/video': Video,
+	'polylang/language-switcher': LanguageSwitcher,
+	'polylang/navigation-language-switcher': NavigationLanguageSwitcher,
+	'yoast-seo/breadcrumbs': YoastBreadcrumbs,
 };
 
 interface PostBodyBlocksProps {
@@ -93,9 +156,7 @@ export async function Blocks({
 					new RegExp(includes).test(name) &&
 					!new RegExp(excludes).test(name)
 				) {
-					const blockComponent =
-						await blocksList[name as keyof typeof blocksList]();
-					const Block = blockComponent.default;
+					const Block = blocksList[name as keyof typeof blocksList];
 					const { ref, ...attributes } = props.attributes;
 					return (
 						<Block
