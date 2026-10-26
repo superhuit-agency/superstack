@@ -81,7 +81,6 @@ export const currentNodeQuery = gql`
 					node {
 						name
 						description
-						uri
 						avatar {
 							url
 						}
