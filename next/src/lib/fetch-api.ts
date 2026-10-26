@@ -157,7 +157,7 @@ function redactVariables(value: unknown): unknown {
 	return value;
 }
 
-const fetchAPI: FetchApiFuncType = async (query, options) => {
+const runQuery: FetchApiFuncType = async (query, options) => {
 	const {
 		variables,
 		auth,
@@ -342,6 +342,42 @@ ${limit}
 	}
 
 	return result;
+};
+
+// Each `use cache` scope reads on its own: the blocks' data, cached one entry
+// per block (see `getCachedBlockData`), would each send the query they share
+// (see `currentNodeQuery`), and template parts their identical menus. Public
+// reads are therefore shared while in flight, across scopes, and dropped as
+// soon as they settle: nothing is kept from one request to the next.
+//
+// Only reads made inside a `use cache` scope may be shared this way: during a
+// prerender, an uncached `fetch()` never resolves, so a cached scope joining
+// such a read would wait on it until the render aborts. No page render makes
+// a public read outside a cached scope today: keep it that way.
+const inFlight = new Map<string, Promise<unknown>>();
+
+const fetchAPI: FetchApiFuncType = (query, options) => {
+	// A mutation isn't safe to share, and an authenticated (preview) read
+	// never leaves its own request
+	if (isMutation(query) || options?.auth?.authToken)
+		return runQuery(query, options);
+
+	const key = JSON.stringify([
+		options?.endpoint ?? WP_GRAPHQL_URL,
+		options?.headers ?? null,
+		options?.variables ?? null,
+		query,
+	]);
+
+	const pending = inFlight.get(key);
+	if (pending) return pending as Promise<never>;
+
+	const promise = runQuery(query, options).finally(() =>
+		inFlight.delete(key)
+	);
+	inFlight.set(key, promise);
+
+	return promise;
 };
 
 export default fetchAPI;

@@ -1,11 +1,10 @@
 import { baseUriContext } from '@/hooks/use-base-uri';
 import { nodeAtUriTags } from '@/lib/cache-tags';
+import { fetchCurrentNode } from '@/lib/current-node';
 import { gql } from '@/utils';
 import type {
 	PostFeaturedImageByPostIdQuery,
 	PostFeaturedImageByPostIdQueryVariables,
-	PostFeaturedImageDataQuery,
-	PostFeaturedImageDataQueryVariables,
 } from '@/__generated__/graphql';
 
 export const usesBaseUri = true;
@@ -49,52 +48,11 @@ export const getData = async (
 		};
 	}
 
-	const query = gql`
-		query PostFeaturedImageData($uri: String!) {
-			nodeByUri(uri: $uri) {
-				... on ContentNode {
-					databaseId
-				}
-				... on Post {
-					featuredImage {
-						node {
-							sourceUrl
-							altText
-							mediaDetails {
-								width
-								height
-							}
-						}
-					}
-				}
-				... on Page {
-					featuredImage {
-						node {
-							sourceUrl
-							altText
-							mediaDetails {
-								width
-								height
-							}
-						}
-					}
-				}
-			}
-		}
-	`;
-
 	const uri = baseUriContext();
 
 	if (!uri) return { featuredImage: null, cacheTags: [] };
 
-	const variables = {
-		uri: uri,
-	};
-
-	const data = await fetcher<
-		PostFeaturedImageDataQuery,
-		PostFeaturedImageDataQueryVariables
-	>(query, { variables });
+	const data = await fetchCurrentNode(fetcher, uri);
 
 	const node = data?.nodeByUri;
 	const featuredImage =
@@ -102,6 +60,8 @@ export const getData = async (
 
 	return {
 		featuredImage: featuredImage?.node,
-		cacheTags: nodeAtUriTags(node?.databaseId),
+		cacheTags: nodeAtUriTags(
+			node && 'databaseId' in node ? node.databaseId : undefined
+		),
 	};
 };

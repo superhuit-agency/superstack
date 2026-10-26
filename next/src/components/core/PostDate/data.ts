@@ -1,11 +1,8 @@
 import { baseUriContext } from '@/hooks/use-base-uri';
 import { cacheTags, nodeAtUriTags } from '@/lib/cache-tags';
+import { fetchCurrentNode } from '@/lib/current-node';
 import { gql } from '@/utils';
-import type {
-	PostDateDataQuery,
-	PostDateDataQueryVariables,
-	PostDateGeneralSettingsQuery,
-} from '@/__generated__/graphql';
+import type { PostDateGeneralSettingsQuery } from '@/__generated__/graphql';
 
 import { parsePostDateToUtcMs } from './format-post-date';
 
@@ -30,30 +27,6 @@ const queryPostDateGeneral = gql`
 	query PostDateGeneralSettings {
 		generalSettings {
 			dateFormat
-		}
-	}
-`;
-
-const queryPostDate = gql`
-	query PostDateData($uri: String!) {
-		generalSettings {
-			dateFormat
-		}
-		nodeByUri(uri: $uri) {
-			__typename
-			... on ContentNode {
-				databaseId
-			}
-			... on Post {
-				date
-				modified
-				uri
-			}
-			... on Page {
-				date
-				modified
-				uri
-			}
 		}
 	}
 `;
@@ -153,10 +126,7 @@ export const getData = async (
 		return { renderEmpty: true as const, cacheTags: [] };
 	}
 
-	const data = await fetcher<PostDateDataQuery, PostDateDataQueryVariables>(
-		queryPostDate,
-		{ variables: { uri: baseUri } }
-	);
+	const data = await fetchCurrentNode(fetcher, baseUri);
 	const found = data?.nodeByUri;
 	// A post or a page: only they have the dates queried
 	const node = found && 'date' in found ? found : null;

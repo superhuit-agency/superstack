@@ -312,8 +312,8 @@ describe('fetchAPI', () => {
 			);
 			vi.stubGlobal('fetch', fetchMock);
 
-			const reads = Array.from({ length: CAP + 1 }, () =>
-				fetchAPI(query)
+			const reads = Array.from({ length: CAP + 1 }, (_, i) =>
+				fetchAPI(query, { variables: { uri: `/${i}/` } })
 			);
 			await vi.advanceTimersByTimeAsync(0);
 			expect(fetchMock).toHaveBeenCalledTimes(CAP);
@@ -362,7 +362,9 @@ describe('fetchAPI', () => {
 			const errors = await failed;
 			expect(errors.every(isWordPressReadError)).toBe(true);
 
-			const reads = Array.from({ length: CAP }, () => fetchAPI(query));
+			const reads = Array.from({ length: CAP }, (_, i) =>
+				fetchAPI(query, { variables: { uri: `/${i}/` } })
+			);
 			await vi.advanceTimersByTimeAsync(0);
 			expect(fetchMock).toHaveBeenCalledTimes(8 + CAP);
 			await expect(Promise.all(reads)).resolves.toHaveLength(CAP);
@@ -381,8 +383,12 @@ describe('fetchAPI', () => {
 			);
 			vi.stubGlobal('fetch', fetchMock);
 
-			const busy = Array.from({ length: CAP }, () => fetchAPI(query));
-			const queued = fetchAPI(query).catch((e) => e);
+			const busy = Array.from({ length: CAP }, (_, i) =>
+				fetchAPI(query, { variables: { uri: `/${i}/` } })
+			);
+			const queued = fetchAPI(query, {
+				variables: { uri: '/queued/' },
+			}).catch((e) => e);
 
 			await vi.advanceTimersByTimeAsync(44999);
 			expect(consoleError).not.toHaveBeenCalled();
@@ -414,8 +420,12 @@ describe('fetchAPI', () => {
 			vi.stubGlobal('fetch', fetchMock);
 			vi.spyOn(Math, 'random').mockReturnValue(0.5);
 
-			const busy = Array.from({ length: CAP }, () => fetchAPI(query));
-			const queued = fetchAPI(query).catch((e) => e);
+			const busy = Array.from({ length: CAP }, (_, i) =>
+				fetchAPI(query, { variables: { uri: `/${i}/` } })
+			);
+			const queued = fetchAPI(query, {
+				variables: { uri: '/queued/' },
+			}).catch((e) => e);
 			await vi.runAllTimersAsync();
 
 			expect(isWordPressReadError(await queued)).toBe(true);
@@ -437,6 +447,89 @@ describe('fetchAPI', () => {
 
 			expect(timeout.mock.calls[0][0]).toBeLessThanOrEqual(45000);
 			vi.unstubAllEnvs();
+		});
+	});
+
+	describe('sharing reads in flight', () => {
+		const answer = {
+			data: { node: null, generalSettings: { title: 't' } },
+		};
+
+		it('shares an identical public read while it is in flight', async () => {
+			const fetchMock = vi.fn(async () => ok(answer));
+			vi.stubGlobal('fetch', fetchMock);
+
+			const [first, second] = await Promise.all([
+				fetchAPI(query, { variables: { uri: '/about/' } }),
+				fetchAPI(query, { variables: { uri: '/about/' } }),
+			]);
+
+			expect(fetchMock).toHaveBeenCalledTimes(1);
+			expect(second).toBe(first);
+		});
+
+		it('reads again once the previous read settled', async () => {
+			const fetchMock = vi.fn(async () => ok(answer));
+			vi.stubGlobal('fetch', fetchMock);
+
+			await fetchAPI(query, { variables: { uri: '/about/' } });
+			await fetchAPI(query, { variables: { uri: '/about/' } });
+
+			expect(fetchMock).toHaveBeenCalledTimes(2);
+		});
+
+		it('drops a failed read, so the next one reads again', async () => {
+			vi.spyOn(console, 'error').mockImplementation(() => {});
+			const fetchMock = vi
+				.fn()
+				.mockResolvedValueOnce(ok({ errors: [{ message: 'Down' }] }))
+				.mockImplementation(async () => ok(answer));
+			vi.stubGlobal('fetch', fetchMock);
+
+			const [failed, joined] = await Promise.all([
+				fetchAPI(query).catch((e) => e),
+				fetchAPI(query).catch((e) => e),
+			]);
+			expect(isWordPressReadError(failed)).toBe(true);
+			expect(joined).toBe(failed);
+
+			await expect(fetchAPI(query)).resolves.toEqual(answer.data);
+			expect(fetchMock).toHaveBeenCalledTimes(2);
+		});
+
+		it("doesn't share reads with different variables", async () => {
+			const fetchMock = vi.fn(async () => ok(answer));
+			vi.stubGlobal('fetch', fetchMock);
+
+			await Promise.all([
+				fetchAPI(query, { variables: { uri: '/about/' } }),
+				fetchAPI(query, { variables: { uri: '/contact/' } }),
+			]);
+
+			expect(fetchMock).toHaveBeenCalledTimes(2);
+		});
+
+		it('never shares an authenticated (preview) read', async () => {
+			const fetchMock = vi.fn(async () => ok(answer));
+			vi.stubGlobal('fetch', fetchMock);
+
+			await Promise.all([
+				fetchAPI(query, { auth: { authToken: 'a' } }),
+				fetchAPI(query, { auth: { authToken: 'a' } }),
+				fetchAPI(query),
+			]);
+
+			expect(fetchMock).toHaveBeenCalledTimes(3);
+		});
+
+		it('never shares a mutation', async () => {
+			const fetchMock = vi.fn(async () => ok({ data: { ok: true } }));
+			vi.stubGlobal('fetch', fetchMock);
+			const mutation = `mutation Send { sendForm { ok } }`;
+
+			await Promise.all([fetchAPI(mutation), fetchAPI(mutation)]);
+
+			expect(fetchMock).toHaveBeenCalledTimes(2);
 		});
 	});
 });

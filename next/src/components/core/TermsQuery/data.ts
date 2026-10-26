@@ -1,13 +1,12 @@
 import configs from '@/configs.json';
 import { baseUriContext } from '@/hooks/use-base-uri';
 import { cacheTags, termTags } from '@/lib/cache-tags';
+import { fetchCurrentNode } from '@/lib/current-node';
 import { gql } from '@/utils';
 import type {
 	RootQueryToTermNodeConnectionWhereArgs,
 	TaxonomyEnum,
 	TermObjectsConnectionOrderbyEnum,
-	TermsQueryArchiveContextQuery,
-	TermsQueryArchiveContextQueryVariables,
 	TermsQueryTermsQuery,
 	TermsQueryTermsQueryVariables,
 } from '@/__generated__/graphql';
@@ -91,33 +90,18 @@ const fetchTermArchiveContext = async (
 	const uri = baseUriContext();
 	if (typeof uri !== 'string' || !uri) return null;
 
-	const query = gql`
-		query TermsQueryArchiveContext($uri: String!) {
-			nodeByUri(uri: $uri) {
-				__typename
-				... on TermNode {
-					databaseId
-					taxonomyName
-				}
-			}
-		}
-	`;
-
-	const data = await fetcher<
-		TermsQueryArchiveContextQuery,
-		TermsQueryArchiveContextQueryVariables
-	>(query, { variables: { uri } });
+	const data = await fetchCurrentNode(fetcher, uri);
 	const node = data?.nodeByUri;
 	if (
 		!node ||
-		!('databaseId' in node) ||
-		typeof node.databaseId !== 'number' ||
+		!('termDatabaseId' in node) ||
+		typeof node.termDatabaseId !== 'number' ||
 		typeof node.taxonomyName !== 'string'
 	) {
 		return null;
 	}
 	return {
-		databaseId: node.databaseId,
+		databaseId: node.termDatabaseId,
 		taxonomyName: node.taxonomyName,
 	};
 };

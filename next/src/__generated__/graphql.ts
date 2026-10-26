@@ -163,66 +163,10 @@ export type NavigationMenuBlocksQueryVariables = Exact<{
 
 export type NavigationMenuBlocksQuery = { navigationMenu: { blocksJSON: string | null } | null };
 
-export type PostAuthorDataQueryVariables = Exact<{
-  uri: string;
-}>;
-
-
-export type PostAuthorDataQuery = { nodeByUri:
-    | { databaseId: number }
-    | { databaseId: number }
-    | { databaseId: number }
-    | { databaseId: number, author: { node: { name: string | null, description: string | null, avatar: { url: string | null } | null } } | null }
-    | { databaseId: number, author: { node: { name: string | null, avatar: { url: string | null } | null } } | null }
-    | { databaseId: number }
-    | { databaseId: number }
-    | { databaseId: number }
-    | Record<PropertyKey, never>
-   | null };
-
-export type PostAuthorNameDataQueryVariables = Exact<{
-  uri: string;
-}>;
-
-
-export type PostAuthorNameDataQuery = { nodeByUri:
-    | { databaseId: number }
-    | { databaseId: number }
-    | { databaseId: number }
-    | { databaseId: number, author: { node: { name: string | null, uri: string | null } } | null }
-    | { databaseId: number, author: { node: { name: string | null } } | null }
-    | { databaseId: number }
-    | { databaseId: number }
-    | { databaseId: number }
-    | Record<PropertyKey, never>
-   | null };
-
 export type PostDateGeneralSettingsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type PostDateGeneralSettingsQuery = { generalSettings: { dateFormat: string | null } | null };
-
-export type PostDateDataQueryVariables = Exact<{
-  uri: string;
-}>;
-
-
-export type PostDateDataQuery = { generalSettings: { dateFormat: string | null } | null, nodeByUri:
-    | { __typename: 'BlockEditorPreview', databaseId: number }
-    | { __typename: 'Category' }
-    | { __typename: 'Comment' }
-    | { __typename: 'ContentType' }
-    | { __typename: 'MediaItem', databaseId: number }
-    | { __typename: 'NavigationMenu', databaseId: number }
-    | { __typename: 'Page', databaseId: number, date: string | null, modified: string | null, uri: string | null }
-    | { __typename: 'Post', databaseId: number, date: string | null, modified: string | null, uri: string | null }
-    | { __typename: 'PostFormat' }
-    | { __typename: 'ReusableBlock', databaseId: number }
-    | { __typename: 'Tag' }
-    | { __typename: 'Template', databaseId: number }
-    | { __typename: 'TemplatePart', databaseId: number }
-    | { __typename: 'User' }
-   | null };
 
 export type PostExcerptDataQueryVariables = Exact<{
   uri: string;
@@ -248,45 +192,6 @@ export type PostFeaturedImageByPostIdQueryVariables = Exact<{
 
 export type PostFeaturedImageByPostIdQuery = { post: { databaseId: number, featuredImage: { node: { sourceUrl: string | null, altText: string | null, mediaDetails: { width: number | null, height: number | null } | null } } | null } | null };
 
-export type PostFeaturedImageDataQueryVariables = Exact<{
-  uri: string;
-}>;
-
-
-export type PostFeaturedImageDataQuery = { nodeByUri:
-    | { databaseId: number }
-    | { databaseId: number }
-    | { databaseId: number }
-    | { databaseId: number, featuredImage: { node: { sourceUrl: string | null, altText: string | null, mediaDetails: { width: number | null, height: number | null } | null } } | null }
-    | { databaseId: number, featuredImage: { node: { sourceUrl: string | null, altText: string | null, mediaDetails: { width: number | null, height: number | null } | null } } | null }
-    | { databaseId: number }
-    | { databaseId: number }
-    | { databaseId: number }
-    | Record<PropertyKey, never>
-   | null };
-
-export type PostNavigationLinkContextQueryVariables = Exact<{
-  uri: string;
-}>;
-
-
-export type PostNavigationLinkContextQuery = { nodeByUri:
-    | { __typename: 'BlockEditorPreview' }
-    | { __typename: 'Category' }
-    | { __typename: 'Comment' }
-    | { __typename: 'ContentType' }
-    | { __typename: 'MediaItem' }
-    | { __typename: 'NavigationMenu' }
-    | { __typename: 'Page', databaseId: number, date: string | null }
-    | { __typename: 'Post', databaseId: number, date: string | null, categories: { nodes: Array<{ databaseId: number }> } | null, tags: { nodes: Array<{ databaseId: number }> } | null }
-    | { __typename: 'PostFormat' }
-    | { __typename: 'ReusableBlock' }
-    | { __typename: 'Tag' }
-    | { __typename: 'Template' }
-    | { __typename: 'TemplatePart' }
-    | { __typename: 'User' }
-   | null };
-
 export type PostNavigationLinkAdjacentPostQueryVariables = Exact<{
   before?: DateInput | null | undefined;
   after?: DateInput | null | undefined;
@@ -308,40 +213,6 @@ export type PostNavigationLinkAdjacentPageQueryVariables = Exact<{
 
 
 export type PostNavigationLinkAdjacentPageQuery = { pages: { nodes: Array<{ databaseId: number, date: string | null, uri: string | null, title: string | null }> } | null };
-
-export type PostTermsCategoriesQueryVariables = Exact<{
-  uri: string;
-}>;
-
-
-export type PostTermsCategoriesQuery = { nodeByUri:
-    | { databaseId: number }
-    | { databaseId: number }
-    | { databaseId: number }
-    | { databaseId: number }
-    | { databaseId: number, categories: { nodes: Array<{ databaseId: number, name: string | null, uri: string | null }> } | null }
-    | { databaseId: number }
-    | { databaseId: number }
-    | { databaseId: number }
-    | Record<PropertyKey, never>
-   | null };
-
-export type PostTermsTagsQueryVariables = Exact<{
-  uri: string;
-}>;
-
-
-export type PostTermsTagsQuery = { nodeByUri:
-    | { databaseId: number }
-    | { databaseId: number }
-    | { databaseId: number }
-    | { databaseId: number }
-    | { databaseId: number, tags: { nodes: Array<{ databaseId: number, name: string | null, uri: string | null }> } | null }
-    | { databaseId: number }
-    | { databaseId: number }
-    | { databaseId: number }
-    | Record<PropertyKey, never>
-   | null };
 
 export type PostTimeToReadByPostIdQueryVariables = Exact<{
   postId: string | number;
@@ -370,23 +241,6 @@ export type PostTimeToReadByUriQuery = { nodeByUri:
     | { __typename: 'Template', databaseId: number }
     | { __typename: 'TemplatePart', databaseId: number }
     | { __typename: 'User' }
-   | null };
-
-export type PostTitleDataQueryVariables = Exact<{
-  uri: string;
-}>;
-
-
-export type PostTitleDataQuery = { nodeByUri:
-    | { databaseId: number }
-    | { databaseId: number }
-    | { databaseId: number }
-    | { databaseId: number, title: string | null }
-    | { databaseId: number, title: string | null }
-    | { databaseId: number }
-    | { databaseId: number }
-    | { databaseId: number }
-    | Record<PropertyKey, never>
    | null };
 
 type QueryNodeFields_BlockEditorPreview_Fragment = { title: string | null, content: string | null, id: string, databaseId: number, uri: string | null, date: string | null, author: { node: { name: string | null } } | null };
@@ -454,28 +308,6 @@ export type QueryContentNodesQuery = { contentNodes: { pageInfo: { offsetPaginat
       | { title: string | null, excerpt: string | null, content: string | null, id: string, databaseId: number, uri: string | null, date: string | null, author: { node: { name: string | null } } | null }
     > } | null };
 
-export type QueryTitleDataQueryVariables = Exact<{
-  uri: string;
-}>;
-
-
-export type QueryTitleDataQuery = { nodeByUri:
-    | { __typename: 'BlockEditorPreview' }
-    | { __typename: 'Category', databaseId: number, name: string | null }
-    | { __typename: 'Comment' }
-    | { __typename: 'ContentType', label: string | null }
-    | { __typename: 'MediaItem' }
-    | { __typename: 'NavigationMenu' }
-    | { __typename: 'Page' }
-    | { __typename: 'Post' }
-    | { __typename: 'PostFormat', databaseId: number, name: string | null }
-    | { __typename: 'ReusableBlock' }
-    | { __typename: 'Tag', databaseId: number, name: string | null }
-    | { __typename: 'Template' }
-    | { __typename: 'TemplatePart' }
-    | { __typename: 'User', name: string | null }
-   | null };
-
 export type SiteLogoDataQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -502,40 +334,6 @@ export type TaxonomyListTermsQuery = { terms: { nodes: Array<
       | { id: string, databaseId: number, name: string | null, slug: string | null, uri: string | null, count: number | null }
       | { id: string, databaseId: number, name: string | null, slug: string | null, uri: string | null, count: number | null }
     > } | null };
-
-export type TermNameDataQueryVariables = Exact<{
-  uri: string;
-}>;
-
-
-export type TermNameDataQuery = { nodeByUri:
-    | { databaseId: number, name: string | null, uri: string | null }
-    | { databaseId: number, name: string | null, uri: string | null }
-    | { databaseId: number, name: string | null, uri: string | null }
-    | Record<PropertyKey, never>
-   | null };
-
-export type TermsQueryArchiveContextQueryVariables = Exact<{
-  uri: string;
-}>;
-
-
-export type TermsQueryArchiveContextQuery = { nodeByUri:
-    | { __typename: 'BlockEditorPreview' }
-    | { __typename: 'Category', databaseId: number, taxonomyName: string | null }
-    | { __typename: 'Comment' }
-    | { __typename: 'ContentType' }
-    | { __typename: 'MediaItem' }
-    | { __typename: 'NavigationMenu' }
-    | { __typename: 'Page' }
-    | { __typename: 'Post' }
-    | { __typename: 'PostFormat', databaseId: number, taxonomyName: string | null }
-    | { __typename: 'ReusableBlock' }
-    | { __typename: 'Tag', databaseId: number, taxonomyName: string | null }
-    | { __typename: 'Template' }
-    | { __typename: 'TemplatePart' }
-    | { __typename: 'User' }
-   | null };
 
 export type TermsQueryTermsQueryVariables = Exact<{
   first: number;
@@ -567,6 +365,37 @@ export type SinglePageFragment = { title: string | null, blocksJSON: string | nu
 export type SinglePostFragment = { title: string | null, date: string | null, blocksJSON: string | null, uri: string | null, editLink?: string | null, id: number, fseTemplate: { slug: string | null } | null, featuredImage: { node: { sourceUrl: string | null, altText: string | null, mediaDetails: { width: number | null, height: number | null } | null } } | null, categories: { nodes: Array<{ databaseId: number, name: string | null, uri: string | null, id: number }> } | null, tags: { nodes: Array<{ databaseId: number, name: string | null, uri: string | null, id: number }> } | null, preview?: { node: { blocksJSON: string | null } } | null, seo: { title: string | null, metaDesc: string | null, metaKeywords: string | null, metaRobotsNoindex: string | null, metaRobotsNofollow: string | null, canonical: string | null, opengraphTitle: string | null, opengraphDescription: string | null, opengraphUrl: string | null, twitterTitle: string | null, twitterDescription: string | null, opengraphImage: { src: string | null } | null, twitterImage: { src: string | null } | null, breadcrumbs: Array<{ text: string | null, url: string | null } | null> | null } | null };
 
 export type TagFragment = { uri: string | null, id: number, title: string | null, fseTemplate: { slug: string | null } | null };
+
+type CurrentNodeFeaturedImage_Page_Fragment = { featuredImage: { node: { sourceUrl: string | null, altText: string | null, mediaDetails: { width: number | null, height: number | null } | null } } | null };
+
+type CurrentNodeFeaturedImage_Post_Fragment = { featuredImage: { node: { sourceUrl: string | null, altText: string | null, mediaDetails: { width: number | null, height: number | null } | null } } | null };
+
+export type CurrentNodeFeaturedImageFragment =
+  | CurrentNodeFeaturedImage_Page_Fragment
+  | CurrentNodeFeaturedImage_Post_Fragment
+;
+
+export type CurrentNodeQueryVariables = Exact<{
+  uri: string;
+}>;
+
+
+export type CurrentNodeQuery = { generalSettings: { dateFormat: string | null } | null, nodeByUri:
+    | { __typename: 'BlockEditorPreview', databaseId: number }
+    | { __typename: 'Category', taxonomyName: string | null, termDatabaseId: number, termName: string | null, termUri: string | null }
+    | { __typename: 'Comment' }
+    | { __typename: 'ContentType', label: string | null }
+    | { __typename: 'MediaItem', databaseId: number }
+    | { __typename: 'NavigationMenu', databaseId: number }
+    | { __typename: 'Page', databaseId: number, title: string | null, date: string | null, modified: string | null, uri: string | null, author: { node: { name: string | null, description: string | null, avatar: { url: string | null } | null } } | null, featuredImage: { node: { sourceUrl: string | null, altText: string | null, mediaDetails: { width: number | null, height: number | null } | null } } | null }
+    | { __typename: 'Post', databaseId: number, title: string | null, date: string | null, modified: string | null, uri: string | null, author: { node: { name: string | null, avatar: { url: string | null } | null } } | null, categories: { nodes: Array<{ databaseId: number, name: string | null, uri: string | null }> } | null, tags: { nodes: Array<{ databaseId: number, name: string | null, uri: string | null }> } | null, featuredImage: { node: { sourceUrl: string | null, altText: string | null, mediaDetails: { width: number | null, height: number | null } | null } } | null }
+    | { __typename: 'PostFormat', taxonomyName: string | null, termDatabaseId: number, termName: string | null, termUri: string | null }
+    | { __typename: 'ReusableBlock', databaseId: number }
+    | { __typename: 'Tag', taxonomyName: string | null, termDatabaseId: number, termName: string | null, termUri: string | null }
+    | { __typename: 'Template', databaseId: number }
+    | { __typename: 'TemplatePart', databaseId: number }
+    | { __typename: 'User', userName: string | null }
+   | null };
 
 export type SeoTaxFragment = { title: string | null, metaDesc: string | null, metaKeywords: string | null, metaRobotsNoindex: string | null, metaRobotsNofollow: string | null, canonical: string | null, opengraphTitle: string | null, opengraphDescription: string | null, opengraphUrl: string | null, twitterTitle: string | null, twitterDescription: string | null, opengraphImage: { src: string | null } | null, twitterImage: { src: string | null } | null, breadcrumbs: Array<{ text: string | null, url: string | null } | null> | null };
 

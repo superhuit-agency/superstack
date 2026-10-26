@@ -1,10 +1,6 @@
 import { baseUriContext } from '@/hooks/use-base-uri';
 import { cacheTags } from '@/lib/cache-tags';
-import { gql } from '@/utils';
-import type {
-	TermNameDataQuery,
-	TermNameDataQueryVariables,
-} from '@/__generated__/graphql';
+import { fetchCurrentNode } from '@/lib/current-node';
 
 export const usesBaseUri = true;
 
@@ -20,30 +16,16 @@ export const getData = async (
 
 	if (!uri || typeof uri !== 'string') return { content: '', cacheTags: [] };
 
-	const query = gql`
-		query TermNameData($uri: String!) {
-			nodeByUri(uri: $uri) {
-				... on TermNode {
-					databaseId
-					name
-					uri
-				}
-			}
-		}
-	`;
-
-	const data = await fetcher<TermNameDataQuery, TermNameDataQueryVariables>(
-		query,
-		{ variables: { uri } }
-	);
+	const data = await fetchCurrentNode(fetcher, uri);
 	const node = data?.nodeByUri;
+	const term = node && 'termName' in node ? node : null;
 
 	return {
-		content: typeof node?.name === 'string' ? node.name : '',
-		uri: typeof node?.uri === 'string' ? node.uri : null,
+		content: typeof term?.termName === 'string' ? term.termName : '',
+		uri: typeof term?.termUri === 'string' ? term.termUri : null,
 		cacheTags:
-			typeof node?.databaseId === 'number'
-				? [cacheTags.term(node.databaseId)]
+			typeof term?.termDatabaseId === 'number'
+				? [cacheTags.term(term.termDatabaseId)]
 				: [cacheTags.uris()],
 	};
 };
