@@ -1,10 +1,6 @@
 import { baseUriContext } from '@/hooks/use-base-uri';
 import { nodeAtUriTags } from '@/lib/cache-tags';
-import { gql } from '@/utils';
-import type {
-	PostTitleDataQuery,
-	PostTitleDataQueryVariables,
-} from '@/__generated__/graphql';
+import { fetchCurrentNode } from '@/lib/current-node';
 
 export const usesBaseUri = true;
 
@@ -14,39 +10,18 @@ export const getData = async (
 ) => {
 	void attrs;
 
-	const query = gql`
-		query PostTitleData($uri: String!) {
-			nodeByUri(uri: $uri) {
-				... on ContentNode {
-					databaseId
-				}
-				... on Page {
-					title(format: RENDERED)
-				}
-				... on Post {
-					title(format: RENDERED)
-				}
-			}
-		}
-	`;
-
 	const uri = baseUriContext();
 
 	if (!uri) return { content: '', cacheTags: [] };
 
-	const variables = {
-		uri: uri,
-	};
-
-	const data = await fetcher<PostTitleDataQuery, PostTitleDataQueryVariables>(
-		query,
-		{ variables }
-	);
+	const data = await fetchCurrentNode(fetcher, uri);
 	const node = data?.nodeByUri;
 	const title = node && 'title' in node ? node.title : null;
 
 	return {
 		content: typeof title === 'string' ? title : '',
-		cacheTags: nodeAtUriTags(data?.nodeByUri?.databaseId),
+		cacheTags: nodeAtUriTags(
+			node && 'databaseId' in node ? node.databaseId : undefined
+		),
 	};
 };

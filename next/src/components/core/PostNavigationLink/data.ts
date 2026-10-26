@@ -1,13 +1,12 @@
 import { baseUriContext } from '@/hooks/use-base-uri';
 import { cacheTags, nodeAtUriTags } from '@/lib/cache-tags';
+import { fetchCurrentNode } from '@/lib/current-node';
 import { gql } from '@/utils';
 import type {
 	PostNavigationLinkAdjacentPageQuery,
 	PostNavigationLinkAdjacentPageQueryVariables,
 	PostNavigationLinkAdjacentPostQuery,
 	PostNavigationLinkAdjacentPostQueryVariables,
-	PostNavigationLinkContextQuery,
-	PostNavigationLinkContextQueryVariables,
 } from '@/__generated__/graphql';
 
 type NavigationDirection = 'next' | 'previous';
@@ -82,42 +81,11 @@ export const getData = async (
 	const direction = normalizeDirection(attrs?.type);
 	const taxonomy = normalizeTaxonomy(attrs?.taxonomy);
 
-	const postContextQuery = gql`
-		query PostNavigationLinkContext($uri: String!) {
-			nodeByUri(uri: $uri) {
-				__typename
-				... on Post {
-					databaseId
-					date
-					categories {
-						nodes {
-							databaseId
-						}
-					}
-					tags {
-						nodes {
-							databaseId
-						}
-					}
-				}
-				... on Page {
-					databaseId
-					date
-				}
-			}
-		}
-	`;
-
 	const uri = baseUriContext();
 
 	if (!uri) return { navigationPost: null, cacheTags: [] };
 
-	const contextData = await fetcher<
-		PostNavigationLinkContextQuery,
-		PostNavigationLinkContextQueryVariables
-	>(postContextQuery, {
-		variables: { uri },
-	});
+	const contextData = await fetchCurrentNode(fetcher, uri);
 	const node = contextData?.nodeByUri;
 	const currentNode =
 		node?.__typename === 'Post' || node?.__typename === 'Page'

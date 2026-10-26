@@ -1,10 +1,6 @@
 import { baseUriContext } from '@/hooks/use-base-uri';
 import { cacheTags } from '@/lib/cache-tags';
-import { gql } from '@/utils';
-import type {
-	QueryTitleDataQuery,
-	QueryTitleDataQueryVariables,
-} from '@/__generated__/graphql';
+import { fetchCurrentNode } from '@/lib/current-node';
 
 const archivePrefix = (type: string): string => {
 	if (type === 'archive') return 'Archives';
@@ -29,42 +25,25 @@ export const getData = async (
 
 	if (!uri) return { content: '', cacheTags: [] };
 
-	const query = gql`
-		query QueryTitleData($uri: String!) {
-			nodeByUri(uri: $uri) {
-				__typename
-				... on TermNode {
-					databaseId
-					name
-				}
-				... on ContentType {
-					label
-				}
-				... on User {
-					name
-				}
-			}
-		}
-	`;
-
-	const data = await fetcher<
-		QueryTitleDataQuery,
-		QueryTitleDataQueryVariables
-	>(query, { variables: { uri } });
+	const data = await fetchCurrentNode(fetcher, uri);
 	const node = data?.nodeByUri;
 
 	const tags = !node
 		? [cacheTags.uris()]
-		: 'databaseId' in node && typeof node.databaseId === 'number'
-			? [cacheTags.term(node.databaseId)]
+		: 'termDatabaseId' in node && typeof node.termDatabaseId === 'number'
+			? [cacheTags.term(node.termDatabaseId)]
 			: [];
 
 	const name: string =
 		node && 'label' in node && typeof node.label === 'string'
 			? node.label
-			: node && 'name' in node && typeof node.name === 'string'
-				? node.name
-				: '';
+			: node && 'termName' in node && typeof node.termName === 'string'
+				? node.termName
+				: node &&
+					  'userName' in node &&
+					  typeof node.userName === 'string'
+					? node.userName
+					: '';
 
 	if (!name) return { content: '', cacheTags: tags };
 
