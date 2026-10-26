@@ -16,6 +16,7 @@ import {
 	getRedirection,
 	getWpUriFromNextPath,
 } from '@/lib';
+import { AUTH_TOKEN_COOKIE } from '@/lib/preview-auth-token';
 import { baseUriContext } from '@/hooks/use-base-uri';
 import configs from '@/configs.json';
 
@@ -197,6 +198,7 @@ function parseRouteSegments(uriSegments: string[] | undefined) {
  * Preview read of a node in Draft Mode, with the user's auth from the preview
  * cookies. Shared by the page and its metadata, so a request refreshes the
  * auth token and reads the node once.
+ * Reuses the auth token cookie until it expires or WordPress rejects it.
  * Exits preview mode when the refresh token is invalid.
  */
 const getDraftModeNode = cache(
@@ -209,28 +211,46 @@ const getDraftModeNode = cache(
 		const isDraft = cookieStore.get('preview-draft')?.value === 'true';
 
 		let auth: { authToken?: string } = {};
+		let node;
 
-		if (token) {
-			// Get a fresh auth token
-			auth = {
-				authToken: await getAuthToken(token),
-			};
+		// Set until it expires by the preview route, then by the proxy
+		const authToken = cookieStore.get(AUTH_TOKEN_COOKIE)?.value;
+
+		if (authToken) {
+			// WordPress may reject it before it expires (clock skew, revoked
+			// user…): refresh it then, as when there is none
+			node = await getPreviewNodeByURI(
+				uri,
+				lang,
+				routePage,
+				{ authToken },
+				isDraft
+			).catch(() => undefined);
 		}
 
-		if (!auth.authToken) {
-			// Exit preview mode if refresh token is invalid
-			redirect(
-				`/api/preview-exit?redirect=${encodeURIComponent(addLangPrefix(uri, lang))}`
+		if (node === undefined) {
+			if (token) {
+				// Get a fresh auth token
+				auth = {
+					authToken: await getAuthToken(token),
+				};
+			}
+
+			if (!auth.authToken) {
+				// Exit preview mode if refresh token is invalid
+				redirect(
+					`/api/preview-exit?redirect=${encodeURIComponent(addLangPrefix(uri, lang))}`
+				);
+			}
+
+			node = await getPreviewNodeByURI(
+				uri,
+				lang,
+				routePage,
+				auth,
+				isDraft
 			);
 		}
-
-		const node = await getPreviewNodeByURI(
-			uri,
-			lang,
-			routePage,
-			auth,
-			isDraft
-		);
 
 		return { node, isDraft };
 	}

@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 
 import { getAuthToken, getPreviewNode } from '@/lib';
 import getSameOriginPath from '@/lib/get-same-origin-path';
+import { setAuthTokenCookie } from '@/lib/preview-auth-token';
 import secretMatches from '@/lib/secret-matches';
 
 let hasLoggedMissingSecret = false;
@@ -87,6 +88,7 @@ export async function GET(request: NextRequest) {
 		path: '/',
 	}); // Expires when the browser closes (at the end of the session) -- same as Next.js draftMode cookie
 	cookieStore.set('preview-draft', draft ? 'true' : 'false'); // Expires when the browser closes (at the end of the session) -- same as Next.js draftMode cookie
+	setAuthTokenCookie(cookieStore, auth.authToken);
 
 	return redirect(getSameOriginPath(location, request.nextUrl.origin));
 }

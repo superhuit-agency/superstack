@@ -178,7 +178,9 @@ describe('generateMetadata', () => {
 			params: Promise.resolve({ uri, lang: 'fr' as Locale }),
 		});
 
-	const enableDraftMode = () => {
+	const enableDraftMode = (
+		previewCookies: Record<string, { value: string }> = {}
+	) => {
 		vi.mocked(draftMode).mockResolvedValueOnce({
 			isEnabled: true,
 		} as never);
@@ -187,6 +189,7 @@ describe('generateMetadata', () => {
 				({
 					token: { value: 'refresh' },
 					'preview-draft': { value: 'true' },
+					...previewCookies,
 				})[name],
 		} as never);
 	};
@@ -228,6 +231,60 @@ describe('generateMetadata', () => {
 			true
 		);
 		expect(vi.mocked(getPublicNodeByURI)).not.toHaveBeenCalled();
+	});
+
+	it('reuses the auth token cookie in Draft Mode', async () => {
+		enableDraftMode({ 'auth-token': { value: 'cached-auth' } });
+		vi.mocked(getPreviewNodeByURI).mockResolvedValueOnce({
+			title: 'Draft',
+		} as never);
+
+		const { title } = await metadata(['37']);
+
+		expect(title).toBe('Draft');
+		expect(vi.mocked(getAuthToken)).not.toHaveBeenCalled();
+		expect(vi.mocked(getPreviewNodeByURI)).toHaveBeenCalledWith(
+			'/37/',
+			'fr',
+			1,
+			{ authToken: 'cached-auth' },
+			true
+		);
+	});
+
+	it('refreshes the auth token in Draft Mode when WordPress rejects the cookie', async () => {
+		enableDraftMode({ 'auth-token': { value: 'revoked-auth' } });
+		vi.mocked(getPreviewNodeByURI)
+			.mockRejectedValueOnce(new Error('invalid-jwt'))
+			.mockResolvedValueOnce({ title: 'Draft' } as never);
+		vi.mocked(getAuthToken).mockResolvedValueOnce('auth');
+
+		const { title } = await metadata(['37']);
+
+		expect(title).toBe('Draft');
+		expect(vi.mocked(getAuthToken)).toHaveBeenCalledWith('refresh');
+		expect(vi.mocked(getPreviewNodeByURI)).toHaveBeenLastCalledWith(
+			'/37/',
+			'fr',
+			1,
+			{ authToken: 'auth' },
+			true
+		);
+	});
+
+	it('exits preview in Draft Mode when the cookie is rejected and the refresh token is invalid', async () => {
+		enableDraftMode({ 'auth-token': { value: 'revoked-auth' } });
+		vi.mocked(getPreviewNodeByURI).mockRejectedValueOnce(
+			new Error('invalid-jwt')
+		);
+		vi.mocked(getAuthToken).mockResolvedValueOnce(false as never);
+
+		await expect(metadata(['37'])).rejects.toThrow('NEXT_REDIRECT');
+
+		expect(vi.mocked(redirect)).toHaveBeenCalledWith(
+			'/api/preview-exit?redirect=%2Ffr%2F37%2F'
+		);
+		expect(vi.mocked(getPreviewNodeByURI)).toHaveBeenCalledTimes(1);
 	});
 
 	it('exits preview in Draft Mode when the refresh token is invalid', async () => {

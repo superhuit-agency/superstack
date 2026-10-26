@@ -17,8 +17,18 @@ vi.mock('next/navigation', () => ({
 	redirect: vi.fn(),
 }));
 
+const authToken = vi.hoisted(() =>
+	[
+		'header',
+		Buffer.from(JSON.stringify({ exp: Date.now() / 1000 + 300 })).toString(
+			'base64url'
+		),
+		'signature',
+	].join('.')
+);
+
 vi.mock('@/lib', () => ({
-	getAuthToken: vi.fn(async () => 'auth-token'),
+	getAuthToken: vi.fn(async () => authToken),
 	getPreviewNode: vi.fn(async () => ({
 		databaseId: 42,
 		status: 'draft',
@@ -78,6 +88,24 @@ describe('GET /api/preview', () => {
 		);
 		// The preview toolbar toggles it
 		expect(cookieStore.set).toHaveBeenCalledWith('preview-draft', 'false');
+	});
+
+	it('keeps the auth token until it expires', async () => {
+		vi.stubEnv('WORDPRESS_PREVIEW_SECRET', SECRET);
+		const route = await loadRoute();
+
+		await route.GET(preview(SECRET));
+
+		expect(cookieStore.set).toHaveBeenCalledWith(
+			'auth-token',
+			authToken,
+			expect.objectContaining({
+				httpOnly: true,
+				sameSite: 'lax',
+				path: '/',
+				maxAge: expect.any(Number),
+			})
+		);
 	});
 
 	it('redirects to the `uri` of an archive', async () => {
