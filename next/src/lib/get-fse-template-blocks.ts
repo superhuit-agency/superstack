@@ -34,17 +34,20 @@ const applyTemplatePartTranslations = (
  * (e.g. footer, header) before request-time enrichment runs.
  * @param templateSlug - The slug of the template
  * @param lang - The requested language code, if any
+ * @param templates - The FSE templates read, when already started
  * @returns
  */
 export const getTemplateBlocks = async (
 	templateSlug: string,
-	lang: string | null = null
+	lang: string | null = null,
+	templates?: Promise<FseTemplateEntry[]>
 ): Promise<BlockPropsType[]> => {
 	if (!templateSlug) return [];
 
 	const fseTemplate: FseTemplateEntry | null =
-		(await getFseTemplates()).find((tpl) => tpl?.slug === templateSlug) ??
-		null;
+		(await (templates ?? getFseTemplates())).find(
+			(tpl) => tpl?.slug === templateSlug
+		) ?? null;
 
 	if (!fseTemplate?.blocks?.length) return [];
 

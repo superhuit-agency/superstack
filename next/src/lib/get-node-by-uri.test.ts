@@ -477,6 +477,40 @@ describe('getPublicNodeByURI', () => {
 
 		expect(vi.mocked(baseUriContext)).toHaveBeenLastCalledWith('/de/');
 	});
+
+	it('reads the templates along with the node, not after it', async () => {
+		let answerNode: (value: unknown) => void = () => {};
+		vi.mocked(fetchAPI).mockReturnValueOnce(
+			new Promise((resolve) => (answerNode = resolve))
+		);
+		vi.mocked(getFseTemplates).mockResolvedValueOnce([
+			{
+				slug: 'category',
+				blocks: [{ name: 'core/site-logo', attributes: {} }],
+			},
+		] as FseTemplateEntry[]);
+
+		const read = getPublicNodeByURI('/category/news/');
+		await Promise.resolve();
+
+		expect(getFseTemplates).toHaveBeenCalledTimes(1);
+
+		answerNode({ node: category, seo: {}, generalSettings: {} });
+
+		expect((await read)?.blocks).toEqual([
+			{ name: 'core/site-logo', attributes: {}, innerBlocks: [] },
+		]);
+		expect(getFseTemplates).toHaveBeenCalledTimes(1);
+	});
+
+	it('ignores a failed templates read when there is no node', async () => {
+		wordpressReturns(null);
+		vi.mocked(getFseTemplates).mockRejectedValueOnce(
+			new Error('templates')
+		);
+
+		expect(await getPublicNodeByURI('/nothing/')).toBeNull();
+	});
 });
 
 describe('reading a node by its database ID', () => {

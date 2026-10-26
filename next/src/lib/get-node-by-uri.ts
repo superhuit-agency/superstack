@@ -13,6 +13,7 @@ import {
 	enrichTemplateBlocks,
 	getTemplateBlocks,
 } from '@/lib/get-fse-template-blocks';
+import getFseTemplates from '@/lib/get-fse-templates';
 import injectBreadcrumbs from '@/lib/inject-breadcrumbs';
 import { throwIfWordPressReadFailed } from '@/lib/wordpress-read-error';
 
@@ -187,6 +188,11 @@ async function getNodeByURI(
 
 	const query = isId ? nodeByIdQuery(lang) : nodeByUriQuery(lang);
 
+	// Read along with the node: only picking the template needs the node.
+	const fseTemplates = getFseTemplates();
+	// Not awaited when the node is missing or its read fails
+	fseTemplates.catch(() => {});
+
 	const response = await fetchAPI(query, {
 		variables,
 		auth,
@@ -254,8 +260,8 @@ async function getNodeByURI(
 	const [templateBlocks, { blocksJSON, templateData }] = await Promise.all([
 		// Not settled with the rest: a failed template read must fail the page,
 		// not be cached as a page without its header and footer.
-		getTemplateBlocks(node?.fseTemplate?.slug, lang).then((blocks) =>
-			enrichTemplateBlocks(blocks, { lang, preview, context })
+		getTemplateBlocks(node?.fseTemplate?.slug, lang, fseTemplates).then(
+			(blocks) => enrichTemplateBlocks(blocks, { lang, preview, context })
 		),
 		Promise.allSettled([
 			formatBlocksJSON(
