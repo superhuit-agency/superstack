@@ -3,6 +3,7 @@ import { NextRequest } from 'next/server';
 import { redirect } from 'next/navigation';
 
 import getSameOriginPath from '@/lib/get-same-origin-path';
+import { AUTH_TOKEN_COOKIE } from '@/lib/preview-auth-token';
 
 export async function GET(request: NextRequest) {
 	const path = request.nextUrl.searchParams.get('redirect');
@@ -14,6 +15,7 @@ export async function GET(request: NextRequest) {
 	const cookieStore = await cookies();
 	cookieStore.delete('token');
 	cookieStore.delete('preview-draft');
+	cookieStore.delete(AUTH_TOKEN_COOKIE);
 
 	return redirect(getSameOriginPath(path, request.nextUrl.origin));
 }

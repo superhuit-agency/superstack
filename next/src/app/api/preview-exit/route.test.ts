@@ -61,6 +61,7 @@ describe('GET /api/preview-exit', () => {
 		expect(vi.mocked(cookies)).toHaveBeenCalled();
 		expect(cookieStore.delete).toHaveBeenCalledWith('token');
 		expect(cookieStore.delete).toHaveBeenCalledWith('preview-draft');
+		expect(cookieStore.delete).toHaveBeenCalledWith('auth-token');
 		expect(url).toBe('/company/');
 		expect(status).toBe(307);
 	});

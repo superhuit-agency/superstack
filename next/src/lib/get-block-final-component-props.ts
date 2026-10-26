@@ -180,6 +180,8 @@ const getAttributes = async (
 		: undefined;
 
 	let data: Record<string, unknown>;
+	// Draft mode skips reading and saving `use cache` entries: in preview,
+	// `getCachedBlockData` would read WordPress live all the same
 	if (options?.preview) {
 		const liveData: BlockData = {
 			...(await blockModule.getData(fetchAPI, attributes, lang, context)),

@@ -1,4 +1,4 @@
-import { fetchAPI } from '@/lib';
+import fetchAPI from '@/lib/fetch-api';
 
 /**
  * Refresh the auth-token, thanks to the refresh-token
