@@ -19,14 +19,14 @@ Deliver block-related changes with minimal scope, no duplication, and full compa
 ## Where to Look
 
 - WordPress side:
-    - `wordpress/theme/src`
-    - `wordpress/theme/includes`
-    - `wordpress/theme/functions.php`
+  - `wordpress/theme/src`
+  - `wordpress/theme/includes`
+  - `wordpress/theme/functions.php`
 - Next.js side:
-    - `next/src/components/core`
-    - `next/src/components/global/blockRegistry.ts`
-    - `next/src/lib/get-block-final-component-props.ts`
-    - `next/src/components/templates`
+  - `next/src/components/core`
+  - `next/src/components/global/blockRegistry.ts`
+  - `next/src/lib/get-block-final-component-props.ts`
+  - `next/src/components/templates`
 
 ## Change Rules
 
