@@ -4,7 +4,6 @@ import {
 	MouseEvent,
 	MouseEventHandler,
 	useCallback,
-	useEffect,
 	useState,
 } from 'react';
 
@@ -32,7 +31,7 @@ export const GdprBanner: FC<GdprBannerProps> = ({
 	onPersonalizeClick,
 	onRejectClick,
 }) => {
-	const [isHidden, setIsHidden] = useState(true);
+	const [isClosed, setIsClosed] = useState(false);
 	const [isUnmounting, setIsUnmounting] = useState(false);
 
 	const { dictionary } = useLocale();
@@ -45,10 +44,10 @@ export const GdprBanner: FC<GdprBannerProps> = ({
 
 			window.setTimeout(() => {
 				onAcceptClick();
-				setIsHidden(true);
+				setIsClosed(true);
 			}, 300);
 		},
-		[setIsHidden, onAcceptClick]
+		[onAcceptClick]
 	);
 
 	const handleRejectClick = useCallback(
@@ -59,15 +58,13 @@ export const GdprBanner: FC<GdprBannerProps> = ({
 
 			window.setTimeout(() => {
 				onRejectClick();
-				setIsHidden(true);
+				setIsClosed(true);
 			}, 300);
 		},
-		[onRejectClick, setIsHidden]
+		[onRejectClick]
 	);
 
-	useEffect(() => {
-		setIsHidden(bannerDismissed);
-	}, [bannerDismissed]);
+	const isHidden = bannerDismissed || isClosed;
 
 	return (
 		<div
