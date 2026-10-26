@@ -36,9 +36,10 @@ Deliver block-related changes with minimal scope, no duplication, and full compa
    explicit request. Registration is what keeps already-published content
    renderable — dropping it breaks live pages, not just new ones. See
    [Removing or renaming a block](../../../docs/blocks/create-block.md#removing-or-renaming-a-block).
-4. Preserve existing naming conventions and folder structure.
-5. Do not add/remove code comments unless explicitly requested.
-6. If a change impacts both WP and Next, update both sides in the same task.
+4. Register Server Component blocks with a static import in `next/src/components/global/Blocks.tsx`. Register Client Components (and the client parts of Server Component blocks) through `next/dynamic` in `next/src/components/global/ClientBlocks.tsx`, except navigation blocks. Never use `() => import()` in `blocksList`. See [Step 2: Register the block in Next.js](../../../docs/blocks/create-block.md#step-2-register-the-block-in-nextjs).
+5. Preserve existing naming conventions and folder structure.
+6. Do not add/remove code comments unless explicitly requested.
+7. If a change impacts both WP and Next, update both sides in the same task.
 
 ## Block Data Caching Rules
 
