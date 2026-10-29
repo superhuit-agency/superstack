@@ -36,7 +36,7 @@ Made with ❤️ by [superhuit.ch](https://superhuit.ch)
 
 When theme changes require updating existing content in the database (e.g. renaming CSS classes in block markup), migration scripts handle it.
 
-Migrations run automatically during deployment via `provision.sh`, which backs the database up to `$BACKUP_PATH` (default `$WORDPRESS_PATH/db-backups`) beforehand and fails the deployment if a migration errors. See [Database migrations during deployment](../docs/setup/deployment.md#-database-migrations-during-deployment) — on nginx you need one extra rule to keep the dumps unreachable.
+Migrations run automatically during deployment via `provision.sh`, which backs the database up to `$BACKUP_PATH` (default `$HOME/db-backups/<site>`, outside the webroot) beforehand and fails the deployment if a migration errors. See [Database migrations during deployment](../docs/setup/deployment.md#-database-migrations-during-deployment).
 
 They can also be run manually:
 
