@@ -9,7 +9,7 @@ import addLangPrefix from '@/lib/add-lang-prefix';
 import './styles.css';
 
 interface ErrorPageProps {
-	error: Error & { digest?: string };
+	error?: Error & { digest?: string };
 	retry: () => void;
 }
 
@@ -41,7 +41,7 @@ export const ErrorPage: FC<ErrorPageProps> = ({ error, retry }) => {
 					/>
 				</div>
 
-				{error.digest ? (
+				{error?.digest ? (
 					<p className="supt-error-page__reference">
 						{`${dictionary.error.reference} ${error.digest}`}
 					</p>
