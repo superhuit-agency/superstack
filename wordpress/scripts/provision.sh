@@ -33,10 +33,12 @@ IS_MULTILANG=${IS_MULTILANG:=false}
 HTTP_HOST=${WORDPRESS_URL}
 
 # Database dumps taken before running pending migrations.
-# Backups live in a directory we own, never directly in $WORDPRESS_PATH:
-# WordPress owns $WORDPRESS_PATH/.htaccess (permalink rules) and we must not
-# clobber it. Override with BACKUP_PATH to store dumps outside the webroot.
-BACKUP_PATH=${BACKUP_PATH:=$WORDPRESS_PATH/db-backups}
+# They default to the deploy user's home, outside the webroot: anything under
+# $WORDPRESS_PATH can be downloaded unless the web server is told otherwise.
+# If you override BACKUP_PATH with a directory inside the webroot, use one we
+# own, never $WORDPRESS_PATH itself: WordPress owns $WORDPRESS_PATH/.htaccess
+# (permalink rules) and we must not clobber it.
+BACKUP_PATH=${BACKUP_PATH:=$HOME/db-backups}
 BACKUP_KEEP=${BACKUP_KEEP:=10}
 
 # #===========================================
@@ -302,9 +304,9 @@ if [ "$FIRSTTIME_INSTALL" = true ]; then
 elif [ "$PENDING" = unknown ]; then
 	echo "⚠ Could not determine the number of pending migrations, skipping." 1>&2
 elif [ "$PENDING" -gt 0 ]; then
-	mkdir -p "$BACKUP_PATH"
+	mkdir -p "$BACKUP_PATH" && chmod 700 "$BACKUP_PATH"
 
-	# Apache: keep the dumps unreachable over HTTP while they sit in the webroot.
+	# Apache: keep the dumps unreachable over HTTP if BACKUP_PATH sits in the webroot.
 	# nginx needs the equivalent rule in the server block, see docs/setup/deployment.md:
 	#   location ^~ /db-backups/ { deny all; }
 	if [ ! -f "$BACKUP_PATH/.htaccess" ]; then
@@ -322,7 +324,9 @@ elif [ "$PENDING" -gt 0 ]; then
 
 	BACKUP_FILE="$BACKUP_PATH/db-backup-$(date +%Y%m%d_%H%M%S).sql"
 	echo $en "- $PENDING pending migration(s), backing up database $ec"
-	if ! $WPCLI db export "$BACKUP_FILE" --quiet || [ ! -s "$BACKUP_FILE" ]; then
+	# The shell writes the file, not wp-cli: locally wp-cli runs as www-data,
+	# which cannot write to root's home.
+	if ! $WPCLI db export - --quiet > "$BACKUP_FILE" || [ ! -s "$BACKUP_FILE" ]; then
 		rm -f "$BACKUP_FILE"
 		echo 1>&2
 		echo "ERROR: database backup to $BACKUP_FILE failed, migrations were not run." 1>&2
