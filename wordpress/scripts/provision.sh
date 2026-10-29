@@ -38,7 +38,9 @@ HTTP_HOST=${WORDPRESS_URL}
 # If you override BACKUP_PATH with a directory inside the webroot, use one we
 # own, never $WORDPRESS_PATH itself: WordPress owns $WORDPRESS_PATH/.htaccess
 # (permalink rules) and we must not clobber it.
-BACKUP_PATH=${BACKUP_PATH:=$HOME/db-backups}
+# One subdirectory per site (named after $WORDPRESS_PATH): sites deployed by the
+# same user must not prune each other's dumps, nor mix them up on restore.
+BACKUP_PATH=${BACKUP_PATH:=$HOME/db-backups/$(echo "$WORDPRESS_PATH" | sed 's|^/*||; s|/*$||; s|/|_|g')}
 BACKUP_KEEP=${BACKUP_KEEP:=10}
 
 # #===========================================

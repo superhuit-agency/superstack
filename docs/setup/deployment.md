@@ -54,7 +54,7 @@ During each deployment workflow:
 Theme changes that require updating existing content in the database ship as migration files in `wordpress/theme/migrations/`. `provision.sh` runs them on every deployment, after the plugin/theme configuration and before the rewrite flush:
 
 1. Counts pending migrations with `wp spck migrate --pending-count`. If there are none, nothing else happens.
-2. Exports the database to `$BACKUP_PATH/db-backup-<YYYYMMDD_HHMMSS>.sql` (default `$HOME/db-backups`, the deploy user's home, outside the webroot). If the export fails, the step exits non-zero without running any migration.
+2. Exports the database to `$BACKUP_PATH/db-backup-<YYYYMMDD_HHMMSS>.sql` (default `$HOME/db-backups/<site>`, in the deploy user's home, outside the webroot, where `<site>` is `$WORDPRESS_PATH` with its slashes turned into `_`, e.g. `var_www_html`). If the export fails, the step exits non-zero without running any migration.
 3. Runs `wp spck migrate`.
 4. Prunes the backup directory down to the newest `$BACKUP_KEEP` dumps (default `10`).
 
@@ -103,7 +103,7 @@ These are non-sensitive configuration values. Set them with `gh variable set`.
 | `NEXT_PATH`            | SSH deployment only            | Absolute path to the **live Next.js path** on the remote server (example: `/var/www/next/current`). This path becomes a [symlink to the current](#ssh-release-strategy-when-vercel_project_id-is-empty) release. |
 | `PM2_APP_NAME`         | SSH deployment only            | PM2 application name used by `.github/actions/next-pm2` to run `pm2 describe`, then either `pm2 restart <app>` or `pm2 start ecosystem.config.js --only <app>`.                                                  |
 | `KEEP_RELEASES`        | SSH deployment only (optional) | Number of most recent releases to keep on server. Default: `5`.                                                                                                                                                  |
-| `BACKUP_PATH`          | Optional                       | Directory where `provision.sh` writes the DB dump taken before running pending migrations. Default: `$HOME/db-backups`.                                                                                          |
+| `BACKUP_PATH`          | Optional                       | Directory where `provision.sh` writes the DB dump taken before running pending migrations. Default: `$HOME/db-backups/<site>` (see above).                                                                       |
 | `BACKUP_KEEP`          | Optional                       | Number of most recent DB dumps to keep in `BACKUP_PATH`. Older ones are pruned after each backup. Default: `10`.                                                                                                 |
 | `VERCEL_ORG_ID`        | Vercel deployment only         | Your Vercel org/user ID. Found at vercel.com → Account settings → General (bottom of page).                                                                                                                      |
 | `VERCEL_PROJECT_ID`    | Vercel deployment only         | Your Vercel project ID. Found at vercel.com → Project → Settings → General (bottom of page). **If set, Vercel deployment is used; if empty, SSH deployment is used.**                                            |
