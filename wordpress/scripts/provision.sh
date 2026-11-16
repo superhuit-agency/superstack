@@ -258,10 +258,16 @@ fi
 GRAPHQL_JWT_AUTH_SECRET_KEY=$($WPCLI config get GRAPHQL_JWT_AUTH_SECRET_KEY --quiet 2> /dev/null)
 if [ -z "${GRAPHQL_JWT_AUTH_SECRET_KEY}" ]; then
 	if [ -z "${WORDPRESS_GRAPHQL_JWT_AUTH_SECRET_KEY}" ]; then
+		# 32 random bytes, never anything guessable: anyone who can guess the key can sign a token as any user.
+		# wp-cli's own PHP (random_bytes) when openssl is missing; stop rather than set a weak key.
 		if [ -x "$(command -v openssl)" ]; then
 			WORDPRESS_GRAPHQL_JWT_AUTH_SECRET_KEY="$(openssl rand -hex 32)"
 		else
-			WORDPRESS_GRAPHQL_JWT_AUTH_SECRET_KEY="$(date +%s | shasum | awk '{print $1}')"
+			WORDPRESS_GRAPHQL_JWT_AUTH_SECRET_KEY="$($WPCLI eval 'echo bin2hex(random_bytes(32));' --skip-wordpress 2> /dev/null)"
+		fi
+		if [ "${#WORDPRESS_GRAPHQL_JWT_AUTH_SECRET_KEY}" -ne 64 ]; then
+			echo "✘ Could not generate a GraphQL JWT Auth secret key: set WORDPRESS_GRAPHQL_JWT_AUTH_SECRET_KEY"
+			exit 1
 		fi
 		echo $en "- Generating GraphQL JWT Auth secret key for WP config $ec"
 	else
