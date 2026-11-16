@@ -36,6 +36,7 @@ services:
         define('WP_ALLOW_MULTISITE', 0);              
         define('WP_AUTO_UPDATE_CORE', 'minor');
         define('GRAPHQL_JWT_AUTH_SECRET_KEY', 'y8151qr3T-5PfcRnNOE3}8@vtO=m[PchP:bP:oZC4MD_EsPD.A@&|>xFAY*WM');
+        define('WP_ENVIRONMENT_TYPE', 'local');     // the local JWT key above is refused elsewhere
         if (getenv('WORDPRESS_URL')) {                // let each instance follow its own port
           define('WP_HOME', getenv('WORDPRESS_URL'));
           define('WP_SITEURL', getenv('WORDPRESS_URL'));
