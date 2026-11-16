@@ -61,6 +61,7 @@ require_once __DIR__ . '/admin/template-redirect-preview.php';
  */
 require_once __DIR__ . '/graphql/filter-blocksJSON-properties.php';
 require_once __DIR__ . '/graphql/graphql-endpoint-script.php';
+require_once __DIR__ . '/graphql/jwt-secret-key.php';
 require_once __DIR__ . '/graphql/navigation-inner-blocks.php';
 require_once __DIR__ . '/graphql/node-idtype.php';
 require_once __DIR__ . '/graphql/post-edit-link.php';
